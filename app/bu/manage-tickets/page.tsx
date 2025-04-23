@@ -1,8 +1,8 @@
 "use client"
 
 import React from 'react'
-import Navbar from '../components/Navbar/Navbar'
-import Header from '../components/Header/Header'
+import Navbar from '../../components/Navbar/Navbar'
+import Header from '../../components/Header/Header'
 
 function Page() {
     return (
