@@ -1,30 +1,29 @@
 "use client"
 
 import React, { useState } from 'react'
-import Navbar from '@/app/components/Navbar/Navbar'
-import Header from '@/app/components/Header/Header'
-import Title from '@/app/components/Title'
 import Image from 'next/image'
-import { companyData, routeData } from '@/provider/Provider'
 import { STATUS, FILTER } from '@/constants/enum'
-import ButtonBG from '@/app/components/Form/ButtonBG'
-import TableRoute from '@/app/components/RoutePage/TableRoute'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 
 //sweet alert
 import Swal from 'sweetalert2'
 
-//from companent 
+//companent 
 import SelectFilter from '@/app/components/RoutePage/SelectFilter'
+import ButtonBG from '@/app/components/Form/ButtonBG'
+import TableRoute from '@/app/components/RoutePage/TableRoute'
+import Navbar from '@/app/components/Navbar/Navbar'
+import Header from '@/app/components/Header/Header'
+import Title from '@/app/components/Title'
 
+//mock
+import { companyData, routeData } from '@/provider/Provider'
 
 function Page() {
 
     const router = useRouter();
     const pathname = usePathname();
-    console.log(pathname)
-
 
     const listCompany = companyData.map((item) => item.name)
     const listStatus = [
@@ -66,7 +65,7 @@ function Page() {
             item.route,
             item.company,
             item.schedule,
-            item.time.join(', '),
+            item.times.join(', '),
             item.status,
             item.routeColor
         );

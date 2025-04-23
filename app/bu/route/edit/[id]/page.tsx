@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation';
 
 //type
 import { StationProps } from '@/types/stations';
@@ -18,6 +19,9 @@ import { stationData } from '@/provider/Provider';
 
 
 function Page() {
+
+    const params = useParams();
+    console.log(params)
 
     //select route name
     const [routeName, setRouteName] = useState<string>()
@@ -42,7 +46,7 @@ function Page() {
     const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
         setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
     };
-
+    
 
     useEffect(() => {
         const stationIds = listB.map(station => station.id);
@@ -63,7 +67,7 @@ function Page() {
             <div className='w-full'>
                 <Header />
                 <div className='p-7 '>
-                    <p className='text-[20px] font-bold'>Add New Route</p>
+                    <p className='text-[20px] font-bold'>Edit Route</p>
                     <FormRoute
                         routeName={routeName}
                         setRouteName={setRouteName}

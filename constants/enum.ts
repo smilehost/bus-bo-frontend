@@ -12,8 +12,3 @@ export enum FILTER {
     ALL_STATUS = "All Status",
     ALL_COMPANIES = "All Companies"
 }
-
-export enum SCHEDULE {
-    DAILY = "Daily",
-    WEEKDAYS = "Weekdays",
-}

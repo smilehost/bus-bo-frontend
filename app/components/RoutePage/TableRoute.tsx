@@ -1,5 +1,7 @@
 import React from 'react'
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+//mui
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
@@ -10,6 +12,8 @@ import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 
 import { STATUS } from '@/constants/enum';
+import Link from 'next/link';
+
 type RouteData = {
   route: string;
   company: string;
@@ -26,6 +30,8 @@ type TableRouteProps = {
 
 function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
 
+  const pathname = usePathname();
+  
   //table
   const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -99,7 +105,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
                 <div className='flex gap-2 min-w-max'>
                   <div className='cursor-pointer'>
                     <Image
-                      src={"/icons/edit.svg"}
+                      src={"/icons/money.svg"}
                       width={1000}
                       height={1000}
                       alt='icon'
@@ -107,7 +113,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
                       className='w-[16px] h-[16px]'
                     />
                   </div>
-                  <div className='cursor-pointer'>
+                  <Link href={`${pathname}/edit/${index+1}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/edit.svg"}
                       width={1000}
@@ -116,7 +122,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
                       priority
                       className='w-[16px] h-[16px]'
                     />
-                  </div>
+                  </Link>
                   <div onClick={() => handleDeleteRoute({ route: row.route, index: index })} className='cursor-pointer'>
                     <Image
                       src={"/icons/garbage.svg"}
