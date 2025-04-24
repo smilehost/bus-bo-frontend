@@ -6,9 +6,7 @@ import React, { useState, useEffect } from 'react'
 import { StationProps } from '@/types/stations';
 
 //component 
-import Navbar from '@/app/components/Navbar/Navbar'
-import Header from '@/app/components/Header/Header'
-import FormRoute from '@/app/components/RoutePage/FormRoute';
+import FormRoute from '@/app/components/Form/FormRoute';
 
 //mui
 import { SelectChangeEvent } from '@mui/material';
@@ -20,7 +18,7 @@ import { stationData } from '@/provider/Provider';
 function Page() {
 
     //select route name
-    const [routeName, setRouteName] = useState<string>()
+    const [routeName, setRouteName] = useState<string>('')
 
     //select station
     const transformedList = stationData.map((station, index) => ({
@@ -58,27 +56,21 @@ function Page() {
     }
 
     return (
-        <div className='flex'>
-            <Navbar id={3} />
-            <div className='w-full'>
-                <Header />
-                <div className='p-7 '>
-                    <p className='text-[20px] font-bold'>Add New Route</p>
-                    <FormRoute
-                        routeName={routeName}
-                        setRouteName={setRouteName}
-                        listA={listA}
-                        setListA={setListA}
-                        listB={listB}
-                        setListB={setListB}
-                        selectedTime={selectedTime}
-                        handleChangeTime={handleChangeTime}
-                        schedule={schedule}
-                        handleChangeSchedule={handleChangeSchedule}
-                        handleSubmit={handleSubmit}
-                    />
-                </div>
-            </div>
+        <div>
+            <p className='text-[20px] font-bold'>Add New Route</p>
+            <FormRoute
+                routeName={routeName}
+                setRouteName={setRouteName}
+                listA={listA}
+                setListA={setListA}
+                listB={listB}
+                setListB={setListB}
+                selectedTime={selectedTime}
+                handleChangeTime={handleChangeTime}
+                schedule={schedule}
+                handleChangeSchedule={handleChangeSchedule}
+                handleSubmit={handleSubmit}
+            />
         </div>
     )
 }

@@ -66,7 +66,7 @@ function SelectTime({ selectedTime, onChange, timeData }: SelectTimeProps) {
                     startAdornment={(
                         <InputAdornment position="start">
                             <Image
-                                src="/icons/clock_gray.svg"
+                                src="/icons/clock-gray.svg"
                                 alt="clock icon"
                                 width={22}
                                 height={22}

@@ -4,7 +4,7 @@ type TitleProps = {
     title: string,
     description: string
 }
-function Title({ title, description }: TitleProps) {
+function TitlePage({ title, description }: TitleProps) {
     return (
         <div className='flex flex-col '>
             <p className='font-bold text-[20px]'>{title}</p>
@@ -13,4 +13,4 @@ function Title({ title, description }: TitleProps) {
     )
 }
 
-export default Title
+export default TitlePage

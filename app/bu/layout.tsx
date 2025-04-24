@@ -4,20 +4,16 @@ import React from 'react'
 import Navbar from '@/app/components/Navbar/Navbar'
 import Header from '@/app/components/Header/Header'
 
-function Page() {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className='flex'>
-            <Navbar id={1}/>
+            <Navbar />
             <div className='w-full'>
                 <Header />
                 <div className='p-7'>
-                    <div className='border h-[50px]'>
-
-                    </div>
+                    {children}
                 </div>
             </div>
         </div>
     )
 }
-
-export default Page

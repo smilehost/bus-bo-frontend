@@ -1,6 +1,8 @@
 import React from 'react'
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+
 //mui
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,15 +13,19 @@ import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 
+//const
 import { STATUS } from '@/constants/enum';
-import Link from 'next/link';
+
+//component
+import StatusText from '../StatusText';
 
 type RouteData = {
+  id: string
   route: string;
   company: string;
   schedule: string;
   time: string;
-  status: string;
+  status: STATUS;
   routeColor: string;
 };
 
@@ -91,15 +97,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
               <StyledTableCell align="left">{row.schedule}</StyledTableCell>
               <StyledTableCell align="left">{row.time}</StyledTableCell>
               <StyledTableCell align="left">
-                {row.status === STATUS.ACTIVE ? (
-                  <div className='px-2 py-1 bg-[#DCFCE7] rounded-xl w-fit text-[10px]'>
-                    {row.status}
-                  </div>
-                ) : (
-                  <div className='px-2 py-1 bg-[#F3F4F6] rounded-xl w-fit text-[10px]'>
-                    {row.status}
-                  </div>
-                )}
+               <StatusText type={row.status}/>
               </StyledTableCell>
               <StyledTableCell align="left">
                 <div className='flex gap-2 min-w-max'>
@@ -113,7 +111,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
                       className='w-[16px] h-[16px]'
                     />
                   </div>
-                  <Link href={`${pathname}/edit/${index+1}`} className='cursor-pointer'>
+                  <Link href={`${pathname}/edit/${row.id}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/edit.svg"}
                       width={1000}

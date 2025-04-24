@@ -19,7 +19,7 @@ import { StationProps } from '@/types/stations';
 
 type FormRouteProps = {
   routeName?: string | undefined;
-  setRouteName: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setRouteName: React.Dispatch<React.SetStateAction<string>>;
   listA: StationProps[];
   setListA: React.Dispatch<React.SetStateAction<StationProps[]>>;
   listB: StationProps[];

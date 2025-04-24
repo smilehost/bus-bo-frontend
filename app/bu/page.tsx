@@ -2,23 +2,11 @@
 
 import React from 'react'
 
-//component
-import Navbar from '@/app/components/Navbar/Navbar'
-import Header from '@/app/components/Header/Header'
-
 function Page() {
     return (
-        <div className='flex'>
-            <Navbar id={1}/>
-            <div className='w-full'>
-                <Header />
-                <div className='p-7'>
-                    <div className='border h-[50px]'>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div>
+        s
+      </div>
     )
 }
 

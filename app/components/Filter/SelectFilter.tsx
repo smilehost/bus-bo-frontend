@@ -5,13 +5,14 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select'
 
-type SelectFilterProps = {
+export type SelectFilterProps = {
     width: string;
     defaultValue: string;
     listValue?: string[];
     onChange?: (event: SelectChangeEvent) => void; // ✅ เพิ่ม onChange ที่ถูกต้อง
 
 }
+
 function SelectFilter({ width, defaultValue, listValue, onChange }: SelectFilterProps) {
     return (
 

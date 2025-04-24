@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
-body{
-  background-color: #F3F4F6;
+:root {
+  --main-gradient: linear-gradient(to right, #eab308, #f97316);
 }
 
-.bg-main {
-  @apply  bg-gradient-to-r from-[#EAB308] to-[#F97316];
+body {
+  background-color: #f3f4f6;
+}
+
+.custom-bg-main {
+  background-image: var(--main-gradient);
 }
 
 .hover\:bg-main:hover {
-  @apply bg-gradient-to-r from-[#EAB308] to-[#F97316];
+  background-image: var(--main-gradient);
+}
+
+.custom-btn-bg-main {
+  @apply px-4 py-2 rounded-md text-white cursor-pointer;
+  background-image: var(--main-gradient); /* ใช้ตัวแปรที่สร้าง */
 }
 
 .custom-border-gray {
   @apply border-1 border-[#D1D5DB];
 }
-

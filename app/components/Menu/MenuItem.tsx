@@ -10,7 +10,7 @@ type MenuItemProps = {
 }
 function MenuItem({ text, icon, status, link }: MenuItemProps) {
     return (
-        <Link href={link} className={`${status && 'bg-main'} hover:bg-main cursor-pointer flex gap-3 items-center px-4 py-3 rounded-lg  text-[12px]`}>
+        <Link href={link} className={`${status && 'custom-bg-main'} hover:bg-main cursor-pointer flex gap-3 items-center px-4 py-3 rounded-lg  text-[12px]`}>
             <Image src={icon}
                 priority
                 width={20}

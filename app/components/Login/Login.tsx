@@ -15,7 +15,7 @@ function Login() {
 
   return (
     <div className=' shadow-xl rounded-lg overflow-hidden'>
-      <div className='flex flex-col justify-center items-center gap-4 bg-main py-8 w-[448px] text-white'>
+      <div className='flex flex-col justify-center items-center gap-4 custom-bg-main py-8 w-[448px] text-white'>
         <div className='border-6 border-white rounded-full w-[64px] h-[64px] shadow-xl' />
         <div className='flex flex-col gap-2 items-center'>
           <p className='font-bold text-xl '>Bus Ticketing System</p>

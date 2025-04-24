@@ -8,7 +8,7 @@ type ProfileProps = {
 function Profile({ size, charactor }: ProfileProps) {
 
     return (
-        <div className={`${size} bg-main rounded-full flex justify-center items-center text-white`}>
+        <div className={`${size} custom-bg-main rounded-full flex justify-center items-center text-white`}>
             <p className='text-[14px] font-medium'>{charactor.toUpperCase()}</p>
         </div>
     )

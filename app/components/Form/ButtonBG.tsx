@@ -9,7 +9,7 @@ type ButtonBG = {
 }
 function ButtonBG({ size, text, icon, onClick }: ButtonBG) {
     return (
-        <button onClick={onClick} className={`bg-main border-1 border-[#D1D5DB] ${size} px-4 py-2 rounded-lg text-xs text-white cursor-pointer flex justify-center items-center gap-2`}>
+        <button onClick={onClick} className={`custom-btn-bg-main custom-border-gray  border-1 border-[#D1D5DB] ${size} px-4 py-2 rounded-lg text-xs text-white cursor-pointer flex justify-center items-center gap-2`}>
             {icon && (
                 <Image
                     src={icon}

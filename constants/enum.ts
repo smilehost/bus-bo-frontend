@@ -1,3 +1,4 @@
+
 export enum USER_TIER {
     ADMIN = "Admin",
     SUPER_ADMIN = "Super Admin",
@@ -5,7 +6,8 @@ export enum USER_TIER {
 
 export enum STATUS {
     ACTIVE = "Active",
-    INACTIVE = "Inactive"
+    INACTIVE = "Inactive",
+    CANCELLED = "Canceled",
 }
 
 export enum FILTER {

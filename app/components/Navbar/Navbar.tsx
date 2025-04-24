@@ -6,7 +6,7 @@ import { USER_TIER } from '@/constants/enum'
 import { userData } from '@/provider/Provider';
 
 type NavbarProps = {
-  id: number
+  id?: number
 }
 
 function Navbar({ id }: NavbarProps) {
@@ -17,11 +17,11 @@ function Navbar({ id }: NavbarProps) {
   const allMenu = [
     { id: 1, icon: "/icons/home.svg", text: "Dashboard", link: `${path}` },
     { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "" },
-    { id: 3, icon: "/icons/route.svg", text: "Manage Routes", link: `${path}/route` },
-    { id: 4, icon: "/icons/ticket.svg", text: "Manage Tickets", link: "" },
+    { id: 3, icon: "/icons/route.svg", text: "Manage Routes", link: `${path}/manage-route` },
+    { id: 4, icon: "/icons/ticket.svg", text: "Manage Tickets", link: `${path}/manage-ticket` },
     { id: 5, icon: "/icons/time.svg", text: "Manage Times", link: "" },
     { id: 6, icon: "/icons/date.svg", text: "Manage Date", link: "" },
-    { id: 7, icon: "/icons/users.svg", text: "Manage Members", link: "" },
+    { id: 7, icon: "/icons/users.svg", text: "Manage Members", link: `${path}/manage-members` },
     { id: 8, icon: "/icons/report.svg", text: "Reports", link: "" },
     { id: 9, icon: "/icons/company.svg", text: "Manage Company", link: "" },
   ]
