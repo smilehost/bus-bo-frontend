@@ -29,85 +29,7 @@ function Page() {
       schedule: "12:00, 13:00, 14:00",
       status: "Inactive",
     },
-    {
-      id: 3,
-      name: "รอบเย็น",
-      schedule: "18:00, 19:00",
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "รอบดึก",
-      schedule: "20:00, 21:00",
-      status: "Inactive",
-    },
-    {
-      id: 5,
-      name: "รอบดึก",
-      schedule: "22:00, 23:00",
-      status: "Inactive",
-    },
-    {
-      id: 6,
-      name: "รอบดึก",
-      schedule: "24:00, 25:00",
-      status: "Inactive",
-    },
-    {
-      id: 7,
-      name: "รอบดึก",
-      schedule: "26:00, 27:00",
-      status: "Inactive",
-    },
-    {
-      id: 8,
-      name: "รอบดึก",
-      schedule: "28:00, 29:00",
-      status: "Inactive",
-    },
-    {
-      id: 9,
-      name: "รอบดึก",
-      schedule: "30:00, 31:00",
-      status: "Inactive",
-    },
-    {
-      id: 10,
-      name: "รอบดึก",
-      schedule: "32:00, 33:00",
-      status: "Inactive",
-    },
-    {
-      id: 11,
-      name: "รอบดึก",
-      schedule: "34:00, 35:00",
-      status: "Inactive",
-    },
-    {
-      id: 12,
-      name: "รอบดึก",
-      schedule: "36:00, 37:00",
-      status: "Inactive",
-    },
-    {
-      id: 13,
-      name: "รอบดึก",
-      schedule: "38:00, 39:00",
-      status: "Inactive",
-    },
-    {
-      id: 14,
-      name: "รอบดึก",
-      schedule: "40:00, 41:00",
-      status: "Inactive",
-    },
-    {
-      id: 15,
-      name: "รอบดึก",
-      schedule: "42:00, 43:00",
-      status: "Inactive",
-    },
-    // เพิ่มข้อมูลเพิ่มเติมตามต้องการ
+    // ...existing data...
   ]);
 
   const [showModal, setShowModal] = useState(false);
@@ -119,8 +41,6 @@ function Page() {
     schedule: string;
     status: "Active" | "Inactive";
     times?: string[];
-    startTime?: string;
-    endTime?: string;
   } | undefined>(undefined);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -139,14 +59,13 @@ function Page() {
   const handleSaveTime = (newTimeEntry: {
     name: string;
     startTime: string;
-    endTime: string;
     times: string[];
     status: string;
   }) => {
     const schedule =
       newTimeEntry.times.length > 0
         ? newTimeEntry.times.join(", ")
-        : `${newTimeEntry.startTime} - ${newTimeEntry.endTime}`;
+        : newTimeEntry.startTime;
 
     const newTime = {
       id: editingTime
@@ -184,16 +103,9 @@ function Page() {
         ? timeToEdit.schedule.split(",").map((t) => t.trim())
         : [];
 
-      const [startTime, endTime] =
-        !timesList.length && timeToEdit.schedule.includes("-")
-          ? timeToEdit.schedule.split("-").map((t) => t.trim())
-          : ["", ""];
-
       setEditingTime({
         ...timeToEdit,
         times: timesList,
-        startTime,
-        endTime,
       });
 
       setShowModal(true);
@@ -257,9 +169,8 @@ function Page() {
             editingTime
               ? {
                   ...editingTime,
-                  startTime: editingTime.startTime || "",
-                  endTime: editingTime.endTime || "",
                   times: editingTime.times || [],
+                  startTime: editingTime.times?.[0] || "", // Provide a default startTime
                 }
               : undefined
           }

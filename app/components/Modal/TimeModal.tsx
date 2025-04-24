@@ -5,14 +5,12 @@ interface TimeModalProps {
   onSave: (data: {
     name: string;
     startTime: string;
-    endTime: string;
     times: string[];
     status: string;
   }) => void;
   editingTime?: {
     name: string;
     startTime: string;
-    endTime: string;
     times: string[];
     status: string;
   };
@@ -22,7 +20,6 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
   const [newTime, setNewTime] = useState({
     name: editingTime?.name || "",
     startTime: editingTime?.startTime || "",
-    endTime: editingTime?.endTime || "",
     times: editingTime?.times || [],
     status: editingTime?.status || "Active",
   });
@@ -35,8 +32,8 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
       return;
     }
 
-    if (!newTime.startTime || !newTime.endTime) {
-      alert("Please select both start time and end time");
+    if (!newTime.startTime) {
+      alert("Please select a start time");
       return;
     }
 
@@ -101,64 +98,33 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
             />
           </div>
 
-          {/* Time Range Selector */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                Start Time
-              </label>
-              <div className="relative">
-                <input
-                  type="time"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none pr-10 transition"
-                  value={newTime.startTime}
-                  onChange={(e) =>
-                    setNewTime({ ...newTime, startTime: e.target.value })
-                  }
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                End Time
-              </label>
-              <div className="relative">
-                <input
-                  type="time"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none pr-10 transition"
-                  value={newTime.endTime}
-                  onChange={(e) =>
-                    setNewTime({ ...newTime, endTime: e.target.value })
-                  }
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+          {/* Start Time Selector */}
+          <div className="mb-6">
+            <label className="block mb-2 font-medium text-gray-700">
+              Start Time
+            </label>
+            <div className="relative">
+              <input
+                type="time"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none pr-10 transition"
+                value={newTime.startTime}
+                onChange={(e) =>
+                  setNewTime({ ...newTime, startTime: e.target.value })
+                }
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </div>
             </div>
           </div>
@@ -211,7 +177,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293-1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                             clipRule="evenodd"
                           />
                         </svg>
