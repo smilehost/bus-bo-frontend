@@ -14,7 +14,7 @@ function Page() {
       id: number;
       name: string;
       schedule: string;
-      status: string;
+      status: "Active" | "Inactive";
     }>
   >([
     {
@@ -117,20 +117,23 @@ function Page() {
     id: number;
     name: string;
     schedule: string;
-    status: string;
-  } | null>(null);
+    status: "Active" | "Inactive";
+    times?: string[];
+    startTime?: string;
+    endTime?: string;
+  } | undefined>(undefined);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleAddTime = () => {
-    setEditingTime(null);
+    setEditingTime(undefined);
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditingTime(null);
+    setEditingTime(undefined);
   };
 
   const handleSaveTime = (newTimeEntry: {
@@ -153,7 +156,7 @@ function Page() {
         : 1,
       name: newTimeEntry.name,
       schedule,
-      status: newTimeEntry.status,
+      status: newTimeEntry.status as "Active" | "Inactive",
     };
 
     if (editingTime) {
@@ -167,7 +170,7 @@ function Page() {
     setSearchTerm(""); // รีเซตการค้นหา
     setStatusFilter("All Status"); // รีเซต filter ให้แสดงครบ
     setShowModal(false);
-    setEditingTime(null);
+    setEditingTime(undefined);
   };
 
   const handleDeleteTime = (id: number) => {
@@ -250,7 +253,16 @@ function Page() {
         <TimeModal
           onClose={handleCloseModal}
           onSave={handleSaveTime}
-          editingTime={editingTime}
+          editingTime={
+            editingTime
+              ? {
+                  ...editingTime,
+                  startTime: editingTime.startTime || "",
+                  endTime: editingTime.endTime || "",
+                  times: editingTime.times || [],
+                }
+              : undefined
+          }
         />
       )}
     </div>

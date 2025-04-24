@@ -156,19 +156,20 @@ function Page() {
   };
 
   const handleSaveDate = (newDateEntry: {
-    id: number;
-    name: string;
-    days: {
-      monday: boolean;
-      tuesday: boolean;
-      wednesday: boolean;
-      thursday: boolean;
-      friday: boolean;
-      saturday: boolean;
-      sunday: boolean;
-    };
-    status: string;
-  }) => {
+        name: string;
+        startDate: string;
+        endDate: string;
+        days: {
+          monday: boolean;
+          tuesday: boolean;
+          wednesday: boolean;
+          thursday: boolean;
+          friday: boolean;
+          saturday: boolean;
+          sunday: boolean;
+        };
+        status: string;
+      }) => {
     if (editingDate) {
       // กรณีแก้ไขรายการเดิม
       setDates(
@@ -180,7 +181,7 @@ function Page() {
       );
     } else {
       // กรณีเพิ่มรายการใหม่
-      setDates([...dates, { ...newDateEntry, id: dates.length + 1 }]);
+      setDates([...dates, { ...newDateEntry, id: dates.length ? dates[dates.length - 1].id + 1 : 1 }]);
     }
     setShowModal(false);
     setEditingDate(null);
@@ -247,11 +248,11 @@ function Page() {
         <DateModal
           onClose={handleCloseModal}
           onSave={handleSaveDate}
-          editingDate={editingDate}
+          editingDate={editingDate || undefined}
         />
       )}
     </div>
   );
 }
 
-export default Page;
+export default Page

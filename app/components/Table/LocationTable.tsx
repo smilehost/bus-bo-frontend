@@ -1,12 +1,12 @@
 import React from "react";
 import Pagination from "../Pagination/Pagination";
 
-type DateTableProps = {
-  dates: {
+type LocationTableProps = {
+  locations: {
     id: number;
     name: string;
-    days: Record<string, boolean>;
-    status: string;
+    latitude: number;
+    longitude: number;
   }[];
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
@@ -17,8 +17,8 @@ type DateTableProps = {
   onRowsPerPageChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
-function DateTable({
-  dates,
+function LocationTable({
+  locations,
   onDelete,
   onEdit,
   currentPage,
@@ -26,24 +26,16 @@ function DateTable({
   rowsPerPage,
   totalResults,
   onRowsPerPageChange,
-}: DateTableProps) {
-  const englishDays = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-
+}: LocationTableProps) {
   const totalPages = Math.ceil(totalResults / rowsPerPage);
 
   return (
     <div className="flex flex-col space-y-6">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
         <div className="bg-gray-50 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
-          <h3 className="text-lg font-medium text-gray-800">Available Dates</h3>
+          <h3 className="text-lg font-medium text-gray-800">
+            Manage Locations
+          </h3>
           <div className="text-sm text-gray-500">
             Total: {totalResults} entries
           </div>
@@ -57,20 +49,13 @@ function DateTable({
                   No.
                 </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
-                  Name
+                  Location Name
                 </th>
-                {englishDays.map((day, index) => (
-                  <th
-                    key={day}
-                    className={`sticky top-0 py-4 px-4 bg-gray-50 border-b-2 border-gray-200 font-semibold text-center ${
-                      index >= 5 ? "text-red-600" : "text-gray-600"
-                    }`}
-                  >
-                    <span className="block">{day}</span>
-                  </th>
-                ))}
-                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center w-24">
-                  Status
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                  Latitude
+                </th>
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                  Longitude
                 </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center w-24">
                   Actions
@@ -78,16 +63,16 @@ function DateTable({
               </tr>
             </thead>
             <tbody>
-              {dates.length === 0 ? (
+              {locations.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-8 text-center text-gray-500">
-                    No data found
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
+                    No locations found
                   </td>
                 </tr>
               ) : (
-                dates.map((date, index) => (
+                locations.map((loc, index) => (
                   <tr
-                    key={date.id}
+                    key={loc.id}
                     className={`transition-all duration-200 hover:bg-blue-50/70 ${
                       index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                     }`}
@@ -96,67 +81,38 @@ function DateTable({
                       {index + 1 + (currentPage - 1) * rowsPerPage}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200 font-medium text-gray-800">
-                      {date.name}
+                      {loc.name}
                     </td>
-                    {englishDays.map((day, dayIndex) => (
-                      <td
-                        key={day}
-                        className={`py-4 px-4 border-b border-gray-200 text-center ${
-                          dayIndex >= 5 ? "bg-red-50/30" : ""
-                        }`}
-                      >
-                        {date.days[day.toLowerCase()] ? (
-                          <span className="inline-flex items-center justify-center w-7 h-7 bg-green-100 text-green-600 rounded-full shadow-sm transition-transform hover:scale-110">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center justify-center w-7 h-7 bg-red-100 text-red-600 rounded-full shadow-sm transition-transform hover:scale-110">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                    <td className="py-4 px-6 border-b border-gray-200">
-                      <div className="flex items-center justify-center">
-                        {date.status === "Active" ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
-                            <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-                            <span>Active</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
-                            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-                            <span>Inactive</span>
-                          </span>
-                        )}
-                      </div>
+                    <td className="py-4 px-6 border-b border-gray-200 text-center">
+                      {loc.latitude}
+                    </td>
+                    <td className="py-4 px-6 border-b border-gray-200 text-center">
+                      {loc.longitude}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200">
                       <div className="flex justify-center space-x-2">
+                        <a
+                          href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 bg-purple-50 rounded-lg text-purple-600 hover:bg-purple-100 transition-colors hover:shadow-sm"
+                          title="View on Map"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.05 3.05a7 7 0 119.9 9.9L10 20l-4.95-7.05a7 7 0 010-9.9zM10 10a2 2 0 100-4 2 2 0 000 4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </a>
                         <button
-                          onClick={() => onEdit(date.id)}
+                          onClick={() => onEdit(loc.id)}
                           className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"
                           title="Edit"
                         >
@@ -170,7 +126,7 @@ function DateTable({
                           </svg>
                         </button>
                         <button
-                          onClick={() => onDelete(date.id)}
+                          onClick={() => onDelete(loc.id)}
                           className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
                           title="Delete"
                         >
@@ -210,4 +166,4 @@ function DateTable({
   );
 }
 
-export default DateTable;
+export default LocationTable;
