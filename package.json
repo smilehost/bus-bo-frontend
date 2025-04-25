@@ -12,6 +12,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^7.0.2",
+    "axios": "^1.9.0",
     "bus_bo_frontend": "file:",
     "next": "15.3.1",
     "react": "^19.0.0",
