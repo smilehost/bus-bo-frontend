@@ -1,18 +1,24 @@
 import React from 'react'
+import LabelText from './LabelText'
 
 type InputLabelProps = {
     label: string,
     placeholder: string,
-    setValue?: () => void;
+    setValue: (value: string) => void;
+    value?: string | undefined;
+    type: string,
+    size?: string
 }
-function InputLabel({ label, placeholder }: InputLabelProps) {
+function InputLabel({ label, placeholder, setValue, type, size, value }: InputLabelProps) {
     return (
-        <div className='flex flex-col gap-1'>
-            <label className='text-xs'>{label}</label>
+        <div className='flex flex-col gap-2'>
+            <LabelText text={label} />
             <input
-                type="text"
+                value={value}
+                type={type}
                 placeholder={placeholder}
-                className='py-1 px-5 border rounded-md border-[#D1D5DB] text-[14px]'
+                className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] ${size}`}
+                onChange={(e) => setValue(e.target.value)}
             />
         </div>
     )
