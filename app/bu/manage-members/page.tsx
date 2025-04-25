@@ -13,9 +13,13 @@ import MemberModel from '@/app/components/Model/MemberModel'
 import { FILTER, STATUS } from '@/constants/enum'
 
 //mock
-import { companyData, membersData, userData } from '@/provider/Provider'
+import { useDataStore } from "@/stores/dataStore";
 
 function Page() {
+
+    const companyData = useDataStore(state => state.companyData);
+    const membersData = useDataStore(state => state.membersData);
+    const userData = useDataStore(state => state.userData);
 
     //member data
     const [members, setMembers] = useState(membersData)

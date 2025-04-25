@@ -14,9 +14,15 @@ import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 
 //mock
-import { companyData, routeData, timeData, scheduleData } from '@/provider/Provider'
+import { useDataStore } from "@/stores/dataStore";
 
 function Page() {
+
+    //mock
+    const companyData = useDataStore(state => state.companyData);
+    const routeData = useDataStore(state => state.routeData);
+    const timeData = useDataStore(state => state.timeData);
+    const scheduleData = useDataStore(state => state.scheduleData);
 
     const router = useRouter();
     const pathname = usePathname();

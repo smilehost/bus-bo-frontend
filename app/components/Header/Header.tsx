@@ -1,7 +1,10 @@
 import React from 'react'
-import { userData } from '@/provider/Provider'
+import { useDataStore } from "@/stores/dataStore";
 import Profile from '../Profile'
+
 function Header() {
+
+    const userData = useDataStore(state => state.userData);
 
     const name = userData.name
     const user_tier = userData.user_tier
