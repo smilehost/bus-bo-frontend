@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "../../components/Navbar/Navbar";
-import Header from "../../components/Header/Header";
+// ลบการ import Navbar และ Header
 import TimeTable from "../../components/Table/TimeTable";
 import TimeModal from "../../components/Modal/TimeModal";
 import SearchFilter from "../../components/SearchFilter/TimeSearchFilter";
@@ -129,9 +128,8 @@ function Page() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Navbar />
+      {/* ลบ Navbar และ Header */}
       <div className="flex-1 flex flex-col">
-        <Header />
         <div className="p-7">
           <PageHeader onAddTime={handleAddTime} />
 

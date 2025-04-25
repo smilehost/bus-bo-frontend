@@ -6,9 +6,10 @@ type MenuItemProps = {
     text: string,
     icon: string,
     status: boolean,
-    link: string
+    link: string,
+    onClick?: () => void // Optional onClick property
 }
-function MenuItem({ text, icon, status, link }: MenuItemProps) {
+function MenuItemLink({ text, icon, status, link }: MenuItemProps) {
     return (
         <Link href={link} className={`${status && 'custom-bg-main'} hover:bg-main cursor-pointer flex gap-3 items-center px-4 py-3 rounded-lg  text-[12px]`}>
             <Image src={icon}
@@ -46,4 +47,4 @@ function MenuItem({ text, icon, status, onClick }: MenuItemProps) {
   )
 }
 
-export default MenuItem
+export default MenuItemLink

@@ -13,7 +13,7 @@ function PageHeader({ onAddLocation }: PageHeaderProps) {
       </div>
       <button 
         onClick={onAddLocation}
-        className="bg-main hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center"
+        className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center"
       >
         <span className="mr-2">+</span>
         Add New Location

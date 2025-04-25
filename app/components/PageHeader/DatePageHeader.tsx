@@ -11,9 +11,9 @@ function PageHeader({ onAddDate }: PageHeaderProps) {
         <h1 className="text-2xl font-semibold">Manage Date</h1>
         <p className="text-gray-500">View and manage date information</p>
       </div>
-      <button 
+      <button
         onClick={onAddDate}
-        className="bg-main hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center"
+        className="px-4 py-2 text-white font-medium bg-gradient-to-r from-yellow-500 to-orange-500 rounded-md flex items-center hover:opacity-90"
       >
         <span className="mr-2">+</span>
         Add New Date

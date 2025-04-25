@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "../../components/Navbar/Navbar";
-import Header from "../../components/Header/Header";
+// ลบการ import Navbar และ Header
 import DateTable from "../../components/Table/DateTable";
 import DateModal from "../../components/Modal/DateModal";
 import SearchFilter from "../../components/SearchFilter/DateSearchFilter";
@@ -86,22 +85,21 @@ function Page() {
   };
 
   const handleSaveDate = (newDateEntry: {
-        name: string;
-        startDate: string;
-        endDate: string;
-        days: {
-          monday: boolean;
-          tuesday: boolean;
-          wednesday: boolean;
-          thursday: boolean;
-          friday: boolean;
-          saturday: boolean;
-          sunday: boolean;
-        };
-        status: string;
-      }) => {
+    name: string;
+    startDate: string;
+    endDate: string;
+    days: {
+      monday: boolean;
+      tuesday: boolean;
+      wednesday: boolean;
+      thursday: boolean;
+      friday: boolean;
+      saturday: boolean;
+      sunday: boolean;
+    };
+    status: string;
+  }) => {
     if (editingDate) {
-      // กรณีแก้ไขรายการเดิม
       setDates(
         dates.map((date) =>
           date.id === editingDate.id
@@ -110,8 +108,10 @@ function Page() {
         )
       );
     } else {
-      // กรณีเพิ่มรายการใหม่
-      setDates([...dates, { ...newDateEntry, id: dates.length ? dates[dates.length - 1].id + 1 : 1 }]);
+      setDates([
+        ...dates,
+        { ...newDateEntry, id: dates.length ? dates[dates.length - 1].id + 1 : 1 },
+      ]);
     }
     setShowModal(false);
     setEditingDate(null);
@@ -129,7 +129,6 @@ function Page() {
     }
   };
 
-  // กรองข้อมูลตาม Search และ Status Filter
   const filteredDates = dates.filter(
     (date) =>
       date.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -138,7 +137,6 @@ function Page() {
         (statusFilter === "Inactive" && date.status === "Inactive"))
   );
 
-  // คำนวณข้อมูลที่จะแสดงในหน้าปัจจุบัน
   const paginatedDates = filteredDates.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
@@ -146,9 +144,8 @@ function Page() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Navbar />
+      {/* ลบ Navbar และ Header */}
       <div className="flex-1 flex flex-col">
-        <Header />
         <div className="p-7">
           <PageHeader onAddDate={handleAddDate} />
 
@@ -167,7 +164,9 @@ function Page() {
               currentPage={currentPage}
               onPageChange={setCurrentPage}
               rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+              onRowsPerPageChange={(e) =>
+                setRowsPerPage(Number(e.target.value))
+              }
               totalResults={filteredDates.length}
             />
           </div>
@@ -185,4 +184,4 @@ function Page() {
   );
 }
 
-export default Page
+export default Page;
