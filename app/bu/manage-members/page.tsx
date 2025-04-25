@@ -34,7 +34,6 @@ function Page() {
         const matchesStatus = searchStatus && searchStatus !== FILTER.ALL_STATUS ? item.member_status === searchStatus : true;
         const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? company?.toLowerCase().includes(searchCompany.toLowerCase()) : true;
         const matchesSearch = search ? item.member_name.toLowerCase().includes(search.toLowerCase()) : true;
-        console.log(searchCompany)
         return matchesStatus && matchesCompany && matchesSearch;
     });
 
