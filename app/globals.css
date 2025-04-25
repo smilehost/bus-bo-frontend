@@ -24,3 +24,7 @@ body {
 .custom-border-gray {
   @apply border-1 border-[#D1D5DB];
 }
+
+.custom-frame-content {
+  @apply bg-white rounded-lg shadow-xs mt-5;
+}

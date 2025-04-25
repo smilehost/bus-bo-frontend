@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChromePicker, ColorResult } from 'react-color'; 
+import { ColorResult } from 'react-color'; 
 import LabelText from './LabelText';
+
+//component 
+import ColorModel from '../Model/ColorModel';
 
 type ColorRouteProps = {
     color: string;
@@ -53,11 +56,8 @@ function ColorRoute({ color, setRouteColor }: ColorRouteProps) {
                 />
             </div>
 
-            {showColorPicker && (
-                <div className="mt-2 absolute top-[100%] z-10">
-                    <ChromePicker color={color} onChangeComplete={handleChangeComplete} />
-                </div>
-            )}
+            <ColorModel color={color} onChangeComplete={handleChangeComplete} show={showColorPicker} />
+
         </div>
     );
 }

@@ -30,10 +30,11 @@ function Page() {
     const [search, setSearch] = useState<string>(''); // Search input
 
     const filtered = members.filter((item) => {
+        const company = companyData.find((com) => com.id === item.member_company_id)?.name || ''
         const matchesStatus = searchStatus && searchStatus !== FILTER.ALL_STATUS ? item.member_status === searchStatus : true;
-        const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? item.member_company_id?.toLowerCase().includes(searchCompany.toLowerCase()) : true;
+        const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? company?.toLowerCase().includes(searchCompany.toLowerCase()) : true;
         const matchesSearch = search ? item.member_name.toLowerCase().includes(search.toLowerCase()) : true;
-
+        console.log(searchCompany)
         return matchesStatus && matchesCompany && matchesSearch;
     });
 
@@ -83,6 +84,7 @@ function Page() {
     const getCompanyName = ({ id }: { id: string }) => {
         return companyData.find((com) => com.id === id)?.name || ''
     }
+
     return (
         <div>
             <div className='flex justify-between items-end'>
@@ -90,7 +92,7 @@ function Page() {
                 <ButtonBG size='h-[38px]' text='Add New Member' icon='/icons/plus.svg' onClick={handleOpenMemberModel} />
             </div>
             <FormFilter setSearch={setSearch} placeholderSearch='Search by phone or name...' filter={filterSearch} />
-            <div className='bg-white rounded-lg shadow-xs mt-5 '>
+            <div className='custom-frame-content'>
                 {filtered?.map((item, index) => {
                     const company = getCompanyName({ id: item.member_company_id });
                     return (

@@ -56,7 +56,7 @@ function FormRoute({
   console.log('routeColor', routeColor)
 
   return (
-    <form onSubmit={handleSubmit} className='bg-white px-5 py-7 rounded-lg mt-5 w-full'>
+    <form onSubmit={handleSubmit} className='custom-frame-content px-5 py-7 mt-5 w-full'>
       <div className="lg:mx-20">
         <div className='flex justify-between flex-wrap gap-3'>
           {/* route name */}

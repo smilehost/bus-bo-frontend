@@ -40,6 +40,7 @@ function Page() {
         schedule: string,
         time: string,
         status: STATUS,
+        // ticket_amount: string,
         routeColor: string
     ) => {
         return { id, route, company, schedule, time, status, routeColor };
@@ -70,6 +71,8 @@ function Page() {
         const timeId = item.times_id
         const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
 
+        //ticket amount 
+        // const realTicketAmount = item.ticket_amount
         return createData(
             item.id,
             item.route,

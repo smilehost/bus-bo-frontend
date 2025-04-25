@@ -19,7 +19,7 @@ type FormFilterProps = {
 
 function FormFilter({ setSearch, placeholderSearch, filter }: FormFilterProps) {
     return (
-        <div className='bg-white rounded-lg shadow-xs mt-5 p-3 flex items-center'>
+        <div className='custom-frame-content mt-5 p-3 flex items-center'>
             <div className='flex-1'>
                 {setSearch && (
                     <input
