@@ -1,7 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
+
+// Mock token only in browser
+if (typeof window !== "undefined" && !localStorage.getItem("token_bo")) {
+  localStorage.setItem("token_bo", "mock-token-1234");
+}
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -10,35 +15,42 @@ const instance = axios.create({
   },
 });
 
+// Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token_bo");
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
-      com_id: 1
+    if (config.headers) {
+      config.headers.set("Authorization", token ? `Bearer ${token}` : "");
+      config.headers.set("com_id", "1"); // ใส่ com_id แค่ใน header เท่านั้น
     }
   }
   return config;
 });
 
+// Interceptor หลังรับ response
 instance.interceptors.response.use(
   (response) => {
     const code = response.data?.code;
     if (code === 20000 || code === 10011 || code === 22006) {
+      console.warn("Token expired or unauthorized!", response.data);
       localStorage.clear();
-      if (typeof window !== "undefined") window.location.href = CONTEXT_PATH;
+      if (process.env.NODE_ENV !== "development") {
+        window.location.href = CONTEXT_PATH;
+      }
     }
     return response;
   },
   (error) => {
     console.error("API Error:", error);
     localStorage.clear();
-    if (typeof window !== "undefined") window.location.href = CONTEXT_PATH;
+    if (process.env.NODE_ENV !== "development") {
+      window.location.href = CONTEXT_PATH;
+    }
     return Promise.reject(error);
   }
 );
 
-// Define payload interfaces
+// Service layer (สำหรับเรียกใช้งาน)
 interface Payload {
   path: string;
   params?: string | number;

@@ -4,12 +4,13 @@ import Pagination from "../Pagination/Pagination";
 interface Time {
   id: number;
   name: string;
-  schedule: string;
+  schedule: string[]; // ✅ เปลี่ยนเป็น array
   status: "Active" | "Inactive";
 }
 
 interface TimeTableProps {
   times: Time[];
+  isLoading?: boolean;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   currentPage: number;
@@ -21,6 +22,7 @@ interface TimeTableProps {
 
 function TimeTable({
   times,
+  isLoading = false,
   onEdit,
   onDelete,
   currentPage,
@@ -29,12 +31,10 @@ function TimeTable({
   onRowsPerPageChange,
   totalResults = 0,
 }: TimeTableProps) {
-  // Calculate total pages
   const totalPages = Math.ceil(totalResults / rowsPerPage);
 
   return (
     <div className="flex flex-col space-y-6">
-      {/* Times List */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
         <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -47,7 +47,11 @@ function TimeTable({
           </div>
         </div>
 
-        {times.length === 0 ? (
+        {isLoading ? (
+          <div className="p-8 text-center text-gray-500 animate-pulse">
+            Loading time schedules...
+          </div>
+        ) : times.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             No time schedules found
           </div>
@@ -105,47 +109,41 @@ function TimeTable({
                     clipRule="evenodd"
                   />
                 </svg>
-                {time.schedule}
+                {Array.isArray(time.schedule)
+                  ? time.schedule.join(", ")
+                  : String(time.schedule)}
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex justify-center space-x-2">
                 <button
                   onClick={() => onEdit(time.id)}
-                  className="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-1.5 rounded-lg transition-colors duration-150"
-                  aria-label="Edit"
+                  className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"
+                  title="Edit"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 </button>
                 <button
                   onClick={() => onDelete(time.id)}
-                  className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors duration-150"
-                  aria-label="Delete"
+                  className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
+                  title="Delete"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      fillRule="evenodd"
+                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                      clipRule="evenodd"
                     />
                   </svg>
                 </button>

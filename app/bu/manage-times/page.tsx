@@ -1,49 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
-// ลบการ import Navbar และ Header
-import TimeTable from "../../components/Table/TimeTable";
-import TimeModal from "../../components/Modal/TimeModal";
-import SearchFilter from "../../components/SearchFilter/TimeSearchFilter";
-import PageHeader from "../../components/PageHeader/TimePageHeader";
+import React, { useState, useEffect } from "react";
+import TimeTable from "@/app/components/Table/TimeTable";
+import TimeModal from "@/app/components/Modal/TimeModal";
+import SearchFilter from "@/app/components/SearchFilter/TimeSearchFilter";
+import PageHeader from "@/app/components/PageHeader/TimePageHeader";
+import { TimeService, TimeItem } from "@/app/services/time.service";
 
 function Page() {
-  const [times, setTimes] = useState<
-    Array<{
-      id: number;
-      name: string;
-      schedule: string;
-      status: "Active" | "Inactive";
-    }>
-  >([
-    {
-      id: 1,
-      name: "รอบเช้า",
-      schedule: "08:00, 09:00, 15:00, 17:00",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "รอบบ่าย",
-      schedule: "12:00, 13:00, 14:00",
-      status: "Inactive",
-    },
-    // ...existing data...
-  ]);
-
-  const [showModal, setShowModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
-  const [editingTime, setEditingTime] = useState<{
-    id: number;
-    name: string;
-    schedule: string;
-    status: "Active" | "Inactive";
-    times?: string[];
-  } | undefined>(undefined);
-
+  const [times, setTimes] = useState<TimeItem[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [showModal, setShowModal] = useState(false);
+  const [editingTime, setEditingTime] = useState<
+    (TimeItem & { times?: string[]; startTime?: string }) | undefined
+  >(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchTimes = async () => {
+    setIsLoading(true);
+    try {
+      const res = await TimeService.fetchTimes(
+        currentPage,
+        rowsPerPage,
+        searchTerm,
+        statusFilter !== "All Status" ? statusFilter : undefined
+      );
+      setTimes(res.data);
+      setTotalResults(res.total);
+    } catch (err) {
+      console.error("โหลดข้อมูลล้มเหลว", err);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTimes();
+  }, [currentPage, rowsPerPage, searchTerm, statusFilter]);
 
   const handleAddTime = () => {
     setEditingTime(undefined);
@@ -55,7 +51,7 @@ function Page() {
     setEditingTime(undefined);
   };
 
-  const handleSaveTime = (newTimeEntry: {
+  const handleSaveTime = async (newTimeEntry: {
     name: string;
     startTime: string;
     times: string[];
@@ -63,78 +59,51 @@ function Page() {
   }) => {
     const schedule =
       newTimeEntry.times.length > 0
-        ? newTimeEntry.times.join(", ")
-        : newTimeEntry.startTime;
-
-    const newTime = {
-      id: editingTime
-        ? editingTime.id
-        : times.length > 0
-        ? Math.max(...times.map((t) => t.id)) + 1
-        : 1,
-      name: newTimeEntry.name,
-      schedule,
-      status: newTimeEntry.status as "Active" | "Inactive",
-    };
+        ? newTimeEntry.times
+        : [newTimeEntry.startTime];
 
     if (editingTime) {
-      setTimes(
-        times.map((time) => (time.id === editingTime.id ? newTime : time))
-      );
+      await TimeService.updateTime(editingTime.id, {
+        name: newTimeEntry.name,
+        schedule,
+        status: newTimeEntry.status,
+      });
     } else {
-      setTimes([...times, newTime]);
+      await TimeService.createTime({
+        name: newTimeEntry.name,
+        schedule,
+        status: newTimeEntry.status,
+      });
     }
 
-    setSearchTerm(""); // รีเซตการค้นหา
-    setStatusFilter("All Status"); // รีเซต filter ให้แสดงครบ
-    setShowModal(false);
-    setEditingTime(undefined);
+    fetchTimes(); // รีโหลดข้อมูลหลังบันทึก
+    handleCloseModal();
   };
 
-  const handleDeleteTime = (id: number) => {
-    setTimes(times.filter((time) => time.id !== id));
+  const handleDeleteTime = async (id: number) => {
+    await TimeService.deleteTime(id);
+    fetchTimes();
   };
 
   const handleEditTime = (id: number) => {
     const timeToEdit = times.find((time) => time.id === id);
     if (timeToEdit) {
-      const timesList = timeToEdit.schedule.includes(",")
-        ? timeToEdit.schedule.split(",").map((t) => t.trim())
-        : [];
-
       setEditingTime({
         ...timeToEdit,
-        times: timesList,
+        times: timeToEdit.schedule,
+        startTime: timeToEdit.schedule[0] || "",
       });
-
       setShowModal(true);
     }
   };
 
-  // กรองข้อมูลตาม Search และ Status Filter
-  const filteredTimes = times.filter(
-    (time) =>
-      time.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "All Status" ||
-        (statusFilter === "Active" && time.status === "Active") ||
-        (statusFilter === "Inactive" && time.status === "Inactive"))
-  );
-
-  // คำนวณข้อมูลที่จะแสดงในหน้าปัจจุบัน
-  const paginatedTimes = filteredTimes.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* ลบ Navbar และ Header */}
       <div className="flex-1 flex flex-col">
         <div className="p-7">
           <PageHeader onAddTime={handleAddTime} />
 
           <div className="bg-white rounded-md shadow p-5">
-            {/* Search Filter */}
             <SearchFilter
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
@@ -142,9 +111,15 @@ function Page() {
               setStatusFilter={setStatusFilter}
             />
 
-            {/* Time Table */}
             <TimeTable
-              times={paginatedTimes}
+              times={times.map((time) => ({
+                ...time,
+                status:
+                  time.status === "Active" || time.status === "Inactive"
+                    ? time.status
+                    : "Inactive",
+              }))}
+              isLoading={isLoading}
               onDelete={handleDeleteTime}
               onEdit={handleEditTime}
               currentPage={currentPage}
@@ -153,7 +128,7 @@ function Page() {
               onRowsPerPageChange={(e) =>
                 setRowsPerPage(Number(e.target.value))
               }
-              totalResults={filteredTimes.length}
+              totalResults={totalResults}
             />
           </div>
         </div>
@@ -167,8 +142,13 @@ function Page() {
             editingTime
               ? {
                   ...editingTime,
+                  startTime: editingTime.startTime || "",
                   times: editingTime.times || [],
-                  startTime: editingTime.times?.[0] || "", // Provide a default startTime
+                  status:
+                    editingTime.status === "Active" ||
+                    editingTime.status === "Inactive"
+                      ? editingTime.status
+                      : "Inactive",
                 }
               : undefined
           }

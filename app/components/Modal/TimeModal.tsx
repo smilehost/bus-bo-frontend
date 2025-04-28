@@ -1,27 +1,31 @@
 import React, { useState } from "react";
 
+interface NewTime {
+  name: string;
+  startTime: string;
+  times: string[];
+  status: "Active" | "Inactive";
+}
+
 interface TimeModalProps {
   onClose: () => void;
-  onSave: (data: {
-    name: string;
-    startTime: string;
-    times: string[];
-    status: string;
-  }) => void;
-  editingTime?: {
-    name: string;
-    startTime: string;
-    times: string[];
-    status: string;
-  };
+  onSave: (data: NewTime) => void;
+  editingTime?: Partial<NewTime>;
 }
 
 function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
-  const [newTime, setNewTime] = useState({
+  const [newTime, setNewTime] = useState<NewTime>({
     name: editingTime?.name || "",
     startTime: editingTime?.startTime || "",
-    times: editingTime?.times || [],
-    status: editingTime?.status || "Active",
+    times: Array.isArray(editingTime?.times)
+      ? editingTime.times
+      : typeof editingTime?.times === "string"
+      ? (editingTime.times as string).split(",").map((t) => t.trim())
+      : [],
+    status:
+      editingTime?.status === "Active" || editingTime?.status === "Inactive"
+        ? editingTime.status
+        : "Active",
   });
 
   const isEditing = !!editingTime;
@@ -32,7 +36,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
       return;
     }
 
-    if (!newTime.startTime) {
+    if (!newTime.startTime.trim()) {
       alert("Please select a start time");
       return;
     }
@@ -45,328 +49,175 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
     onSave(newTime);
   };
 
-  const formatTimeDisplay = (time: string) => {
-    try {
-      const [hours, minutes] = time.split(":");
-      return `${hours}:${minutes}`;
-    } catch {
-      return time;
-    }
-  };
+  const isValidTimeFormat = (time: string) => /^\d{2}:\d{2}$/.test(time);
 
   const addTimeSlot = () => {
-    if (!newTime.startTime) return;
+    const trimmedTime = newTime.startTime.trim();
 
-    // Check if this time already exists
-    if (newTime.times.includes(newTime.startTime)) {
+    if (!trimmedTime || !isValidTimeFormat(trimmedTime)) {
+      alert("Invalid time format. Please use HH:mm.");
       return;
     }
 
+    if (newTime.times.includes(trimmedTime)) return;
+
     setNewTime({
       ...newTime,
-      times: [...newTime.times, newTime.startTime].sort(),
+      times: [...newTime.times, trimmedTime].sort(),
     });
   };
 
+  const formatTimeDisplay = (time: string) => {
+    const parts = time.split(":");
+    return parts.length === 2 ? `${parts[0]}:${parts[1]}` : time;
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden">
-        {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-orange-500 to-yellow-500 p-6 text-white">
-          <h2 className="text-2xl font-semibold">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden transform transition-all animate-fadeIn">
+        <div className="bg-gradient-to-r from-orange-500 to-amber-400 p-6 text-white relative">
+          <div className="absolute top-3 right-3">
+            <button 
+              onClick={onClose}
+              className="text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight">
             {isEditing ? "Edit Time" : "Add New Time"}
           </h2>
-          <p className="opacity-90 mt-1">
+          <p className="opacity-90 mt-1 font-light">
             {isEditing
               ? "Update the time details below"
               : "Fill in the time details below"}
           </p>
         </div>
 
-        <div className="p-6">
-          {/* Time Name */}
-          <div className="mb-6">
-            <label className="block mb-2 font-medium text-gray-700">
+        <div className="p-6 space-y-6">
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 text-sm">
               Time Name
             </label>
             <input
               type="text"
               placeholder="Enter time name"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-shadow shadow-sm hover:shadow"
               value={newTime.name}
               onChange={(e) => setNewTime({ ...newTime, name: e.target.value })}
             />
           </div>
 
-          {/* Start Time Selector */}
-          <div className="mb-6">
-            <label className="block mb-2 font-medium text-gray-700">
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 text-sm">
               Start Time
             </label>
-            <div className="relative">
-              <input
-                type="time"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none pr-10 transition"
-                value={newTime.startTime}
-                onChange={(e) =>
-                  setNewTime({ ...newTime, startTime: e.target.value })
-                }
-              />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
+            <input
+              type="time"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-shadow shadow-sm hover:shadow text-gray-700"
+              value={newTime.startTime}
+              onChange={(e) =>
+                setNewTime({ ...newTime, startTime: e.target.value })
+              }
+            />
           </div>
 
-          {/* Time Slots */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <label className="font-medium text-gray-700">Time Slots</label>
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <label className="font-medium text-gray-700 text-sm">Time Slots</label>
               <button
                 onClick={addTimeSlot}
-                className="flex items-center text-sm px-3 py-1 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition"
+                className="flex items-center text-sm px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors font-medium shadow-sm"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-1"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                    clipRule="evenodd"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Add Current Time
               </button>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-16">
-              {newTime.times.length > 0 ? (
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-16 shadow-inner">
+              {Array.isArray(newTime.times) && newTime.times.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {newTime.times.map((time, index) => (
                     <div
                       key={index}
-                      className="px-3 py-1.5 bg-orange-50 border border-orange-200 text-orange-800 rounded-md flex items-center shadow-sm"
+                      className="px-3 py-1.5 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg flex items-center shadow-sm transition-all hover:shadow"
                     >
-                      <span>{formatTimeDisplay(time)}</span>
+                      <span className="font-medium">{formatTimeDisplay(time)}</span>
                       <button
                         onClick={() => {
                           const newTimes = [...newTime.times];
                           newTimes.splice(index, 1);
                           setNewTime({ ...newTime, times: newTimes });
                         }}
-                        className="ml-2 text-orange-600 hover:text-orange-800"
+                        className="ml-2 text-orange-400 hover:text-orange-700 transition-colors"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293-1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clipRule="evenodd"
-                          />
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-4 text-gray-500">
-                  No time slots added yet. Add your first time slot.
+                <div className="text-center py-6 text-gray-500 flex flex-col items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  No time slots added yet.
                 </div>
               )}
             </div>
           </div>
 
-          {/* Enhanced Status Selection */}
-          <div className="mb-6">
-            <label className="block mb-3 font-medium text-gray-700">
+          <div>
+            <label className="block mb-3 font-medium text-gray-700 text-sm">
               Status
             </label>
             <div className="grid grid-cols-2 gap-4">
-              {/* Active Option */}
-              <div
-                className={`relative rounded-lg overflow-hidden ${
-                  newTime.status === "Active"
-                    ? "ring-2 ring-green-500"
-                    : "border border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  id="status-active"
-                  name="status"
-                  value="Active"
-                  checked={newTime.status === "Active"}
-                  onChange={() => setNewTime({ ...newTime, status: "Active" })}
-                  className="sr-only" // Hide the actual radio button
-                />
+              {["Active", "Inactive"].map((status) => (
                 <label
-                  htmlFor="status-active"
-                  className={`block cursor-pointer p-4 ${
-                    newTime.status === "Active"
-                      ? "bg-green-50"
-                      : "bg-white hover:bg-gray-50"
+                  key={status}
+                  className={`cursor-pointer flex items-center p-3 border rounded-lg transition-all ${
+                    newTime.status === status 
+                      ? "border-orange-500 bg-orange-50 shadow-sm" 
+                      : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <div className="flex items-center">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        newTime.status === "Active"
-                          ? "bg-green-500"
-                          : "border-2 border-gray-300"
-                      }`}
-                    >
-                      {newTime.status === "Active" && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 text-white"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="ml-3">
-                      <span className="font-medium">Active</span>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Time is visible and can be selected
-                      </p>
-                    </div>
-                  </div>
-                  {newTime.status === "Active" && (
-                    <div className="absolute top-0 right-0 mt-1 mr-1">
-                      <div className="bg-green-500 text-white rounded-full p-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3 w-3"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
+                  <input
+                    type="radio"
+                    name="status"
+                    value={status}
+                    checked={newTime.status === status}
+                    onChange={() =>
+                      setNewTime({
+                        ...newTime,
+                        status: status as "Active" | "Inactive",
+                      })
+                    }
+                    className="text-orange-500 focus:ring-orange-500 h-4 w-4"
+                  />
+                  <span className={`ml-2 ${newTime.status === status ? "text-orange-700 font-medium" : "text-gray-700"}`}>
+                    {status}
+                  </span>
                 </label>
-              </div>
-
-              {/* Inactive Option */}
-              <div
-                className={`relative rounded-lg overflow-hidden ${
-                  newTime.status === "Inactive"
-                    ? "ring-2 ring-red-500"
-                    : "border border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  id="status-inactive"
-                  name="status"
-                  value="Inactive"
-                  checked={newTime.status === "Inactive"}
-                  onChange={() =>
-                    setNewTime({ ...newTime, status: "Inactive" })
-                  }
-                  className="sr-only" // Hide the actual radio button
-                />
-                <label
-                  htmlFor="status-inactive"
-                  className={`block cursor-pointer p-4 ${
-                    newTime.status === "Inactive"
-                      ? "bg-red-50"
-                      : "bg-white hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        newTime.status === "Inactive"
-                          ? "bg-red-500"
-                          : "border-2 border-gray-300"
-                      }`}
-                    >
-                      {newTime.status === "Inactive" && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 text-white"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="ml-3">
-                      <span className="font-medium">Inactive</span>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Time is hidden and cannot be selected
-                      </p>
-                    </div>
-                  </div>
-                  {newTime.status === "Inactive" && (
-                    <div className="absolute top-0 right-0 mt-1 mr-1">
-                      <div className="bg-red-500 text-white rounded-full p-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3 w-3"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                </label>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Button Bar */}
         <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-4 border-t">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition"
+            className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSaveTime}
-            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-lg font-medium hover:from-orange-600 hover:to-yellow-600 shadow-md transition"
+            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-medium hover:opacity-90 transition-opacity shadow"
           >
             {isEditing ? "Update Time" : "Add Time"}
           </button>

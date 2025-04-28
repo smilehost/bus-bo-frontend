@@ -16,7 +16,7 @@ function SearchFilter({
     <div className="flex justify-between mb-4">
       <input
         type="text"
-        placeholder="Search by times or name..."
+        placeholder="Search by name..."
         className="border p-2 rounded-md w-3/4"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
