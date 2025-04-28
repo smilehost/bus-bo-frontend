@@ -9,7 +9,7 @@ import ButtonBG from '../Form/ButtonBG'
 import ButtonDefault from '../Form/ButtonDefault'
 
 //type
-import { TicketTypePrice } from '@/app/bu/manage-route/ticket/page'
+import { TicketTypePrice } from '@/app/bu/manage-route/ticket/[id]/page'
 
 type TicketPriceFixedProps = {
     open: boolean
