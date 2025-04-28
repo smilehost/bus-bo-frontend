@@ -11,8 +11,7 @@ type NavbarProps = {
 
 function Navbar({ id }: NavbarProps) {
 
-  const userData = useDataStore(state => state.userData);
-
+  const userData = useDataStore((state: { userData: any; }) => state.userData);
   const user_tier = userData.user_tier;
 
   const path = "/bu";

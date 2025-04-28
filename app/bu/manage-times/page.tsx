@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Modal/TimeModal";
-import SearchFilter from "@/app/components/SearchFilter/TimeSearchFilter";
 import PageHeader from "@/app/components/PageHeader/TimePageHeader";
-import { TimeService, TimeItem } from "@/app/services/time.service";
+import { ManageTimeController } from "@/controllers/manageTime.controller";
+import { TimeItem } from "@/types/time.type";
+import { debounce } from "@/utils/debounce";
 
 function Page() {
   const [times, setTimes] = useState<TimeItem[]>([]);
@@ -13,27 +14,39 @@ function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingTime, setEditingTime] = useState<
     (TimeItem & { times?: string[]; startTime?: string }) | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchTimes = async () => {
+  const fetchTimes = async (search?: string) => {
     setIsLoading(true);
     try {
-      const res = await TimeService.fetchTimes(currentPage, rowsPerPage, searchTerm);
+      const res = await ManageTimeController.fetchTimes(
+        currentPage,
+        rowsPerPage,
+        search
+      );
       setTimes(res.data);
       setTotalResults(res.total);
-    } catch (err) {
-      console.error("โหลดข้อมูลล้มเหลว", err);
+    } catch (error) {
+      console.error("โหลดข้อมูลล้มเหลว", error);
     }
     setIsLoading(false);
   };
 
+  const debouncedFetch = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 350),
+    []
+  );
+
   useEffect(() => {
-    fetchTimes();
-  }, [currentPage, rowsPerPage, searchTerm]);
+    fetchTimes(debouncedSearch);
+  }, [currentPage, rowsPerPage, debouncedSearch]);
 
   const handleAddTime = () => {
     setEditingTime(undefined);
@@ -55,25 +68,30 @@ function Page() {
         ? newTimeEntry.times
         : [newTimeEntry.startTime];
 
-    if (editingTime) {
-      await TimeService.updateTime(editingTime.id, {
-        name: newTimeEntry.name,
-        schedule,
-      });
-    } else {
-      await TimeService.createTime({
-        name: newTimeEntry.name,
-        schedule,
-      });
+    try {
+      if (editingTime) {
+        await ManageTimeController.updateTime(
+          editingTime.id,
+          newTimeEntry.name,
+          schedule
+        );
+      } else {
+        await ManageTimeController.createTime(newTimeEntry.name, schedule);
+      }
+      await fetchTimes(debouncedSearch);
+      handleCloseModal();
+    } catch (error) {
+      console.error("Save Time error:", error);
     }
-
-    fetchTimes(); // รีโหลดข้อมูลหลังบันทึก
-    handleCloseModal();
   };
 
   const handleDeleteTime = async (id: number) => {
-    await TimeService.deleteTime(id);
-    fetchTimes();
+    try {
+      await ManageTimeController.deleteTime(id);
+      await fetchTimes(debouncedSearch);
+    } catch (error) {
+      console.error("Delete Time error:", error);
+    }
   };
 
   const handleEditTime = (id: number) => {
@@ -95,10 +113,19 @@ function Page() {
           <PageHeader onAddTime={handleAddTime} />
 
           <div className="bg-white rounded-md shadow p-5">
-            <SearchFilter
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
+            {/* Search input with debounce */}
+            <div className="flex justify-between mb-4">
+              <input
+                type="text"
+                placeholder="Search by name..."
+                className="border p-2 rounded-md w-full"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  debouncedFetch(e.target.value);
+                }}
+              />
+            </div>
 
             <TimeTable
               times={times}
