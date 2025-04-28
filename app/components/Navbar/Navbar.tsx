@@ -149,7 +149,7 @@ function Navbar({ id }: NavbarProps) {
       {/* Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-10 bg-white-500 bg-opacity-30 lg:hidden"
+          className="fixed inset-0 z-10 bg-gray-600 opacity-75 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         ></div>
       )}
