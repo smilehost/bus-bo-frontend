@@ -4,7 +4,6 @@ interface NewTime {
   name: string;
   startTime: string;
   times: string[];
-  status: "Active" | "Inactive";
 }
 
 interface TimeModalProps {
@@ -22,10 +21,6 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
       : typeof editingTime?.times === "string"
       ? (editingTime.times as string).split(",").map((t) => t.trim())
       : [],
-    status:
-      editingTime?.status === "Active" || editingTime?.status === "Inactive"
-        ? editingTime.status
-        : "Active",
   });
 
   const isEditing = !!editingTime;
@@ -97,6 +92,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Time Name */}
           <div>
             <label className="block mb-2 font-medium text-gray-700 text-sm">
               Time Name
@@ -110,6 +106,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
             />
           </div>
 
+          {/* Start Time */}
           <div>
             <label className="block mb-2 font-medium text-gray-700 text-sm">
               Start Time
@@ -124,6 +121,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
             />
           </div>
 
+          {/* Time Slots */}
           <div>
             <div className="flex justify-between items-center mb-3">
               <label className="font-medium text-gray-700 text-sm">Time Slots</label>
@@ -171,43 +169,9 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
               )}
             </div>
           </div>
-
-          <div>
-            <label className="block mb-3 font-medium text-gray-700 text-sm">
-              Status
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              {["Active", "Inactive"].map((status) => (
-                <label
-                  key={status}
-                  className={`cursor-pointer flex items-center p-3 border rounded-lg transition-all ${
-                    newTime.status === status 
-                      ? "border-orange-500 bg-orange-50 shadow-sm" 
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="status"
-                    value={status}
-                    checked={newTime.status === status}
-                    onChange={() =>
-                      setNewTime({
-                        ...newTime,
-                        status: status as "Active" | "Inactive",
-                      })
-                    }
-                    className="text-orange-500 focus:ring-orange-500 h-4 w-4"
-                  />
-                  <span className={`ml-2 ${newTime.status === status ? "text-orange-700 font-medium" : "text-gray-700"}`}>
-                    {status}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
         </div>
 
+        {/* Footer Buttons */}
         <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-4 border-t">
           <button
             onClick={onClose}

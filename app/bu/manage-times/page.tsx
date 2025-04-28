@@ -13,7 +13,6 @@ function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
   const [showModal, setShowModal] = useState(false);
   const [editingTime, setEditingTime] = useState<
     (TimeItem & { times?: string[]; startTime?: string }) | undefined
@@ -23,12 +22,7 @@ function Page() {
   const fetchTimes = async () => {
     setIsLoading(true);
     try {
-      const res = await TimeService.fetchTimes(
-        currentPage,
-        rowsPerPage,
-        searchTerm,
-        statusFilter !== "All Status" ? statusFilter : undefined
-      );
+      const res = await TimeService.fetchTimes(currentPage, rowsPerPage, searchTerm);
       setTimes(res.data);
       setTotalResults(res.total);
     } catch (err) {
@@ -39,7 +33,7 @@ function Page() {
 
   useEffect(() => {
     fetchTimes();
-  }, [currentPage, rowsPerPage, searchTerm, statusFilter]);
+  }, [currentPage, rowsPerPage, searchTerm]);
 
   const handleAddTime = () => {
     setEditingTime(undefined);
@@ -55,7 +49,6 @@ function Page() {
     name: string;
     startTime: string;
     times: string[];
-    status: string;
   }) => {
     const schedule =
       newTimeEntry.times.length > 0
@@ -66,13 +59,11 @@ function Page() {
       await TimeService.updateTime(editingTime.id, {
         name: newTimeEntry.name,
         schedule,
-        status: newTimeEntry.status,
       });
     } else {
       await TimeService.createTime({
         name: newTimeEntry.name,
         schedule,
-        status: newTimeEntry.status,
       });
     }
 
@@ -107,18 +98,10 @@ function Page() {
             <SearchFilter
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
             />
 
             <TimeTable
-              times={times.map((time) => ({
-                ...time,
-                status:
-                  time.status === "Active" || time.status === "Inactive"
-                    ? time.status
-                    : "Inactive",
-              }))}
+              times={times}
               isLoading={isLoading}
               onDelete={handleDeleteTime}
               onEdit={handleEditTime}
@@ -144,11 +127,6 @@ function Page() {
                   ...editingTime,
                   startTime: editingTime.startTime || "",
                   times: editingTime.times || [],
-                  status:
-                    editingTime.status === "Active" ||
-                    editingTime.status === "Inactive"
-                      ? editingTime.status
-                      : "Inactive",
                 }
               : undefined
           }
