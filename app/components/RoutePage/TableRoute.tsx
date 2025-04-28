@@ -25,6 +25,7 @@ type RouteData = {
   company: string;
   schedule: string;
   time: string;
+  ticket_amount: string,
   status: STATUS;
   routeColor: string;
 };
@@ -37,7 +38,7 @@ type TableRouteProps = {
 function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
 
   const pathname = usePathname();
-  
+
   //table
   const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -67,6 +68,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
     company: '20%',
     schedule: '20%',
     time: '20%',
+    tickets: '15%',
     status: '15%',
     action: '25%',
   };
@@ -80,6 +82,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
             <StyledTableCell align="left" sx={{ width: columnWidths.company }}>Company</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.schedule }}>Schedule</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.time }}>Departure Times</StyledTableCell>
+            <StyledTableCell align="center" sx={{ width: columnWidths.tickets }}>Tickets</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.status }}>Status</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.action }}>Action</StyledTableCell>
           </TableRow>
@@ -89,19 +92,22 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
             <StyledTableRow key={index}>
               <StyledTableCell align="left">
                 <div className='flex gap-3 items-center'>
-                  <div className={`w-[8px] h-[32px] ${row.routeColor} rounded-lg`} />
+                  <div className={`w-[8px] h-[32px] rounded-lg`}
+                    style={{ backgroundColor: row.routeColor }}
+                  />
                   {row.route}
                 </div>
               </StyledTableCell>
               <StyledTableCell align="left">{row.company}</StyledTableCell>
               <StyledTableCell align="left">{row.schedule}</StyledTableCell>
               <StyledTableCell align="left">{row.time}</StyledTableCell>
+              <StyledTableCell align="center">{row.ticket_amount}</StyledTableCell>
               <StyledTableCell align="left">
-               <StatusText type={row.status}/>
+                <StatusText type={row.status} />
               </StyledTableCell>
               <StyledTableCell align="left">
                 <div className='flex gap-2 min-w-max'>
-                  <div className='cursor-pointer'>
+                  <Link href={`${pathname}/ticket/${row.id}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/money.svg"}
                       width={1000}
@@ -110,7 +116,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
                       priority
                       className='w-[16px] h-[16px]'
                     />
-                  </div>
+                  </Link>
                   <Link href={`${pathname}/edit/${row.id}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/edit.svg"}

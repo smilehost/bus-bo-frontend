@@ -7,18 +7,24 @@ import { StationProps } from '@/types/stations';
 
 //component 
 import FormRoute from '@/app/components/Form/FormRoute';
+import TitleHeader from '@/app/components/Title/TitleHeader';
 
 //mui
 import { SelectChangeEvent } from '@mui/material';
 
 //mock
-import { stationData } from '@/provider/Provider';
-
+import { useDataStore } from "@/stores/appStore";
 
 function Page() {
 
+    //mock
+    const stationData = useDataStore(state => state.stationData);
+
     //select route name
     const [routeName, setRouteName] = useState<string>('')
+
+    //route color
+    const [routeColor, setRouteColor] = useState<string>('#3B82F6')
 
     //select station
     const transformedList = stationData.map((station, index) => ({
@@ -50,6 +56,7 @@ function Page() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         console.log("Route Name: ", routeName)
+        console.log("Route Color: ", routeColor)
         console.log("Time: ", selectedTime)
         console.log("Schedule: ", schedule)
         console.log("listStations", listStations)
@@ -57,10 +64,12 @@ function Page() {
 
     return (
         <div>
-            <p className='text-[20px] font-bold'>Add New Route</p>
+            <TitleHeader text={"Add New Route"} />
             <FormRoute
                 routeName={routeName}
                 setRouteName={setRouteName}
+                routeColor={routeColor}
+                setRouteColor={setRouteColor}
                 listA={listA}
                 setListA={setListA}
                 listB={listB}

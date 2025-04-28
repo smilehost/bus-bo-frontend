@@ -14,3 +14,8 @@ export enum FILTER {
     ALL_STATUS = "All Status",
     ALL_COMPANIES = "All Companies"
 }
+
+export enum TICKET_TYPE {
+    FIXED = "Fixed",
+    TIERED = "Tiered",
+}

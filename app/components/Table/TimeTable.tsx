@@ -4,8 +4,7 @@ import Pagination from "../Pagination/Pagination";
 interface Time {
   id: number;
   name: string;
-  schedule: string[]; // ✅ เปลี่ยนเป็น array
-  status: "Active" | "Inactive";
+  schedule: string[]; // ✅ ใช้แค่ id, name, schedule เท่านั้น
 }
 
 interface TimeTableProps {
@@ -77,23 +76,7 @@ function TimeTable({
                 >
                   {time.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <div className="font-medium text-gray-900">{time.name}</div>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
-                      time.status === "Active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full mr-1.5 ${
-                        time.status === "Active" ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    ></span>
-                    {time.status}
-                  </span>
-                </div>
+                <div className="font-medium text-gray-900">{time.name}</div>
               </div>
 
               <div className="text-gray-700 font-medium flex items-center">

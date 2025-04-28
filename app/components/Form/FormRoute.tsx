@@ -12,7 +12,7 @@ import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
 
 //mock
-import { timeData, scheduleData } from '@/provider/Provider';
+import { useDataStore } from "@/stores/appStore";
 
 //type
 import { StationProps } from '@/types/stations';
@@ -20,6 +20,8 @@ import { StationProps } from '@/types/stations';
 type FormRouteProps = {
   routeName?: string | undefined;
   setRouteName: React.Dispatch<React.SetStateAction<string>>;
+  routeColor: string;
+  setRouteColor: React.Dispatch<React.SetStateAction<string>>;
   listA: StationProps[];
   setListA: React.Dispatch<React.SetStateAction<StationProps[]>>;
   listB: StationProps[];
@@ -34,6 +36,8 @@ type FormRouteProps = {
 function FormRoute({
   routeName,
   setRouteName,
+  routeColor, 
+  setRouteColor,
   listA,
   setListA,
   listB,
@@ -46,8 +50,15 @@ function FormRoute({
 }: FormRouteProps) {
   const router = useRouter();
 
+  const scheduleData = useDataStore(state => state.scheduleData);
+  const timeData = useDataStore(state => state.timeData);
+
   return (
+<<<<<<< HEAD
     <form onSubmit={handleSubmit} className='bg-white px-5 py-7 rounded-lg mt-5 w-full '>
+=======
+    <form onSubmit={handleSubmit} className='custom-frame-content px-5 py-7 mt-5 w-full'>
+>>>>>>> 4e1c0dba24685310f3cd5c758ffc6541fc0de038
       <div className="lg:mx-20">
         <div className='flex justify-between flex-wrap gap-3 '>
           {/* route name */}
@@ -60,7 +71,7 @@ function FormRoute({
             size='min-w-[300px] xl:w-[400px] max-w-[400px]'
           />
           {/* color */}
-          <ColorRoute bgColor='bg-[#3B82F6]' />
+          <ColorRoute color={routeColor} setRouteColor={setRouteColor} label={"Route Color"} size_circle='w-[38px] h-[38px]' size_input='w-full' size='min-w-[300px] xl:w-[400px] max-w-[400px]'/>
         </div>
         <div className='flex justify-between flex-wrap lg:mt-5 gap-3 mt-3'>
           {/* time */}

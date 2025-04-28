@@ -1,5 +1,8 @@
 import React from 'react'
 
+//component
+import TitleHeader from './TitleHeader'
+
 type TitleProps = {
     title: string,
     description: string
@@ -7,7 +10,7 @@ type TitleProps = {
 function TitlePage({ title, description }: TitleProps) {
     return (
         <div className='flex flex-col '>
-            <p className='font-bold text-[20px]'>{title}</p>
+            <TitleHeader text={title} />
             <p className='text-[14px] text-[#4B5563]'>{description}</p>
         </div>
     )
