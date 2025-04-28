@@ -101,6 +101,7 @@ export default function RootLayout({
                                 link={item.link}
                                 text={item.text}
                                 icon={item.icon}
+                                status
                             />
                         ))}
                     </div>
