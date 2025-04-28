@@ -15,8 +15,8 @@ export const useTicketStore = create<TicketStore>((set) => ({
      ticketData: [
             {
                 id: "T12345",
-                ticketName_th: "as",
-                ticketName_en: "as",
+                ticketName_th: "รอบเช้า",
+                ticketName_en: "Morning",
                 ticket_type: TICKET_TYPE.FIXED,
                 ticket_amount: "2",
                 ticket_color: "#3B82F6",
@@ -24,6 +24,10 @@ export const useTicketStore = create<TicketStore>((set) => ({
                     {
                         type: "Normal",
                         price: 200
+                    },
+                    {
+                        type: "Man",
+                        price: 100
                     },
                     {
                         type: "Student",
@@ -34,8 +38,8 @@ export const useTicketStore = create<TicketStore>((set) => ({
             },
             {
                 id: "T12347",
-                ticketName_th: "as",
-                ticketName_en: "as",
+                ticketName_th: "รอบเย็นsdfsfsdfsdfssdsdssdsdssddf",
+                ticketName_en: "Test",
                 ticket_type: TICKET_TYPE.FIXED,
                 ticket_amount: "2",
                 ticket_color: "#10B981",
@@ -53,9 +57,9 @@ export const useTicketStore = create<TicketStore>((set) => ({
             },
             {
                 id: "T12232",
-                ticketName_th: "as",
-                ticketName_en: "as",
-                ticket_type: TICKET_TYPE.FIXED,
+                ticketName_th: "รอบไหน",
+                ticketName_en: "Test test",
+                ticket_type: TICKET_TYPE.TIERED,
                 ticket_amount: "2",
                 ticket_color: "#F59E0B",
                 ticket_list: [

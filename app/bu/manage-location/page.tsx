@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 // ลบการ import Navbar และ Header
 import LocationTable from "../../components/Table/LocationTable";
-import LocationModal from "../../components/Modal/LocationModal";
+import LocationModal from "../../components/Model/LocationModal";
 import SearchFilter from "../../components/SearchFilter/LocationSearchFilter";
 import PageHeader from "../../components/PageHeader/LocationPageHeader";
 

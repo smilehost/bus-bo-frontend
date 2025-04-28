@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 // ลบการ import Navbar และ Header
 import DateTable from "../../components/Table/DateTable";
-import DateModal from "../../components/Modal/DateModal";
+import DateModal from "../../components/Model/DateModal";
 import SearchFilter from "../../components/SearchFilter/DateSearchFilter";
 import PageHeader from "../../components/PageHeader/DatePageHeader";
 

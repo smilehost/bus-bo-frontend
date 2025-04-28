@@ -8,6 +8,7 @@ import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import ColorRoute from '@/app/components/Form/ColorRoute'
 
+//const
 import { TICKET_TYPE } from '@/constants/enum'
 
 type FormRouteTicketProps = {
@@ -54,7 +55,7 @@ function FormRouteTicket({
     return (
         <>
             {/* form */}
-            <div className='flex gap-x-3 gap-y-4 flex-wrap'>
+            <form className='flex gap-x-3 gap-y-4 flex-wrap'>
                 <div className='flex w-full gap-3'>
                     <div className="flex-1">
                         <InputLabel
@@ -142,7 +143,7 @@ function FormRouteTicket({
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
 
             {/* button */}
             <div className='mt-10 flex justify-end gap-2'>

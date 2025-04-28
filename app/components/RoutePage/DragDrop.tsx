@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { StationProps } from '@/types/stations';
 import { Dispatch, SetStateAction } from 'react';
@@ -13,12 +13,31 @@ type DragDropProps = {
 
 function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
 
+  const [search, setSearch] = useState<string>("");
+
+  // ใช้ useMemo เพื่อ filter listA ตามคำ search
+  const filteredListA = useMemo(() => {
+    if (!search) return listA;
+    return listA.filter((item) =>
+      item.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search, listA]);
+
+
   return (
     <div className="flex justify-between flex-wrap">
       {/* List A */}
-      <div className="p-4 rounded-md w-[200px] lg:w-[350px] xl:w-[434px]">
+      <div className=" p-4 rounded-md w-[200px] lg:w-[350px] xl:w-[434px]">
         <p className="text-center text-[12px] font-medium">Station List</p>
-        <div className=' mt-5'>
+        <div className='mt-3'>
+          <input
+            type={"text"}
+            placeholder={"Search Station..."}
+            className={` px-5 py-1 rounded-md custom-border-gray text-[14px] w-full`}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className=' mt-4 max-h-[300px] overflow-y-scroll'>
           <ReactSortable
             list={listA}
             setList={setListA}
@@ -26,10 +45,11 @@ function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
             animation={200}
             className="min-h-36"
           >
-            {listA.map((item, index) => (
+            {filteredListA.map((item, index) => (
               <div
-                key={index}
-                className={`${listA.length - 1 === index && "rounded-b-md "} ${0 === index && "rounded-t-md border-t"} border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
+                key={item.id || index}
+                className={`${filteredListA.length - 1 === index && "rounded-b-md"
+                  } ${0 === index && "rounded-t-md border-t"} border-b border-r border-l w-full px-4 py-1 border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
               >
                 {item.name}
               </div>
@@ -41,7 +61,7 @@ function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
       {/* List B */}
       <div className=" p-4 rounded-md w-[200px] lg:w-[350px] xl:w-[434px]">
         <p className="text-center text-[12px] font-medium">Stations this Route</p>
-        <div className=' overflow-hidden mt-5'>
+        <div className=' overflow-hidden mt-5 max-h-[300px] overflow-y-scroll'>
           <ReactSortable
             list={listB}
             setList={setListB}

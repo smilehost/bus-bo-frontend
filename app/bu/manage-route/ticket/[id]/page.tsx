@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
+
 //component
 import TitleHeader from '@/app/components/Title/TitleHeader'
 import FormRouteTicket from '@/app/components/Form/FormRouteTicket'
@@ -16,6 +17,9 @@ import { useTicketStore } from '@/stores/ticketStore'
 
 //type 
 import { TicketProps } from '@/types/types'
+
+//icon
+import { Bolt, Table } from "lucide-react";
 
 export type TicketTypePrice = {
     type: string,
@@ -32,6 +36,8 @@ function Page() {
 
     //velues
     const [tickets, setTickets] = useState<TicketProps[]>();
+    const [ticketActive, setTicketActive] = useState<string>();
+
     const [ticketNameTH, setTicketNameTH] = useState<string>('');
     const [ticketNameEN, setTicketNameEN] = useState<string>('');
     const [ticketAmount, setTicketAmount] = useState<string>('');
@@ -52,6 +58,36 @@ function Page() {
             }
         }
     }, [params, ticketData])
+
+    useEffect(() => {
+        const ticket = ticketData.find((item) => item.id === ticketActive);
+
+
+        if (ticketActive === undefined) {
+            setTicketNameTH("")
+            setTicketNameEN("")
+            setTicketAmount("")
+            setTicketColor("")
+            setTicketType(undefined)
+            setTicketTypePrice([])
+            setTicketCheckList([]);
+            setTicketTypeList([]);
+        }
+
+        if (!ticket) return;
+
+        const ticketListName = ticket?.ticket_list.map((item) => item.type)
+        setTicketNameTH(ticket?.ticketName_th)
+        setTicketNameEN(ticket?.ticketName_en)
+        setTicketAmount(ticket?.ticket_amount)
+        setTicketColor(ticket?.ticket_color)
+        setTicketType(ticket?.ticket_type)
+        setTicketTypePrice(ticket?.ticket_list)
+        setTicketCheckList(ticketListName);
+        setTicketTypeList(ticketListName);
+
+
+    }, [ticketActive])
 
     const [newType, setNewType] = useState("");
 
@@ -104,13 +140,30 @@ function Page() {
                     <p className='font-medium'>Tickets</p>
                     <div className='flex gap-4 mt-1'>
                         {tickets.map((item, index) => (
-                            <div key={index} className='shadow-xs px-7 rounded-md text-center bg-white relative overflow-hidden'>
+                            <div key={index}
+                                className={`${ticketActive === item.id ? "bg-gray-200" : "bg-white"} w-[200px] cursor-pointer shadow-xs px-7 rounded-md relative overflow-hidden`}
+                                onClick={() => {
+                                    if (ticketActive === item.id) {
+                                        setTicketActive(undefined); // ถ้าคลิกตัวเดิม ซ้ำ → ล้างค่า
+                                    } else {
+                                        setTicketActive(item.id); // ถ้าไม่ใช่ → set เป็น id นั้น
+                                    }
+                                }}
+                            >
                                 <div className={` w-[8px] h-full absolute left-0`}
                                     style={{
                                         backgroundColor: item.ticket_color
                                     }}
                                 />
-                                <p className='text-[14px] py-1'>{item.id}</p>
+                                <div className='flex flex-col gap-1 py-2'>
+                                    <p className='text-[12px] whitespace-nowrap text-ellipsis overflow-hidden'>{item.ticketName_th}</p>
+                                    <p className='text-[12px] whitespace-nowrap text-ellipsis overflow-hidden'>{item.ticketName_en}</p>
+                                </div>
+                                {item.ticket_type === TICKET_TYPE.FIXED ? (
+                                    <Bolt size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
+                                ) : (item.ticket_type === TICKET_TYPE.TIERED) && (
+                                    <Table size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
+                                )}
                             </div>
                         ))}
                     </div>

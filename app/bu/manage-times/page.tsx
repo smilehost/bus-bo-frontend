@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import TimeTable from "@/app/components/Table/TimeTable";
-import TimeModal from "@/app/components/Modal/TimeModal";
+import TimeModal from "@/app/components/Model/TimeModal";
 import PageHeader from "@/app/components/PageHeader/TimePageHeader";
 import { ManageTimeController } from "@/controllers/manageTime.controller";
 import { TimeItem } from "@/types/time.type";
