@@ -12,7 +12,7 @@ import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
 
 //mock
-import { useDataStore } from "@/stores/dataStore";
+import { useDataStore } from "@/stores/appStore";
 
 //type
 import { StationProps } from '@/types/stations';
@@ -53,8 +53,6 @@ function FormRoute({
   const scheduleData = useDataStore(state => state.scheduleData);
   const timeData = useDataStore(state => state.timeData);
 
-  console.log('routeColor', routeColor)
-
   return (
     <form onSubmit={handleSubmit} className='custom-frame-content px-5 py-7 mt-5 w-full'>
       <div className="lg:mx-20">
@@ -69,7 +67,7 @@ function FormRoute({
             size='min-w-[300px] xl:w-[400px] max-w-[400px]'
           />
           {/* color */}
-          <ColorRoute color={routeColor} setRouteColor={setRouteColor} />
+          <ColorRoute color={routeColor} setRouteColor={setRouteColor} label={"Route Color"} size_circle='w-[38px] h-[38px]' size_input='w-full' size='min-w-[300px] xl:w-[400px] max-w-[400px]'/>
         </div>
         <div className='flex justify-between flex-wrap lg:mt-5 gap-3 mt-3'>
           {/* time */}

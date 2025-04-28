@@ -14,12 +14,13 @@ import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 
 //mock
-import { useDataStore } from "@/stores/dataStore";
+import { useDataStore } from "@/stores/appStore";
 
 function Page() {
 
     //mock
     const companyData = useDataStore(state => state.companyData);
+    const ticketData = useDataStore(state => state.ticketData);
     const routeData = useDataStore(state => state.routeData);
     const timeData = useDataStore(state => state.timeData);
     const scheduleData = useDataStore(state => state.scheduleData);
@@ -39,11 +40,11 @@ function Page() {
         company: string,
         schedule: string,
         time: string,
+        ticket_amount: string,
         status: STATUS,
-        // ticket_amount: string,
         routeColor: string
     ) => {
-        return { id, route, company, schedule, time, status, routeColor };
+        return { id, route, company, schedule, time, ticket_amount, status, routeColor };
     };
 
     // Filter routes based on search values
@@ -71,14 +72,17 @@ function Page() {
         const timeId = item.times_id
         const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
 
+
         //ticket amount 
-        // const realTicketAmount = item.ticket_amount
+        const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
+        
         return createData(
             item.id,
             item.route,
             realCompany,
             realSchedule,
             realTimes,
+            realTicketAmount,
             item.status,
             item.routeColor
         )

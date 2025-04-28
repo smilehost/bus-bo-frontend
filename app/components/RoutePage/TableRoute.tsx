@@ -25,6 +25,7 @@ type RouteData = {
   company: string;
   schedule: string;
   time: string;
+  ticket_amount: string,
   status: STATUS;
   routeColor: string;
 };
@@ -67,6 +68,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
     company: '20%',
     schedule: '20%',
     time: '20%',
+    tickets: '15%',
     status: '15%',
     action: '25%',
   };
@@ -80,6 +82,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
             <StyledTableCell align="left" sx={{ width: columnWidths.company }}>Company</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.schedule }}>Schedule</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.time }}>Departure Times</StyledTableCell>
+            <StyledTableCell align="center" sx={{ width: columnWidths.tickets }}>Tickets</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.status }}>Status</StyledTableCell>
             <StyledTableCell align="left" sx={{ width: columnWidths.action }}>Action</StyledTableCell>
           </TableRow>
@@ -98,12 +101,13 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
               <StyledTableCell align="left">{row.company}</StyledTableCell>
               <StyledTableCell align="left">{row.schedule}</StyledTableCell>
               <StyledTableCell align="left">{row.time}</StyledTableCell>
+              <StyledTableCell align="center">{row.ticket_amount}</StyledTableCell>
               <StyledTableCell align="left">
                 <StatusText type={row.status} />
               </StyledTableCell>
               <StyledTableCell align="left">
                 <div className='flex gap-2 min-w-max'>
-                  <Link href={`${pathname}/ticket`} className='cursor-pointer'>
+                  <Link href={`${pathname}/ticket/${row.id}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/money.svg"}
                       width={1000}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useDataStore } from "@/stores/dataStore";
+import { useDataStore } from "@/stores/appStore";
 import Profile from '../Profile'
 
 function Header() {

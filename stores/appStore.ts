@@ -1,11 +1,12 @@
 import { create } from 'zustand';
-import { USER_TIER, STATUS } from '@/constants/enum';
+import { USER_TIER, STATUS, TICKET_TYPE } from '@/constants/enum';
 
 type Company = { id: string; name: string };
 type User = { user_tier: USER_TIER; name: string; company_id: string };
 type Time = { id: string; name: string; times: string[]; status: STATUS };
 type Schedule = { id: string; name: string };
 type Station = { id: string; name: string; coordinates: string };
+
 type Route = {
     id: string;
     route: string;
@@ -17,16 +18,23 @@ type Route = {
     company_id: string;
     schedule_id: string;
 };
-// type Route_Ticket = {
-//     id: string;
-//     ticketName_th: string;
-//     ticketName_en: string;
-//     ticket_type: string;
-//     ticket_amount: string;
-//     ticket_color: string;
-//     ticket_type_list: string[];
-//     route_id: string;
-// };
+
+type TicketListProps = {
+    type: string,
+    price: number
+}
+
+export type TicketProps = {
+    id: string;
+    ticketName_th: string;
+    ticketName_en: string;
+    ticket_type: string;
+    ticket_amount: string;
+    ticket_color: string;
+    ticket_list: TicketListProps[];
+    route_id: string;
+};
+
 type Member = {
     id: string;
     member_name: string;
@@ -45,9 +53,117 @@ type DataStore = {
     stationData: Station[];
     routeData: Route[];
     membersData: Member[];
+    ticketData: TicketProps[];
 };
 
 export const useDataStore = create<DataStore>(() => ({
+    ticketData: [
+        {
+            id: "T12345",
+            ticketName_th: "as",
+            ticketName_en: "as",
+            ticket_type: TICKET_TYPE.FIXED,
+            ticket_amount: "2",
+            ticket_color: "#3B82F6",
+            ticket_list: [
+                {
+                    type: "Normal",
+                    price: 200
+                },
+                {
+                    type: "Student",
+                    price: 200
+                },
+            ],
+            route_id: "2"
+        },
+        {
+            id: "T12347",
+            ticketName_th: "as",
+            ticketName_en: "as",
+            ticket_type: TICKET_TYPE.FIXED,
+            ticket_amount: "2",
+            ticket_color: "#10B981",
+            ticket_list: [
+                {
+                    type: "Normal",
+                    price: 200
+                },
+                {
+                    type: "Student",
+                    price: 200
+                },
+            ],
+            route_id: "3"
+        },
+        {
+            id: "T12232",
+            ticketName_th: "as",
+            ticketName_en: "as",
+            ticket_type: TICKET_TYPE.FIXED,
+            ticket_amount: "2",
+            ticket_color: "#F59E0B",
+            ticket_list: [
+                {
+                    type: "Normal",
+                    price: 200
+                },
+                {
+                    type: "Student",
+                    price: 200
+                },
+            ],
+            route_id: "3"
+        },
+    ],
+
+    routeData: [
+        {
+            id: '1',
+            company_id: '3',
+            route: 'Northern Express',
+            schedule_id: '1',
+            times_id: '2',
+            status: STATUS.ACTIVE,
+            routeColor: '#3B82F6',
+            stations: ['1', '4', '2', '5'],
+            ticket_amount: "0", // จะถูกอัปเดตผ่านฟังก์ชัน
+        },
+        {
+            id: '2',
+            company_id: '1',
+            route: 'Southern Route',
+            schedule_id: '3',
+            times_id: '2',
+            status: STATUS.ACTIVE,
+            routeColor: '#10B981',
+            stations: ['1', '4', '2', '5'],
+            ticket_amount: "0",
+        },
+        {
+            id: '3',
+            company_id: '4',
+            route: 'Eastern Circuit',
+            schedule_id: '1',
+            times_id: '3',
+            status: STATUS.INACTIVE,
+            routeColor: '#F59E0B',
+            stations: ['1', '4', '2', '5'],
+            ticket_amount: "0",
+        },
+        {
+            id: '4',
+            company_id: '2',
+            route: 'Western Line',
+            schedule_id: '2',
+            times_id: '3',
+            status: STATUS.ACTIVE,
+            routeColor: '#8B5CF6',
+            stations: ['1', '4', '2', '5'],
+            ticket_amount: "0",
+        },
+    ],
+
     companyData: [
         { id: '1', name: 'Northern Bus Co.' },
         { id: '2', name: 'Southern Express' },
@@ -102,52 +218,7 @@ export const useDataStore = create<DataStore>(() => ({
         { id: '9', name: 'Hat Yai Bus Terminal', coordinates: '' },
     ],
 
-    routeData: [
-        {
-            id: '1',
-            company_id: '3',
-            route: 'Northern Express',
-            schedule_id: '1',
-            times_id: '2',
-            status: STATUS.ACTIVE,
-            routeColor: '#3B82F6',
-            stations: ['1', '4', '2', '5'],
-            ticket_amount: "2",
-        },
-        {
-            id: '2',
-            company_id: '1',
-            route: 'Southern Route',
-            schedule_id: '3',
-            times_id: '2',
-            status: STATUS.ACTIVE,
-            routeColor: '#10B981',
-            stations: ['1', '4', '2', '5'],
-            ticket_amount: "0",
-        },
-        {
-            id: '3',
-            company_id: '4',
-            route: 'Eastern Circuit',
-            schedule_id: '1',
-            times_id: '3',
-            status: STATUS.INACTIVE,
-            routeColor: '#F59E0B',
-            stations: ['1', '4', '2', '5'],
-            ticket_amount: "0",
-        },
-        {
-            id: '4',
-            company_id: '2',
-            route: 'Western Line',
-            schedule_id: '2',
-            times_id: '3',
-            status: STATUS.ACTIVE,
-            routeColor: '#8B5CF6',
-            stations: ['1', '4', '2', '5'],
-            ticket_amount: "1",
-        },
-    ],
+
 
     membersData: [
         {

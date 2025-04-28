@@ -13,7 +13,7 @@ import TitleHeader from '@/app/components/Title/TitleHeader';
 import { SelectChangeEvent } from '@mui/material';
 
 //mock
-import { useDataStore } from "@/stores/dataStore";
+import { useDataStore } from "@/stores/appStore";
 
 function Page() {
 

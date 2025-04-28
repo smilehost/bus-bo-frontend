@@ -13,7 +13,7 @@ import MemberModel from '@/app/components/Model/MemberModel'
 import { FILTER, STATUS } from '@/constants/enum'
 
 //mock
-import { useDataStore } from "@/stores/dataStore";
+import { useDataStore } from "@/stores/appStore";
 
 function Page() {
 

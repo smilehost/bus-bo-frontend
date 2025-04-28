@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import MenuItem from '../Menu/MenuItem';
 import Image from 'next/image'
 import { USER_TIER } from '@/constants/enum'
-import { useDataStore } from "@/stores/dataStore";
+import { useDataStore } from "@/stores/appStore";
 
 type NavbarProps = {
   id?: number
@@ -20,7 +20,7 @@ function Navbar({ id }: NavbarProps) {
     { id: 1, icon: "/icons/home.svg", text: "Dashboard", link: `${path}` },
     { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "" },
     { id: 3, icon: "/icons/route.svg", text: "Manage Routes", link: `${path}/manage-route` },
-    { id: 4, icon: "/icons/ticket.svg", text: "Manage Tickets", link: `${path}/manage-ticket` },
+    { id: 4, icon: "/icons/ticket.svg", text: "Manage Tickets", link: `${path}/` },
     { id: 5, icon: "/icons/time.svg", text: "Manage Times", link: "" },
     { id: 6, icon: "/icons/date.svg", text: "Manage Date", link: "" },
     { id: 7, icon: "/icons/users.svg", text: "Manage Members", link: `${path}/manage-members` },

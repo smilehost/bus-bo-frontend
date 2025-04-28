@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ColorResult } from 'react-color'; 
+import { ColorResult } from 'react-color';
 import LabelText from './LabelText';
 
 //component 
@@ -7,10 +7,14 @@ import ColorModel from '../Model/ColorModel';
 
 type ColorRouteProps = {
     color: string;
+    label: string;
+    size_circle?: string;
+    size_input?: string;
+    size?: string
     setRouteColor: React.Dispatch<React.SetStateAction<string>>;
 };
 
-function ColorRoute({ color, setRouteColor }: ColorRouteProps) {
+function ColorRoute({ color, setRouteColor, label, size_circle, size_input, size }: ColorRouteProps) {
     const [showColorPicker, setShowColorPicker] = useState(false);
     const pickerRef = useRef<HTMLDivElement>(null); // ใช้จับ ref
 
@@ -43,16 +47,16 @@ function ColorRoute({ color, setRouteColor }: ColorRouteProps) {
     }, [showColorPicker]);
 
     return (
-        <div ref={pickerRef} className="relative min-w-[300px] xl:w-[400px] max-w-[400px] flex flex-col gap-2">
-            <LabelText text="Route Color" />
-            <div className="flex gap-4 cursor-pointer" onClick={toggleColorPicker}>
+        <div ref={pickerRef} className={`relative ${size} flex flex-col gap-2`}>
+            <LabelText text={label} />
+            <div className={`flex gap-4 cursor-pointer`} onClick={toggleColorPicker}>
                 <div
                     style={{ backgroundColor: color }}
-                    className="w-[32px] h-[32px] rounded-full flex-shrink-0 custom-border-gray"
+                    className={`${size_circle} rounded-full flex-shrink-0 custom-border-gray`}
                 />
                 <div
                     style={{ backgroundColor: color }}
-                    className="h-[32px] w-full rounded-md custom-border-gray"
+                    className={`${size_input} rounded-md custom-border-gray`}
                 />
             </div>
 
