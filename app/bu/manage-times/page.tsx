@@ -100,7 +100,6 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col">
-        <div className="p-7">
           <PageHeader onAddTime={handleAddTime} />
 
           <div className="bg-white rounded-md shadow p-5">
@@ -131,7 +130,6 @@ function Page() {
               totalResults={totalResults}
             />
           </div>
-        </div>
       </div>
 
       {showModal && (

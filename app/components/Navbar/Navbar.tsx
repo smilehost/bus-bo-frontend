@@ -100,7 +100,7 @@ function Navbar({ id }: NavbarProps) {
                   link={item.link}
                   text={item.text}
                   icon={item.icon}
-                  status={id === item?.id}
+                  // status={id === item?.id}
                 />
               ))}
             </div>

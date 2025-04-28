@@ -86,7 +86,6 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col">
-        <div className="p-7">
         {isLoading ? (
               <SkeletonCard count={rowsPerPage} /> // ⬅️ แสดง Skeleton ตามจำนวน rows ที่ตั้งไว้
             ) : (
@@ -112,7 +111,6 @@ function Page() {
                 </div>
               </>
             )}
-        </div>
       </div>
 
       {showModal && (

@@ -91,7 +91,7 @@ export default function Home() {
 
     console.log(resultJSON)
     return (
-        <div className="p-6 overflow-x-auto">
+        <div className=" overflow-x-auto">
             <h2 className="text-xl font-semibold mb-4">Set Tiered Price</h2>
 
             {/* Input controls */}

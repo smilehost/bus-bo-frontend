@@ -146,7 +146,6 @@ function Page() {
     <div className="flex h-screen bg-gray-100">
       {/* ลบ Navbar และ Header */}
       <div className="flex-1 flex flex-col">
-        <div className="p-7">
           <PageHeader onAddDate={handleAddDate} />
 
           <div className="bg-white rounded-md shadow p-5">
@@ -170,7 +169,6 @@ function Page() {
               totalResults={filteredDates.length}
             />
           </div>
-        </div>
       </div>
 
       {showModal && (
