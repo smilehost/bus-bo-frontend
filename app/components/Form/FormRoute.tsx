@@ -54,11 +54,7 @@ function FormRoute({
   const timeData = useDataStore(state => state.timeData);
 
   return (
-<<<<<<< HEAD
-    <form onSubmit={handleSubmit} className='bg-white px-5 py-7 rounded-lg mt-5 w-full '>
-=======
     <form onSubmit={handleSubmit} className='custom-frame-content px-5 py-7 mt-5 w-full'>
->>>>>>> 4e1c0dba24685310f3cd5c758ffc6541fc0de038
       <div className="lg:mx-20">
         <div className='flex justify-between flex-wrap gap-3 '>
           {/* route name */}

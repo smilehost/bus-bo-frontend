@@ -7,7 +7,6 @@ import { userData } from "@/provider/Provider";
 import { XIcon, MenuIcon, LogOutIcon, MoonIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
 
-<<<<<<< HEAD
 export default function RootLayout({
   children,
 }: {
@@ -92,18 +91,6 @@ export default function RootLayout({
           >
             <XIcon size={24} className="text-gray-500 " />
           </button>
-=======
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-    return (
-        <div className='flex'>
-            <Navbar/>
-            <div className='w-full'>
-                <Header />
-                <div className='p-7'>
-                    {children}
-                </div>
-            </div>
->>>>>>> 4e1c0dba24685310f3cd5c758ffc6541fc0de038
         </div>
         <div className="px-3 py-4">
           <div className="space-y-1">
