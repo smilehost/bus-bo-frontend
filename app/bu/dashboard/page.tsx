@@ -1,0 +1,24 @@
+"use client"
+
+import React from 'react'
+import Navbar from '../../components/Navbar/Navbar'
+import Header from '../../components/Header/Header'
+
+function Page() {
+  return (
+    <div className="flex">
+      <Navbar />
+      <div className="w-full">
+        <Header />
+        <div className="p-7">
+          <div className="border h-[50px]"></div>
+        </div>
+      </div>
+      <div>
+        <h1>Dashboard Page</h1>
+      </div>
+    </div>
+  );
+}
+
+export default Page;
