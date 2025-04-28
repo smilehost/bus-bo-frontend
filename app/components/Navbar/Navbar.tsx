@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
-import MenuItem from "../Menu/MenuItem";
-import Image from "next/image";
-import { USER_TIER } from "@/constants/enum";
-import { userData } from "@/provider/Provider";
+
+import React, { useEffect, useState } from 'react'
+import MenuItem from '../Menu/MenuItem';
+import Image from 'next/image'
+import { USER_TIER } from '@/constants/enum'
+import { useDataStore } from "@/stores/dataStore";
 
 type NavbarProps = {
   id?: number;
 };
 
 function Navbar({ id }: NavbarProps) {
+
+  const userData = useDataStore(state => state.userData);
+
   const user_tier = userData.user_tier;
 
   const path = "/bu";

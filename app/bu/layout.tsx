@@ -7,7 +7,7 @@ import Header from '@/app/components/Header/Header'
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className='flex'>
-            <Navbar />
+            <Navbar/>
             <div className='w-full'>
                 <Header />
                 <div className='p-7'>

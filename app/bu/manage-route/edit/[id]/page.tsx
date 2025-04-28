@@ -9,54 +9,79 @@ import { RouteType } from '@/types/routes';
 
 //component 
 import FormRoute from '@/app/components/Form/FormRoute';
+import TitleHeader from '@/app/components/Title/TitleHeader';
 
 //mui
 import { SelectChangeEvent } from '@mui/material';
 
 //mock
-import { stationData } from '@/provider/Provider';
-import { routeData } from '@/provider/Provider';
+import { useDataStore } from "@/stores/dataStore";
+
 
 
 function Page() {
 
+    //mock
+    const stationData = useDataStore(state => state.stationData);
+    const routeData = useDataStore(state => state.routeData);
+
     const params = useParams()
     //set default value
     const [routeIndexData, setRouteIndexData] = useState<RouteType>()
-    // useEffect(() => {
-    //     if (params?.id !== undefined) {
-    //         const id = params.id
-    //         if (id) {
-    //             console.log(route)
-    //             const route = routeData.find((value) => value.id === id);
-    //             setRouteIndexData(route)
-    //         }
-    //     }
-    // }, [params])
+    useEffect(() => {
+        if (params?.id !== undefined) {
+            const foundRoute = routeData.find((value) => value.id === params?.id);
+            if (foundRoute) {
+                const routeIndexData: RouteType = {
+                    id: foundRoute.id,
+                    route: foundRoute.route,
+                    company: foundRoute.company_id,
+                    schedule: foundRoute.schedule_id,
+                    times: foundRoute.times_id,
+                    status: foundRoute.status,
+                    routeColor: foundRoute.routeColor,
+                    stations: foundRoute.stations
+                };
+
+                setRouteIndexData(routeIndexData);
+            }
+        }
+    }, [params, routeData])
 
     useEffect(() => {
         if (routeIndexData) {
-            // กำหนดค่าเริ่มต้นของ routeName
             setRouteName(routeIndexData.route);
-
-            // กำหนดค่าเริ่มต้นของ time
             setSelectedTime(routeIndexData.times.toString());
+            setSchedule(routeIndexData.schedule.toString());
+            setRouteColor(routeIndexData.routeColor.toString())
 
-            // กำหนดค่าเริ่มต้นของ schedule
-            setSchedule(routeIndexData.schedule.toString()); // กำหนดเป็น string
+            // ดึง station ที่ id ตรงกับ routeIndexData.stations
+            const stationObjects = routeIndexData.stations.map((stationId) => {
+                return transformedList.find((s) => s.id === stationId);
+            }).filter(Boolean) as StationProps[];
 
-            // กำหนด 
+            setListB(stationObjects);
+
+            // เอา station ที่ยังไม่ถูกเลือก (ไม่อยู่ใน listB)
+            const filteredListA = transformedList.filter(
+                (station) => !stationObjects.some((s) => s.id === station.id)
+            );
+            setListA(filteredListA);
         }
     }, [routeIndexData]);
+
+    const transformedList = stationData.map((station) => ({
+        id: station.id,
+        name: station.name,
+    }));
 
     //select route name
     const [routeName, setRouteName] = useState<string>('')
 
+    //route color
+    const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
+
     //select station
-    const transformedList = stationData.map((station, index) => ({
-        id: (index + 1).toString(),
-        name: station.name,
-    }));
     const [listA, setListA] = useState<StationProps[]>(transformedList);
     const [listB, setListB] = useState<StationProps[]>([]);
     const [listStations, setListStations] = useState<string[]>([]);
@@ -82,6 +107,7 @@ function Page() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         console.log("Route Name: ", routeName)
+        console.log("Route Color: ", routeColor)
         console.log("Time: ", selectedTime)
         console.log("Schedule: ", schedule)
         console.log("listStations", listStations)
@@ -92,10 +118,12 @@ function Page() {
     }
     return (
         <div>
-            <p className='text-[20px] font-bold'>Edit Route</p>
+            <TitleHeader text={"Edit Route"} />
             <FormRoute
                 routeName={routeName}
                 setRouteName={setRouteName}
+                routeColor={routeColor}
+                setRouteColor={setRouteColor}
                 listA={listA}
                 setListA={setListA}
                 listB={listB}

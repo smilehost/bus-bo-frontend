@@ -14,9 +14,15 @@ import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 
 //mock
-import { companyData, routeData, timeData, scheduleData } from '@/provider/Provider'
+import { useDataStore } from "@/stores/dataStore";
 
 function Page() {
+
+    //mock
+    const companyData = useDataStore(state => state.companyData);
+    const routeData = useDataStore(state => state.routeData);
+    const timeData = useDataStore(state => state.timeData);
+    const scheduleData = useDataStore(state => state.scheduleData);
 
     const router = useRouter();
     const pathname = usePathname();
@@ -34,6 +40,7 @@ function Page() {
         schedule: string,
         time: string,
         status: STATUS,
+        // ticket_amount: string,
         routeColor: string
     ) => {
         return { id, route, company, schedule, time, status, routeColor };
@@ -64,6 +71,8 @@ function Page() {
         const timeId = item.times_id
         const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
 
+        //ticket amount 
+        // const realTicketAmount = item.ticket_amount
         return createData(
             item.id,
             item.route,
