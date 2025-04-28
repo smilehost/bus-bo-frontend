@@ -57,14 +57,19 @@ export default function RootLayout({
       link: `${path}/manage-members`,
     },
     { id: 9, icon: "/icons/report.svg", text: "Reports", link: "" },
-    { id: 10, icon: "/icons/company.svg", text: "Manage Company", link: "" },
+    { 
+      id: 10, 
+      icon: "/icons/company.svg",
+      text: "Manage Company", 
+      link: `${path}/manage-company`, 
+    }
   ];
 
   const [roleMenu, setRoleMenu] = useState<number[]>();
 
   useEffect(() => {
     if (user_tier === USER_TIER.ADMIN) {
-      setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     } else if (user_tier === USER_TIER.SUPER_ADMIN) {
       setRoleMenu([1, 2, 3, 4, 7, 8, 10]);
     }
