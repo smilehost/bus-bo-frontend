@@ -1,90 +1,87 @@
 "use client";
 
-import React, { useState } from "react";
-// ลบการ import Navbar และ Header
-import DateTable from "../../components/Table/DateTable";
-import DateModal from "../../components/Modal/DateModal";
-import SearchFilter from "../../components/SearchFilter/DateSearchFilter";
-import PageHeader from "../../components/PageHeader/DatePageHeader";
+import React, { useEffect, useState, useCallback } from "react";
+import { ManageDateController } from "@/controllers/manageDate.controller";
+import { DateItem } from "@/types/date.type";
+import DateTable from "@/app/components/Table/DateTable";
+import DateModal from "@/app/components/Modal/DateModal";
+import PageHeader from "@/app/components/PageHeader/DatePageHeader";
+import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
+import { debounce } from "@/utils/debounce";
 
 function Page() {
-  const [dates, setDates] = useState([
-    {
-      id: 1,
-      name: "Daily",
-      days: {
-        monday: true,
-        tuesday: true,
-        wednesday: true,
-        thursday: true,
-        friday: true,
-        saturday: true,
-        sunday: true,
-      },
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Weekly",
-      days: {
-        monday: false,
-        tuesday: true,
-        wednesday: false,
-        thursday: true,
-        friday: false,
-        saturday: true,
-        sunday: false,
-      },
-      status: "Inactive",
-    },
-    {
-      id: 3,
-      name: "Monthly",
-      days: {
-        monday: true,
-        tuesday: false,
-        wednesday: true,
-        thursday: false,
-        friday: true,
-        saturday: false,
-        sunday: true,
-      },
-      status: "Active",
-    },
-  ]);
-
-  const [showModal, setShowModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
-  const [editingDate, setEditingDate] = useState<{
-    id: number;
-    name: string;
-    days: {
-      monday: boolean;
-      tuesday: boolean;
-      wednesday: boolean;
-      thursday: boolean;
-      friday: boolean;
-      saturday: boolean;
-      sunday: boolean;
-    };
-    status: string;
-  } | null>(null);
-
+  const [allDates, setAllDates] = useState<DateItem[]>([]); // เก็บข้อมูลทั้งหมด
+  const [filteredDates, setFilteredDates] = useState<DateItem[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("All Status");
+  const [showModal, setShowModal] = useState(false);
+  const [editingDate, setEditingDate] = useState<DateItem | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ดึงข้อมูลทั้งหมดจาก backend (ครั้งเดียว)
+  const fetchDates = async () => {
+    setIsLoading(true);
+    try {
+      const res = await ManageDateController.fetchDates(currentPage, rowsPerPage, debouncedSearch, statusFilter !== "All Status" ? statusFilter : undefined);
+      setAllDates(res.data); 
+    } catch (error) {
+      console.error("โหลดข้อมูลล้มเหลว", error);
+    }
+    setIsLoading(false);
+  };
+
+  // เมื่อ search term หรือ status เปลี่ยน ➔ filter ฝั่ง frontend
+  const filterDates = useCallback(() => {
+    let tempDates = [...allDates];
+
+    if (debouncedSearch) {
+      tempDates = tempDates.filter(date =>
+        date.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+
+    if (statusFilter !== "All Status") {
+      tempDates = tempDates.filter(date => date.status === statusFilter);
+    }
+
+    setFilteredDates(tempDates);
+    setTotalResults(tempDates.length);
+    setCurrentPage(1); // reset ไปหน้าแรกทุกครั้งที่ search/filter
+  }, [allDates, debouncedSearch, statusFilter]);
+
+  const debouncedFetch = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 350),
+    []
+  );
+
+  useEffect(() => {
+    fetchDates();
+  }, []);
+
+  useEffect(() => {
+    filterDates();
+  }, [debouncedSearch, statusFilter, allDates]);
 
   const handleAddDate = () => {
-    setEditingDate(null);
+    setEditingDate(undefined);
     setShowModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setEditingDate(null);
+  const handleEditDate = (id: number) => {
+    const date = allDates.find((d) => d.id === id);
+    if (date) {
+      setEditingDate(date);
+      setShowModal(true);
+    }
   };
 
-  const handleSaveDate = (newDateEntry: {
+  const handleSaveDate = async (data: {
     name: string;
     startDate: string;
     endDate: string;
@@ -99,43 +96,45 @@ function Page() {
     };
     status: string;
   }) => {
+    const date: DateItem = {
+      id: editingDate?.id || 0,
+      name: data.name,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      days: {
+        mon: data.days.monday,
+        tue: data.days.tuesday,
+        wed: data.days.wednesday,
+        thu: data.days.thursday,
+        fri: data.days.friday,
+        sat: data.days.saturday,
+        sun: data.days.sunday,
+      },
+      status: data.status,
+    };
+
     if (editingDate) {
-      setDates(
-        dates.map((date) =>
-          date.id === editingDate.id
-            ? { ...newDateEntry, id: editingDate.id }
-            : date
-        )
-      );
+      await ManageDateController.updateDate(editingDate.id, date);
     } else {
-      setDates([
-        ...dates,
-        { ...newDateEntry, id: dates.length ? dates[dates.length - 1].id + 1 : 1 },
-      ]);
+      await ManageDateController.createDate(date);
     }
     setShowModal(false);
-    setEditingDate(null);
+    fetchDates();
   };
 
-  const handleDeleteDate = (id: number) => {
-    setDates(dates.filter((date) => date.id !== id));
+  const handleDeleteDate = async (id: number) => {
+    await ManageDateController.deleteDate(id);
+    fetchDates();
   };
 
-  const handleEditDate = (id: number) => {
-    const dateToEdit = dates.find((date) => date.id === id);
-    if (dateToEdit) {
-      setEditingDate(dateToEdit);
-      setShowModal(true);
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    debouncedFetch(e.target.value);
   };
 
-  const filteredDates = dates.filter(
-    (date) =>
-      date.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "All Status" ||
-        (statusFilter === "Active" && date.status === "Active") ||
-        (statusFilter === "Inactive" && date.status === "Inactive"))
-  );
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+  };
 
   const paginatedDates = filteredDates.slice(
     (currentPage - 1) * rowsPerPage,
@@ -144,40 +143,61 @@ function Page() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* ลบ Navbar และ Header */}
-      <div className="flex-1 flex flex-col">
-        <div className="p-7">
-          <PageHeader onAddDate={handleAddDate} />
+      <div className="flex-1 flex flex-col p-7">
+        <PageHeader onAddDate={handleAddDate} />
+        <div className="bg-white rounded-md shadow p-5">
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={handleSearchChange}
+            statusFilter={statusFilter}
+            setStatusFilter={handleStatusFilterChange}
+          />
 
-          <div className="bg-white rounded-md shadow p-5">
-            <SearchFilter
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-            />
-
-            <DateTable
-              dates={paginatedDates}
-              onDelete={handleDeleteDate}
-              onEdit={handleEditDate}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={(e) =>
-                setRowsPerPage(Number(e.target.value))
-              }
-              totalResults={filteredDates.length}
-            />
-          </div>
+          <DateTable
+            dates={paginatedDates.map((date) => ({
+              ...date,
+              days: {
+                monday: date.days.mon,
+                tuesday: date.days.tue,
+                wednesday: date.days.wed,
+                thursday: date.days.thu,
+                friday: date.days.fri,
+                saturday: date.days.sat,
+                sunday: date.days.sun,
+              },
+            }))}
+            onEdit={handleEditDate}
+            onDelete={handleDeleteDate}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+            totalResults={totalResults}
+            isLoading={isLoading}
+          />
         </div>
       </div>
 
       {showModal && (
         <DateModal
-          onClose={handleCloseModal}
+          onClose={() => setShowModal(false)}
           onSave={handleSaveDate}
-          editingDate={editingDate || undefined}
+          editingDate={
+            editingDate
+              ? {
+                  ...editingDate,
+                  days: {
+                    monday: editingDate.days.mon,
+                    tuesday: editingDate.days.tue,
+                    wednesday: editingDate.days.wed,
+                    thursday: editingDate.days.thu,
+                    friday: editingDate.days.fri,
+                    saturday: editingDate.days.sat,
+                    sunday: editingDate.days.sun,
+                  },
+                }
+              : undefined
+          }
         />
       )}
     </div>
