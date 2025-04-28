@@ -47,9 +47,9 @@ function FormRoute({
   const router = useRouter();
 
   return (
-    <form onSubmit={handleSubmit} className='bg-white px-5 py-7 rounded-lg mt-5 w-full'>
+    <form onSubmit={handleSubmit} className='bg-white px-5 py-7 rounded-lg mt-5 w-full '>
       <div className="lg:mx-20">
-        <div className='flex justify-between flex-wrap gap-3'>
+        <div className='flex justify-between flex-wrap gap-3 '>
           {/* route name */}
           <InputLabel
             label="Route Name"

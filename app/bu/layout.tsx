@@ -78,7 +78,7 @@ export default function RootLayout({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b bg-white">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-white">
           <div className="flex items-center">
             <div className="h-8 w-8 rounded-md bg-gradient-to-r from-yellow-500 to-orange-500"></div>
             <span className="ml-2 text-lg font-semibold text-gray-800">
@@ -104,7 +104,7 @@ export default function RootLayout({
             ))}
           </div>
         </div>
-        <div className="absolute bottom-0 w-full border-t  ">
+        <div className="absolute bottom-0 w-full border-t border-gray-200   ">
           <div className="flex items-end justify-between px-4 py-3">
             <button>
               <LogOutIcon size={18} className="mr-2" />
