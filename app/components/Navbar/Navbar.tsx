@@ -3,6 +3,7 @@ import MenuItem from "../Menu/MenuItem";
 import Image from "next/image";
 import { USER_TIER } from "@/constants/enum";
 import { userData } from "@/provider/Provider";
+import { XIcon, MenuIcon } from "lucide-react"; 
 
 type NavbarProps = {
   id?: number;
@@ -10,6 +11,7 @@ type NavbarProps = {
 
 function Navbar({ id }: NavbarProps) {
   const user_tier = userData.user_tier;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const path = "/bu";
   const allMenu = [
@@ -68,48 +70,89 @@ function Navbar({ id }: NavbarProps) {
   const menu = allMenu.filter((item) => roleMenu?.includes(item.id));
 
   return (
-    <div className="w-[256px] flex-shrink-0 bg-white min-h-screen flex flex-col justify-between">
-      <div>
-        {/* header */}
-        <div className="flex gap-2 items-center h-[64px] px-6 border-b-1 border-[#E5E7EB]">
-          <Image src={"/logo.svg"} width={32} height={32} priority alt="logo" />
-          <p className="font-bold">BusTicket</p>
+    <div className="flex h-screen bg-white border-r border-[#E5E7EB]">
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-20 w-[256px] transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col justify-between h-full">
+          <div>
+            {/* Header */}
+            <div className="flex items-center gap-2 h-[64px] px-6 border-b border-[#E5E7EB]">
+              <Image src="/logo.svg" width={32} height={32} priority alt="logo" />
+              <p className="font-bold text-gray-800">BusTicket</p>
+              {/* Close button */}
+              <button
+                className="ml-auto p-1 rounded-md lg:hidden focus:outline-none"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <XIcon size={24} className="text-gray-500" />
+              </button>
+            </div>
+
+            {/* Menu */}
+            <div className="p-3 space-y-1">
+              {menu.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  link={item.link}
+                  text={item.text}
+                  icon={item.icon}
+                  status={id === item?.id}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-[#E5E7EB] flex items-center justify-between h-[60px] px-5">
+            <button className="p-2 rounded-lg hover:bg-gray-100">
+              <Image
+                src="/icons/mode-dark.svg"
+                width={18}
+                height={18}
+                priority
+                alt="dark-mode"
+              />
+            </button>
+            <button className="flex items-center text-xs font-medium text-[#DC2626] hover:bg-red-50 rounded-lg px-4 py-2">
+              <Image
+                src="/icons/exit.svg"
+                width={18}
+                height={18}
+                priority
+                alt="logout"
+                className="mr-2"
+              />
+              Logout
+            </button>
+          </div>
         </div>
-        {/* menu */}
-        <div className="p-3 ">
-          {menu.map((item, index) => (
-            <MenuItem
-              key={index}
-              link={item.link}
-              text={item.text}
-              icon={item.icon}
-              status={id === item?.id}
-            />
-          ))}
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <div className="flex items-center justify-between h-[64px] lg:hidden px-4 sm:px-6">
+          {/* Open sidebar button */}
+          <button
+            className="block lg:hidden p-1 rounded-md focus:outline-none"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <MenuIcon size={24} className="text-gray-500" />
+          </button>
         </div>
       </div>
-      {/* footer */}
-      <div className="h-[60px] flex justify-between items-center px-5 border-t-1 border-[#E5E7EB]">
-        <div className="cursor-pointer">
-          <Image
-            src={"/icons/mode-dark.svg"}
-            priority
-            width={18}
-            height={18}
-            alt="icon-menu"
-          />
-        </div>
-        <div className="text-red-500 flex gap-1 items-center cursor-pointer">
-          <Image
-            src={"/icons/exit.svg"}
-            priority
-            width={18}
-            height={18}
-            alt="icon-menu"
-          />
-          <p className="text-xs text-[#DC2626]">Logout</p>
-        </div>
-      </div>
+
+
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-10 bg-white-500 bg-opacity-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
     </div>
   );
 }
