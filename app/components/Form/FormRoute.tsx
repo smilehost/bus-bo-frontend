@@ -12,7 +12,8 @@ import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
 
 //mock
-import { useDataStore } from "@/stores/appStore";
+import { useTimeStore } from '@/stores/timeStore';
+import { useScheduleStore } from '@/stores/scheduleStore';
 
 //type
 import { StationProps } from '@/types/stations';
@@ -36,7 +37,7 @@ type FormRouteProps = {
 function FormRoute({
   routeName,
   setRouteName,
-  routeColor, 
+  routeColor,
   setRouteColor,
   listA,
   setListA,
@@ -50,8 +51,8 @@ function FormRoute({
 }: FormRouteProps) {
   const router = useRouter();
 
-  const scheduleData = useDataStore(state => state.scheduleData);
-  const timeData = useDataStore(state => state.timeData);
+  const { scheduleData } = useScheduleStore();
+  const { timeData } = useTimeStore();
 
   return (
     <form onSubmit={handleSubmit} className='custom-frame-content px-5 py-7 mt-5 w-full'>
@@ -67,7 +68,7 @@ function FormRoute({
             size='min-w-[300px] xl:w-[400px] max-w-[400px]'
           />
           {/* color */}
-          <ColorRoute color={routeColor} setRouteColor={setRouteColor} label={"Route Color"} size_circle='w-[38px] h-[38px]' size_input='w-full' size='min-w-[300px] xl:w-[400px] max-w-[400px]'/>
+          <ColorRoute color={routeColor} setRouteColor={setRouteColor} label={"Route Color"} size_circle='w-[38px] h-[38px]' size_input='w-full' size='min-w-[300px] xl:w-[400px] max-w-[400px]' />
         </div>
         <div className='flex justify-between flex-wrap lg:mt-5 gap-3 mt-3'>
           {/* time */}

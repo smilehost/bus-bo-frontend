@@ -12,10 +12,10 @@ import { TICKET_TYPE } from '@/constants/enum'
 import { useRouter, useParams } from 'next/navigation'
 
 //mock
-import { useDataStore } from '@/stores/appStore'
+import { useTicketStore } from '@/stores/ticketStore'
 
 //type 
-import { TicketProps } from '@/stores/appStore'
+import { TicketProps } from '@/types/types'
 
 export type TicketTypePrice = {
     type: string,
@@ -24,7 +24,7 @@ export type TicketTypePrice = {
 
 function Page() {
 
-    const ticketData = useDataStore(state => state.ticketData);
+    const { ticketData } = useTicketStore();
     const router = useRouter();
     const pathname = usePathname();
 

@@ -13,12 +13,12 @@ import TitleHeader from '@/app/components/Title/TitleHeader';
 import { SelectChangeEvent } from '@mui/material';
 
 //mock
-import { useDataStore } from "@/stores/appStore";
+import { useStationStore } from '@/stores/stationStore';
 
 function Page() {
 
     //mock
-    const stationData = useDataStore(state => state.stationData);
+    const { stationData } = useStationStore();
 
     //select route name
     const [routeName, setRouteName] = useState<string>('')

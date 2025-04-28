@@ -15,15 +15,15 @@ import TitleHeader from '@/app/components/Title/TitleHeader';
 import { SelectChangeEvent } from '@mui/material';
 
 //mock
-import { useDataStore } from "@/stores/appStore";
-
+import { useStationStore } from '@/stores/stationStore';
+import { useRouteStore } from '@/stores/routeStore';
 
 
 function Page() {
 
     //mock
-    const stationData = useDataStore(state => state.stationData);
-    const routeData = useDataStore(state => state.routeData);
+    const { stationData } = useStationStore();
+    const { routeData } = useRouteStore();
 
     const params = useParams()
     //set default value

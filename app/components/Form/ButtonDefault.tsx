@@ -9,7 +9,7 @@ type ButtonDefaultProps = {
 }
 function ButtonDefault({ size, text, icon, onClick }: ButtonDefaultProps) {
     return (
-        <button onClick={onClick} className={`custom-border-gray ${size} px-4 py-2 rounded-lg text-xs cursor-pointer flex justify-center items-center gap-2`}>
+        <div onClick={onClick} className={`custom-border-gray ${size} px-4 py-2 rounded-lg text-xs cursor-pointer flex justify-center items-center gap-2`}>
             {icon && (
                 <Image
                     src={icon}
@@ -20,7 +20,7 @@ function ButtonDefault({ size, text, icon, onClick }: ButtonDefaultProps) {
                 />
             )}
             <p> {text}</p>
-        </button>
+        </div>
     )
 }
 

@@ -14,16 +14,21 @@ import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 
 //mock
-import { useDataStore } from "@/stores/appStore";
+import { useCompanyStore } from '@/stores/companyStore'
+import { useRouteStore } from '@/stores/routeStore'
+import { useTicketStore } from '@/stores/ticketStore'
+import { useTimeStore } from '@/stores/timeStore'
+import { useScheduleStore } from '@/stores/scheduleStore'
 
 function Page() {
 
     //mock
-    const companyData = useDataStore(state => state.companyData);
-    const ticketData = useDataStore(state => state.ticketData);
-    const routeData = useDataStore(state => state.routeData);
-    const timeData = useDataStore(state => state.timeData);
-    const scheduleData = useDataStore(state => state.scheduleData);
+    // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
+    const { companyData } = useCompanyStore();
+    const { routeData } = useRouteStore();
+    const { ticketData } = useTicketStore();
+    const { timeData } = useTimeStore();
+    const { scheduleData } = useScheduleStore();
 
     const router = useRouter();
     const pathname = usePathname();
@@ -75,7 +80,7 @@ function Page() {
 
         //ticket amount 
         const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
-        
+
         return createData(
             item.id,
             item.route,
