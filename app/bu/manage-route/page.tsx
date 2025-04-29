@@ -6,12 +6,11 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 
 //companent 
-import ButtonBG from '@/app/components/Form/ButtonBG'
 import TableRoute from '@/app/components/RoutePage/TableRoute'
-import TitlePage from '@/app/components/Title/TitlePage'
 import { confirmDialog } from '@/app/components/Dialog/Confirm'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
+import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 
 //mock
 import { useCompanyStore } from '@/stores/companyStore'
@@ -141,10 +140,7 @@ function Page() {
 
     return (
         <>
-            <div className='flex justify-between items-end'>
-                <TitlePage title="Manage Routes" description="View and manage bus routes" />
-                <ButtonBG size='h-[38px]' text='Add New Route' icon='/icons/plus.svg' onClick={RedirectoAdd} />
-            </div>
+            <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd}/>
             <FormFilter setSearch={setSearch} placeholderSearch='Search routes...' filter={filterSearch} />
             <div className='bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden'>
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />

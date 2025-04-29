@@ -28,3 +28,7 @@ body {
 .custom-frame-content {
   @apply bg-white rounded-lg shadow-xs mt-5;
 }
+
+.custom-ellipsis-style {
+  @apply whitespace-nowrap text-ellipsis overflow-hidden;
+}

@@ -3,11 +3,10 @@
 import React, { useState } from 'react'
 
 //component
-import TitlePage from '@/app/components/Title/TitlePage'
-import ButtonBG from '@/app/components/Form/ButtonBG'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import ItemUser from '@/app/components/MembersPage/ItemUser'
 import MemberModel from '@/app/components/Model/MemberModel'
+import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 
 //const 
 import { FILTER, STATUS } from '@/constants/enum'
@@ -88,10 +87,7 @@ function Page() {
 
     return (
         <div>
-            <div className='flex justify-between items-end'>
-                <TitlePage title="Manage Members" description="View and manage customer information" />
-                <ButtonBG size='h-[38px]' text='Add New Member' icon='/icons/plus.svg' onClick={handleOpenMemberModel} />
-            </div>
+            <TitlePageAndButton title='Manage Members' description='View and manage customer information' btnText='Add New Member' handleOpenModel={handleOpenMemberModel}/>
             <FormFilter setSearch={setSearch} placeholderSearch='Search by phone or name...' filter={filterSearch} />
             <div className='custom-frame-content'>
                 {filtered?.map((item, index) => {

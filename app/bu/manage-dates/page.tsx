@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { ManageDateController } from "@/controllers/manageDate.controller";
 import { DateItem } from "@/types/date.type";
 import DateTable from "@/app/components/Table/DateTable";
-import DateModal from "@/app/components/Modal/DateModal";
+import DateModal from "@/app/components/Model/DateModal";
 import PageHeader from "@/app/components/PageHeader/DatePageHeader";
 import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";

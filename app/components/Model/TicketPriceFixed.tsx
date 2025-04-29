@@ -13,54 +13,50 @@ import { TicketTypePrice } from '@/app/bu/manage-route/ticket/[id]/page'
 
 type TicketPriceFixedProps = {
     open: boolean
-    listType: string[];
+    listType: TicketTypePrice[];
     setTicketTypePrice: (value: TicketTypePrice[]) => void;
     onClose: () => void
-    onHandle: () => void
+    onHandle: (value: TicketTypePrice[]) => void
 }
 
-function TicketPriceFixed({ open, onClose, onHandle, listType, setTicketTypePrice }: TicketPriceFixedProps) {
+type PriceListItem = {
+    type: string;
+    price: string; // ใช้ string ชั่วคราวใน input
+};
 
-    const [priceList, setPriceList] = useState<Record<string, number>>({});
+function TicketPriceFixed({ open, onClose, onHandle, listType }: TicketPriceFixedProps) {
+    const [priceList, setPriceList] = useState<PriceListItem[]>([]);
 
     useEffect(() => {
-        if (open) {
-            // reset price list ทุกครั้งที่เปิด model
-            const initialPriceList: Record<string, number> = {};
-            listType.forEach(type => {
-                initialPriceList[type] = 0;
-            });
-            setPriceList(initialPriceList);
-        }
-    }, [open, listType]);
-
-    const handlePriceChange = (type: string, value: string) => {
-        const num = parseFloat(value);
-        setPriceList(prev => ({
-            ...prev,
-            [type]: isNaN(num) ? 0 : num
+        const converted = listType.map(item => ({
+            type: item.type,
+            price: item.price.toString()
         }));
+        setPriceList(converted);
+    }, [listType]);
+
+    // handle change on each input
+    const handlePriceChange = (index: number, value: string) => {
+        const newList = [...priceList];
+        newList[index].price = value;
+        setPriceList(newList);
     };
 
     const handleAddPrice = () => {
-        // เช็คก่อนว่ามีช่องไหนที่ยังไม่ได้กรอก หรือกรอก <= 0
-        const isIncomplete = Object.values(priceList).some(price => price <= 0);
-
-        if (isIncomplete) {
+        const isInvalid = priceList.some(p => !p.price || parseFloat(p.price) <= 0);
+        if (isInvalid) {
             alert("Please fill in all prices greater than 0.");
             return;
         }
 
-        const priceArray: TicketTypePrice[] = Object.entries(priceList).map(([type, price]) => ({
-            type,
-            price
+        const finalList = priceList.map(p => ({
+            type: p.type,
+            price: parseFloat(p.price)
         }));
 
-        setTicketTypePrice(priceArray);
-        onHandle(); // callback ที่ฝั่ง page
-        onClose(); // ปิด model
+        onHandle(finalList); // ส่งข้อมูลไปตรงๆ
+        onClose();
     };
-
 
     return (
         <Dialog open={open} onClose={onClose}>
@@ -79,17 +75,17 @@ function TicketPriceFixed({ open, onClose, onHandle, listType, setTicketTypePric
                         </div>
                     </div>
 
-                    {listType.map((item, index) => (
+                    {priceList.map((item, index) => (
                         <div key={index} className='flex text-[16px] border-b border-[#E5E7EB]'>
                             <div className='flex-1 py-4 text-center'>
-                                <p>{item}</p>
+                                <p>{item.type}</p>
                             </div>
                             <div className='flex-1 py-4 flex justify-center'>
                                 <div className='flex gap-3'>
                                     <input
                                         type="number"
-                                        value={priceList[item] || ''}
-                                        onChange={(e) => handlePriceChange(item, e.target.value)}
+                                        value={item.price}
+                                        onChange={(e) => handlePriceChange(index, e.target.value)}
                                         className='custom-border-gray text-center rounded-md w-[100px]'
                                     />
                                     <p>THB</p>
@@ -105,7 +101,8 @@ function TicketPriceFixed({ open, onClose, onHandle, listType, setTicketTypePric
                 </div>
             </DialogContent>
         </Dialog>
-    )
+    );
 }
+
 
 export default TicketPriceFixed

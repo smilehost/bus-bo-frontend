@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ColorResult } from 'react-color';
 import LabelText from './LabelText';
