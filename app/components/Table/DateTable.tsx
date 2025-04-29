@@ -1,3 +1,5 @@
+// src/app/components/Table/DateTable.tsx
+
 import React from "react";
 import Pagination from "../Pagination/Pagination";
 
@@ -5,7 +7,15 @@ type DateTableProps = {
   dates: {
     id: number;
     name: string;
-    days: Record<string, boolean>;
+    days: {
+      monday: boolean;
+      tuesday: boolean;
+      wednesday: boolean;
+      thursday: boolean;
+      friday: boolean;
+      saturday: boolean;
+      sunday: boolean;
+    };
     status: string;
   }[];
   onDelete: (id: number) => void;
@@ -14,6 +24,7 @@ type DateTableProps = {
   onPageChange: (page: number) => void;
   rowsPerPage: number;
   totalResults: number;
+  isLoading: boolean;
   onRowsPerPageChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
@@ -105,7 +116,9 @@ function DateTable({
                           dayIndex >= 5 ? "bg-red-50/30" : ""
                         }`}
                       >
-                        {date.days[day.toLowerCase()] ? (
+                        {!!date.days[
+                          day.toLowerCase() as keyof typeof date.days
+                        ] ? (
                           <span className="inline-flex items-center justify-center w-7 h-7 bg-green-100 text-green-600 rounded-full shadow-sm transition-transform hover:scale-110">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"

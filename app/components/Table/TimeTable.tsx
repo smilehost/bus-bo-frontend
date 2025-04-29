@@ -58,11 +58,12 @@ function TimeTable({
           times.map((time, index) => (
             <div
               key={time.id}
-              className={`flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors duration-150 ${
+              className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-gray-50 transition-colors duration-150 ${
                 index !== times.length - 1 ? "border-b border-gray-200" : ""
               }`}
             >
-              <div className="flex items-center space-x-4">
+              {/* First column - Time name with icon (3 cols) */}
+              <div className="col-span-3 flex items-center space-x-4">
                 <div
                   className={`text-white rounded-full h-10 w-10 flex items-center justify-center text-lg font-medium shadow-sm ${
                     time.name.toLowerCase().includes("morning")
@@ -79,25 +80,44 @@ function TimeTable({
                 <div className="font-medium text-gray-900">{time.name}</div>
               </div>
 
-              <div className="text-gray-700 font-medium flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-gray-400 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {Array.isArray(time.schedule)
-                  ? time.schedule.join(", ")
-                  : String(time.schedule)}
+              {/* Middle column - Schedule with enhanced clock icon (left-aligned, 7 cols) */}
+              <div className="col-span-7 flex items-start">
+                <div className="text-gray-700 font-medium flex items-start text-left group">
+                  {/* Enhanced Clock Icon */}
+                  <div className="relative mr-3 flex-shrink-0">
+                    <div className="h-6 w-6 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm flex items-center justify-center group-hover:shadow transition-all duration-300">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-4 w-4 text-blue-500 group-hover:text-blue-600 transition-colors"
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                    </div>
+                    <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  <div className="text-left">
+                    {Array.isArray(time.schedule) ? (
+                      time.schedule.length > 0 ? (
+                        time.schedule.join(", ")
+                      ) : (
+                        <span className="text-gray-400 italic">No schedule</span>
+                      )
+                    ) : (
+                      String(time.schedule)
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="flex justify-center space-x-2">
+              {/* Third column - Action buttons (2 cols) */}
+              <div className="col-span-2 flex justify-end space-x-2">
                 <button
                   onClick={() => onEdit(time.id)}
                   className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"

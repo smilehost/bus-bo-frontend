@@ -57,7 +57,7 @@ function FormRoute({
   return (
     <form onSubmit={handleSubmit} className='custom-frame-content px-5 py-7 mt-5 w-full'>
       <div className="lg:mx-20">
-        <div className='flex justify-between flex-wrap gap-3'>
+        <div className='flex justify-between flex-wrap gap-3 '>
           {/* route name */}
           <InputLabel
             label="Route Name"

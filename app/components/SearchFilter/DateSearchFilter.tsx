@@ -2,10 +2,11 @@ import React from "react";
 
 interface SearchFilterProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
+  setSearchTerm: (e: React.ChangeEvent<HTMLInputElement>) => void;
   statusFilter: string;
   setStatusFilter: (value: string) => void;
 }
+
 function SearchFilter({
   searchTerm,
   setSearchTerm,
@@ -19,7 +20,7 @@ function SearchFilter({
         placeholder="Search by name..."
         className="border p-2 rounded-md w-3/4"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={setSearchTerm} // ✅ ใช้ e => ส่งให้ฟังก์ชัน handleSearchChange ที่มี debounce
       />
       <div className="flex items-center">
         <span className="mr-2">Filters:</span>
@@ -29,9 +30,9 @@ function SearchFilter({
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
-          <option>All Status</option>
-          <option>Active</option>
-          <option>Inactive</option>
+          <option value="All Status">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
         </select>
       </div>
     </div>
