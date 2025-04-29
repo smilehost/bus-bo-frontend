@@ -14,6 +14,7 @@ type LocationTableProps = {
   onPageChange: (page: number) => void;
   rowsPerPage: number;
   totalResults: number;
+  isLoading: boolean;
   onRowsPerPageChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 

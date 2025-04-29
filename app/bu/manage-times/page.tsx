@@ -9,7 +9,8 @@ import { TimeItem } from "@/types/time.type";
 import { debounce } from "@/utils/debounce";
 
 function Page() {
-  const [times, setTimes] = useState<TimeItem[]>([]);
+  const [allTimes, setAllTimes] = useState<TimeItem[]>([]); // Store all data
+  const [filteredTimes, setFilteredTimes] = useState<TimeItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -21,21 +22,36 @@ function Page() {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchTimes = async (search?: string) => {
+  // Fetch all times from the backend
+  const fetchTimes = async () => {
     setIsLoading(true);
     try {
       const res = await ManageTimeController.fetchTimes(
         currentPage,
         rowsPerPage,
-        search
+        debouncedSearch
       );
-      setTimes(res.data);
-      setTotalResults(res.total);
+      setAllTimes(res.data);
     } catch (error) {
-      console.error("โหลดข้อมูลล้มเหลว", error);
+      console.error("Failed to load data", error);
     }
     setIsLoading(false);
   };
+
+  // Filter times based on search term
+  const filterTimes = useCallback(() => {
+    let tempTimes = [...allTimes];
+
+    if (debouncedSearch) {
+      tempTimes = tempTimes.filter((time) =>
+        time.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+
+    setFilteredTimes(tempTimes);
+    setTotalResults(tempTimes.length);
+    setCurrentPage(1); // Reset to the first page on filter change
+  }, [allTimes, debouncedSearch]);
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -45,41 +61,49 @@ function Page() {
   );
 
   useEffect(() => {
-    fetchTimes(debouncedSearch);
-  }, [currentPage, rowsPerPage, debouncedSearch]);
+    fetchTimes();
+  }, []);
+
+  useEffect(() => {
+    filterTimes();
+  }, [debouncedSearch, allTimes]);
 
   const handleAddTime = () => {
     setEditingTime(undefined);
     setShowModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setEditingTime(undefined);
+  const handleEditTime = (id: number) => {
+    const time = allTimes.find((t) => t.id === id);
+    if (time) {
+      setEditingTime({
+        ...time,
+        times: time.schedule,
+        startTime: time.schedule[0] || "",
+      });
+      setShowModal(true);
+    }
   };
 
-  const handleSaveTime = async (newTimeEntry: {
+  const handleSaveTime = async (data: {
     name: string;
     startTime: string;
     times: string[];
   }) => {
-    const schedule =
-      newTimeEntry.times.length > 0
-        ? newTimeEntry.times
-        : [newTimeEntry.startTime];
+    const schedule = data.times.length > 0 ? data.times : [data.startTime];
 
     try {
       if (editingTime) {
         await ManageTimeController.updateTime(
           editingTime.id,
-          newTimeEntry.name,
+          data.name,
           schedule
         );
       } else {
-        await ManageTimeController.createTime(newTimeEntry.name, schedule);
+        await ManageTimeController.createTime(data.name, schedule);
       }
-      await fetchTimes(debouncedSearch);
-      handleCloseModal();
+      setShowModal(false);
+      fetchTimes();
     } catch (error) {
       console.error("Save Time error:", error);
     }
@@ -88,65 +112,57 @@ function Page() {
   const handleDeleteTime = async (id: number) => {
     try {
       await ManageTimeController.deleteTime(id);
-      await fetchTimes(debouncedSearch);
+      fetchTimes();
     } catch (error) {
       console.error("Delete Time error:", error);
     }
   };
 
-  const handleEditTime = (id: number) => {
-    const timeToEdit = times.find((time) => time.id === id);
-    if (timeToEdit) {
-      setEditingTime({
-        ...timeToEdit,
-        times: timeToEdit.schedule,
-        startTime: timeToEdit.schedule[0] || "",
-      });
-      setShowModal(true);
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    debouncedFetch(e.target.value);
   };
+
+  const paginatedTimes = filteredTimes.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col">
-        <div className="p-7">
-          <PageHeader onAddTime={handleAddTime} />
-
-          <div className="bg-white rounded-md shadow p-5">
-            {/* Search input with debounce */}
-            <div className="flex justify-between mb-4">
-              <input
-                type="text"
-                placeholder="Search by name..."
-                className="border p-2 rounded-md w-full"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  debouncedFetch(e.target.value);
-                }}
-              />
-            </div>
-
-            <TimeTable
-              times={times}
-              isLoading={isLoading}
-              onDelete={handleDeleteTime}
-              onEdit={handleEditTime}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={(e) =>
-                setRowsPerPage(Number(e.target.value))
-              }
-              totalResults={totalResults}
+      <div className="flex-1 flex flex-col p-7">
+        <PageHeader onAddTime={handleAddTime} />
+        <div className="bg-white rounded-md shadow p-5">
+          {/* Search input */}
+          <div className="flex justify-between mb-4">
+            <input
+              type="text"
+              placeholder="Search by name..."
+              className="border p-2 rounded-md w-full"
+              value={searchTerm}
+              onChange={handleSearchChange}
             />
           </div>
+
+          <TimeTable
+            times={paginatedTimes.map((time) => ({
+              ...time,
+            }))}
+            onEdit={handleEditTime}
+            onDelete={handleDeleteTime}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+            totalResults={totalResults}
+            isLoading={isLoading}
+          />
         </div>
       </div>
 
       {showModal && (
         <TimeModal
-          onClose={handleCloseModal}
+          onClose={() => setShowModal(false)}
           onSave={handleSaveTime}
           editingTime={
             editingTime

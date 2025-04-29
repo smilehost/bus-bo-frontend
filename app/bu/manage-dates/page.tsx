@@ -19,19 +19,31 @@ function Page() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All Status");
   const [showModal, setShowModal] = useState(false);
-  const [editingDate, setEditingDate] = useState<DateItem | undefined>(undefined);
+  const [editingDate, setEditingDate] = useState<DateItem | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   // ดึงข้อมูลทั้งหมดจาก backend (ครั้งเดียว)
   const fetchDates = async () => {
     setIsLoading(true);
     try {
-      const res = await ManageDateController.fetchDates(currentPage, rowsPerPage, debouncedSearch, statusFilter !== "All Status" ? statusFilter : undefined);
-      setAllDates(res.data); 
+      const res = await ManageDateController.fetchDates(
+        currentPage,
+        rowsPerPage,
+        debouncedSearch,
+        statusFilter !== "All Status" ? statusFilter : undefined
+      );
+      setAllDates(res.data);
     } catch (error) {
-      console.error("โหลดข้อมูลล้มเหลว", error);
+      console.error("Failed to load data", error);
     }
     setIsLoading(false);
+  };
+
+  const loadDateDetail = async (id: number) => {
+    const date = await ManageDateController.fetchDateById(id);
+    console.log("ข้อมูล Date:", date);
   };
 
   // เมื่อ search term หรือ status เปลี่ยน ➔ filter ฝั่ง frontend
@@ -39,13 +51,13 @@ function Page() {
     let tempDates = [...allDates];
 
     if (debouncedSearch) {
-      tempDates = tempDates.filter(date =>
+      tempDates = tempDates.filter((date) =>
         date.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
 
     if (statusFilter !== "All Status") {
-      tempDates = tempDates.filter(date => date.status === statusFilter);
+      tempDates = tempDates.filter((date) => date.status === statusFilter);
     }
 
     setFilteredDates(tempDates);

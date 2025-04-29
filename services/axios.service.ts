@@ -15,19 +15,19 @@ const instance = axios.create({
   },
 });
 
-// Interceptor ก่อนส่ง request
+// ✅ Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token_bo");
     if (config.headers) {
-      config.headers.set("Authorization", token ? `Bearer ${token}` : "");
-      config.headers.set("com_id", "1"); // ใส่ com_id แค่ใน header เท่านั้น
+      config.headers["Authorization"] = token ? `Bearer ${token}` : "";
+      config.headers["com_id"] = "1"; // ✅ แก้ตรงนี้ให้ถูกต้อง (assign แบบ object property)
     }
   }
   return config;
 });
 
-// Interceptor หลังรับ response
+// ✅ Interceptor หลังรับ response
 instance.interceptors.response.use(
   (response) => {
     const code = response.data?.code;
@@ -50,7 +50,7 @@ instance.interceptors.response.use(
   }
 );
 
-// Service layer (สำหรับเรียกใช้งาน)
+// ✅ Service layer (สำหรับเรียกใช้งาน)
 interface Payload {
   path: string;
   params?: string | number;

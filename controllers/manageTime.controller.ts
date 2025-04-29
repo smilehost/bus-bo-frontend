@@ -9,10 +9,11 @@ export const ManageTimeController = {
   ): Promise<FetchTimesResult> {
     try {
       const res = (await TimeService.fetchTimes({ page, size, search })) as {
-        data: any[];
-        total: number;
+        result: any[];
       };
-      const data: TimeItem[] = res.data.map((item) => ({
+      console.log("DEBUG fetchtime response:", res);
+
+      const data: TimeItem[] = res.result.map((item: any) => ({
         id: item.route_time_id,
         name: item.route_time_name,
         schedule: Array.isArray(item.route_time_array)
@@ -20,23 +21,34 @@ export const ManageTimeController = {
           : item.route_time_array.split(",").map((t: string) => t.trim()),
       }));
 
-      return { data, total: res.total };
+      return { data, total: res.result.length };
     } catch (error) {
       console.error("FetchTimes error:", error);
       throw error;
     }
   },
 
+  async getTimeById(id: number): Promise<TimeItem> {
+    const res = (await TimeService.getTimeById(id)) as any;
+    return {
+      id: res.route_time_id,
+      name: res.route_time_name,
+      schedule: Array.isArray(res.route_time_array)
+        ? res.route_time_array
+        : res.route_time_array.split(",").map((t: string) => t.trim()),
+    };
+  },
+
   async createTime(name: string, schedule: string[]) {
-    await TimeService.createTime({
-      routeTimeName: name,
-      routeTimeArray: schedule,
-      routeTimeComIdd: 1,
+    return await TimeService.createTime({
+      route_time_name: name,
+      route_time_array: schedule,
+      route_time_com_id: 1,
     });
   },
 
   async updateTime(id: number, name: string, schedule: string[]) {
-    await TimeService.updateTime(id, {
+    return await TimeService.updateTime(id, {
       route_time_id: id,
       route_time_name: name,
       route_time_array: schedule.join(","),
@@ -45,6 +57,6 @@ export const ManageTimeController = {
   },
 
   async deleteTime(id: number) {
-    await TimeService.deleteTime(id);
+    return await TimeService.deleteTime(id);
   },
 };
