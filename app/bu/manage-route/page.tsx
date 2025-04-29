@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { STATUS, FILTER } from '@/constants/enum'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
@@ -19,6 +19,7 @@ import { useRouteStore } from '@/stores/routeStore'
 import { useTicketStore } from '@/stores/ticketStore'
 import { useTimeStore } from '@/stores/timeStore'
 import { useScheduleStore } from '@/stores/scheduleStore'
+import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 
 function Page() {
 
@@ -138,20 +139,46 @@ function Page() {
             size: "w-[170px]"
         },
     ]
+    const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+          useEffect(() => {
+                  // Simulate fetching data (fake delay)
+                  const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
+                  return () => clearTimeout(timer);
+                }, []);
 
     return (
         <>
-            <div className='flex justify-between items-end'>
-                <TitlePage title="Manage Routes" description="View and manage bus routes" />
-                <ButtonBG size='h-[38px]' text='Add New Route' icon='/icons/plus.svg' onClick={RedirectoAdd} />
-            </div>
-            <FormFilter setSearch={setSearch} placeholderSearch='Search routes...' filter={filterSearch} />
-            <div className='bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden'>
+          {isLoadingskeleton ? (
+            <SkeletonRoute />
+          ) : (
+            <>
+              <div className="flex justify-between items-end">
+                <TitlePage
+                  title="Manage Routes"
+                  description="View and manage bus routes"
+                />
+                <ButtonBG
+                  size="h-[38px]"
+                  text="Add New Route"
+                  icon="/icons/plus.svg"
+                  onClick={RedirectoAdd}
+                />
+              </div>
+      
+              <FormFilter
+                setSearch={setSearch}
+                placeholderSearch="Search routes..."
+                filter={filterSearch}
+              />
+      
+              <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-            </div>
-
+              </div>
+            </>
+          )}
         </>
-    )
+      );
+      
 }
 
 export default Page

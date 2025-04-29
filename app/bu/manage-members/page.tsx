@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 //component
 import TitlePage from '@/app/components/Title/TitlePage'
@@ -16,13 +16,21 @@ import { FILTER, STATUS } from '@/constants/enum'
 import { useUserStore } from '@/stores/userStore'
 import { useCompanyStore } from '@/stores/companyStore'
 import { useMemberStore } from '@/stores/memberStore'
+import SkeletonMemberPage from '@/app/components/Skeleton/SkeletonMemberPage'
 
 function Page() {
 
     const { companyData } = useCompanyStore();
     const { membersData } = useMemberStore();
     const { userData } = useUserStore();
+    const [isLoading, setIsLoading] = useState(true); // ✅ loading state
+    const [rowsPerPage, setRowsPerPage] = useState(4);
 
+    useEffect(() => {
+        // Simulate fetching data (fake delay)
+        const timer = setTimeout(() => setIsLoading(false), 1000);
+        return () => clearTimeout(timer);
+      }, []);
     //member data
     const [members, setMembers] = useState(membersData)
 
@@ -87,33 +95,60 @@ function Page() {
     }
 
     return (
-        <div>
-            <div className='flex justify-between items-end'>
-                <TitlePage title="Manage Members" description="View and manage customer information" />
-                <ButtonBG size='h-[38px]' text='Add New Member' icon='/icons/plus.svg' onClick={handleOpenMemberModel} />
-            </div>
-            <FormFilter setSearch={setSearch} placeholderSearch='Search by phone or name...' filter={filterSearch} />
-            <div className='custom-frame-content'>
+        <>
+          {isLoading ? (
+            <SkeletonMemberPage rows={5} />
+          ) : (
+            <div>
+              <div className="flex justify-between items-end">
+                <TitlePage 
+                  title="Manage Members" 
+                  description="View and manage customer information" 
+                />
+                <ButtonBG 
+                  size="h-[38px]" 
+                  text="Add New Member" 
+                  icon="/icons/plus.svg" 
+                  onClick={handleOpenMemberModel} 
+                />
+              </div>
+      
+              <FormFilter 
+                setSearch={setSearch} 
+                placeholderSearch="Search by phone or name..." 
+                filter={filterSearch} 
+              />
+      
+              <div className="custom-frame-content">
                 {filtered?.map((item, index) => {
-                    const company = getCompanyName({ id: item.member_company_id });
-                    return (
-                        <React.Fragment key={index}>
-                            <ItemUser
-                                name={item.member_name}
-                                tel={item.member_phone}
-                                status={item.member_status}
-                                company={company}
-                                tripsTotal={item.member_tripsTotal}
-                                lastTransaction={item.member_lastTransaction}
-                            />
-                            {index < filtered.length - 1 && <hr className=' border-t border-[#E5E7EB]' />}
-                        </React.Fragment>
-                    )
+                  const company = getCompanyName({ id: item.member_company_id });
+                  return (
+                    <React.Fragment key={index}>
+                      <ItemUser
+                        name={item.member_name}
+                        tel={item.member_phone}
+                        status={item.member_status}
+                        company={company}
+                        tripsTotal={item.member_tripsTotal}
+                        lastTransaction={item.member_lastTransaction}
+                      />
+                      {index < filtered.length - 1 && (
+                        <hr className="border-t border-[#E5E7EB]" />
+                      )}
+                    </React.Fragment>
+                  );
                 })}
+              </div>
+      
+              <MemberModel 
+                open={memberModelOpen} 
+                onClose={handleCloseMemberModel} 
+                onHandle={handleNewMember} 
+              />
             </div>
-            <MemberModel open={memberModelOpen} onClose={handleCloseMemberModel} onHandle={handleNewMember} />
-        </div>
-    )
-}
+          )}
+        </>
+      );
+}      
 
 export default Page

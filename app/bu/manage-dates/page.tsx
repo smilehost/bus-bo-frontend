@@ -8,6 +8,7 @@ import PageHeader from "@/app/components/PageHeader/DatePageHeader";
 import DateModal from "@/app/components/Model/DateModal";
 import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
+import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 
 function Page() {
   const [allDates, setAllDates] = useState<DateItem[]>([]); // เก็บข้อมูลทั้งหมด
@@ -140,44 +141,56 @@ function Page() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+            useEffect(() => {
+                    // Simulate fetching data (fake delay)
+                    const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
+                    return () => clearTimeout(timer);
+                  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        <PageHeader onAddDate={handleAddDate} />
-        <div className="bg-white rounded-md shadow p-5">
-          <SearchFilter
-            searchTerm={searchTerm}
-            setSearchTerm={handleSearchChange}
-            statusFilter={statusFilter}
-            setStatusFilter={handleStatusFilterChange}
-          />
-
-          <DateTable
-            dates={paginatedDates.map((date) => ({
-              ...date,
-              days: {
-                monday: date.days.mon,
-                tuesday: date.days.tue,
-                wednesday: date.days.wed,
-                thursday: date.days.thu,
-                friday: date.days.fri,
-                saturday: date.days.sat,
-                sunday: date.days.sun,
-              },
-            }))}
-            onEdit={handleEditDate}
-            onDelete={handleDeleteDate}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
-            totalResults={totalResults}
-            isLoading={isLoading}
-          />
-        </div>
+        {isLoadingskeleton ? (
+          <SkeletonDateTable count={5} />
+        ) : (
+          <>
+            <PageHeader onAddDate={handleAddDate} />
+            <div className="bg-white rounded-md shadow p-5">
+              <SearchFilter
+                searchTerm={searchTerm}
+                setSearchTerm={handleSearchChange}
+                statusFilter={statusFilter}
+                setStatusFilter={handleStatusFilterChange}
+              />
+  
+              <DateTable
+                dates={paginatedDates.map((date) => ({
+                  ...date,
+                  days: {
+                    monday: date.days.mon,
+                    tuesday: date.days.tue,
+                    wednesday: date.days.wed,
+                    thursday: date.days.thu,
+                    friday: date.days.fri,
+                    saturday: date.days.sat,
+                    sunday: date.days.sun,
+                  },
+                }))}
+                onEdit={handleEditDate}
+                onDelete={handleDeleteDate}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+                totalResults={totalResults}
+                isLoading={isLoading}
+              />
+            </div>
+          </>
+        )}
       </div>
-
+  
       {showModal && (
         <DateModal
           onClose={() => setShowModal(false)}

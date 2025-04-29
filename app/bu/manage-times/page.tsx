@@ -7,6 +7,7 @@ import PageHeader from "@/app/components/PageHeader/TimePageHeader";
 import { ManageTimeController } from "@/controllers/manageTime.controller";
 import { TimeItem } from "@/types/time.type";
 import { debounce } from "@/utils/debounce";
+import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
 
 function Page() {
   const [times, setTimes] = useState<TimeItem[]>([]);
@@ -20,6 +21,12 @@ function Page() {
     (TimeItem & { times?: string[]; startTime?: string }) | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+  useEffect(() => {
+          // Simulate fetching data (fake delay)
+          const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
+          return () => clearTimeout(timer);
+        }, []);
 
   const fetchTimes = async (search?: string) => {
     setIsLoading(true);
@@ -108,11 +115,13 @@ function Page() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col">
+      {isLoadingskeleton ? (
+        <SkeletonManageTime rows={5} />
+      ) : (
+        <div className="flex-1 flex flex-col">
           <PageHeader onAddTime={handleAddTime} />
-
           <div className="bg-white rounded-md shadow p-5">
-            {/* Search input with debounce */}
+            {/* Search input */}
             <div className="flex justify-between mb-4">
               <input
                 type="text"
@@ -140,7 +149,8 @@ function Page() {
               totalResults={totalResults}
             />
           </div>
-      </div>
+        </div>
+      )}
 
       {showModal && (
         <TimeModal

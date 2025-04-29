@@ -6,18 +6,34 @@ import LocationModal from "../../components/Model/LocationModal";
 import SearchFilter from "../../components/SearchFilter/LocationSearchFilter";
 import PageHeader from "../../components/PageHeader/LocationPageHeader";
 import SkeletonCard from "../../components/SkeletonCard"; // ✅ import Skeleton
+import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
 
 function Page() {
   const [locations, setLocations] = useState([
-    { id: 1, name: "Bang Sue Grand Station", latitude: 13.8028, longitude: 100.5382 },
+    {
+      id: 1,
+      name: "Bang Sue Grand Station",
+      latitude: 13.8028,
+      longitude: 100.5382,
+    },
     { id: 2, name: "Chatuchak Park", latitude: 13.8027, longitude: 100.553 },
     { id: 3, name: "Victory Monument", latitude: 13.7649, longitude: 100.5374 },
     { id: 4, name: "Siam Paragon", latitude: 13.7461, longitude: 100.5342 },
     { id: 5, name: "Central World", latitude: 13.7461, longitude: 100.5353 },
     { id: 6, name: "MBK Center", latitude: 13.7461, longitude: 100.5342 },
     { id: 7, name: "Terminal 21", latitude: 13.7367, longitude: 100.5604 },
-    { id: 8, name: "Asiatique The Riverfront", latitude: 13.7073, longitude: 100.5161 },
-    { id: 9, name: "Chatuchak Weekend Market", latitude: 13.8006, longitude: 100.5583 },
+    {
+      id: 8,
+      name: "Asiatique The Riverfront",
+      latitude: 13.7073,
+      longitude: 100.5161,
+    },
+    {
+      id: 9,
+      name: "Chatuchak Weekend Market",
+      latitude: 13.8006,
+      longitude: 100.5583,
+    },
     { id: 10, name: "Lumphini Park", latitude: 13.7308, longitude: 100.5413 },
   ]);
 
@@ -49,15 +65,24 @@ function Page() {
     setEditingLocation(null);
   };
 
-  const handleSaveLocation = (newLocation: { name: string; latitude: number; longitude: number }) => {
+  const handleSaveLocation = (newLocation: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  }) => {
     if (editingLocation) {
-      setLocations(locations.map((loc) =>
-        loc.id === editingLocation.id
-          ? { ...newLocation, id: editingLocation.id }
-          : loc
-      ));
+      setLocations(
+        locations.map((loc) =>
+          loc.id === editingLocation.id
+            ? { ...newLocation, id: editingLocation.id }
+            : loc
+        )
+      );
     } else {
-      setLocations([...locations, { ...newLocation, id: locations.length + 1 }]);
+      setLocations([
+        ...locations,
+        { ...newLocation, id: locations.length + 1 },
+      ]);
     }
     handleCloseModal();
   };
@@ -87,30 +112,30 @@ function Page() {
     <div className="flex h-screen bg-gray-100 ">
       <div className="flex-1 flex flex-col">
         {isLoading ? (
-              <SkeletonCard count={rowsPerPage} /> // ⬅️ แสดง Skeleton ตามจำนวน rows ที่ตั้งไว้
-            ) : (
-              <>
-                <PageHeader onAddLocation={handleAddLocation} />
-                <div className="bg-white rounded-md shadow p-5">
-                  <SearchFilter
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                  />
-                  <LocationTable
-                    locations={paginatedLocations}
-                    onDelete={handleDeleteLocation}
-                    onEdit={handleEditLocation}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={(e) =>
-                      setRowsPerPage(Number(e.target.value))
-                    }
-                    totalResults={filteredLocations.length}
-                  />
-                </div>
-              </>
-            )}
+          <SkeletonLocationTable rows={5} />
+        ) : (
+          <>
+            <PageHeader onAddLocation={handleAddLocation} />
+            <div className="bg-white rounded-md shadow p-5">
+              <SearchFilter
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+              />
+              <LocationTable
+                locations={paginatedLocations}
+                onDelete={handleDeleteLocation}
+                onEdit={handleEditLocation}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(e) =>
+                  setRowsPerPage(Number(e.target.value))
+                }
+                totalResults={filteredLocations.length}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {showModal && (

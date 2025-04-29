@@ -1,6 +1,6 @@
 'use client'; // เพราะมี useState, Chart ต้อง render ฝั่ง client
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -17,6 +17,7 @@ import {
 
 import { FilterIcon, UsersIcon, CreditCardIcon, TruckIcon } from 'lucide-react';
 import { JSX } from '@emotion/react/jsx-runtime';
+import SkeletonDashboard from '@/app/components/Skeleton/SkeletonDashboard';
 
 const transactionData = [
   { name: 'Cash', value: 4000, color: '#10B981' },
@@ -33,11 +34,21 @@ const routeData = [
 export default function DashboardPage() {
   const [selectedCompany, setSelectedCompany] = useState('all');
   const [selectedProvince, setSelectedProvince] = useState('all');
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+      useEffect(() => {
+              // Simulate fetching data (fake delay)
+              const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
+              return () => clearTimeout(timer);
+            }, []);
 
   const totalPassengers = routeData.reduce((sum, route) => sum + route.passengers, 0);
   const totalAmount = routeData.reduce((sum, route) => sum + route.amount, 0);
 
   return (
+    <>
+    {isLoadingskeleton ? (
+      <SkeletonDashboard />
+    ) : (
     <div className="">
       {/* Header */}
       <div className="mb-6">
@@ -151,7 +162,9 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )}
+  </>
+);
 }
 function StatsCard({ title, value, icon, change, iconBg }: { title: string; value: string | number; icon: JSX.Element; change: string; iconBg: string }) {
   return (
