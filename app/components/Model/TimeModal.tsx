@@ -73,7 +73,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
           <div className="absolute top-3 right-3">
             <button
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+              className="cursor-pointer text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +139,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
               </label>
               <button
                 onClick={addTimeSlot}
-                className="flex items-center text-sm px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors font-medium shadow-sm"
+                className="cursor-pointer flex items-center text-sm px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors font-medium shadow-sm"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +175,7 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
                           newTimes.splice(index, 1);
                           setNewTime({ ...newTime, times: newTimes });
                         }}
-                        className="ml-2 text-orange-400 hover:text-orange-700 transition-colors"
+                        className="cursor-pointer ml-2 text-orange-400 hover:text-orange-700 transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -222,13 +222,13 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
         <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-4 border-t">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+            className="cursor-pointer px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSaveTime}
-            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-medium hover:opacity-90 transition-opacity shadow"
+            className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-medium hover:opacity-90 transition-opacity shadow"
           >
             {isEditing ? "Update Time" : "Add Time"}
           </button>

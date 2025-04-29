@@ -152,7 +152,7 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
                 selectedOption === "Select"
                   ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
                   : "bg-white"
-              }`}
+              } cursor-pointer`}
               onClick={() => handleSelectOption("Select")}
             >
               Select
@@ -162,7 +162,7 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
                 selectedOption === "All Days"
                   ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
                   : "bg-white"
-              }`}
+              } cursor-pointer`}
               onClick={() => handleSelectOption("All Days")}
             >
               All Days
@@ -196,22 +196,6 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
                     setNewDate({ ...newDate, startDate: e.target.value })
                   }
                 />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </span>
               </div>
             </div>
             <div>
@@ -227,22 +211,6 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
                     setNewDate({ ...newDate, endDate: e.target.value })
                   }
                 />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </span>
               </div>
             </div>
           </div>
@@ -265,21 +233,15 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
                   key={day}
                   onClick={() => handleDaySelect(day)}
                   disabled={selectedOption === "All Days"}
-                  className={`
-                    py-2 px-1 rounded-md text-center text-sm font-medium transition-all duration-200
-                    ${
-                      newDate.days[
-                        day.toLowerCase() as keyof typeof newDate.days
-                      ]
-                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
-                        : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
-                    }
-                    ${
-                      selectedOption === "All Days"
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }
-                  `}
+                  className={`cursor-pointer py-2 px-1 rounded-md text-center text-sm font-medium transition-all duration-200 ${
+                    newDate.days[day.toLowerCase() as keyof typeof newDate.days]
+                      ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                      : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
+                  } ${
+                    selectedOption === "All Days"
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                 >
                   {day.slice(0, 3)}
                 </button>
@@ -291,13 +253,13 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
         <div className="flex justify-end space-x-4 mt-6">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50"
+            className="cursor-pointer px-6 py-2.5 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSaveDate}
-            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-md font-medium hover:from-yellow-600 hover:to-orange-600 shadow-md"
+            className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-md font-medium hover:from-yellow-600 hover:to-orange-600 shadow-md"
           >
             {isEditing ? "Update Date" : "Add Date"}
           </button>

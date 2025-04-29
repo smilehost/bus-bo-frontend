@@ -11,8 +11,11 @@ import { debounce } from "@/utils/debounce";
 import dynamic from "next/dynamic";
 import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
+import { Confirm } from "@/app/components/Dialog/Confirm";
+import { Alert } from "@/app/components/Dialog/Alert";
 
 function Page() {
+  // State variables
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +29,7 @@ function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
+  // Fetch locations from the backend
   const fetchLocations = async () => {
     setIsLoading(true);
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
@@ -43,6 +47,7 @@ function Page() {
       setIsLoadingskeleton(false); // reset กลับ
   };
 
+  // Debounced search handler
   const debouncedFetch = useCallback(
     debounce((value: string) => {
       setDebouncedSearch(value);
@@ -50,15 +55,10 @@ function Page() {
     []
   );
 
+  // Effect to fetch locations when page or rows per page changes
   useEffect(() => {
     fetchLocations();
   }, [currentPage, rowsPerPage]);
-
-  useEffect(() => {
-    // Simulate fetching data (fake delay)
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleAddLocation = () => {
     setEditingLocation(undefined);
@@ -85,21 +85,76 @@ function Page() {
       long: data.longitude.toString(),
     };
 
-    if (editingLocation) {
-      await ManageLocationController.updateLocation(
-        editingLocation.id,
-        location
-      );
-    } else {
-      await ManageLocationController.createLocation(location);
+    const isConfirmed = await Confirm({
+      title: editingLocation ? "Confirm Update" : "Confirm Create",
+      text: editingLocation
+        ? "Do you want to update this location?"
+        : "Do you want to create this location?",
+      confirmText: editingLocation ? "Update" : "Create",
+      cancelText: "Cancel",
+      type: "question",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      if (editingLocation) {
+        await ManageLocationController.updateLocation(
+          editingLocation.id,
+          location
+        );
+        await Alert({
+          title: "Updated!",
+          text: "Location updated successfully",
+          type: "success",
+        });
+      } else {
+        await ManageLocationController.createLocation(location);
+        await Alert({
+          title: "Created!",
+          text: "Location created successfully",
+          type: "success",
+        });
+      }
+      setShowModal(false);
+      fetchLocations();
+    } catch (error) {
+      console.error("Save Location error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Something went wrong.",
+        type: "error",
+      });
     }
-    setShowModal(false);
-    fetchLocations();
   };
 
   const handleDeleteLocation = async (id: number) => {
-    await ManageLocationController.deleteLocation(id);
-    fetchLocations();
+    const isConfirmed = await Confirm({
+      title: "Confirm Delete",
+      text: "Are you sure you want to delete this location?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "warning",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await ManageLocationController.deleteLocation(id);
+      await Alert({
+        title: "Deleted!",
+        text: "Location deleted successfully",
+        type: "success",
+      });
+      fetchLocations();
+    } catch (error) {
+      console.error("Delete Location error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to delete.",
+        type: "error",
+      });
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,11 +162,18 @@ function Page() {
     debouncedFetch(e.target.value);
   };
 
-  // 🔥 Search เฉพาะฝั่ง client (ใน state) เท่านั้น
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newRowsPerPage = Number(e.target.value);
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1); 
+  };
+
+  // Filter locations based on search term
   const filteredLocations = locations.filter((loc) =>
     loc.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
+  // Paginate filtered locations
   const paginatedLocations = filteredLocations.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
@@ -159,6 +221,7 @@ function Page() {
         )}
       </div>
 
+      {/* Location Modal */}
       {showModal && (
         <LocationModal
           onClose={() => setShowModal(false)}
