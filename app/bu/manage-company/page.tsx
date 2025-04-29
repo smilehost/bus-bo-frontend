@@ -47,7 +47,7 @@ export default function ManageCompanies() {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center justify-center w-full md:w-auto"
+          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center justify-center w-full md:w-auto cursor-pointer"
         >
           <span className="mr-2 text-xl font-bold">+</span>
           Add New Company

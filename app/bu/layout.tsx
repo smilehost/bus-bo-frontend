@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { USER_TIER } from "@/constants/enum";
 import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
@@ -18,7 +17,10 @@ export default function RootLayout({
 
   const path = "/bu";
   const allMenu = [
-    { id: 1, icon: "/icons/home.svg", text: "Dashboard", link: `${path}` },
+    { id: 1, 
+      icon: "/icons/home.svg", 
+      text: "Dashboard", 
+      link: `${path}/dashboard` },
     { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "" },
     {
       id: 3,
@@ -56,7 +58,10 @@ export default function RootLayout({
       text: "Manage Members",
       link: `${path}/manage-members`,
     },
-    { id: 9, icon: "/icons/report.svg", text: "Reports", link: "" },
+    { id: 9, 
+      icon: "/icons/report.svg", 
+      text: "Reports", 
+      link: `${path}/reports` },
     { 
       id: 10, 
       icon: "/icons/company.svg",
