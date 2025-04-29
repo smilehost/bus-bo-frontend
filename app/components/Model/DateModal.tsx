@@ -111,7 +111,8 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
       ...newDate,
       days: {
         ...newDate.days,
-        [day.toLowerCase() as keyof typeof newDate.days]: !newDate.days[day.toLowerCase() as keyof typeof newDate.days],
+        [day.toLowerCase() as keyof typeof newDate.days]:
+          !newDate.days[day.toLowerCase() as keyof typeof newDate.days],
       },
     });
   };
@@ -137,7 +138,9 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg w-full max-w-3xl shadow-xl">
-        <h2 className="text-xl font-semibold mb-2 text-center">Add New Date</h2>
+        <h2 className="text-xl font-semibold mb-2 text-center">
+          {isEditing ? "Edit Date" : "Add New Date"}
+        </h2>
         <p className="text-gray-500 text-sm text-center mb-6">
           Fill in the dates details below
         </p>
@@ -265,7 +268,9 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
                   className={`
                     py-2 px-1 rounded-md text-center text-sm font-medium transition-all duration-200
                     ${
-                      newDate.days[day.toLowerCase() as keyof typeof newDate.days]
+                      newDate.days[
+                        day.toLowerCase() as keyof typeof newDate.days
+                      ]
                         ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
                         : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
                     }

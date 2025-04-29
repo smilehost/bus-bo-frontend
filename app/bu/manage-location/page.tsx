@@ -1,53 +1,53 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import LocationTable from "../../components/Table/LocationTable";
-import LocationModal from "../../components/Model/LocationModal";
-import SearchFilter from "../../components/SearchFilter/LocationSearchFilter";
-import PageHeader from "../../components/PageHeader/LocationPageHeader";
-import SkeletonCard from "../../components/SkeletonCard"; // ✅ import Skeleton
-import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
+import React, { useEffect, useState, useCallback } from "react";
+import { ManageLocationController } from "@/controllers/manageLocation.controller";
+import { LocationItem } from "@/types/location.type";
+import LocationTable from "@/app/components/Table/LocationTable";
+import LocationModal from "@/app/components/Modal/LocationModal";
+import PageHeader from "@/app/components/PageHeader/LocationPageHeader";
+import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
+import { debounce } from "@/utils/debounce";
+import dynamic from "next/dynamic";
 
 function Page() {
-  const [locations, setLocations] = useState([
-    {
-      id: 1,
-      name: "Bang Sue Grand Station",
-      latitude: 13.8028,
-      longitude: 100.5382,
-    },
-    { id: 2, name: "Chatuchak Park", latitude: 13.8027, longitude: 100.553 },
-    { id: 3, name: "Victory Monument", latitude: 13.7649, longitude: 100.5374 },
-    { id: 4, name: "Siam Paragon", latitude: 13.7461, longitude: 100.5342 },
-    { id: 5, name: "Central World", latitude: 13.7461, longitude: 100.5353 },
-    { id: 6, name: "MBK Center", latitude: 13.7461, longitude: 100.5342 },
-    { id: 7, name: "Terminal 21", latitude: 13.7367, longitude: 100.5604 },
-    {
-      id: 8,
-      name: "Asiatique The Riverfront",
-      latitude: 13.7073,
-      longitude: 100.5161,
-    },
-    {
-      id: 9,
-      name: "Chatuchak Weekend Market",
-      latitude: 13.8006,
-      longitude: 100.5583,
-    },
-    { id: 10, name: "Lumphini Park", latitude: 13.7308, longitude: 100.5413 },
-  ]);
-
-  const [isLoading, setIsLoading] = useState(true); // ✅ loading state
-  const [showModal, setShowModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingLocation, setEditingLocation] = useState<null | {
-    id: number;
-    name: string;
-    latitude: number;
-    longitude: number;
-  }>(null);
+  const [locations, setLocations] = useState<LocationItem[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingLocation, setEditingLocation] = useState<
+    LocationItem | undefined
+  >(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchLocations = async () => {
+    setIsLoading(true);
+    try {
+      const res = await ManageLocationController.fetchLocations(
+        currentPage,
+        rowsPerPage
+      );
+      setLocations(res.data);
+      setTotalResults(res.total);
+    } catch (error) {
+      console.error("Failed to load data", error);
+    }
+    setIsLoading(false);
+  };
+
+  const debouncedFetch = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 350),
+    []
+  );
+
+  useEffect(() => {
+    fetchLocations();
+  }, [currentPage, rowsPerPage]);
 
   useEffect(() => {
     // Simulate fetching data (fake delay)
@@ -56,51 +56,55 @@ function Page() {
   }, []);
 
   const handleAddLocation = () => {
-    setEditingLocation(null);
+    setEditingLocation(undefined);
     setShowModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setEditingLocation(null);
-  };
-
-  const handleSaveLocation = (newLocation: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  }) => {
-    if (editingLocation) {
-      setLocations(
-        locations.map((loc) =>
-          loc.id === editingLocation.id
-            ? { ...newLocation, id: editingLocation.id }
-            : loc
-        )
-      );
-    } else {
-      setLocations([
-        ...locations,
-        { ...newLocation, id: locations.length + 1 },
-      ]);
-    }
-    handleCloseModal();
-  };
-
-  const handleDeleteLocation = (id: number) => {
-    setLocations(locations.filter((loc) => loc.id !== id));
-  };
-
   const handleEditLocation = (id: number) => {
-    const locationToEdit = locations.find((loc) => loc.id === id);
-    if (locationToEdit) {
-      setEditingLocation(locationToEdit);
+    const location = locations.find((loc) => loc.id === id);
+    if (location) {
+      setEditingLocation(location);
       setShowModal(true);
     }
   };
 
+  const handleSaveLocation = async (data: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  }) => {
+    const location: LocationItem = {
+      id: editingLocation?.id || 0,
+      name: data.name,
+      lat: data.latitude.toString(),
+      long: data.longitude.toString(),
+    };
+
+    if (editingLocation) {
+      await ManageLocationController.updateLocation(
+        editingLocation.id,
+        location
+      );
+    } else {
+      await ManageLocationController.createLocation(location);
+    }
+    setShowModal(false);
+    fetchLocations();
+  };
+
+  const handleDeleteLocation = async (id: number) => {
+    await ManageLocationController.deleteLocation(id);
+    fetchLocations();
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    debouncedFetch(e.target.value);
+  };
+
+  // 🔥 Search เฉพาะฝั่ง client (ใน state) เท่านั้น
   const filteredLocations = locations.filter((loc) =>
-    loc.name.toLowerCase().includes(searchTerm.toLowerCase())
+    loc.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   const paginatedLocations = filteredLocations.slice(
@@ -109,6 +113,7 @@ function Page() {
   );
 
   return (
+<<<<<<< HEAD
     <div className="flex h-screen bg-gray-100 ">
       <div className="flex-1 flex flex-col">
         {isLoading ? (
@@ -136,13 +141,53 @@ function Page() {
             </div>
           </>
         )}
+=======
+    <div className="flex h-screen bg-gray-100">
+      <div className="flex-1 flex flex-col p-7">
+        <PageHeader onAddLocation={handleAddLocation} />
+
+        <div className="bg-white rounded-md shadow p-5">
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+          />
+          <LocationTable
+            locations={paginatedLocations.map((location) => ({
+              id: location.id,
+              name: location.name,
+              latitude: parseFloat(location.lat),
+              longitude: parseFloat(location.long),
+            }))}
+            onEdit={handleEditLocation}
+            onDelete={handleDeleteLocation}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+            totalResults={filteredLocations.length}
+            isLoading={isLoading}
+          />
+        </div>
+>>>>>>> fa57600a4d3159966d889ed4265a585bd26e380f
       </div>
 
       {showModal && (
         <LocationModal
-          onClose={handleCloseModal}
+          onClose={() => setShowModal(false)}
           onSave={handleSaveLocation}
-          editingLocation={editingLocation}
+          editingLocation={
+            editingLocation
+              ? {
+                  name: editingLocation.name,
+                  latitude: parseFloat(editingLocation.lat),
+                  longitude: parseFloat(editingLocation.long),
+                }
+              : undefined
+          }
         />
       )}
     </div>
