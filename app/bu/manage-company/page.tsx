@@ -1,6 +1,6 @@
 'use client';
 
-import CompanyModal from '@/app/components/Modal/CompanyModal';
+import CompanyModal from '@/app/components/Model/CompanyModal';
 import CompanyTable from '@/app/components/Table/CompanyTable';
 import { useState } from 'react';
 

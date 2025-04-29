@@ -3,16 +3,16 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { USER_TIER } from "@/constants/enum";
-import { XIcon, MenuIcon, LogOutIcon, MoonIcon } from "lucide-react";
+import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
-import { useDataStore } from "@/stores/appStore";
+import { useUserStore } from "@/stores/userStore";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userData = useDataStore(state => state.userData);
+  const userData = useUserStore((state) => state.userData);
   const user_tier = userData.user_tier;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
