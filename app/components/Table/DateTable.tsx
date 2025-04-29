@@ -170,7 +170,7 @@ function DateTable({
                       <div className="flex justify-center space-x-2">
                         <button
                           onClick={() => onEdit(date.id)}
-                          className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"
+                          className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer"
                           title="Edit"
                         >
                           <svg
@@ -184,7 +184,7 @@ function DateTable({
                         </button>
                         <button
                           onClick={() => onDelete(date.id)}
-                          className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
+                          className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm cursor-pointer"
                           title="Delete"
                         >
                           <svg

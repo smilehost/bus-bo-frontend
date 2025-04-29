@@ -7,9 +7,11 @@ import PageHeader from "@/app/components/PageHeader/TimePageHeader";
 import { ManageTimeController } from "@/controllers/manageTime.controller";
 import { TimeItem } from "@/types/time.type";
 import { debounce } from "@/utils/debounce";
+import { Confirm } from "@/app/components/Dialog/Confirm";
+import { Alert } from "@/app/components/Dialog/Alert";
 
 function Page() {
-  const [allTimes, setAllTimes] = useState<TimeItem[]>([]); // Store all data
+  const [allTimes, setAllTimes] = useState<TimeItem[]>([]);
   const [filteredTimes, setFilteredTimes] = useState<TimeItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,7 +24,6 @@ function Page() {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch all times from the backend
   const fetchTimes = async () => {
     setIsLoading(true);
     try {
@@ -38,19 +39,16 @@ function Page() {
     setIsLoading(false);
   };
 
-  // Filter times based on search term
   const filterTimes = useCallback(() => {
     let tempTimes = [...allTimes];
-
     if (debouncedSearch) {
       tempTimes = tempTimes.filter((time) =>
         time.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
-
     setFilteredTimes(tempTimes);
     setTotalResults(tempTimes.length);
-    setCurrentPage(1); // Reset to the first page on filter change
+    setCurrentPage(1); // Reset page
   }, [allTimes, debouncedSearch]);
 
   const debouncedFetch = useCallback(
@@ -92,6 +90,18 @@ function Page() {
   }) => {
     const schedule = data.times.length > 0 ? data.times : [data.startTime];
 
+    const isConfirmed = await Confirm({
+      title: editingTime ? "Confirm Update" : "Confirm Create",
+      text: editingTime
+        ? "Do you want to update this time?"
+        : "Do you want to create this time?",
+      confirmText: editingTime ? "Update" : "Create",
+      cancelText: "Cancel",
+      type: "question",
+    });
+
+    if (!isConfirmed) return;
+
     try {
       if (editingTime) {
         await ManageTimeController.updateTime(
@@ -99,23 +109,64 @@ function Page() {
           data.name,
           schedule
         );
+        await Alert({
+          title: "Updated!",
+          text: "Time updated successfully",
+          type: "success",
+        });
       } else {
         await ManageTimeController.createTime(data.name, schedule);
+        await Alert({
+          title: "Created!",
+          text: "Time created successfully",
+          type: "success",
+        });
       }
       setShowModal(false);
       fetchTimes();
     } catch (error) {
       console.error("Save Time error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Something went wrong.",
+        type: "error",
+      });
     }
   };
 
   const handleDeleteTime = async (id: number) => {
+    const isConfirmed = await Confirm({
+      title: "Confirm Delete",
+      text: "Are you sure you want to delete this time?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "warning",
+    });
+
+    if (!isConfirmed) return;
+
     try {
       await ManageTimeController.deleteTime(id);
+      await Alert({
+        title: "Deleted!",
+        text: "Time deleted successfully",
+        type: "success",
+      });
       fetchTimes();
     } catch (error) {
       console.error("Delete Time error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to delete.",
+        type: "error",
+      });
     }
+  };
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newRowsPerPage = Number(e.target.value);
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,8 +183,8 @@ function Page() {
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
         <PageHeader onAddTime={handleAddTime} />
+
         <div className="bg-white rounded-md shadow p-5">
-          {/* Search input */}
           <div className="flex justify-between mb-4">
             <input
               type="text"
@@ -145,15 +196,13 @@ function Page() {
           </div>
 
           <TimeTable
-            times={paginatedTimes.map((time) => ({
-              ...time,
-            }))}
+            times={paginatedTimes}
             onEdit={handleEditTime}
             onDelete={handleDeleteTime}
             currentPage={currentPage}
             onPageChange={setCurrentPage}
             rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+            onRowsPerPageChange={handleRowsPerPageChange}
             totalResults={totalResults}
             isLoading={isLoading}
           />

@@ -120,7 +120,7 @@ function TimeTable({
               <div className="col-span-2 flex justify-end space-x-2">
                 <button
                   onClick={() => onEdit(time.id)}
-                  className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"
+                  className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer" 
                   title="Edit"
                 >
                   <svg
@@ -134,7 +134,7 @@ function TimeTable({
                 </button>
                 <button
                   onClick={() => onDelete(time.id)}
-                  className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
+                  className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm cursor-pointer"
                   title="Delete"
                 >
                   <svg

@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import TableRoute from '@/app/components/RoutePage/TableRoute'
 import TitlePage from '@/app/components/Title/TitlePage'
-import { confirmDialog } from '@/app/components/Dialog/Confirm'
+import { Confirm } from '@/app/components/Dialog/Confirm'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 
@@ -86,7 +86,7 @@ function Page() {
 
     // Handle delete route
     const handleDeleteRoute = async ({ route, index }: { route: string, index: number }) => {
-        const confirmed = await confirmDialog({
+        const confirmed = await Confirm({
             title: `Delete "${route}"?`,
             text: "Do you want to delete this route?",
             confirmText: "Delete",

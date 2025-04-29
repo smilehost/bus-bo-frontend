@@ -13,7 +13,7 @@ function PageHeader({ onAddTime }: PageHeaderProps) {
       </div>
       <button 
         onClick={onAddTime}
-        className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center"
+        className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center cursor-pointer"
       >
         <span className="mr-2">+</span>
         Add New Time

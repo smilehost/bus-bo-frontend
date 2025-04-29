@@ -8,9 +8,12 @@ import DateModal from "@/app/components/Modal/DateModal";
 import PageHeader from "@/app/components/PageHeader/DatePageHeader";
 import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
+import { Confirm } from "@/app/components/Dialog/Confirm";
+import { Alert } from "@/app/components/Dialog/Alert";
 
 function Page() {
-  const [allDates, setAllDates] = useState<DateItem[]>([]); // เก็บข้อมูลทั้งหมด
+  // State variables
+  const [allDates, setAllDates] = useState<DateItem[]>([]);
   const [filteredDates, setFilteredDates] = useState<DateItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +27,7 @@ function Page() {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  // ดึงข้อมูลทั้งหมดจาก backend (ครั้งเดียว)
+  // Fetch all dates from the backend
   const fetchDates = async () => {
     setIsLoading(true);
     try {
@@ -41,12 +44,7 @@ function Page() {
     setIsLoading(false);
   };
 
-  const loadDateDetail = async (id: number) => {
-    const date = await ManageDateController.fetchDateById(id);
-    console.log("ข้อมูล Date:", date);
-  };
-
-  // เมื่อ search term หรือ status เปลี่ยน ➔ filter ฝั่ง frontend
+  // Filter dates based on search term and status
   const filterDates = useCallback(() => {
     let tempDates = [...allDates];
 
@@ -62,7 +60,7 @@ function Page() {
 
     setFilteredDates(tempDates);
     setTotalResults(tempDates.length);
-    setCurrentPage(1); // reset ไปหน้าแรกทุกครั้งที่ search/filter
+    setCurrentPage(1); // Reset to the first page on filter change
   }, [allDates, debouncedSearch, statusFilter]);
 
   const debouncedFetch = useCallback(
@@ -108,36 +106,98 @@ function Page() {
     };
     status: string;
   }) => {
-    const date: DateItem = {
-      id: editingDate?.id || 0,
-      name: data.name,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      days: {
-        mon: data.days.monday,
-        tue: data.days.tuesday,
-        wed: data.days.wednesday,
-        thu: data.days.thursday,
-        fri: data.days.friday,
-        sat: data.days.saturday,
-        sun: data.days.sunday,
-      },
-      status: data.status,
+    const schedule = {
+      mon: data.days.monday,
+      tue: data.days.tuesday,
+      wed: data.days.wednesday,
+      thu: data.days.thursday,
+      fri: data.days.friday,
+      sat: data.days.saturday,
+      sun: data.days.sunday,
     };
 
-    if (editingDate) {
-      await ManageDateController.updateDate(editingDate.id, date);
-    } else {
-      await ManageDateController.createDate(date);
+    const isConfirmed = await Confirm({
+      title: editingDate ? "Confirm Update" : "Confirm Create",
+      text: editingDate
+        ? "Do you want to update this date?"
+        : "Do you want to create this date?",
+      confirmText: editingDate ? "Update" : "Create",
+      cancelText: "Cancel",
+      type: "question",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      if (editingDate) {
+        await ManageDateController.updateDate(editingDate.id, {
+          id: editingDate.id,
+          ...data,
+          days: schedule,
+        });
+        await Alert({
+          title: "Updated!",
+          text: "Date updated successfully",
+          type: "success",
+        });
+      } else {
+        await ManageDateController.createDate({
+          id: 0, // Default or placeholder ID
+          ...data,
+          days: schedule,
+        });
+        await Alert({
+          title: "Created!",
+          text: "Date created successfully",
+          type: "success",
+        });
+      }
+      setShowModal(false);
+      fetchDates();
+    } catch (error) {
+      console.error("Save Date error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Something went wrong.",
+        type: "error",
+      });
     }
-    setShowModal(false);
-    fetchDates();
   };
 
   const handleDeleteDate = async (id: number) => {
-    await ManageDateController.deleteDate(id);
-    fetchDates();
+    const isConfirmed = await Confirm({
+      title: "Confirm Delete",
+      text: "Are you sure you want to delete this date?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "warning",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await ManageDateController.deleteDate(id);
+      await Alert({
+        title: "Deleted!",
+        text: "Date deleted successfully",
+        type: "success",
+      });
+      fetchDates();
+    } catch (error) {
+      console.error("Delete Date error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to delete.",
+        type: "error",
+      });
+    }
   };
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newRowsPerPage = Number(e.target.value);
+      setRowsPerPage(newRowsPerPage);
+      setCurrentPage(1); 
+    };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -157,6 +217,7 @@ function Page() {
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
         <PageHeader onAddDate={handleAddDate} />
+
         <div className="bg-white rounded-md shadow p-5">
           <SearchFilter
             searchTerm={searchTerm}
@@ -183,7 +244,7 @@ function Page() {
             currentPage={currentPage}
             onPageChange={setCurrentPage}
             rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+            onRowsPerPageChange={handleRowsPerPageChange}
             totalResults={totalResults}
             isLoading={isLoading}
           />

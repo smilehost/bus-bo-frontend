@@ -13,7 +13,7 @@ function PageHeader({ onAddDate }: PageHeaderProps) {
       </div>
       <button
         onClick={onAddDate}
-        className="px-4 py-2 text-white font-medium bg-gradient-to-r from-yellow-500 to-orange-500 rounded-md flex items-center hover:opacity-90"
+        className="px-4 py-2 text-white font-medium bg-gradient-to-r from-yellow-500 to-orange-500 rounded-md flex items-center hover:opacity-90 cursor-pointer"
       >
         <span className="mr-2">+</span>
         Add New Date
