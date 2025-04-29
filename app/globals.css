@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
+/* Variable */
 :root {
   --main-gradient: linear-gradient(to right, #eab308, #f97316);
 }
 
+/* Basic Setup */
 body {
   background-color: #f3f4f6;
 }
@@ -18,7 +20,7 @@ body {
 
 .custom-btn-bg-main {
   @apply px-4 py-2 rounded-md text-white cursor-pointer;
-  background-image: var(--main-gradient); /* ใช้ตัวแปรที่สร้าง */
+  background-image: var(--main-gradient);
 }
 
 .custom-border-gray {
@@ -27,4 +29,20 @@ body {
 
 .custom-frame-content {
   @apply bg-white rounded-lg shadow-xs mt-5;
+}
+
+/* 🎯 เพิ่ม Animation Fade-In-Up (แบบเดียวกับที่ทำให้ Table Animate) */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.5s ease-out forwards;
 }

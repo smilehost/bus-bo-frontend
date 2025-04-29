@@ -9,6 +9,7 @@ import DateModal from "@/app/components/Model/DateModal";
 import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
 import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
 function Page() {
   const [allDates, setAllDates] = useState<DateItem[]>([]); // เก็บข้อมูลทั้งหมด
@@ -24,10 +25,11 @@ function Page() {
     undefined
   );
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   // ดึงข้อมูลทั้งหมดจาก backend (ครั้งเดียว)
   const fetchDates = async () => {
     setIsLoading(true);
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
     try {
       const res = await ManageDateController.fetchDates(
         currentPage,
@@ -39,7 +41,9 @@ function Page() {
     } catch (error) {
       console.error("Failed to load data", error);
     }
+    cancelSkeleton();
     setIsLoading(false);
+    setIsLoadingskeleton(false)
   };
 
   const loadDateDetail = async (id: number) => {
@@ -153,12 +157,7 @@ function Page() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
-            useEffect(() => {
-                    // Simulate fetching data (fake delay)
-                    const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-                    return () => clearTimeout(timer);
-                  }, []);
+ 
 
   return (
     <div className="flex h-screen bg-gray-100">

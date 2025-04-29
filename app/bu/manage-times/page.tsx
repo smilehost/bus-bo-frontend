@@ -8,6 +8,7 @@ import { ManageTimeController } from "@/controllers/manageTime.controller";
 import { TimeItem } from "@/types/time.type";
 import { debounce } from "@/utils/debounce";
 import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
 function Page() {
   const [allTimes, setAllTimes] = useState<TimeItem[]>([]); // Store all data
@@ -22,16 +23,12 @@ function Page() {
     (TimeItem & { times?: string[]; startTime?: string }) | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
-  useEffect(() => {
-          // Simulate fetching data (fake delay)
-          const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-          return () => clearTimeout(timer);
-        }, []);
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
   // Fetch all times from the backend
   const fetchTimes = async () => {
     setIsLoading(true);
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
     try {
       const res = await ManageTimeController.fetchTimes(
         currentPage,
@@ -41,8 +38,11 @@ function Page() {
       setAllTimes(res.data);
     } catch (error) {
       console.error("Failed to load data", error);
-    }
+    }finally {
+    cancelSkeleton();
     setIsLoading(false);
+    setIsLoadingskeleton(false)
+    }
   };
 
   // Filter times based on search term
@@ -135,38 +135,46 @@ function Page() {
     currentPage * rowsPerPage
   );
 
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        <PageHeader onAddTime={handleAddTime} />
-        <div className="bg-white rounded-md shadow p-5">
-          {/* Search input */}
-          <div className="flex justify-between mb-4">
-            <input
-              type="text"
-              placeholder="Search by name..."
-              className="border p-2 rounded-md w-full"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </div>
-
-          <TimeTable
-            times={paginatedTimes.map((time) => ({
-              ...time,
-            }))}
-            onEdit={handleEditTime}
-            onDelete={handleDeleteTime}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
-            totalResults={totalResults}
-            isLoading={isLoading}
-          />
-        </div>
-      )}
-
+        {isLoadingskeleton ? (
+          <SkeletonManageTime rows={5} />
+        ) : (
+          <>
+            <PageHeader onAddTime={handleAddTime} />
+  
+            <div className="bg-white rounded-md shadow p-5">
+              {/* Search input */}
+              <div className="flex justify-between mb-4">
+                <input
+                  type="text"
+                  placeholder="Search by name..."
+                  className="border p-2 rounded-md w-full"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+  
+              <TimeTable
+                times={paginatedTimes.map((time) => ({
+                  ...time,
+                }))}
+                onEdit={handleEditTime}
+                onDelete={handleDeleteTime}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+                totalResults={totalResults}
+                isLoading={isLoading}
+              />
+            </div>
+          </>
+        )}
+      </div>
+  
       {showModal && (
         <TimeModal
           onClose={() => setShowModal(false)}
@@ -184,6 +192,7 @@ function Page() {
       )}
     </div>
   );
+  
 }
 
 export default Page;

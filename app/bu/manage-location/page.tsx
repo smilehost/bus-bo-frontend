@@ -4,11 +4,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { ManageLocationController } from "@/controllers/manageLocation.controller";
 import { LocationItem } from "@/types/location.type";
 import LocationTable from "@/app/components/Table/LocationTable";
-import LocationModal from "@/app/components/Modal/LocationModal";
+import LocationModal from "@/app/components/Model/LocationModal";
 import PageHeader from "@/app/components/PageHeader/LocationPageHeader";
 import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
 import { debounce } from "@/utils/debounce";
 import dynamic from "next/dynamic";
+import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
 function Page() {
   const [locations, setLocations] = useState<LocationItem[]>([]);
@@ -21,10 +23,12 @@ function Page() {
   const [editingLocation, setEditingLocation] = useState<
     LocationItem | undefined
   >(undefined);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
   const fetchLocations = async () => {
     setIsLoading(true);
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
     try {
       const res = await ManageLocationController.fetchLocations(
         currentPage,
@@ -34,8 +38,9 @@ function Page() {
       setTotalResults(res.total);
     } catch (error) {
       console.error("Failed to load data", error);
-    }
-    setIsLoading(false);
+    } cancelSkeleton();
+      setIsLoading(false);
+      setIsLoadingskeleton(false); // reset กลับ
   };
 
   const debouncedFetch = useCallback(
@@ -113,23 +118,33 @@ function Page() {
   );
 
   return (
-<<<<<<< HEAD
-    <div className="flex h-screen bg-gray-100 ">
-      <div className="flex-1 flex flex-col">
-        {isLoading ? (
-          <SkeletonLocationTable rows={5} />
+    <div className="flex h-screen bg-gray-100">
+      <div className="flex-1 flex flex-col p-7">
+        {isLoadingskeleton ? (
+          <SkeletonLocationTable rows={rowsPerPage} />
         ) : (
           <>
             <PageHeader onAddLocation={handleAddLocation} />
+
             <div className="bg-white rounded-md shadow p-5">
               <SearchFilter
                 searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
+                setSearchTerm={(value: string) =>
+                  handleSearchChange({
+                    target: { value },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                }
               />
+
               <LocationTable
-                locations={paginatedLocations}
-                onDelete={handleDeleteLocation}
+                locations={paginatedLocations.map((location) => ({
+                  id: location.id,
+                  name: location.name,
+                  latitude: parseFloat(location.lat),
+                  longitude: parseFloat(location.long),
+                }))}
                 onEdit={handleEditLocation}
+                onDelete={handleDeleteLocation}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
                 rowsPerPage={rowsPerPage}
@@ -137,42 +152,11 @@ function Page() {
                   setRowsPerPage(Number(e.target.value))
                 }
                 totalResults={filteredLocations.length}
+                isLoading={isLoading}
               />
             </div>
           </>
         )}
-=======
-    <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col p-7">
-        <PageHeader onAddLocation={handleAddLocation} />
-
-        <div className="bg-white rounded-md shadow p-5">
-          <SearchFilter
-            searchTerm={searchTerm}
-            setSearchTerm={(value: string) =>
-              handleSearchChange({
-                target: { value },
-              } as React.ChangeEvent<HTMLInputElement>)
-            }
-          />
-          <LocationTable
-            locations={paginatedLocations.map((location) => ({
-              id: location.id,
-              name: location.name,
-              latitude: parseFloat(location.lat),
-              longitude: parseFloat(location.long),
-            }))}
-            onEdit={handleEditLocation}
-            onDelete={handleDeleteLocation}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
-            totalResults={filteredLocations.length}
-            isLoading={isLoading}
-          />
-        </div>
->>>>>>> fa57600a4d3159966d889ed4265a585bd26e380f
       </div>
 
       {showModal && (
