@@ -112,7 +112,7 @@ function LocationTable({
                       </a>
                       <button
                         onClick={() => onEdit(loc.id)}
-                        className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"
+                        className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer"
                         title="Edit"
                       >
                         <svg
@@ -126,7 +126,7 @@ function LocationTable({
                       </button>
                       <button
                         onClick={() => onDelete(loc.id)}
-                        className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
+                        className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm cursor-pointer"
                         title="Delete"
                       >
                         <svg

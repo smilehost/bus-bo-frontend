@@ -77,6 +77,10 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
       alert("Please select at least one day");
       return;
     }
+    if (!newDate.name) {
+      alert("Please enter a date name");
+      return;
+    }
 
     const finalDays =
       selectedOption === "All Days"
@@ -150,7 +154,7 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
             <button
               className={`flex-1 py-3 text-center font-medium ${
                 selectedOption === "Select"
-                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600"
                   : "bg-white"
               } cursor-pointer`}
               onClick={() => handleSelectOption("Select")}
@@ -160,7 +164,7 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
             <button
               className={`flex-1 py-3 text-center font-medium ${
                 selectedOption === "All Days"
-                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600"
                   : "bg-white"
               } cursor-pointer`}
               onClick={() => handleSelectOption("All Days")}

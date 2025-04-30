@@ -4,61 +4,35 @@ import React, { useState, useEffect, useCallback } from "react";
 import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Model/TimeModal";
 import PageHeader from "@/app/components/PageHeader/TimePageHeader";
-import { ManageTimeController } from "@/controllers/manageTime.controller";
-import { TimeItem } from "@/types/time.type";
+import { useTimeStore } from "@/stores/timeStore";
 import { debounce } from "@/utils/debounce";
 import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
-import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 
 function Page() {
-  const [allTimes, setAllTimes] = useState<TimeItem[]>([]);
-  const [filteredTimes, setFilteredTimes] = useState<TimeItem[]>([]);
-  const [totalResults, setTotalResults] = useState(0);
+  const {
+    times,
+    total,
+    isLoading,
+    getTimes,
+    createTime,
+    updateTime,
+    deleteTime,
+  } = useTimeStore();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [filteredTimes, setFilteredTimes] = useState(times); // State สำหรับผลลัพธ์การค้นหา
   const [showModal, setShowModal] = useState(false);
   const [editingTime, setEditingTime] = useState<
-    (TimeItem & { times?: string[]; startTime?: string }) | undefined
+    ((typeof times)[0] & { times?: string[]; startTime?: string }) | undefined
   >(undefined);
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
-
-  const fetchTimes = async () => {
-    setIsLoading(true);
-    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    try {
-      const res = await ManageTimeController.fetchTimes(
-        currentPage,
-        rowsPerPage,
-        debouncedSearch
-      );
-      setAllTimes(res.data);
-    } catch (error) {
-      console.error("Failed to load data", error);
-    }finally {
-    cancelSkeleton();
-    setIsLoading(false);
-    setIsLoadingskeleton(false)
-    }
-  };
-
-  const filterTimes = useCallback(() => {
-    let tempTimes = [...allTimes];
-    if (debouncedSearch) {
-      tempTimes = tempTimes.filter((time) =>
-        time.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
-    }
-    setFilteredTimes(tempTimes);
-    setTotalResults(tempTimes.length);
-    setCurrentPage(1); // Reset page
-  }, [allTimes, debouncedSearch]);
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -68,12 +42,15 @@ function Page() {
   );
 
   useEffect(() => {
-    fetchTimes();
-  }, []);
+    getTimes(currentPage, rowsPerPage);
+  }, [currentPage, rowsPerPage]);
 
   useEffect(() => {
-    filterTimes();
-  }, [debouncedSearch, allTimes]);
+    const filtered = times.filter((time) =>
+      time.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+    );
+    setFilteredTimes(filtered);
+  }, [debouncedSearch, times]);
 
   const handleAddTime = () => {
     setEditingTime(undefined);
@@ -81,7 +58,7 @@ function Page() {
   };
 
   const handleEditTime = (id: number) => {
-    const time = allTimes.find((t) => t.id === id);
+    const time = times.find((t) => t.id === id);
     if (time) {
       setEditingTime({
         ...time,
@@ -113,18 +90,14 @@ function Page() {
 
     try {
       if (editingTime) {
-        await ManageTimeController.updateTime(
-          editingTime.id,
-          data.name,
-          schedule
-        );
+        await updateTime(editingTime.id, data.name, schedule);
         await Alert({
           title: "Updated!",
           text: "Time updated successfully",
           type: "success",
         });
       } else {
-        await ManageTimeController.createTime(data.name, schedule);
+        await createTime(data.name, schedule);
         await Alert({
           title: "Created!",
           text: "Time created successfully",
@@ -132,7 +105,7 @@ function Page() {
         });
       }
       setShowModal(false);
-      fetchTimes();
+      getTimes(currentPage, rowsPerPage);
     } catch (error) {
       console.error("Save Time error:", error);
       await Alert({
@@ -155,13 +128,13 @@ function Page() {
     if (!isConfirmed) return;
 
     try {
-      await ManageTimeController.deleteTime(id);
+      await deleteTime(id);
       await Alert({
         title: "Deleted!",
         text: "Time deleted successfully",
         type: "success",
       });
-      fetchTimes();
+      getTimes(currentPage, rowsPerPage);
     } catch (error) {
       console.error("Delete Time error:", error);
       await Alert({
@@ -187,7 +160,6 @@ function Page() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -228,15 +200,15 @@ function Page() {
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
                 rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
-                totalResults={totalResults}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                totalResults={filteredTimes.length}
                 isLoading={isLoading}
               />
 }
             </div>
           </>
       </div>
-  
+
       {showModal && (
         <TimeModal
           onClose={() => setShowModal(false)}
@@ -254,7 +226,6 @@ function Page() {
       )}
     </div>
   );
-  
 }
 
 export default Page;
