@@ -5,8 +5,8 @@ type TitleHeaderProps = {
 }
 function TitleHeader({ text }: TitleHeaderProps) {
     return (
-        <p className='text-[20px] font-bold'>{text}</p>
-    )
-}
+      <h1 className='text-2xl font-semibold text-gray-800'>{text}</h1>
+    );
+  }
 
 export default TitleHeader

@@ -45,11 +45,8 @@ export default function ManageCompanies() {
   };
 
   return (
-    <>
-      {isLoadingskeleton ? (
-        <SkeletonCompanyTable rows={5} />
-      ) : (
-        <div className="">
+
+        <div >
           {/* Header */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
             <div>
@@ -75,9 +72,10 @@ export default function ManageCompanies() {
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
+          
   
           {/* Table */}
-          <CompanyTable companies={filteredCompanies} />
+          {isLoadingskeleton ? <SkeletonCompanyTable rows={5} /> :  <CompanyTable companies={filteredCompanies} />}
   
           {/* Modal */}
           <CompanyModal
@@ -88,7 +86,5 @@ export default function ManageCompanies() {
             setNewCompanyName={setNewCompanyName}
           />
         </div>
-      )}
-    </>
   );
 }

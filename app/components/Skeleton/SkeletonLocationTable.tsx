@@ -10,17 +10,17 @@ const SkeletonLocationTable: React.FC<SkeletonLocationTableProps> = ({
   return (
     <div className="flex flex-col space-y-6 animate-pulse">
       {/* Page Header + Search Filter */}
-      <div className="flex justify-between items-center mb-4">
+      {/* <div className="flex justify-between items-center mb-4">
         <div>
           <div className="h-6 w-48 bg-gray-200 rounded-md mb-2" />
           <div className="h-4 w-64 bg-gray-200 rounded-md" />
         </div>
         <div className="h-10 w-40 bg-gradient-to-r bg-gray-300 rounded-md" />
-      </div>
+      </div> */}
       
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <div className="w-full h-10 border border-gray-200 bg-white rounded-md px-3" />
-      </div>
+      </div> */}
 
       {/* Table Container */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">

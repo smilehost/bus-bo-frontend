@@ -12,6 +12,8 @@ import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
+import TitlePage from "@/app/components/Title/TitlePage";
+import ButtonBG from "@/app/components/Form/ButtonBG";
 
 function Page() {
   // State variables
@@ -46,7 +48,7 @@ function Page() {
     }
     cancelSkeleton();
     setIsLoading(false);
-    setIsLoadingskeleton(false)
+    setIsLoadingskeleton(false);
   };
 
   // Filter dates based on search term and status
@@ -199,10 +201,10 @@ function Page() {
   };
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newRowsPerPage = Number(e.target.value);
-      setRowsPerPage(newRowsPerPage);
-      setCurrentPage(1); 
-    };
+    const newRowsPerPage = Number(e.target.value);
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -217,16 +219,25 @@ function Page() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
- 
 
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        {isLoadingskeleton ? (
-          <SkeletonDateTable count={5} />
-        ) : (
+        
           <>
-            <PageHeader onAddDate={handleAddDate} />
+            {/* <PageHeader onAddDate={handleAddDate} /> */}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+              <TitlePage
+                title="Manage Date"
+                description="View and manage date information"
+              />
+              <ButtonBG
+                size="h-[38px]"
+                text="Add New Date"
+                icon="/icons/plus.svg"
+                onClick={handleAddDate}
+              />
+            </div>
             <div className="bg-white rounded-md shadow p-5">
               <SearchFilter
                 searchTerm={searchTerm}
@@ -234,7 +245,7 @@ function Page() {
                 statusFilter={statusFilter}
                 setStatusFilter={handleStatusFilterChange}
               />
-  
+              {isLoadingskeleton ? <SkeletonDateTable count={5} /> : 
               <DateTable
                 dates={paginatedDates.map((date) => ({
                   ...date,
@@ -253,15 +264,16 @@ function Page() {
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
                 rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+                onRowsPerPageChange={(e) =>
+                  setRowsPerPage(Number(e.target.value))
+                }
                 totalResults={totalResults}
                 isLoading={isLoading}
-              />
+              />}
             </div>
           </>
-        )}
       </div>
-  
+
       {showModal && (
         <DateModal
           onClose={() => setShowModal(false)}

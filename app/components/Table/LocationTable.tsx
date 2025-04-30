@@ -72,8 +72,7 @@ function LocationTable({
               locations.map((loc, index) => (
                 <tr
                   key={loc.id}
-                  className={`transition-all duration-500 ease-out transform opacity-0 translate-y-4 animate-fade-in ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                  className={`transition-all duration-500 ease-out transform border-b border-gray-200 opacity-0 translate-y-4 animate-fade-in 
                   }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >

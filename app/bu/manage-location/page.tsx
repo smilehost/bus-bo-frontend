@@ -13,6 +13,8 @@ import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTab
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
+import TitlePage from "@/app/components/Title/TitlePage";
+import ButtonBG from "@/app/components/Form/ButtonBG";
 
 function Page() {
   // State variables
@@ -182,11 +184,20 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        {isLoadingskeleton ? (
-          <SkeletonLocationTable rows={rowsPerPage} />
-        ) : (
           <>
-            <PageHeader onAddLocation={handleAddLocation} />
+            {/* <PageHeader onAddLocation={handleAddLocation} /> */}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+              <TitlePage
+                title="Manage Location"
+                description="View and manage location information"
+              />
+              <ButtonBG
+                size="h-[38px]"
+                text="Add New Location"
+                icon="/icons/plus.svg"
+                onClick={handleAddLocation}
+              />
+            </div>
 
             <div className="bg-white rounded-md shadow p-5">
               <SearchFilter
@@ -197,7 +208,7 @@ function Page() {
                   } as React.ChangeEvent<HTMLInputElement>)
                 }
               />
-
+               {isLoadingskeleton ? <SkeletonLocationTable rows={5} /> :
               <LocationTable
                 locations={paginatedLocations.map((location) => ({
                   id: location.id,
@@ -216,9 +227,9 @@ function Page() {
                 totalResults={filteredLocations.length}
                 isLoading={isLoading}
               />
+}
             </div>
           </>
-        )}
       </div>
 
       {/* Location Modal */}

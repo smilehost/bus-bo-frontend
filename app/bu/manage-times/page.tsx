@@ -11,6 +11,8 @@ import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
+import TitlePage from "@/app/components/Title/TitlePage";
+import ButtonBG from "@/app/components/Form/ButtonBG";
 
 function Page() {
   const [allTimes, setAllTimes] = useState<TimeItem[]>([]);
@@ -190,11 +192,20 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        {isLoadingskeleton ? (
-          <SkeletonManageTime rows={5} />
-        ) : (
           <>
-            <PageHeader onAddTime={handleAddTime} />
+            {/* <PageHeader onAddTime={handleAddTime} /> */}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+            <TitlePage
+              title="Manage Time"
+              description="View and manage time information"
+            />
+            <ButtonBG
+              size="h-[38px]"
+              text="Add New Time"
+              icon="/icons/plus.svg"
+              onClick={handleAddTime}
+            />
+          </div>
   
             <div className="bg-white rounded-md shadow p-5">
               {/* Search input */}
@@ -207,7 +218,7 @@ function Page() {
                   onChange={handleSearchChange}
                 />
               </div>
-  
+              {isLoadingskeleton ? <SkeletonManageTime rows={5} /> :
               <TimeTable
                 times={paginatedTimes.map((time) => ({
                   ...time,
@@ -221,9 +232,9 @@ function Page() {
                 totalResults={totalResults}
                 isLoading={isLoading}
               />
+}
             </div>
           </>
-        )}
       </div>
   
       {showModal && (

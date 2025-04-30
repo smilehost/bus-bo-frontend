@@ -148,11 +148,9 @@ function Page() {
 
     return (
         <>
-          {isLoadingskeleton ? (
-            <SkeletonRoute />
-          ) : (
+
             <>
-              <div className="flex justify-between items-end">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
                 <TitlePage
                   title="Manage Routes"
                   description="View and manage bus routes"
@@ -170,12 +168,12 @@ function Page() {
                 placeholderSearch="Search routes..."
                 filter={filterSearch}
               />
-      
+              {isLoadingskeleton ? <SkeletonRoute /> :
               <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
               </div>
+}
             </>
-          )}
         </>
       );
       

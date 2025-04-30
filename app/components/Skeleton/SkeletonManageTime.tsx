@@ -5,18 +5,18 @@ export default function SkeletonManageTime({ rows = 5 }: { rows?: number }) {
     <div className="flex-1 w-full min-h-screen px-6 py-6 animate-pulse bg-gray-50">
     <div className="flex flex-col space-y-6 animate-pulse">
       {/* Page Header */}
-      <div className="flex justify-between items-center mb-4">
+      {/* <div className="flex justify-between items-center mb-4">
         <div>
           <div className="h-6 w-48 bg-gray-200 rounded-md mb-2" />
           <div className="h-4 w-64 bg-gray-200 rounded-md" />
         </div>
         <div className="h-10 w-40 bg-gradient-to-r bg-gray-300 rounded-md" />
-      </div>
+      </div> */}
 
       {/* Search Bar */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <div className="w-full h-10 border border-gray-200 bg-gray-100 rounded-md px-3" />
-      </div>
+      </div> */}
 
       {/* Table Block */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">

@@ -4,16 +4,16 @@ export default function SkeletonCompanyTable({ rows = 5 }: { rows?: number }) {
   return (
     <div className="animate-pulse space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      {/* <div className="flex justify-between items-center mb-4">
         <div>
           <div className="h-6 w-48 bg-gray-200 rounded-md mb-2" />
           <div className="h-4 w-64 bg-gray-200 rounded-md" />
         </div>
         <div className="h-10 w-40 bg-gradient-to-r bg-gray-300 rounded-md" />
-      </div>
+      </div> */}
 
       {/* Search Input */}
-      <div className="h-10 w-full bg-white rounded-lg border border-gray-200" />
+      {/* <div className="h-10 w-full bg-white rounded-lg border border-gray-200" /> */}
 
       {/* Table */}
       <div className="overflow-x-auto bg-white rounded-lg shadow">

@@ -6,18 +6,18 @@ export default function SkeletonDateTable({ count = 10 }: { count?: number }) {
   return (
     <div className="flex flex-col space-y-6 animate-pulse">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      {/* <div className="flex justify-between items-center mb-4">
         <div>
           <div className="h-6 w-48 bg-gray-200 rounded-md mb-2" />
           <div className="h-4 w-64 bg-gray-200 rounded-md" />
         </div>
         <div className="h-10 w-40 bg-gradient-to-r bg-gray-300 rounded-md" />
-      </div>
+      </div> */}
 
       {/* Search Filter */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <div className="h-10 w-full bg-gray-200 rounded-md" />
-      </div>
+      </div> */}
 
       {/* Table Skeleton */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
