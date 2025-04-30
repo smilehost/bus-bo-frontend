@@ -42,9 +42,10 @@ function Page() {
       setTotalResults(res.total);
     } catch (error) {
       console.error("Failed to load data", error);
-    } cancelSkeleton();
-      setIsLoading(false);
-      setIsLoadingskeleton(false); // reset กลับ
+    }
+    cancelSkeleton();
+    setIsLoading(false);
+    setIsLoadingskeleton(false); // reset กลับ
   };
 
   // Debounced search handler
@@ -165,7 +166,7 @@ function Page() {
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRowsPerPage = Number(e.target.value);
     setRowsPerPage(newRowsPerPage);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   // Filter locations based on search term
@@ -210,9 +211,7 @@ function Page() {
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
                 rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={(e) =>
-                  setRowsPerPage(Number(e.target.value))
-                }
+                onRowsPerPageChange={handleRowsPerPageChange}
                 totalResults={filteredLocations.length}
                 isLoading={isLoading}
               />

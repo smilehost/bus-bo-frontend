@@ -253,7 +253,7 @@ function Page() {
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
                 rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={(e) => setRowsPerPage(Number(e.target.value))}
+                onRowsPerPageChange={handleRowsPerPageChange}
                 totalResults={totalResults}
                 isLoading={isLoading}
               />
