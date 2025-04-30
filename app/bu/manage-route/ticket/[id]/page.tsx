@@ -1,22 +1,28 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
 
 //component
 import TitleHeader from '@/app/components/Title/TitleHeader'
 import FormRouteTicket from '@/app/components/Form/FormRouteTicket'
-import TicketPriceFixed from '@/app/components/Model/TicketPriceFixed'
+import TicketPriceFixed from '@/app/components/Form/TicketPriceFixed'
+import TierdPriceTable from '@/app/components/Table/TierdPriceTable'
+import ButtonBG from '@/app/components/Form/ButtonBG'
+import ButtonDefault from '@/app/components/Form/ButtonDefault'
 
 //const 
 import { TICKET_TYPE } from '@/constants/enum'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 
 //mock
 import { useTicketStore } from '@/stores/ticketStore'
+import { useRouteStore } from '@/stores/routeStore'
+import { useTicketPriceStore } from '@/stores/ticketPriceTypeStore'
+import { useUserStore } from '@/stores/userStore'
 
 //type 
-import { TicketProps } from '@/types/types'
+import { TicketProps, TicketPriceType } from '@/types/types'
+import { Route } from '@/types/types'
 
 //icon
 import { Bolt, Table } from "lucide-react";
@@ -27,296 +33,315 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-export type TicketTypePrice = {
-    type: string,
-    price: number,
+export type TicketPriceTypeFixed = {
+  id_type: string,
+  price: number
 }
 
 function Page() {
 
-    const { ticketData, updateTicket, addTicket } = useTicketStore();
+  const { updateTicket, addTicket, getTicketByRouteId, getTicketById } = useTicketStore();
+  const { getRouteById } = useRouteStore();
+  const { getTypeTicketByCompanyId } = useTicketPriceStore();
+  const { userData } = useUserStore()
 
-    const router = useRouter();
-    const pathname = usePathname();
+  const params = useParams();
 
-    const params = useParams();
+  // useEffect(() => {
+  //     handleTestApi();
+  // }, [])
 
-    //velues
-    const [tickets, setTickets] = useState<TicketProps[]>();
-    const [ticketActive, setTicketActive] = useState<string>();
+  // const [testApi, setTestApi] = useState();
+  // const handleTestApi = async () => {
+  //     try {
+  //         const response = await axios.get("http://94.237.73.171:8000/api/ticket/priceType", {
+  //             headers: {
+  //                 com_id: `1`
+  //             }
+  //         });
 
-    const [ticketNameTH, setTicketNameTH] = useState<string>('');
-    const [ticketNameEN, setTicketNameEN] = useState<string>('');
-    const [ticketAmount, setTicketAmount] = useState<string>('');
-    const [ticketColor, setTicketColor] = useState<string>('');
-    const [ticketType, setTicketType] = useState<TICKET_TYPE>();
-    const [ticketTypePrice, setTicketTypePrice] = useState<TicketTypePrice[]>([])
-    const [ticketTypeList, setTicketTypeList] = useState<TicketTypePrice[]>([
-        {
-            type: "Normal",
-            price: 0,
-        },
-        {
-            type: "Student",
-            price: 0
-        }
-    ]);
+  //         setTestApi(response.data)
 
-    //Default Ticket
-    useEffect(() => {
-        if (params?.id !== undefined) {
-            const foundValue = ticketData.filter((value) => value.route_id === params?.id);
-            if (foundValue) {
-                setTickets(foundValue);
-            }
-        }
-    }, [params, ticketData])
+  //     } catch (error) {
+  //         console.error("API Error:", error);
+  //     }
+  // };
+  // console.log("testApi: ", testApi)
 
-    useEffect(() => {
-        const ticket = ticketData.find((item) => item.id === ticketActive);
+  //velues
+  const [routeActive, setRouteActive] = useState<Route>();
 
-        if (ticketActive === undefined) {
-            setTicketNameTH("")
-            setTicketNameEN("")
-            setTicketAmount("")
-            setTicketColor("")
-            setTicketType(undefined)
-            setTicketTypePrice([])
-        }
+  const [tickets, setTickets] = useState<TicketProps[]>();
+  const [ticketActive, setTicketActive] = useState<string>();
+  const [ticketNameTH, setTicketNameTH] = useState<string>('');
+  const [ticketNameEN, setTicketNameEN] = useState<string>('');
+  const [ticketAmount, setTicketAmount] = useState<string>('');
+  const [ticketColor, setTicketColor] = useState<string>('');
+  const [ticketType, setTicketType] = useState<TICKET_TYPE>();
+  const [ticketPriceFixed, setTicketPriceFixed] = useState<TicketPriceTypeFixed[]>([])
+  const [ticketChecked, setTicketChecked] = useState<string[]>([])
+  const [ticketTypeList, setTicketTypeList] = useState<TicketPriceType[]>([]);
 
-        if (!ticket) return;
+  //Default Ticket
+  useEffect(() => {
+    const routeId = params?.id?.toString() || ''
+    const com_id = userData.company_id
 
-        setTicketNameTH(ticket?.ticketName_th)
-        setTicketNameEN(ticket?.ticketName_en)
-        setTicketAmount(ticket?.ticket_amount)
-        setTicketColor(ticket?.ticket_color)
-        setTicketType(ticket?.ticket_type)
-        setTicketTypePrice(ticket?.ticket_list)
-        setTicketTypeList(ticket?.ticket_list);
+    const ticketData = getTicketByRouteId(routeId)
+    const routeData = getRouteById(routeId)
+    const priceTypeTemp = getTypeTicketByCompanyId(com_id)
 
-    }, [ticketActive])
+    setTickets(ticketData)
+    setRouteActive(routeData)
+    setTicketTypeList(priceTypeTemp)
 
+  }, [params, getRouteById, getTicketByRouteId])
 
-    const [newType, setNewType] = useState("");
+  //active ticket
+  useEffect(() => {
+    const ticketId = ticketActive || ''
+    const ticket = getTicketById(ticketId);
 
-    const handleAddType = () => {
-        if (!newType) {
-            return;
-        }
-        setTicketTypeList([
-            ...ticketTypeList,
-            {
-                type: newType,
-                price: 0
-            }
-        ])
-        setNewType('')
-    };
+    //find price type checked
+    const ticketChecked = Array.from(new Set(
+      ticket?.ticket_price
+        ?.filter((item) =>
+          ticketTypeList.some((type) => type.id === item.ticket_price_type_id)
+        )
+        .map(item => item.ticket_price_type_id)
+    ));
 
-    const handleValidateNext = () => {
-        if (!ticketNameTH || !ticketNameEN || !ticketAmount || !ticketColor || !ticketType || ticketTypePrice.length <= 0) {
-            alert("กรอกไม่ครบ")
-            return;
-        }
+    setTicketChecked(ticketChecked)
 
-        if (ticketType === TICKET_TYPE.FIXED) {
-            if (ticketTypePrice.length <= 0) return;
-            handleOpenModel();
-            return;
-        }
+    if (!ticketId) {
+      setTicketNameTH("")
+      setTicketNameEN("")
+      setTicketAmount("")
+      setTicketColor("")
+      setTicketType(undefined)
+    }
 
-        if (ticketType === TICKET_TYPE.TIERED) {
-            if (ticketActive) {
-                router.push(`${pathname}/tiered/${ticketActive}`)
-            } else {
-                router.push(`${pathname}/tiered/create`)
-            }
-            return;
-        }
+    if (!ticket) return;
+    setTicketNameTH(ticket?.ticketName_th)
+    setTicketNameEN(ticket?.ticketName_en)
+    setTicketAmount(ticket?.ticket_amount)
+    setTicketColor(ticket?.ticket_color)
+    setTicketType(ticket?.ticket_type)
+
+  }, [ticketActive])
+
+  const [newType, setNewType] = useState("");
+
+  const handleAddType = () => {
+    if (!newType) {
+      return;
+    }
+    setNewType('')
+  };
+
+  //Form steps
+  const [activeStep, setActiveStep] = React.useState(0);
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleValidateNext = () => {
+    if (!ticketNameTH || !ticketNameEN || !ticketAmount || !ticketColor || !ticketType || ticketChecked.length <= 0) {
+      alert("กรอกไม่ครบ")
+      return;
+    }
+
+    if (ticketType === TICKET_TYPE.FIXED) {
+      const tempTicketPriceFixed = ticketChecked.map((id_type) => ({
+        id_type: id_type,
+        price: 0
+      }));
+      setTicketPriceFixed(tempTicketPriceFixed);
+    }
+
+    if (ticketType === TICKET_TYPE.TIERED) {
 
     }
 
-    const handleSubmit = (prices: TicketTypePrice[]) => {
-        setTicketTypePrice(prices); // หรือจะใช้ในที่อื่นเลยก็ได้
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  }
 
-        if (!ticketType || !params.id) return;
+  const handleSubmit = () => {
 
-        const tempId = ticketActive || "123"
-        const tempTicket = {
-            id: tempId,
-            ticketName_th: ticketNameTH,
-            ticketName_en: ticketNameEN,
-            ticket_type: ticketType,
-            ticket_amount: ticketAmount,
-            ticket_color: ticketColor,
-            ticket_list: prices,
-            route_id: params.id.toString()
-        }
-        if (ticketActive) {
-            updateTicket(ticketActive, tempTicket)
-        } else {
-            addTicket(tempTicket)
-            setTicketActive(tempId);
-        }
+    if (!ticketType || !params.id) return;
 
-        console.log("Submit ticket data");
-        console.log("ticketTypePrice:", prices); // ใช้ข้อมูลที่ทันสมัย
-    };
+    const tempId = ticketActive || "123"
+    const tempTicket = {
+      id: tempId,
+      ticketName_th: ticketNameTH,
+      ticketName_en: ticketNameEN,
+      ticket_type: ticketType,
+      ticket_amount: ticketAmount,
+      ticket_color: ticketColor,
+      ticket_price_fixed: ticketPriceFixed,
+      ticket_price: [],
+      route_id: params.id.toString()
+    }
+    if (ticketActive) {
+      updateTicket(ticketActive, tempTicket)
+    } else {
+      addTicket(tempTicket)
+      setTicketActive(tempId);
+    }
 
-    //handle ticket fixed price model
-    const [ModelOpen, setModelOpen] = useState(false)
-    const handleOpenModel = () => setModelOpen(true)
-    const handleCloseModel = () => setModelOpen(false)
+    console.log("Submit ticket data");
+  };
 
-    //form steps
-    const steps = [
-        {
-            label: 'Select campaign settings',
-            description: `For each ad campaign that you create, you can control how much
-                    you're willing to spend on clicks and conversions, which networks
-                    and geographical locations you want your ads to show on, and more.`,
-        },
-        {
-            label: 'Create an ad group',
-            description:
-                'An ad group contains one or more ads which target a shared set of keywords.',
-        },
-        {
-            label: 'Create an ad',
-            description: `Try out different ad text to see what brings in the most customers,
-                    and learn how to enhance your ads using features like ad extensions.
-                    If you run into any problems with your ads, find out how to tell if
-                    they're running and how to resolve approval issues.`,
-        },
-    ];
+  // console.log("ticket: ", tickets)
+  // console.log("routeActive: ", routeActive)
 
-    const [activeStep, setActiveStep] = React.useState(0);
-
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
-
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
-
-    const handleReset = () => {
-        setActiveStep(0);
-    };
-
-    return (
-        <div>
-            <TitleHeader text={"Add New Route Ticket"} />
-            {tickets && tickets.length > 0 && (
-                <div className='mt-4'>
-                    <p className='font-medium'>Tickets</p>
-                    <div className='flex gap-4 mt-1'>
-                        {tickets.map((item, index) => (
-                            <div key={index}
-                                className={`${ticketActive === item.id ? "bg-gray-200" : "bg-white"} w-[200px] cursor-pointer shadow-xs px-7 rounded-md relative overflow-hidden`}
-                                onClick={() => {
-                                    if (ticketActive === item.id) {
-                                        setTicketActive(undefined);
-                                    } else {
-                                        setTicketActive(item.id);
-                                    }
-                                }}
-                            >
-                                <div className={` w-[8px] h-full absolute left-0`}
-                                    style={{
-                                        backgroundColor: item.ticket_color
-                                    }}
-                                />
-                                <div className='flex flex-col gap-1 py-2'>
-                                    <p className='text-[12px] custom-ellipsis-style'>{item.ticketName_th}</p>
-                                    <p className='text-[12px] custom-ellipsis-style'>{item.ticketName_en}</p>
-                                </div>
-                                {item.ticket_type === TICKET_TYPE.FIXED ? (
-                                    <Bolt size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
-                                ) : (item.ticket_type === TICKET_TYPE.TIERED) && (
-                                    <Table size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-            <div className='p-5 custom-frame-content'>
-                <Box sx={{ maxWidth: 400 }}>
-                    <Stepper activeStep={activeStep} orientation="vertical">
-                        {steps.map((step, index) => (
-                            <Step key={step.label}>
-                                <StepLabel
-                                    optional={
-                                        index === steps.length - 1 ? (
-                                            <Typography variant="caption">Last step</Typography>
-                                        ) : null
-                                    }
-                                >
-                                    {step.label}
-                                </StepLabel>
-                                <StepContent>
-                                    <Typography>{step.description}</Typography>
-                                    <Box sx={{ mb: 2 }}>
-                                        <Button
-                                            variant="contained"
-                                            onClick={handleNext}
-                                            sx={{ mt: 1, mr: 1 }}
-                                        >
-                                            {index === steps.length - 1 ? 'Finish' : 'Continue'}
-                                        </Button>
-                                        <Button
-                                            disabled={index === 0}
-                                            onClick={handleBack}
-                                            sx={{ mt: 1, mr: 1 }}
-                                        >
-                                            Back
-                                        </Button>
-                                    </Box>
-                                </StepContent>
-                            </Step>
-                        ))}
-                    </Stepper>
-                    {activeStep === steps.length && (
-                        <Paper square elevation={0} sx={{ p: 3 }}>
-                            <Typography>All steps completed - you&apos;re finished</Typography>
-                            <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
-                                Reset
-                            </Button>
-                        </Paper>
-                    )}
-                </Box>
-                <FormRouteTicket
-                    ticketNameTH={ticketNameTH}
-                    setTicketNameTH={setTicketNameTH}
-                    ticketNameEN={ticketNameEN}
-                    setTicketNameEN={setTicketNameEN}
-                    ticketAmount={ticketAmount}
-                    setTicketAmount={setTicketAmount}
-                    ticketColor={ticketColor}
-                    setTicketColor={setTicketColor}
-                    ticketType={ticketType}
-                    setTicketType={setTicketType}
-                    newType={newType}
-                    setNewType={setNewType}
-                    handleAddType={handleAddType}
-                    handleValidateNext={handleValidateNext}
-                    ticketTypePrice={ticketTypePrice}
-                    setTicketTypePrice={setTicketTypePrice}
-                    ticketTypeList={ticketTypeList}
-                    setTicketTypeList={setTicketTypeList}
-                    isEditMode={ticketActive ? true : false}
+  return (
+    <div>
+      <TitleHeader text={"Add New Route Ticket"} />
+      {tickets && tickets.length > 0 && (
+        <div className='mt-4'>
+          <p className='font-medium'>Tickets</p>
+          <div className='flex gap-4 mt-1'>
+            {tickets.map((item, index) => (
+              <div key={index}
+                className={`${ticketActive === item.id ? "bg-gray-200" : "bg-white"} w-[200px] cursor-pointer shadow-xs px-7 rounded-md relative overflow-hidden`}
+                onClick={() => {
+                  if (activeStep > 0) return;
+                  if (ticketActive === item.id) {
+                    setTicketActive(undefined);
+                  } else {
+                    setTicketActive(item.id);
+                  }
+                }}
+              >
+                <div className={` w-[8px] h-full absolute left-0`}
+                  style={{
+                    backgroundColor: item.ticket_color
+                  }}
                 />
-            </div>
-            <TicketPriceFixed open={ModelOpen} onClose={handleCloseModel} listType={ticketTypePrice} onHandle={handleSubmit} setTicketTypePrice={setTicketTypePrice} />
-
+                <div className='flex flex-col gap-1 py-2'>
+                  <p className='text-[12px] custom-ellipsis-style'>{item.ticketName_th}</p>
+                  <p className='text-[12px] custom-ellipsis-style'>{item.ticketName_en}</p>
+                </div>
+                {item.ticket_type === TICKET_TYPE.FIXED ? (
+                  <Bolt size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
+                ) : (item.ticket_type === TICKET_TYPE.TIERED) && (
+                  <Table size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+      )}
+      <div className='p-5 custom-frame-content'>
+        <Box sx={{}}>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            <Step className=''>
+              <StepLabel
+                optional={
+                  <Typography variant="caption">
+                    {ticketActive ? (
+                      <>{ticketActive} - Edit</>
+                    ) : (
+                      <>Ticket - Create</>
+                    )}
+                  </Typography>
+                }
+                sx={{
+                  '.MuiStepIcon-root': {
+                    color: '#F97316 !important',
+                  },
+                  '&.Mui-completed .MuiStepIcon-root': {
+                    color: '#F97316 !important', // สีเมื่อ completed
+                  },
+                  '&.Mui-active .MuiStepIcon-root': {
+                    color: '#F97316 !important', // สีเมื่อ active
+                  },
+                }}
+              >
+              </StepLabel>
+              <StepContent className='pt-5'>
+                <FormRouteTicket
+                  ticketNameTH={ticketNameTH}
+                  setTicketNameTH={setTicketNameTH}
+                  ticketNameEN={ticketNameEN}
+                  setTicketNameEN={setTicketNameEN}
+                  ticketAmount={ticketAmount}
+                  setTicketAmount={setTicketAmount}
+                  ticketColor={ticketColor}
+                  setTicketColor={setTicketColor}
+                  ticketType={ticketType}
+                  setTicketType={setTicketType}
+                  newType={newType}
+                  setNewType={setNewType}
+                  handleAddType={handleAddType}
+                  handleValidateNext={handleValidateNext}
+                  ticketChecked={ticketChecked}
+                  setTicketChecked={setTicketChecked}
+                  ticketTypeList={ticketTypeList}
+                  setTicketTypeList={setTicketTypeList}
+                  isEditMode={ticketActive ? true : false}
+                />
+              </StepContent>
+            </Step>
+            <Step className=''>
+              <StepLabel
+                optional={
+                  <Typography variant="caption">
+                    {ticketActive ? (
+                      <>{ticketActive} - Manage Price</>
+                    ) : (
+                      <>Ticket - Manage Price</>
+                    )}
+                  </Typography>
+                }
 
-    )
+                sx={{
+                  '.MuiStepIcon-root': {
+                    color: '#F97316 !important',
+                  },
+                  '&.Mui-completed .MuiStepIcon-root': {
+                    color: '#F97316 !important', // สีเมื่อ completed
+                  },
+                  '&.Mui-active .MuiStepIcon-root': {
+                    color: '#F97316 !important', // สีเมื่อ active
+                  },
+                }}
+              >
+              </StepLabel>
+              <StepContent className='pt-5'>
+                {ticketType === TICKET_TYPE.TIERED ? (
+                  <>
+                    <TierdPriceTable />
+                    <div className='flex gap-3 mt-8 justify-end'>
+                      <ButtonDefault text="Back" size='' onClick={handleBack} />
+                      <ButtonBG text="Confirm" size='' />
+                    </div>
+                  </>
+                ) : ticketType === TICKET_TYPE.FIXED && (
+                  <>
+                    <TicketPriceFixed listType={ticketPriceFixed} setTicketTypePrice={setTicketPriceFixed} />
+                    <div className='flex gap-3 mt-8 justify-end'>
+                      <ButtonDefault text="Back" size='' onClick={handleBack} />
+                      <ButtonBG text="Confirm" size='' onClick={handleSubmit} />
+                    </div>
+                  </>
+                )}
+
+              </StepContent>
+            </Step>
+          </Stepper>
+        </Box>
+
+      </div>
+      {/* <TicketPriceFixed open={ModelOpen} onClose={handleCloseModel} listType={ticketTypePrice} onHandle={handleSubmit} setTicketTypePrice={setTicketTypePrice} /> */}
+
+    </div>
+
+  )
 }
 
 export default Page

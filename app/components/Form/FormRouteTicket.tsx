@@ -1,5 +1,4 @@
 import React from 'react'
-import { useRouter } from 'next/navigation'
 
 //component
 import InputLabel from '@/app/components/Form/InputLabel'
@@ -12,7 +11,7 @@ import ColorRoute from '@/app/components/Form/ColorRoute'
 import { TICKET_TYPE } from '@/constants/enum'
 
 //type
-import { TicketTypePrice } from '@/app/bu/manage-route/ticket/[id]/page'
+import { TicketPriceType } from '@/types/types'
 
 type FormRouteTicketProps = {
   ticketNameTH: string;
@@ -25,14 +24,15 @@ type FormRouteTicketProps = {
   setTicketColor: React.Dispatch<React.SetStateAction<string>>;
   ticketType?: TICKET_TYPE;
   setTicketType: (value: TICKET_TYPE) => void;
-  ticketTypePrice?: TicketTypePrice[];
-  setTicketTypePrice: (value: TicketTypePrice[]) => void;
-  ticketTypeList?: TicketTypePrice[];
-  setTicketTypeList: (value: TicketTypePrice[]) => void;
+  ticketChecked?: string[]
+  setTicketChecked: (value: string[]) => void;
+  ticketTypeList?: TicketPriceType[];
+  setTicketTypeList: (value: TicketPriceType[]) => void;
   newType: string;
   setNewType: (value: string) => void;
   handleAddType: () => void;
   handleValidateNext: () => void;
+  handleBack?: () => void;
   isEditMode?: boolean;
 };
 
@@ -51,12 +51,23 @@ function FormRouteTicket({
   setNewType,
   handleAddType,
   handleValidateNext,
-  ticketTypePrice,
-  setTicketTypePrice,
+  ticketChecked,
+  setTicketChecked,
   ticketTypeList,
+  handleBack,
   isEditMode = false
 }: FormRouteTicketProps) {
-  const router = useRouter();
+
+  const handleChecked = (id: string) => {
+    // กำหนดค่า fallback ให้ ticketChecked เป็น array ว่างถ้า undefined
+    const currentChecked = ticketChecked || [];
+    const isChecked = currentChecked.includes(id);
+    const newChecked = isChecked
+      ? currentChecked.filter((item) => item !== id)
+      : [...currentChecked, id];
+
+    setTicketChecked(newChecked); // ✅ ไม่ error แล้ว
+  };
 
   return (
     <>
@@ -107,28 +118,16 @@ function FormRouteTicket({
                 <div className='custom-border-gray rounded-md p-3'>
                   <div className='flex flex-col gap-1'>
                     {ticketTypeList?.map((item, index) => {
-                      const isMatched = ticketTypePrice?.some(p => p.type === item.type)
+                      const isMatch = ticketChecked?.some((c) => item.id === c)
                       return (
                         <div key={index} className='flex items-center gap-2'>
                           <input
                             type="checkbox"
                             className='cursor-pointer'
-                            checked={isMatched}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setTicketTypePrice([
-                                  ...ticketTypePrice ?? [],
-                                  { type: item.type, price: 0 }
-                                ]);
-                              } else {
-                                setTicketTypePrice(
-                                  (ticketTypePrice ?? []).filter(p => p.type !== item.type)
-                                );
-                              }
-                            }}
-
+                            checked={isMatch}
+                            onChange={() => handleChecked(item.id)}
                           />
-                          <p className='text-[14px]'>{item.type}</p>
+                          <p className='text-[14px]'>{item.name}</p>
                         </div>
                       )
                     })}
@@ -170,7 +169,9 @@ function FormRouteTicket({
 
       {/* button */}
       <div className='mt-10 flex justify-end gap-2'>
-        <ButtonDefault size='' text='Back' onClick={() => router.back()} />
+        {handleBack && (
+          <ButtonDefault size='' text='Back' onClick={handleBack} />
+        )}
         <ButtonBG size='' text='Next' onClick={handleValidateNext} />
       </div>
 

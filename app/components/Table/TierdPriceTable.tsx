@@ -98,7 +98,7 @@ function TierdPriceTable() {
       }
     };
 
-    // console.log(resultJSON)
+    console.log("resultJSON: ", resultJSON)
     return (
         <div>
             <p className='mb-2 font-medium'>Student</p>
