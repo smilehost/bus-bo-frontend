@@ -3,11 +3,6 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
 
-// Mock token only in browser
-if (typeof window !== "undefined" && !localStorage.getItem("token_bo")) {
-  localStorage.setItem("token_bo", "mock-token-1234");
-}
-
 const instance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -15,13 +10,13 @@ const instance = axios.create({
   },
 });
 
-// ✅ Interceptor ก่อนส่ง request
+// Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token_bo");
     if (config.headers) {
-      config.headers["Authorization"] = token ? `Bearer ${token}` : "";
-      config.headers["com_id"] = "1"; // ✅ แก้ตรงนี้ให้ถูกต้อง (assign แบบ object property)
+      config.headers.set("Authorization", token ? `Bearer ${token}` : "");
+      config.headers.set("com_id", "1"); // ส่ง company id จริง
     }
   }
   return config;

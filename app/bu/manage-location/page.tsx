@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import LocationTable from "@/app/components/Table/LocationTable";
 import LocationModal from "@/app/components/Model/LocationModal";
-import PageHeader from "@/app/components/PageHeader/LocationPageHeader";
 import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
 import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
