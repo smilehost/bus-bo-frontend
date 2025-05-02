@@ -65,7 +65,7 @@ export default function RootLayout({
      
             text: "Reports", 
      
-            link: `${path}/reports`,
+            link: `/reports`,
         },
         {
             id: 10,
