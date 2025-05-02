@@ -8,28 +8,28 @@ import {
 export const LocationService = {
   async fetchLocations(query: FetchLocationsQuery) {
     return await api.get({
-      path: "/api/locations/all",
+      path: "/api/routeLocations/all",
       query: query as unknown as Record<string, string | number>,
     });
   },
 
   async getLocationById(id: number) {
     return await api.get({
-      path: "/api/locations",
+      path: "/api/routeLocations",
       params: id,
     });
   },
 
   async createLocation(payload: CreateLocationPayload) {
     return await api.post({
-      path: "/api/locations",
+      path: "/api/routeLocations",
       body: payload,
     });
   },
 
   async updateLocation(id: number, payload: UpdateLocationPayload) {
     return await api.put({
-      path: "/api/locations",
+      path: "/api/routeLocations",
       params: id,
       body: payload,
     });
@@ -37,7 +37,7 @@ export const LocationService = {
 
   async deleteLocation(id: number) {
     return await api.delete({
-      path: "/api/locations",
+      path: "/api/routeLocations",
       params: id,
     });
   },
