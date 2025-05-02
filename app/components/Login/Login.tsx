@@ -37,7 +37,7 @@ function Login() {
       if (authHeader?.startsWith("Bearer ")) {
         const token = authHeader.split(" ")[1].trim();
         store.token.set(token);
-      
+
         const decoded = jwtDecode<DecodedToken>(token);
         store.com_id.set(decoded.com_id);
         store.account_id.set(decoded.account_id);
@@ -47,9 +47,8 @@ function Login() {
         console.log("account_id :", store.account_id.get());
         console.log("account_role :", store.account_role.get());
         console.log("token :", store.token.get() + ":");
-        
       }
-      // window.location.href = "/bu"; //เปลี่ยนหน้าเมื่อ login สำเร็จ
+      window.location.href = "/bu"; //เปลี่ยนหน้าเมื่อ login สำเร็จ
     } catch (err) {
       console.log(err);
       setError("Login failed: Invalid credentials");
