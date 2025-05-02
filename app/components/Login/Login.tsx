@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import InputLabel from "../Form/InputLabel";
 import ButtonBG from "../Form/ButtonBG";
 import axios from "axios";
+import { store } from "@/stores/store";
 
 function Login() {
   const [username, setUserName] = useState<string>("");
@@ -18,10 +19,17 @@ function Login() {
         {
           username,
           password,
+        },
+        {
+          withCredentials: true,
         }
       );
-      console.log("------------");
-      // console.log(token.data);
+      const authHeader = response.headers["authorization"];
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1]; // ตัดคำว่า Bearer ออก
+        store.token.set(token);
+        console.log(store.token.get());
+      }
       window.location.href = "/bu"; //เปลี่ยนหน้าเมื่อ login สำเร็จ
     } catch (err) {
       console.log(err);
