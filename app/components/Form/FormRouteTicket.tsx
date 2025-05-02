@@ -6,6 +6,7 @@ import LabelText from '@/app/components/Form/LabelText'
 import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import ColorRoute from '@/app/components/Form/ColorRoute'
+import TextError from '../TextError'
 
 //const
 import { TICKET_TYPE } from '@/constants/enum'
@@ -34,6 +35,7 @@ type FormRouteTicketProps = {
   handleValidateNext: () => void;
   handleBack?: () => void;
   isEditMode?: boolean;
+  error?: string;
 };
 
 function FormRouteTicket({
@@ -55,6 +57,7 @@ function FormRouteTicket({
   setTicketChecked,
   ticketTypeList,
   handleBack,
+  error,
   isEditMode = false
 }: FormRouteTicketProps) {
 
@@ -168,13 +171,18 @@ function FormRouteTicket({
       </form>
 
       {/* button */}
-      <div className='mt-10 flex justify-end gap-2'>
-        {handleBack && (
-          <ButtonDefault size='' text='Back' onClick={handleBack} />
+      <div className='mt-10 flex flex-col items-end'>
+        {error && (
+          <TextError text={error} />
         )}
-        <ButtonBG size='' text='Next' onClick={handleValidateNext} />
-      </div>
+        <div className='flex gap-2 mt-3'>
+          {handleBack && (
+            <ButtonDefault size='' text='Back' onClick={handleBack} />
+          )}
+          <ButtonBG size='' text='Next' onClick={handleValidateNext} />
+        </div>
 
+      </div>
     </>
   )
 }

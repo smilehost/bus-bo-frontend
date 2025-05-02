@@ -22,7 +22,7 @@ export const useRouteStore = create<RouteStore>((set) => ({
             times_id: '2',
             status: STATUS.ACTIVE,
             routeColor: '#3B82F6',
-            stations: ['1', '4', '2', '5'],
+            stations: ['1', '2', '3'],
             ticket_amount: "0",
         },
         {

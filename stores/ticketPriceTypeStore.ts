@@ -25,11 +25,16 @@ export const useTicketPriceStore = create<TicketPriceTypeProps>((set) => ({
         },
         {
             id: "3",
+            name: "VIP",
+            company_id: "1"
+        },
+        {
+            id: "4",
             name: "Vip",
             company_id: "2"
         },
         {
-            id: "4",
+            id: "5",
             name: "Super Vip",
             company_id: "2"
         },

@@ -17,10 +17,63 @@ export const useTicketStore = create<TicketStore>((set) => ({
     ticketData: [
         {
             id: "T12345",
-            ticketName_th: "รอบเช้า",
-            ticketName_en: "Morning",
+            ticketName_th: "เชียงใหม่ - กทม.",
+            ticketName_en: "Chiang Mai - Bangkok",
             ticket_color: "#3B82F6",
-            route_id: "2",
+            route_id: "1",
+            ticket_amount: "2",
+            ticket_type: TICKET_TYPE.TIERED,
+            ticket_price: [
+                {
+                    id: "1",
+                    from: "1",
+                    to: "2",
+                    price: 100,
+                    ticket_price_type_id: "1"
+                },
+                {
+                    id: "2",
+                    from: "1",
+                    to: "3",
+                    price: 340,
+                    ticket_price_type_id: "1"
+                },
+                {
+                    id: "3",
+                    from: "2",
+                    to: "3",
+                    price: 300,
+                    ticket_price_type_id: "1"
+                },
+                {
+                    id: "4",
+                    from: "1",
+                    to: "2",
+                    price: 500,
+                    ticket_price_type_id: "2"
+                },
+                {
+                    id: "5",
+                    from: "1",
+                    to: "3",
+                    price: 250,
+                    ticket_price_type_id: "2"
+                },
+                {
+                    id: "6",
+                    from: "2",
+                    to: "3",
+                    price: 100,
+                    ticket_price_type_id: "2"
+                },
+            ],
+        },
+        {
+            id: "T12378",
+            ticketName_th: "ขอนแก่น - กทม",
+            ticketName_en: "Khon Kaen - Bangkok",
+            ticket_color: "#10B981",
+            route_id: "1",
             ticket_amount: "2",
             ticket_type: TICKET_TYPE.FIXED,
             ticket_price: [
@@ -28,43 +81,64 @@ export const useTicketStore = create<TicketStore>((set) => ({
                     id: "1",
                     from: "1",
                     to: "2",
-                    price: 340,
+                    price: 500,
                     ticket_price_type_id: "1"
                 },
                 {
                     id: "2",
                     from: "1",
                     to: "3",
-                    price: 340,
+                    price: 500,
                     ticket_price_type_id: "1"
                 },
                 {
                     id: "3",
                     from: "2",
                     to: "3",
-                    price: 340,
+                    price: 500,
                     ticket_price_type_id: "1"
+                },
+                {
+                    id: "4",
+                    from: "1",
+                    to: "2",
+                    price: 100,
+                    ticket_price_type_id: "2"
+                },
+                {
+                    id: "5",
+                    from: "1",
+                    to: "3",
+                    price: 100,
+                    ticket_price_type_id: "2"
+                },
+                {
+                    id: "6",
+                    from: "2",
+                    to: "3",
+                    price: 100,
+                    ticket_price_type_id: "2"
                 },
                 {
                     id: "1",
                     from: "1",
                     to: "2",
-                    price: 340,
-                    ticket_price_type_id: "2"
+                    price: 800,
+                    ticket_price_type_id: "3"
                 },
                 {
                     id: "2",
                     from: "1",
                     to: "3",
-                    price: 340,
-                    ticket_price_type_id: "2"
+                    price: 800,
+                    ticket_price_type_id: "3"
                 },
                 {
                     id: "3",
                     from: "2",
                     to: "3",
-                    price: 340,
-                    ticket_price_type_id: "2"
+                    price: 800,
+                    ticket_price_type_id: "3"
                 },
             ],
         },
