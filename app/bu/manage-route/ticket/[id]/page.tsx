@@ -158,6 +158,7 @@ function Page() {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setError('')
   };
 
   //validate click next
@@ -427,6 +428,7 @@ function Page() {
                               stations={routeActive?.stations || []}
                               ticketTypePriceName={ticketTypeList.find((item) => item.id === ticketTypeId)?.name || 'Ticket Price Type'}
                               ticketTypePriceId={ticketTypeId}
+                              setError={setError}
                             />
                             <hr className='custom-border-gray ' />
                           </React.Fragment >

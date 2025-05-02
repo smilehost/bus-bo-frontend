@@ -16,30 +16,31 @@ interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
   setTicketPrice: (value: TicketRoutePrice[]) => void;
   stations: string[];
-  ticketTypePriceName: string; 
-  ticketTypePriceId: string; 
+  ticketTypePriceName: string;
+  ticketTypePriceId: string;
+  setError: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePriceName, ticketTypePriceId }: TierdPriceTableProps) {
+function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePriceName, ticketTypePriceId, setError }: TierdPriceTableProps) {
   const { getStationNameById } = useStationStore();
-  
+
   //set price เริ่มต้น
   useEffect(() => {
     // แปลง ticketPrice ที่ส่งเข้ามา ให้ map เข้า matrix
     const newMatrix = Array.from({ length: stations.length - 1 }, () =>
       Array(stations.length - 1).fill(NaN)
     );
-  
+
     ticketPrice.forEach((priceItem) => {
       const fromIndex = stations.indexOf(priceItem.from);
       const toIndex = stations.indexOf(priceItem.to);
-  
+
       // เฉพาะเมื่อ index มีอยู่ใน stations
       if (fromIndex !== -1 && toIndex !== -1 && toIndex > fromIndex) {
         newMatrix[fromIndex][toIndex - 1] = priceItem.price;
       }
     });
-  
+
     setMatrix(newMatrix);
   }, [stations, ticketPrice]);
 
@@ -98,6 +99,7 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
       }
     });
 
+    setShowSave(true)
     setMatrix(newMatrix);
 
     // ✅ Reset input values
@@ -106,12 +108,13 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
     setRowChecked([]);
     setColChecked([]);
   };
+
   const handleSave = () => {
     const newErrors = errorMatrix.map((row) => [...row]);
     let valid = true;
-  
+
     const updatedPrices: TicketRoutePrice[] = [];
-  
+
     for (let i = 0; i < stations.length - 1; i++) {
       for (let j = 0; j < stations.length - 1; j++) {
         if (j >= i) {
@@ -123,14 +126,14 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
             const from = stations[i];
             const to = stations[j + 1];
             const ticketTypeId = ticketTypePriceId
-  
+
             const existing = ticketPrice.find(
               (item) =>
                 item.from === from &&
                 item.to === to &&
                 item.ticket_price_type_id === ticketTypeId
             );
-  
+
             updatedPrices.push({
               id: existing?.id.toString() || '', // ถ้ามีให้ใส่, ถ้าไม่มีจะเป็น undefined
               from,
@@ -142,16 +145,41 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
         }
       }
     }
-  
+
     setErrorMatrix(newErrors);
-  
+
+    setShowSave(false)
+
     if (valid) {
       setTicketPrice(updatedPrices); // ส่งขึ้น parent component
     } else {
-      alert('❌ กรุณากรอกราคาทุกช่องก่อนกด Save');
+      setError('Please fill in all The tables.');
     }
   };
-  
+
+  //check input
+  const [showSave, setShowSave] = useState<boolean>(false)
+  const checkMatrixChanged = () => {
+    for (let i = 0; i < stations.length - 1; i++) {
+      for (let j = 0; j < stations.length - 1; j++) {
+        if (j >= i) {
+          const from = stations[i];
+          const to = stations[j + 1];
+          const price = matrix[i][j];
+          const original = ticketPrice.find(
+            (p) =>
+              p.from === from &&
+              p.to === to &&
+              p.ticket_price_type_id === ticketTypePriceId
+          );
+          if (!original && !isNaN(price)) return true; // ใหม่แต่กรอกแล้ว
+          if (original && original.price !== price) return true; // เปลี่ยนจากเดิม
+        }
+      }
+    }
+    return false;
+  };
+  //แก้เงื่อนไขการกด save table ต่อ อย่าลืมซ่อน confirm อีก
 
   return (
 
@@ -177,7 +205,9 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
           />
         </label>
         <ButtonDefault text='Apply' size='' onClick={applyValues} />
-        <ButtonBG text='Save' size='' onClick={handleSave} />
+        {showSave && (
+          <ButtonBG text='Save Table' size='' onClick={handleSave} />
+        )}
       </div>
 
       {/* Display selection summary */}
@@ -188,7 +218,7 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
         </p>
         <p>
           Selected Columns:{' '}
-          {colChecked.map((i) => `${stationName[i+1]}`).join(', ') ||
+          {colChecked.map((i) => `${stationName[i + 1]}`).join(', ') ||
             'None'}
         </p>
       </div>
@@ -238,7 +268,8 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
                           const newMatrix = [...matrix];
                           newMatrix[i][j] = isNaN(value) ? NaN : value;
                           setMatrix(newMatrix);
-
+                          const changed = checkMatrixChanged();
+                          setShowSave(changed)
                           const newErrors = [...errorMatrix];
                           newErrors[i][j] = false;
                           setErrorMatrix(newErrors);
