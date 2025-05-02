@@ -3,11 +3,6 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
 
-// Mock token only in browser
-if (typeof window !== "undefined" && !localStorage.getItem("token_bo")) {
-  localStorage.setItem("token_bo", "mock-token-1234");
-}
-
 const instance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -21,13 +16,13 @@ instance.interceptors.request.use((config) => {
     const token = localStorage.getItem("token_bo");
     if (config.headers) {
       config.headers.set("Authorization", token ? `Bearer ${token}` : "");
-      config.headers.set("com_id", "1"); // ใส่ com_id แค่ใน header เท่านั้น
+      config.headers.set("com_id", "1"); // ส่ง company id จริง
     }
   }
   return config;
 });
 
-// Interceptor หลังรับ response
+// ✅ Interceptor หลังรับ response
 instance.interceptors.response.use(
   (response) => {
     const code = response.data?.code;
@@ -50,7 +45,7 @@ instance.interceptors.response.use(
   }
 );
 
-// Service layer (สำหรับเรียกใช้งาน)
+// ✅ Service layer (สำหรับเรียกใช้งาน)
 interface Payload {
   path: string;
   params?: string | number;

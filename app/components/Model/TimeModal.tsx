@@ -4,6 +4,7 @@ interface NewTime {
   name: string;
   startTime: string;
   times: string[];
+  schedule?: string | string[]; // Added the 'schedule' property
 }
 
 interface TimeModalProps {
@@ -15,11 +16,11 @@ interface TimeModalProps {
 function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
   const [newTime, setNewTime] = useState<NewTime>({
     name: editingTime?.name || "",
-    startTime: editingTime?.startTime || "",
-    times: Array.isArray(editingTime?.times)
-      ? editingTime.times
-      : typeof editingTime?.times === "string"
-      ? (editingTime.times as string).split(",").map((t) => t.trim())
+    startTime: "",
+    times: Array.isArray(editingTime?.schedule)
+      ? editingTime?.schedule
+      : typeof editingTime?.schedule === "string"
+      ? (editingTime?.schedule as string).split(",").map((t) => t.trim())
       : [],
   });
 
@@ -48,17 +49,15 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
 
   const addTimeSlot = () => {
     const trimmedTime = newTime.startTime.trim();
-
     if (!trimmedTime || !isValidTimeFormat(trimmedTime)) {
       alert("Invalid time format. Please use HH:mm.");
       return;
     }
-
     if (newTime.times.includes(trimmedTime)) return;
 
     setNewTime({
       ...newTime,
-      times: [...newTime.times, trimmedTime].sort(),
+      times: [...(newTime.times ?? []), trimmedTime].sort(),
     });
   };
 
@@ -72,12 +71,23 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
       <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden transform transition-all animate-fadeIn">
         <div className="bg-gradient-to-r from-orange-500 to-amber-400 p-6 text-white relative">
           <div className="absolute top-3 right-3">
-            <button 
+            <button
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+              className="cursor-pointer text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -124,13 +134,26 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
           {/* Time Slots */}
           <div>
             <div className="flex justify-between items-center mb-3">
-              <label className="font-medium text-gray-700 text-sm">Time Slots</label>
+              <label className="font-medium text-gray-700 text-sm">
+                Time Slots
+              </label>
               <button
                 onClick={addTimeSlot}
-                className="flex items-center text-sm px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors font-medium shadow-sm"
+                className="cursor-pointer flex items-center text-sm px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors font-medium shadow-sm"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
                 </svg>
                 Add Current Time
               </button>
@@ -143,17 +166,30 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
                       key={index}
                       className="px-3 py-1.5 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg flex items-center shadow-sm transition-all hover:shadow"
                     >
-                      <span className="font-medium">{formatTimeDisplay(time)}</span>
+                      <span className="font-medium">
+                        {formatTimeDisplay(time)}
+                      </span>
                       <button
                         onClick={() => {
                           const newTimes = [...newTime.times];
                           newTimes.splice(index, 1);
                           setNewTime({ ...newTime, times: newTimes });
                         }}
-                        className="ml-2 text-orange-400 hover:text-orange-700 transition-colors"
+                        className="cursor-pointer ml-2 text-orange-400 hover:text-orange-700 transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -161,8 +197,19 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
                 </div>
               ) : (
                 <div className="text-center py-6 text-gray-500 flex flex-col items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-10 w-10 text-gray-300 mb-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   No time slots added yet.
                 </div>
@@ -175,13 +222,13 @@ function TimeModal({ onClose, onSave, editingTime }: TimeModalProps) {
         <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-4 border-t">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+            className="cursor-pointer px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleSaveTime}
-            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-medium hover:opacity-90 transition-opacity shadow"
+            className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-lg font-medium hover:opacity-90 transition-opacity shadow"
           >
             {isEditing ? "Update Time" : "Add Time"}
           </button>

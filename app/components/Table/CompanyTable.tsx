@@ -1,5 +1,6 @@
 'use client';
 
+import { PencilIcon, Trash2Icon } from 'lucide-react';
 import React from 'react';
 
 type Company = {
@@ -39,9 +40,13 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
                     {company.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-center space-x-2">
-                  <button className="text-blue-500 hover:text-blue-700">✏️</button>
-                  <button className="text-red-500 hover:text-red-700">🗑️</button>
+                <td className="px-6 py-4 text-center space-x-2 ">
+                  <button className="text-blue-500 hover:text-blue-700 cursor-pointer">
+                    <PencilIcon size={16} />
+                  </button>
+                  <button className="text-red-500 hover:text-red-700 cursor-pointer">
+                    <Trash2Icon size={16} />
+                  </button>
                 </td>
               </tr>
             ))

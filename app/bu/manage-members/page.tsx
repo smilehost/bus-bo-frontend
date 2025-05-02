@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
 
 //component
 import FormFilter from '@/app/components/Filter/FormFilter'
@@ -8,84 +8,104 @@ import ItemUser from '@/app/components/MembersPage/ItemUser'
 import MemberModel from '@/app/components/Model/MemberModel'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 
-//const 
-import { FILTER, STATUS } from '@/constants/enum'
+//const
+import { FILTER, STATUS } from "@/constants/enum";
 
 //mock
-import { useUserStore } from '@/stores/userStore'
-import { useCompanyStore } from '@/stores/companyStore'
-import { useMemberStore } from '@/stores/memberStore'
+import { useUserStore } from "@/stores/userStore";
+import { useCompanyStore } from "@/stores/companyStore";
+import { useMemberStore } from "@/stores/memberStore";
+import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
 
 function Page() {
+  const { companyData } = useCompanyStore();
+  const { membersData } = useMemberStore();
+  const { userData } = useUserStore();
+  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true); // ✅ loading state
+  const [rowsPerPage, setRowsPerPage] = useState(4);
 
-    const { companyData } = useCompanyStore();
-    const { membersData } = useMemberStore();
-    const { userData } = useUserStore();
+  useEffect(() => {
+    // Simulate fetching data (fake delay)
+    const timer = setTimeout(() => setisLoadIngskeleton(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+  //member data
+  const [members, setMembers] = useState(membersData);
 
-    //member data
-    const [members, setMembers] = useState(membersData)
+  //filter
+  const [searchStatus, setSearchStatus] = useState<string>(""); // Filter by status
+  const [searchCompany, setSearchCompany] = useState<string>(""); // Filter by company
+  const [search, setSearch] = useState<string>(""); // Search input
 
-    //filter
-    const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-    const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
-    const [search, setSearch] = useState<string>(''); // Search input
+  const filtered = members.filter((item) => {
+    const company =
+      companyData.find((com) => com.id === item.member_company_id)?.name || "";
+    const matchesStatus =
+      searchStatus && searchStatus !== FILTER.ALL_STATUS
+        ? item.member_status === searchStatus
+        : true;
+    const matchesCompany =
+      searchCompany && searchCompany !== FILTER.ALL_COMPANIES
+        ? company?.toLowerCase().includes(searchCompany.toLowerCase())
+        : true;
+    const matchesSearch = search
+      ? item.member_name.toLowerCase().includes(search.toLowerCase())
+      : true;
+    return matchesStatus && matchesCompany && matchesSearch;
+  });
 
-    const filtered = members.filter((item) => {
-        const company = companyData.find((com) => com.id === item.member_company_id)?.name || ''
-        const matchesStatus = searchStatus && searchStatus !== FILTER.ALL_STATUS ? item.member_status === searchStatus : true;
-        const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? company?.toLowerCase().includes(searchCompany.toLowerCase()) : true;
-        const matchesSearch = search ? item.member_name.toLowerCase().includes(search.toLowerCase()) : true;
-        return matchesStatus && matchesCompany && matchesSearch;
-    });
+  const listCompany = companyData.map((item) => item.name);
+  const listStatus = [STATUS.ACTIVE, STATUS.INACTIVE, STATUS.CANCELLED];
 
-    const listCompany = companyData.map((item) => item.name)
-    const listStatus = [
-        STATUS.ACTIVE,
-        STATUS.INACTIVE,
-        STATUS.CANCELLED
-    ]
+  const filterSearch = [
+    {
+      defaulteValue: FILTER.ALL_STATUS,
+      listValue: listStatus,
+      setSearchValue: setSearchStatus,
+      size: "w-[130px]",
+    },
+    {
+      defaulteValue: FILTER.ALL_COMPANIES,
+      listValue: listCompany,
+      setSearchValue: setSearchCompany,
+      size: "w-[170px]",
+    },
+  ];
 
-    const filterSearch = [
-        {
-            defaulteValue: FILTER.ALL_STATUS,
-            listValue: listStatus,
-            setSearchValue: setSearchStatus,
-            size: "w-[130px]"
-        },
-        {
-            defaulteValue: FILTER.ALL_COMPANIES,
-            listValue: listCompany,
-            setSearchValue: setSearchCompany,
-            size: "w-[170px]"
-        },
-    ]
+  //handle memberModel
+  const [memberModelOpen, setMemberModelOpen] = useState(false);
+  const handleOpenMemberModel = () => setMemberModelOpen(true);
+  const handleCloseMemberModel = () => setMemberModelOpen(false);
 
-    //handle memberModel 
-    const [memberModelOpen, setMemberModelOpen] = useState(false)
-    const handleOpenMemberModel = () => setMemberModelOpen(true)
-    const handleCloseMemberModel = () => setMemberModelOpen(false)
+  const handleNewMember = ({
+    name,
+    phone,
+  }: {
+    name: string;
+    phone: string;
+  }) => {
+    console.log("New Member: ", name, phone);
+    const newMember = {
+      id: String(Date.now()),
+      member_name: name,
+      member_phone: phone,
+      member_status: STATUS.ACTIVE, // หรือจะกำหนดให้เลือกก็ได้
+      member_company_id: userData.company_id, // ตั้งค่า default หรือให้เลือกในฟอร์มภายหลัง
+      member_tripsTotal: 0,
+      member_lastTransaction: "-",
+    };
+    setMembers((prev) => [...prev, newMember]);
+    handleCloseMemberModel();
+  };
 
-    const handleNewMember = ({ name, phone }: { name: string; phone: string }) => {
-        console.log("New Member: ", name, phone);
-        const newMember = {
-            id: String(Date.now()),
-            member_name: name,
-            member_phone: phone,
-            member_status: STATUS.ACTIVE, // หรือจะกำหนดให้เลือกก็ได้
-            member_company_id: userData.company_id, // ตั้งค่า default หรือให้เลือกในฟอร์มภายหลัง
-            member_tripsTotal: 0,
-            member_lastTransaction: "-"
-        }
-        setMembers(prev => [...prev, newMember])
-        handleCloseMemberModel()
-    }
+  //get Company
+  const getCompanyName = ({ id }: { id: string }) => {
+    return companyData.find((com) => com.id === id)?.name || "";
+  };
 
-    //get Company 
-    const getCompanyName = ({ id }: { id: string }) => {
-        return companyData.find((com) => com.id === id)?.name || ''
-    }
-
-    return (
+  return (
+    <>
+      
         <div>
             <TitlePageAndButton title='Manage Members' description='View and manage customer information' btnText='Add New Member' handleOpenModel={handleOpenMemberModel}/>
             <FormFilter setSearch={setSearch} placeholderSearch='Search by phone or name...' filter={filterSearch} />
@@ -109,7 +129,9 @@ function Page() {
             </div>
             <MemberModel open={memberModelOpen} onClose={handleCloseMemberModel} onHandle={handleNewMember} />
         </div>
-    )
+      
+    </>
+  );
 }
 
-export default Page
+export default Page;

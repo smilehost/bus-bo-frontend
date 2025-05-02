@@ -1,8 +1,8 @@
 'use client';
 
-import CompanyModal from '@/app/components/Model/CompanyModal';
+import CompanyModal from '@/app/components/Modal/CompanyModal';
 import CompanyTable from '@/app/components/Table/CompanyTable';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 //components
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton';
@@ -22,6 +22,12 @@ export default function ManageCompanies() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState('');
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+    useEffect(() => {
+            // Simulate fetching data (fake delay)
+            const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
+            return () => clearTimeout(timer);
+          }, []);
 
   const filteredCompanies = companies.filter(company =>
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -46,10 +52,22 @@ export default function ManageCompanies() {
   return (
     <div className="">
       {/* Header */}
-      <TitlePageAndButton title='Manage Companies' description='View and manage bus companies' handleOpenModel={handleOpenModel} btnText='Add New Company' />
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Manage Companies</h1>
+          <p className="text-gray-500">View and manage bus companies</p>
+        </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center justify-center w-full md:w-auto"
+        >
+          <span className="mr-2 text-xl font-bold">+</span>
+          Add New Company
+        </button>
+      </div>
 
       {/* Search */}
-      <div className="mb-4 mt-6">
+      <div className="mb-4">
         <input
           type="text"
           placeholder="Search companies..."
