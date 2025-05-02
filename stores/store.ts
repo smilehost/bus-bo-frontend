@@ -3,8 +3,15 @@ import { persist } from "zustand/middleware";
 
 const STORAGE_KEY = "my-app-store";
 
-const defaultState: { com_id: number; token: string } = {
+const defaultState: {
+  com_id: number;
+  account_id: number;
+  account_role: string;
+  token: string;
+} = {
   com_id: 0,
+  account_id: 1,
+  account_role: "",
   token: "",
 };
 

@@ -5,6 +5,15 @@ import InputLabel from "../Form/InputLabel";
 import ButtonBG from "../Form/ButtonBG";
 import axios from "axios";
 import { store } from "@/stores/store";
+import { jwtDecode } from "jwt-decode";
+type DecodedToken = {
+  account_id: number;
+  account_role: string;
+  com_id: number;
+  login_at: number;
+  iat: number;
+  exp: number;
+};
 
 function Login() {
   const [username, setUserName] = useState<string>("");
@@ -26,11 +35,21 @@ function Login() {
       );
       const authHeader = response.headers["authorization"];
       if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.split(" ")[1]; // ตัดคำว่า Bearer ออก
+        const token = authHeader.split(" ")[1].trim();
         store.token.set(token);
-        console.log(store.token.get());
+      
+        const decoded = jwtDecode<DecodedToken>(token);
+        store.com_id.set(decoded.com_id);
+        store.account_id.set(decoded.account_id);
+        store.account_role.set(decoded.account_role);
+
+        console.log("com_id :", store.com_id.get());
+        console.log("account_id :", store.account_id.get());
+        console.log("account_role :", store.account_role.get());
+        console.log("token :", store.token.get() + ":");
+        
       }
-      window.location.href = "/bu"; //เปลี่ยนหน้าเมื่อ login สำเร็จ
+      // window.location.href = "/bu"; //เปลี่ยนหน้าเมื่อ login สำเร็จ
     } catch (err) {
       console.log(err);
       setError("Login failed: Invalid credentials");
