@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { STATUS, FILTER } from '@/constants/enum'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
@@ -18,7 +18,6 @@ import { useRouteStore } from '@/stores/routeStore'
 import { useTicketStore } from '@/stores/ticketStore'
 import { useTimeStore } from '@/stores/timeStore'
 import { useScheduleStore } from '@/stores/scheduleStore'
-import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 
 function Page() {
 
@@ -95,7 +94,7 @@ function Page() {
 
     // Handle delete route
     const handleDeleteRoute = async ({ route, index }: { route: string, index: number }) => {
-        const confirmed = await Confirm({
+        const confirmed = await confirmDialog({
             title: `Delete "${route}"?`,
             text: "Do you want to delete this route?",
             confirmText: "Delete",
@@ -138,12 +137,6 @@ function Page() {
             size: "w-[170px]"
         },
     ]
-    const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
-          useEffect(() => {
-                  // Simulate fetching data (fake delay)
-                  const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-                  return () => clearTimeout(timer);
-                }, []);
 
     return (
         <>
@@ -153,34 +146,8 @@ function Page() {
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
             </div>
 
-            <>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-                <TitlePage
-                  title="Manage Routes"
-                  description="View and manage bus routes"
-                />
-                <ButtonBG
-                  size="h-[38px]"
-                  text="Add New Route"
-                  icon="/icons/plus.svg"
-                  onClick={RedirectoAdd}
-                />
-              </div>
-      
-              <FormFilter
-                setSearch={setSearch}
-                placeholderSearch="Search routes..."
-                filter={filterSearch}
-              />
-              {isLoadingskeleton ? <SkeletonRoute /> :
-              <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
-                <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-              </div>
-}
-            </>
         </>
-      );
-      
+    )
 }
 
 export default Page

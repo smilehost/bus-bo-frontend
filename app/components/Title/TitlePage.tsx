@@ -9,11 +9,11 @@ type TitleProps = {
 }
 function TitlePage({ title, description }: TitleProps) {
     return (
-      <div className='flex flex-col'>
-        <TitleHeader text={title} />
-        <p className='text-gray-500 text-sm'>{description}</p>
-      </div>
-    );
-  }
+        <div className='flex flex-col '>
+            <TitleHeader text={title} />
+            <p className='text-[14px] text-[#4B5563]'>{description}</p>
+        </div>
+    )
+}
 
 export default TitlePage

@@ -1,11 +1,9 @@
 @import "tailwindcss";
 
-/* Variable */
 :root {
   --main-gradient: linear-gradient(to right, #eab308, #f97316);
 }
 
-/* Basic Setup */
 body {
   background-color: #f3f4f6;
 }
@@ -20,7 +18,7 @@ body {
 
 .custom-btn-bg-main {
   @apply px-4 py-2 rounded-md text-white cursor-pointer;
-  background-image: var(--main-gradient);
+  background-image: var(--main-gradient); /* ใช้ตัวแปรที่สร้าง */
 }
 
 .custom-border-gray {
@@ -31,47 +29,6 @@ body {
   @apply bg-white rounded-lg shadow-xs mt-5;
 }
 
-/* 🎯 เพิ่ม Animation Fade-In-Up (แบบเดียวกับที่ทำให้ Table Animate) */
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeInUp 0.5s ease-out forwards;
-}
-.swal2-confirm-btn {
-  background: linear-gradient(to right, #f59e0b, #f97316);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 20px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: background 0.3s;
-}
-
-.swal2-confirm-btn:hover {
-  background: linear-gradient(to right, #ea580c, #f97316);
-}
-
-.swal2-cancel-btn {
-  background: #e5e7eb;
-  color: #374151;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 20px;
-  font-weight: 600;
-  margin-left: 10px;
-  transition: background 0.3s;
-}
-
-.swal2-cancel-btn:hover {
-  background: #d1d5db;
+.custom-ellipsis-style {
+  @apply whitespace-nowrap text-ellipsis overflow-hidden;
 }

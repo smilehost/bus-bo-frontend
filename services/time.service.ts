@@ -1,22 +1,11 @@
 import { api } from "./axios.service";
-import {
-  CreateTimePayload,
-  UpdateTimePayload,
-  FetchTimesQuery,
-} from "../payloads/time.payload";
+import { CreateTimePayload, UpdateTimePayload, FetchTimesQuery } from "../payloads/time.payload";
 
 export const TimeService = {
   async fetchTimes(query: FetchTimesQuery) {
     return await api.get({
-      path: "/api/times/all",
-      query: query as unknown as Record<string, string | number>,
-    });
-  },
-
-  async getTimeById(id: number) {
-    return await api.get({
       path: "/api/times",
-      params: id,
+      query: query as unknown as Record<string, string | number>,
     });
   },
 

@@ -8,15 +8,8 @@ import {
 export const DateService = {
   async fetchDates(query: FetchDatesQuery) {
     return await api.get({
-      path: "/api/dates/all",
-      query: query as unknown as Record<string, string | number>,
-    });
-  },
-
-  async fetchDateById(id: number) {
-    return await api.get({
       path: "/api/dates",
-      params: id,
+      query: query as unknown as Record<string, string | number>,
     });
   },
 

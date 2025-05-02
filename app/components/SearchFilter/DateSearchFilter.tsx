@@ -18,7 +18,7 @@ function SearchFilter({
       <input
         type="text"
         placeholder="Search by name..."
-        className="border p-2 rounded-md w-full"
+        className="border p-2 rounded-md w-3/4"
         value={searchTerm}
         onChange={setSearchTerm} // ✅ ใช้ e => ส่งให้ฟังก์ชัน handleSearchChange ที่มี debounce
       />
@@ -26,7 +26,7 @@ function SearchFilter({
         <span className="mr-2">Filters:</span>
         <select
           aria-label="Status Filter"
-          className="border p-2 rounded-md hover:bg-gray-100 cursor-pointer"
+          className="border p-2 rounded-md"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
