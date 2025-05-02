@@ -13,16 +13,16 @@ type MenuItemProps = {
 
 function MenuItemLink({ text, icon, link }: MenuItemProps) {
   const pathname = usePathname();
-  const isActive = pathname === link;
-
+  const activePath = pathname.split('/bu/')[1]?.split('/')[0] || '';
+  const isActive = activePath === link;
+  
   return (
     <Link
-      href={link}
-      className={`flex items-center px-4 py-3 rounded-md text-[14px] font-medium transition-all ${
-        isActive
-          ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'
-          : 'text-gray-700 hover:bg-gray-100'
-      }`}
+      href={`/bu/${link}`}
+      className={`flex items-center px-4 py-3 rounded-md text-[14px] font-medium transition-all ${isActive
+        ? 'custom-bg-main text-white'
+        : 'text-gray-700 hover:bg-gray-100'
+        }`}
     >
       <Image src={icon} priority width={20} height={20} alt="icon-menu" />
       <span className="ml-3">{text}</span>

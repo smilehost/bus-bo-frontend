@@ -18,6 +18,20 @@ export type Route = {
     schedule_id: string;
 };
 
+export type TicketPriceType = {
+    id: string,
+    name: string,
+    company_id: string
+}
+
+export type TicketRoutePrice = {
+    id: string,
+    from: string,
+    to: string,
+    price: number,
+    ticket_price_type_id: string,
+}
+
 export type TicketListProps = { type: string; price: number };
 
 export type TicketProps = {
@@ -27,7 +41,7 @@ export type TicketProps = {
     ticket_type: TICKET_TYPE;
     ticket_amount: string;
     ticket_color: string;
-    ticket_list: TicketListProps[];
+    ticket_price: TicketRoutePrice[];
     route_id: string;
 };
 

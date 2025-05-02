@@ -31,6 +31,10 @@ body {
   @apply bg-white rounded-lg shadow-xs mt-5;
 }
 
+.custom-ellipsis-style {
+  @apply whitespace-nowrap text-ellipsis overflow-hidden;
+}
+
 /* 🎯 เพิ่ม Animation Fade-In-Up (แบบเดียวกับที่ทำให้ Table Animate) */
 @keyframes fadeInUp {
   0% {

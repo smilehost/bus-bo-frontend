@@ -5,6 +5,8 @@ import SkeletonCompanyTable from '@/app/components/Skeleton/SkeletonCompanyTable
 import CompanyTable from '@/app/components/Table/CompanyTable';
 import { useEffect, useState } from 'react';
 
+//components
+import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton';
 
 type Company = {
   id: number;
@@ -43,6 +45,10 @@ export default function ManageCompanies() {
     setNewCompanyName('');
     setIsModalOpen(false);
   };
+
+  const handleOpenModel = () => {
+    setIsModalOpen(true)
+  }
 
   return (
 

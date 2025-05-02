@@ -9,6 +9,7 @@ type RouteStore = {
     addRoute: (newRoute: Route) => void;
     updateRoute: (id: string, updatedRoute: Route) => void;
     deleteRoute: (id: string) => void;
+    getRouteById: (id: string) => Route | undefined;
 };
 
 export const useRouteStore = create<RouteStore>((set) => ({
@@ -22,7 +23,7 @@ export const useRouteStore = create<RouteStore>((set) => ({
             status: STATUS.ACTIVE,
             routeColor: '#3B82F6',
             stations: ['1', '4', '2', '5'],
-            ticket_amount: "0", // จะถูกอัปเดตผ่านฟังก์ชัน
+            ticket_amount: "0",
         },
         {
             id: '2',
@@ -59,23 +60,32 @@ export const useRouteStore = create<RouteStore>((set) => ({
         },
     ],
 
-    // ฟังก์ชันการตั้งค่าข้อมูล
     setRouteData: (newData) => set({ routeData: newData }),
 
-    // ฟังก์ชันการเพิ่มข้อมูล
-    addRoute: (newRoute) => set((state) => ({
-        routeData: [...state.routeData, newRoute],
-    })),
+    addRoute: (newRoute) =>
+        set((state) => ({
+            routeData: [...state.routeData, newRoute],
+        })),
 
-    // ฟังก์ชันการอัปเดตข้อมูล
-    updateRoute: (id, updatedRoute) => set((state) => ({
-        routeData: state.routeData.map((route) =>
-            route.id === id ? updatedRoute : route
-        ),
-    })),
+    updateRoute: (id, updatedRoute) =>
+        set((state) => ({
+            routeData: state.routeData.map((route) =>
+                route.id === id ? updatedRoute : route
+            ),
+        })),
 
-    // ฟังก์ชันการลบข้อมูล
-    deleteRoute: (id) => set((state) => ({
-        routeData: state.routeData.filter((route) => route.id !== id),
-    })),
+    deleteRoute: (id) =>
+        set((state) => ({
+            routeData: state.routeData.filter((route) => route.id !== id),
+        })),
+
+    // placeholder, จะ override ทีหลัง
+    getRouteById: () => undefined,
+}));
+
+useRouteStore.setState((state) => ({
+    ...state,
+    getRouteById: (id: string) => {
+        return useRouteStore.getState().routeData.find((route) => route.id === id);
+    },
 }));

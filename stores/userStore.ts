@@ -14,9 +14,10 @@ type UserStore = {
 
 export const useUserStore = create<UserStore>((set) => ({
     userData: {
-        user_tier: USER_TIER.ADMIN,
+        id: '1',
         name: 'TEST USER',
-        company_id: '4',
+        user_tier: USER_TIER.ADMIN,
+        company_id: '1',
     },
     setUserData: (newData) => set({ userData: newData }),
 }));
