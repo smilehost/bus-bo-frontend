@@ -53,12 +53,11 @@ const tickets: Ticket[] = [
   },
 ];
 const routeColors: Record<string, string> = {
-    "Northern Express": "bg-blue-500",
-    "Southern Route": "bg-green-500",
-    "Eastern Circuit": "bg-orange-400",
-    "Western Line": "bg-purple-500",
-  };
-  
+  "Northern Express": "bg-blue-500",
+  "Southern Route": "bg-green-500",
+  "Eastern Circuit": "bg-orange-400",
+  "Western Line": "bg-purple-500",
+};
 
 export default function TicketTable() {
   return (
@@ -66,7 +65,7 @@ export default function TicketTable() {
       <table className="min-w-full divide-y divide-gray-200 text-sm">
         <thead className="bg-gray-50 text-left text-gray-600 font-medium">
           <tr>
-            <th className="px-4 py-3" >Ticket ID</th>
+            <th className="px-4 py-3">Ticket ID</th>
             <th className="px-4 py-3">Route</th>
             <th className="px-4 py-3">Journey</th>
             <th className="px-4 py-3">Date & Time</th>
@@ -76,43 +75,61 @@ export default function TicketTable() {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {tickets.map((ticket) => (
-            <tr key={ticket.id}>
-              <td className="px-4 py-3 font-medium">{ticket.id}</td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-6 rounded-full ${routeColors[ticket.route]}`} />
-                    <span>{ticket.route}</span>
-                </div>
-                </td>
-              <td className="px-4 py-3 text-gray-500">
-                <div>{ticket.journey}</div>
-                <div className="text-xs">{ticket.passengers} passenger(s)</div>
-              </td>
-              <td className="px-4 py-3">{ticket.datetime}</td>
-              <td className="px-4 py-3">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                    ticket.status === "Active"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {ticket.status}
-                </span>
-              </td>
-              <td className="px-4 py-3">{ticket.amount}</td>
-              <td className="px-4 py-3">
-                {ticket.price === "matrix price" ? (
-                  <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded cursor-pointer">
-                    matrix price
-                  </span>
-                ) : (
-                  ticket.price
-                )}
+          {tickets.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="py-8 text-center text-gray-500">
+                No locations found
               </td>
             </tr>
-          ))}
+          ) : (
+            tickets.map((ticket, index) => (
+              <tr
+                key={ticket.id}
+                className={`border-t border-gray-200 opacity-0 animate-fade-in-up`}
+  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+              >
+                <td className="px-4 py-3 font-medium">{ticket.id}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-1.5 h-6 rounded-full ${
+                        routeColors[ticket.route]
+                      }`}
+                    />
+                    <span>{ticket.route}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-gray-500">
+                  <div>{ticket.journey}</div>
+                  <div className="text-xs">
+                    {ticket.passengers} passenger(s)
+                  </div>
+                </td>
+                <td className="px-4 py-3">{ticket.datetime}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      ticket.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {ticket.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3">{ticket.amount}</td>
+                <td className="px-4 py-3">
+                  {ticket.price === "matrix price" ? (
+                    <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded cursor-pointer">
+                      matrix price
+                    </span>
+                  ) : (
+                    ticket.price
+                  )}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

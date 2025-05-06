@@ -50,6 +50,10 @@ body {
 .animate-fade-in {
   animation: fadeInUp 0.5s ease-out forwards;
 }
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
 .swal2-confirm-btn {
   background: linear-gradient(to right, #f59e0b, #f97316);
   color: white;

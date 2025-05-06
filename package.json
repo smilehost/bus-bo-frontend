@@ -21,6 +21,7 @@
     "react": "^19.0.0",
     "react-color": "^2.19.3",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
     "react-loading-skeleton": "^3.5.0",
     "react-sortablejs": "^6.1.4",
     "recharts": "^2.15.3",
