@@ -1,4 +1,4 @@
-'use client'; // เพราะมี useState, Chart ต้อง render ฝั่ง client
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import {
