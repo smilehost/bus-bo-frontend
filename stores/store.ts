@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const STORAGE_KEY = "my-app-store";
+const STORAGE_KEY = "token_bo";
 
 const defaultState: {
   com_id: number;

@@ -21,7 +21,7 @@ export default function RootLayout({
       icon: "/icons/home.svg", 
       text: "Dashboard", 
       link: `dashboard` },
-        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "" },
+        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "sell-ticket" },
         {
             id: 3,
             icon: "/icons/route.svg",

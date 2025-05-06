@@ -10,13 +10,30 @@ const instance = axios.create({
   },
 });
 
-// Interceptor ก่อนส่ง request
+// ดึง com_id จาก localStorage
+function getComId(): string | null {
+  try {
+    const store = localStorage.getItem("token_bo");
+    if (!store) return null;
+    const parsed = JSON.parse(store);
+    return parsed?.state?.com_id?.toString() || null;
+  } catch (error) {
+    console.error("Failed to parse com_id from token_bo:", error);
+    return null;
+  }
+}
+
+// ✅ Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token_bo");
+    const com_id = getComId();
+
     if (config.headers) {
       config.headers.set("Authorization", token ? `Bearer ${token}` : "");
-      config.headers.set("com_id", "1"); // ส่ง company id จริง
+      if (com_id) {
+        config.headers.set("com_id", com_id);
+      }
     }
   }
   return config;
@@ -45,7 +62,7 @@ instance.interceptors.response.use(
   }
 );
 
-// ✅ Service layer (สำหรับเรียกใช้งาน)
+// ✅ Service layer
 interface Payload {
   path: string;
   params?: string | number;
