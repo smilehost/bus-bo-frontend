@@ -25,9 +25,18 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
           </tr>
         </thead>
         <tbody>
-          {companies.length > 0 ? (
-            companies.map(company => (
-              <tr key={company.id} className="border-t border-gray-200">
+        {companies.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="py-8 text-center text-gray-500">
+                No locations found
+              </td>
+            </tr>
+          ) : (
+          companies.length > 0 ? (
+            companies.map((company, index) => (
+              <tr key={company.id} 
+              className={`border-t border-gray-200 opacity-0 animate-fade-in-up`}
+              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}>
                 <td className="px-6 py-4">{company.name}</td>
                 <td className="px-6 py-4 text-center">
                   <span
@@ -56,7 +65,8 @@ export default function CompanyTable({ companies }: CompanyTableProps) {
                 No companies found
               </td>
             </tr>
-          )}
+          )
+        )}
         </tbody>
       </table>
     </div>

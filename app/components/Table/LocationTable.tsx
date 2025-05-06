@@ -72,9 +72,8 @@ function LocationTable({
               locations.map((loc, index) => (
                 <tr
                   key={loc.id}
-                  className={`transition-all duration-500 ease-out transform border-b border-gray-200 opacity-0 translate-y-4 animate-fade-in 
-                  }`}
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  className={`border-t border-gray-200 opacity-0 animate-fade-in-up`}
+  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                 >
                   <td className="py-4 px-6 border-b border-gray-200 text-center font-medium text-gray-700">
                     {index + 1 + (currentPage - 1) * rowsPerPage}
