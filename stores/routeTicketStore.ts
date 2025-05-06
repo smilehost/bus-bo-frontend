@@ -29,42 +29,48 @@ export const useTicketStore = create<TicketStore>((set) => ({
                     from: "1",
                     to: "2",
                     price: 100,
-                    ticket_price_type_id: "1"
+                    ticket_price_type_id: "1",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "2",
                     from: "1",
                     to: "3",
                     price: 340,
-                    ticket_price_type_id: "1"
+                    ticket_price_type_id: "1",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "3",
                     from: "2",
                     to: "3",
                     price: 300,
-                    ticket_price_type_id: "1"
+                    ticket_price_type_id: "1",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "4",
                     from: "1",
                     to: "2",
                     price: 500,
-                    ticket_price_type_id: "2"
+                    ticket_price_type_id: "2",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "5",
                     from: "1",
                     to: "3",
                     price: 250,
-                    ticket_price_type_id: "2"
+                    ticket_price_type_id: "2",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "6",
                     from: "2",
                     to: "3",
                     price: 100,
-                    ticket_price_type_id: "2"
+                    ticket_price_type_id: "2",
+                    route_ticket_price_id: "1"
                 },
             ],
         },
@@ -82,63 +88,72 @@ export const useTicketStore = create<TicketStore>((set) => ({
                     from: "1",
                     to: "2",
                     price: 500,
-                    ticket_price_type_id: "1"
+                    ticket_price_type_id: "1",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "2",
                     from: "1",
                     to: "3",
                     price: 500,
-                    ticket_price_type_id: "1"
+                    ticket_price_type_id: "1",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "3",
                     from: "2",
                     to: "3",
                     price: 500,
-                    ticket_price_type_id: "1"
+                    ticket_price_type_id: "1",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "4",
                     from: "1",
                     to: "2",
                     price: 100,
-                    ticket_price_type_id: "2"
+                    ticket_price_type_id: "2",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "5",
                     from: "1",
                     to: "3",
                     price: 100,
-                    ticket_price_type_id: "2"
+                    ticket_price_type_id: "2",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "6",
                     from: "2",
                     to: "3",
                     price: 100,
-                    ticket_price_type_id: "2"
+                    ticket_price_type_id: "2",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "1",
                     from: "1",
                     to: "2",
                     price: 800,
-                    ticket_price_type_id: "3"
+                    ticket_price_type_id: "3",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "2",
                     from: "1",
                     to: "3",
                     price: 800,
-                    ticket_price_type_id: "3"
+                    ticket_price_type_id: "3",
+                    route_ticket_price_id: "1"
                 },
                 {
                     id: "3",
                     from: "2",
                     to: "3",
                     price: 800,
-                    ticket_price_type_id: "3"
+                    ticket_price_type_id: "3",
+                    route_ticket_price_id: "1"
                 },
             ],
         },

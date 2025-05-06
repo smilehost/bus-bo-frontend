@@ -14,14 +14,14 @@ import { useStationStore } from '@/stores/stationStore';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
-  setTicketPrice: (value: TicketRoutePrice[]) => void;
   stations: string[];
   ticketTypePriceName: string;
   ticketTypePriceId: string;
   setError: React.Dispatch<React.SetStateAction<string>>;
+  handleSaveTable: (value: TicketRoutePrice[]) => void;
 }
 
-function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePriceName, ticketTypePriceId, setError }: TierdPriceTableProps) {
+function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, setError, handleSaveTable }: TierdPriceTableProps) {
   const { getStationNameById } = useStationStore();
 
   //set price เริ่มต้น
@@ -85,6 +85,15 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
   const applyValues = () => {
     const newMatrix = matrix.map((row) => [...row]);
 
+    const hasRowInput = rowChecked.length > 0 && !!rowValue;
+    const hasColInput = colChecked.length > 0 && !!colValue;
+  
+    if (!hasRowInput && !hasColInput && !changeMatrix) {
+      setShowSave(false);
+      return;
+    }
+
+    setShowSave(true)
     rowChecked.forEach((rowIdx) => {
       for (let j = rowIdx; j < stations.length - 1; j++) {
         newMatrix[rowIdx][j] = parseFloat(rowValue);
@@ -99,7 +108,6 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
       }
     });
 
-    setShowSave(true)
     setMatrix(newMatrix);
 
     // ✅ Reset input values
@@ -149,9 +157,10 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
     setErrorMatrix(newErrors);
 
     setShowSave(false)
+    setChangeMatrix(false)
 
     if (valid) {
-      setTicketPrice(updatedPrices); // ส่งขึ้น parent component
+      handleSaveTable(updatedPrices); // ส่งขึ้น parent component
     } else {
       setError('Please fill in all The tables.');
     }
@@ -159,6 +168,8 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
 
   //check input
   const [showSave, setShowSave] = useState<boolean>(false)
+  const [changeMatrix, setChangeMatrix] = useState<boolean>(false)
+
   const checkMatrixChanged = () => {
     for (let i = 0; i < stations.length - 1; i++) {
       for (let j = 0; j < stations.length - 1; j++) {
@@ -182,7 +193,6 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
   //แก้เงื่อนไขการกด save table ต่อ อย่าลืมซ่อน confirm อีก
 
   return (
-
     <div >
       <p className='mb-2 font-medium'>{ticketTypePriceName}</p>
       <div className="mb-4 flex flex-wrap gap-4 items-center">
@@ -270,6 +280,7 @@ function TierdPriceTable({ ticketPrice, setTicketPrice, stations, ticketTypePric
                           setMatrix(newMatrix);
                           const changed = checkMatrixChanged();
                           setShowSave(changed)
+                          setChangeMatrix(changed)
                           const newErrors = [...errorMatrix];
                           newErrors[i][j] = false;
                           setErrorMatrix(newErrors);

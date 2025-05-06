@@ -3,14 +3,15 @@
 import React, { useEffect, useState } from 'react';
 
 //type
-import { TicketPriceTypeFixed } from '@/app/bu/manage-route/ticket/[id]/page';
+import { TicketPriceTypeFixed } from '@/app/bu/manage-route/routeTicket/[id]/page';
 
 type TicketPriceFixedProps = {
   listType: TicketPriceTypeFixed[];
   setTicketTypePrice: (value: TicketPriceTypeFixed[]) => void;
+  setCheckConfirm: (value: boolean) => void;
 };
 
-function TicketPriceFixed({ listType, setTicketTypePrice }: TicketPriceFixedProps) {
+function TicketPriceFixed({ listType, setTicketTypePrice, setCheckConfirm }: TicketPriceFixedProps) {
   const [priceList, setPriceList] = useState<TicketPriceTypeFixed[]>([]);
 
   // sync priceList with incoming listType (only when listType changes)
@@ -24,10 +25,18 @@ function TicketPriceFixed({ listType, setTicketTypePrice }: TicketPriceFixedProp
 
     const updated = [...priceList];
     updated[index].price = numericValue;
+
+    const isValidTicketPrice = updated.every(tp => tp.price && tp.price > 0) && updated.length > 0;
+
+    if (!isValidTicketPrice) {
+      setCheckConfirm(true);
+    }else{
+      setCheckConfirm(false);
+    }
+
     setPriceList(updated);
     setTicketTypePrice(updated);
   };
-
 
   return (
     <div>

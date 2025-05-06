@@ -88,7 +88,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
+          {rows?.map((row, index) => (
             <StyledTableRow key={index}>
               <StyledTableCell align="left">
                 <div className='flex gap-3 items-center'>

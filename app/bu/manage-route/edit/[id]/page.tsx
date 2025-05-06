@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 //type
 import { StationProps } from '@/types/stations';
 import { RouteType } from '@/types/routes';
+import { RouteData } from '@/types/types';
 
 //component 
 import FormRoute from '@/app/components/Form/FormRoute';
@@ -23,95 +24,109 @@ function Page() {
 
     //mock
     const { stationData } = useStationStore();
-    const { routeData } = useRouteStore();
+    const { getRouteById } = useRouteStore();
 
     const params = useParams()
     //set default value
-    const [routeIndexData, setRouteIndexData] = useState<RouteType>()
-    useEffect(() => {
-        if (params?.id !== undefined) {
-            const foundRoute = routeData.find((value) => value.id === params?.id);
-            if (foundRoute) {
-                const routeIndexData: RouteType = {
-                    id: foundRoute.id,
-                    route: foundRoute.route,
-                    company: foundRoute.company_id,
-                    schedule: foundRoute.schedule_id,
-                    times: foundRoute.times_id,
-                    status: foundRoute.status,
-                    routeColor: foundRoute.routeColor,
-                    stations: foundRoute.stations
-                };
+    const [routeIndexData, setRouteIndexData] = useState<RouteData>()
 
-                setRouteIndexData(routeIndexData);
+    useEffect(() => {
+        const fetchData = async () => {
+            if (params?.id) {
+                const route = await getRouteById(Number(params.id)); // แปลง id เป็น number ถ้าจาก URL
+                setRouteIndexData(route);
             }
-        }
-    }, [params, routeData])
+        };
 
-    useEffect(() => {
-        if (routeIndexData) {
-            setRouteName(routeIndexData.route);
-            setSelectedTime(routeIndexData.times.toString());
-            setSchedule(routeIndexData.schedule.toString());
-            setRouteColor(routeIndexData.routeColor.toString())
+        fetchData();
+    }, [params?.id, getRouteById]);
 
-            // ดึง station ที่ id ตรงกับ routeIndexData.stations
-            const stationObjects = routeIndexData.stations.map((stationId) => {
-                return transformedList.find((s) => s.id === stationId);
-            }).filter(Boolean) as StationProps[];
+    console.log("routeIndexData: ", routeIndexData)
 
-            setListB(stationObjects);
+    // useEffect(() => {
+    //     if (params?.id !== undefined) {
+    //         const foundRoute = routeData.find((value) => value.id === params?.id);
+    //         if (foundRoute) {
+    //             const routeIndexData: RouteType = {
+    //                 id: foundRoute.id,
+    //                 route: foundRoute.route,
+    //                 company: foundRoute.company_id,
+    //                 schedule: foundRoute.schedule_id,
+    //                 times: foundRoute.times_id,
+    //                 status: foundRoute.status,
+    //                 routeColor: foundRoute.routeColor,
+    //                 stations: foundRoute.stations
+    //             };
 
-            // เอา station ที่ยังไม่ถูกเลือก (ไม่อยู่ใน listB)
-            const filteredListA = transformedList.filter(
-                (station) => !stationObjects.some((s) => s.id === station.id)
-            );
-            setListA(filteredListA);
-        }
-    }, [routeIndexData]);
+    //             setRouteIndexData(routeIndexData);
+    //         }
+    //     }
+    // }, [params, routeData])
 
-    const transformedList = stationData.map((station) => ({
-        id: station.id,
-        name: station.name,
-    }));
+    // useEffect(() => {
+    //     if (routeIndexData) {
+    //         setRouteName(routeIndexData.route);
+    //         setSelectedTime(routeIndexData.times.toString());
+    //         setSchedule(routeIndexData.schedule.toString());
+    //         setRouteColor(routeIndexData.routeColor.toString())
 
-    //select route name
-    const [routeName, setRouteName] = useState<string>('')
+    //         // ดึง station ที่ id ตรงกับ routeIndexData.stations
+    //         const stationObjects = routeIndexData.stations.map((stationId) => {
+    //             return transformedList.find((s) => s.id === stationId);
+    //         }).filter(Boolean) as StationProps[];
 
-    //route color
-    const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
+    //         setListB(stationObjects);
 
-    //select station
-    const [listA, setListA] = useState<StationProps[]>(transformedList);
-    const [listB, setListB] = useState<StationProps[]>([]);
-    const [listStations, setListStations] = useState<string[]>([]);
+    //         // เอา station ที่ยังไม่ถูกเลือก (ไม่อยู่ใน listB)
+    //         const filteredListA = transformedList.filter(
+    //             (station) => !stationObjects.some((s) => s.id === station.id)
+    //         );
+    //         setListA(filteredListA);
+    //     }
+    // }, [routeIndexData]);
 
-    //select time
-    const [selectedTime, setSelectedTime] = useState<string>(''); // ค่าที่จะเก็บเวลา
-    const handleChangeTime = (event: SelectChangeEvent<string>) => {
-        setSelectedTime(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
-    };
+    // const transformedList = stationData.map((station) => ({
+    //     id: station.id,
+    //     name: station.name,
+    // }));
 
-    //select schedule
-    const [schedule, setSchedule] = useState<string>('');
-    const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
-        setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
-    };
+    // //select route name
+    // const [routeName, setRouteName] = useState<string>('')
+
+    // //route color
+    // const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
+
+    // //select station
+    // const [listA, setListA] = useState<StationProps[]>(transformedList);
+    // const [listB, setListB] = useState<StationProps[]>([]);
+    // const [listStations, setListStations] = useState<string[]>([]);
+
+    // //select time
+    // const [selectedTime, setSelectedTime] = useState<string>(''); // ค่าที่จะเก็บเวลา
+    // const handleChangeTime = (event: SelectChangeEvent<string>) => {
+    //     setSelectedTime(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
+    // };
+
+    // //select schedule
+    // const [schedule, setSchedule] = useState<string>('');
+    // const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
+    //     setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
+    // };
 
 
-    useEffect(() => {
-        const stationIds = listB.map(station => station.id);
-        setListStations(stationIds);
-    }, [listB]);
+    // useEffect(() => {
+    //     const stationIds = listB.map(station => station.id);
+    //     setListStations(stationIds);
+    // }, [listB]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        console.log("Route Name: ", routeName)
-        console.log("Route Color: ", routeColor)
-        console.log("Time: ", selectedTime)
-        console.log("Schedule: ", schedule)
-        console.log("listStations", listStations)
-    }
+    // const handleSubmit = (e: React.FormEvent) => {
+    //     e.preventDefault()
+    //     console.log("Route Name: ", routeName)
+    //     console.log("Route Color: ", routeColor)
+    //     console.log("Time: ", selectedTime)
+    //     console.log("Schedule: ", schedule)
+    //     console.log("listStations", listStations)
+    // }
 
     if (!routeIndexData) {
         return null;
@@ -119,7 +134,7 @@ function Page() {
     return (
         <div>
             <TitleHeader text={"Edit Route"} />
-            <FormRoute
+            {/* <FormRoute
                 routeName={routeName}
                 setRouteName={setRouteName}
                 routeColor={routeColor}
@@ -133,7 +148,7 @@ function Page() {
                 schedule={schedule}
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
-            />
+            /> */}
         </div>
     )
 }

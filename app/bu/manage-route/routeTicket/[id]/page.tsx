@@ -16,9 +16,9 @@ import { TICKET_TYPE } from '@/constants/enum'
 import { useParams } from 'next/navigation'
 
 //mock
-import { useTicketStore } from '@/stores/ticketStore'
+import { useTicketStore } from '@/stores/routeTicketStore'
 import { useRouteStore } from '@/stores/routeStore'
-import { useTicketPriceStore } from '@/stores/ticketPriceTypeStore'
+import { useTicketPriceStore } from '@/stores/routeTicketPriceTypeStore'
 import { useUserStore } from '@/stores/userStore'
 
 //type 
@@ -85,7 +85,6 @@ function Page() {
   const [ticketType, setTicketType] = useState<TICKET_TYPE>();
   const [ticketPriceFixed, setTicketPriceFixed] = useState<TicketPriceTypeFixed[]>([])
   const [ticketPriceList, setTicketPriceList] = useState<TicketRoutePrice[]>([])
-  const [ticketPrice, setTicketPrice] = useState<TicketRoutePrice[]>()
   const [ticketChecked, setTicketChecked] = useState<string[]>([])
   const [ticketTypeList, setTicketTypeList] = useState<TicketPriceType[]>([]);
 
@@ -158,6 +157,7 @@ function Page() {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setCheckConfirm(false)
     setError('')
   };
 
@@ -181,16 +181,19 @@ function Page() {
       setTicketPriceFixed(tempTicketPriceFixed);
     }
 
+    setCheckConfirm(false)
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   }
 
-  //submit
+  //submit ticket
+  const [checkConfirm, setCheckConfirm] = useState(true)
   const handleSubmit = () => {
 
     if (!ticketType || !params.id) return;
 
     //Fixed Price
-    let tempTicketPrice: TicketRoutePrice[] = ticketPriceList;
+    let tempTicketPrice: TicketRoutePrice[] = ticketPriceList.filter((item) => ticketChecked.includes(item.ticket_price_type_id));
+
     if (ticketType === TICKET_TYPE.FIXED) {
       const stations = routeActive?.stations
       if (ticketType === TICKET_TYPE.FIXED && stations && ticketPriceFixed.length > 0) {
@@ -209,7 +212,8 @@ function Page() {
                 from: from,
                 to: to,
                 price: type.price,
-                ticket_price_type_id: type.id_type
+                ticket_price_type_id: type.id_type,
+                route_ticket_price_id: params.id?.toString() || '',
               });
               idCounter++;
             });
@@ -226,7 +230,12 @@ function Page() {
 
     const isValidTicketPrice = tempTicketPrice.every(tp => tp.price && tp.price > 0) && tempTicketPrice.length > 0;
 
-    const isValidTicketPriceType = ticketChecked.every((tikketTypeId) => ticketPriceList.some((ticket) => ticket.ticket_price_type_id === tikketTypeId))
+    const isValidTicketPriceType = () => {
+      if (ticketPriceList.length > 0) {
+        return ticketChecked.every((tikketTypeId) => ticketPriceList.some((ticket) => ticket.ticket_price_type_id === tikketTypeId))
+      }
+      return true
+    }
 
     if (!isValidTicketPrice || !isValidTicketPriceType) {
       setError("Please fill in completely.");
@@ -260,10 +269,11 @@ function Page() {
   };
 
   //update and create TicketPriceList
-  const updateTicketPriceList = () => {
+  const updateTicketPriceList = (priceTable: TicketRoutePrice[]) => {
+
     const updatedList = [...ticketPriceList];
 
-    ticketPrice?.forEach((newItem) => {
+    priceTable?.forEach((newItem) => {
       const index = updatedList.findIndex(
         (oldItem) =>
           oldItem.from === newItem.from &&
@@ -281,18 +291,12 @@ function Page() {
         // ➕ เพิ่มใหม่
         updatedList.push({
           ...newItem,
-          id: '', // หรือปล่อย undefined ถ้าคุณไม่ต้องการตั้ง id ตอนนี้
         });
       }
     });
 
     setTicketPriceList(updatedList);
   };
-
-  useEffect(() => {
-    updateTicketPriceList();
-
-  }, [ticketPrice])
 
   // console.log("ticket: ", tickets)
   // console.log("routeActive: ", routeActive)
@@ -424,11 +428,11 @@ function Page() {
                           <React.Fragment key={index}>
                             <TierdPriceTable
                               ticketPrice={ticketPriceByTicketTypePriceId}
-                              setTicketPrice={setTicketPrice}
                               stations={routeActive?.stations || []}
                               ticketTypePriceName={ticketTypeList.find((item) => item.id === ticketTypeId)?.name || 'Ticket Price Type'}
                               ticketTypePriceId={ticketTypeId}
                               setError={setError}
+                              handleSaveTable={updateTicketPriceList}
                             />
                             <hr className='custom-border-gray ' />
                           </React.Fragment >
@@ -441,14 +445,14 @@ function Page() {
                       )}
                       <div className='flex gap-3 mt-3'>
                         <ButtonDefault text="Back" size='' onClick={handleBack} />
-                        <ButtonBG text="Confirm" size='' onClick={handleSubmit} />
+                        <ButtonBG text="Confirm" size='' onClick={handleSubmit} disbled={checkConfirm} />
                       </div>
                     </div>
                   </>
                 ) : ticketType === TICKET_TYPE.FIXED && (
                   <>
                     <div className='flex flex-col gap-8'>
-                      <TicketPriceFixed listType={ticketPriceFixed} setTicketTypePrice={setTicketPriceFixed} />
+                      <TicketPriceFixed listType={ticketPriceFixed} setTicketTypePrice={setTicketPriceFixed} setCheckConfirm={setCheckConfirm} />
                     </div>
                     <div className='flex flex-col items-end mt-10'>
                       {error && (
@@ -456,7 +460,7 @@ function Page() {
                       )}
                       <div className='flex gap-3 mt-3'>
                         <ButtonDefault text="Back" size='' onClick={handleBack} />
-                        <ButtonBG text="Confirm" size='' onClick={handleSubmit} />
+                        <ButtonBG text="Confirm" size='' onClick={handleSubmit} disbled={checkConfirm} />
                       </div>
                     </div>
                   </>
