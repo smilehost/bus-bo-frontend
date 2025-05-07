@@ -24,14 +24,16 @@ function Page() {
   const { companyData } = useCompanyStore();
   const { membersData } = useMemberStore();
   const { userData } = useUserStore();
-  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true); 
-  const [rowsPerPage, setRowsPerPage] = useState(4);
+  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     // Simulate fetching data (fake delay)
     const timer = setTimeout(() => setisLoadIngskeleton(false), 1000);
     return () => clearTimeout(timer);
   }, []);
+
   //member data
   const [members, setMembers] = useState(membersData);
 
@@ -56,6 +58,14 @@ function Page() {
       : true;
     return matchesStatus && matchesCompany && matchesSearch;
   });
+
+  // Paginated data
+  const totalResults = filtered.length;
+  const totalPages = Math.ceil(totalResults / rowsPerPage);
+  const paginatedMembers = filtered.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   const listCompany = companyData.map((item) => item.name);
   const listStatus = [STATUS.ACTIVE, STATUS.INACTIVE, STATUS.CANCELLED];
@@ -106,13 +116,19 @@ function Page() {
       id: String(Date.now()),
       member_name: name,
       member_phone: phone,
-      member_status: STATUS.ACTIVE, // หรือจะกำหนดให้เลือกก็ได้
-      member_company_id: userData.company_id, // ตั้งค่า default หรือให้เลือกในฟอร์มภายหลัง
+      member_status: STATUS.ACTIVE,
+      member_company_id: userData.company_id,
       member_tripsTotal: 0,
       member_lastTransaction: "-",
     };
     setMembers((prev) => [...prev, newMember]);
     handleCloseMemberModel();
+  };
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const rows = Number(e.target.value);
+    setRowsPerPage(rows);
+    setCurrentPage(1);
   };
 
   //get Company
@@ -145,39 +161,27 @@ function Page() {
           <SkeletonMemberPage rows={5} />
         ) : (
           <div className="custom-frame-content">
-            {filtered?.map((item, index) => {
-              const company = getCompanyName({ id: item.member_company_id });
-              return (
-                <React.Fragment key={index}>
-                  <MemberTable
-                    name={item.member_name}
-                    tel={item.member_phone}
-                    status={item.member_status}
-                    company={company}
-                    tripsTotal={item.member_tripsTotal}
-                    lastTransaction={item.member_lastTransaction}
-                    index={index}
-                    currentPage={1}
-                    totalPages={Math.ceil(filtered.length / rowsPerPage)}
-                    onPageChange={(page) =>
-                      console.log("Page changed to:", page)
-                    }
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={(rows) => setRowsPerPage(rows)}
-                    totalResults={filtered.length}
-                    onEditPassword={(id) =>
-                      console.log("Edit password for:", id)
-                    }
-                    onEditStatus={(id, status) =>
-                      console.log("Edit status for:", id, "to", status)
-                    }
-                  />
-                  {index < filtered.length - 1 && (
-                    <hr className="border-t border-[#E5E7EB]" />
-                  )}
-                </React.Fragment>
-              );
-            })}
+            <MemberTable
+              members={paginatedMembers.map((member) => ({
+                id: Number(member.id),
+                name: member.member_name,
+                tel: member.member_phone,
+                status: member.member_status,
+                company: getCompanyName({ id: member.member_company_id }),
+                tripsTotal: member.member_tripsTotal,
+                lastTransaction: member.member_lastTransaction,
+              }))}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              totalResults={totalResults}
+              onEditPassword={(id) => console.log("Edit password for:", id)}
+              onEditStatus={(id, status) =>
+                console.log("Edit status for:", id, "to", status)
+              }
+            />
           </div>
         )}
 
