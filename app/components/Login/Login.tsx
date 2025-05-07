@@ -1,17 +1,82 @@
-import React, { useState } from 'react'
-import InputLabel from '../Form/InputLabel'
-import ButtonBG from '../Form/ButtonBG'
+"use client";
+import React, { useState, useEffect } from "react";
+import InputLabel from "../Form/InputLabel";
+import ButtonBG from "../Form/ButtonBG";
+import axios from "axios";
+import { store } from "@/stores/store";
+import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
+
+type DecodedToken = {
+  account_id: number;
+  account_role: string;
+  com_id: number;
+  login_at: number;
+  iat: number;
+  exp: number;
+};
+
 function Login() {
+  const [username, setUserName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const [username, setUserName] = useState<string>()
-  const [password, setPassword] = useState<string>()
+  // ✅ Redirect ถ้ามี token อยู่แล้ว
+  useEffect(() => {
+    const token = store.token.get();
+    if (token) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(token);
+        const now = Date.now() / 1000;
+        if (decoded.exp > now) {
+          router.replace("/bu/dashboard");
+        }
+      } catch (e) {
+        console.warn("Invalid token found, ignoring.");
+      }
+    }
+  }, []);
 
-  //Login
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log("username: ", username)
-    console.log("password: ", password)
-  }
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      const authHeader = response.headers["authorization"];
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1].trim();
+        store.token.set(token);
+
+        const decoded = jwtDecode<DecodedToken>(token);
+        store.com_id.set(decoded.com_id);
+        store.account_id.set(decoded.account_id);
+        store.account_role.set(decoded.account_role);
+
+        console.log("com_id :", store.com_id.get());
+        console.log("account_id :", store.account_id.get());
+        console.log("account_role :", store.account_role.get());
+        console.log("token :", store.token.get() + ":");
+
+        router.replace("/bu/dashboard");
+      } else {
+        setError("Login failed: No token received");
+      }
+    } catch (err) {
+      setError("Login failed: Invalid credentials");
+      console.error("Login error:", err);
+    }
+  };
 
   return (
     <div className=' shadow-xl rounded-lg overflow-hidden'>

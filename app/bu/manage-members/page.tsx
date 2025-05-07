@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 //component
 import FormFilter from '@/app/components/Filter/FormFilter'
 import ItemUser from '@/app/components/MembersPage/ItemUser'
-import MemberModel from '@/app/components/Model/MemberModel'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 
 //const 
@@ -15,6 +14,7 @@ import { FILTER, STATUS } from '@/constants/enum'
 import { useUserStore } from '@/stores/userStore'
 import { useCompanyStore } from '@/stores/companyStore'
 import { useMemberStore } from '@/stores/memberStore'
+import MemberModel from '@/app/components/Model/MemberModal'
 
 function Page() {
 

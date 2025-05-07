@@ -13,15 +13,17 @@ export default function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { userData } = useUserStore();
-
-    const user_tier = userData.user_tier;
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+  const userData = useUserStore((state) => state.userData);
+  const user_tier = userData.user_tier;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
     const allMenu = [
-        { id: 1, icon: "/icons/home.svg", text: "Dashboard", link: `dashboard` },
-        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "" },
+        { id: 1, 
+      icon: "/icons/home.svg", 
+      text: "Dashboard", 
+      link: `dashboard` },
+        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "sell-ticket" },
         {
             id: 3,
             icon: "/icons/route.svg",
@@ -59,10 +61,13 @@ export default function RootLayout({
             link: `manage-members`,
         },
         {
-            id: 9,
-            icon: "/icons/report.svg",
-            text: "Reports",
-            link: "",
+            id: 9, 
+     
+            icon: "/icons/report.svg", 
+     
+            text: "Reports", 
+     
+            link: `/reports`,
         },
         {
             id: 10,

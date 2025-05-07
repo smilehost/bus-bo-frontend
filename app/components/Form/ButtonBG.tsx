@@ -25,7 +25,7 @@ function ButtonBG({ size, text, icon, onClick, disbled }: ButtonBG) {
                 />
             )}
             <p> {text}</p>
-        </div>
+        </button>
     )
 }
 

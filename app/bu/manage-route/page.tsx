@@ -8,6 +8,8 @@ import { usePathname } from 'next/navigation'
 //companent 
 import TableRoute from '@/app/components/RoutePage/TableRoute'
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
+import TitlePage from '@/app/components/Title/TitlePage'
+// import { Confirm } from '@/app/components/Dialog/Confirm'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
@@ -19,6 +21,7 @@ import { useTicketStore } from '@/stores/routeTicketStore'
 import { useScheduleStore } from '@/stores/scheduleStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
+import ButtonBG from '@/app/components/Form/ButtonBG'
 
 //type
 import { Route } from '@/types/types'
@@ -209,11 +212,32 @@ function Page() {
 
     return (
         <>
-            <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
-            <FormFilter setSearch={setSearch} placeholderSearch='Search routes...' filter={filterSearch} />
-            <div className='bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden'>
+
+            <>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+                <TitlePage
+                  title="Manage Routes"
+                  description="View and manage bus routes"
+                />
+                <ButtonBG
+                  size="h-[38px]"
+                  text="Add New Route"
+                  icon="/icons/plus.svg"
+                  onClick={RedirectoAdd}
+                />
+              </div>
+      
+              <FormFilter
+                setSearch={setSearch}
+                placeholderSearch="Search routes..."
+                filter={filterSearch}
+              />
+              {isLoadingskeleton ? <SkeletonRoute /> :
+              <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-            </div>
+              </div>
+}
+            </>
         </>
     )
 }
