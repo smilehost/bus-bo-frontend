@@ -1,4 +1,6 @@
-import React from 'react'
+"use client"
+
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import { SelectChangeEvent } from '@mui/material';
 
@@ -11,9 +13,9 @@ import ButtonBG from '@/app/components/Form/ButtonBG'
 import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
 
-//mock
+//api
 import { useTimeStore } from '@/stores/timeStore';
-import { useScheduleStore } from '@/stores/scheduleStore';
+import { useDateStore } from '@/stores/dateStore';
 
 //type
 import { LocationItem } from '@/types/location.type';
@@ -55,16 +57,21 @@ function FormRoute({
 }: FormRouteProps) {
   const router = useRouter();
 
-  const { scheduleData } = useScheduleStore();
-  const { timeData } = useTimeStore();
+  const { dates, getDates } = useDateStore();
+  const { times, getTimes } = useTimeStore();
+
+  useEffect(() => {
+    getTimes(1, 5, '')
+    getDates(1, 5, '')
+  }, [])
 
   // console.log(listA, listB)
   return (
     <div className='custom-frame-content px-5 py-7 mt-5 w-full'>
       <div className="lg:mx-20 flex flex-col gap-3">
         <div className='flex justify-between flex-wrap gap-3 '>
-            {/* route name en*/}
-            <InputLabel
+          {/* route name en*/}
+          <InputLabel
             label="Route Name EN"
             placeholder="Enter Route Name Eng"
             type="text"
@@ -87,14 +94,13 @@ function FormRoute({
           <SelectTime
             selectedTime={selectedTime}
             onChange={handleChangeTime}
-            timeData={timeData}
+            timeData={times}
           />
           {/* Schedule */}
           <SelectInputAndAdd
-            data={scheduleData}
+            data={dates}
             value={schedule}
             onChange={handleChangeSchedule}
-
           />
         </div>
         <div className='flex justify-between flex-wrap gap-3'>

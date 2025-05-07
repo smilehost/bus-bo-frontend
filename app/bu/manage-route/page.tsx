@@ -12,12 +12,13 @@ import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 
-//mock
+//api
 import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
 import { useTicketStore } from '@/stores/routeTicketStore'
-import { useTimeStore } from '@/stores/timeStore'
 import { useScheduleStore } from '@/stores/scheduleStore'
+import { useDateStore } from '@/stores/dateStore'
+import { useTimeStore } from '@/stores/timeStore'
 
 //type
 import { Route } from '@/types/types'
@@ -27,12 +28,13 @@ import { toast } from 'react-toastify'
 
 function Page() {
 
-    //mock
+    //api
     // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
     const { companyData } = useCompanyStore();
     const { routeData, getRoutes, deleteRoute } = useRouteStore();
+    const { getDateById } = useDateStore();
     const { ticketData } = useTicketStore();
-    const { timeData } = useTimeStore();
+    const { timeData, getTimeById } = useTimeStore();
     const { scheduleData } = useScheduleStore();
 
     const router = useRouter();
@@ -80,32 +82,75 @@ function Page() {
 
 
     // Generate rows for table
-    const rows = routes?.data?.map((item) => {
-        // //schedule 
-        // const scheduleId = item.schedule_id
-        // const realSchedule = scheduleData.find((value) => value.id === scheduleId)?.name || ''
+    const [rows, setRows] = useState<any[]>([]); // State for table rows
+    useEffect(() => {
+        if (routes?.data) {
+            generateRows();
+        }
+    }, [routes]);
+    const generateRows = async () => {
+        const rows = await Promise.all(
+            routes?.data?.map(async (item) => {
+                const date = await getDateById(item.route_date_id);
+                const time = await getTimeById(item.route_time_id);
+                const dateName = date?.route_date_name || '';
+                const timeName = time?.route_time_array || '';
 
-        // //schedule 
-        // const companyId = item.company_id
-        // const realCompany = companyData.find((value) => value.id === companyId)?.name || ''
+                return createData(
+                    item.route_id,
+                    item.route_name_en,
+                    item.route_com_id, // company?.name || ''
+                    dateName,
+                    timeName, // time?.name || ''
+                    "2", // ticketCount.toString()
+                    item.route_status,
+                    item.route_color
+                );
+            }) || []
+        );
 
-        // //time 
-        // const timeId = item.times_id
-        // const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
+        setRows(rows); // สมมติคุณมี useState สำหรับ rows
+    };
+    // const getDateName = (id: number) => {
+    //     return getDateById(id).then((result) => {
+    //         return result?.route_date_name || ''
+    //     });
+    // }
+    // const rows = routes?.data?.map((item) => {
+    //     // //schedule 
+    //     // const scheduleId = item.schedule_id
+    //     // const realSchedule = scheduleData.find((value) => value.id === scheduleId)?.name || ''
 
-        // //ticket amount 
-        // const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
-        return createData(
-            item.route_id,
-            item.route_name_en,
-            item.route_com_id,
-            "1",
-            item.route_time_id,
-            "2", //realTicketAmount
-            item.route_status,
-            item.route_color
-        )
-    })
+    //     // //schedule 
+    //     // const companyId = item.company_id
+    //     // const realCompany = companyData.find((value) => value.id === companyId)?.name || ''
+
+    //     // //time 
+    //     // const timeId = item.times_id
+    //     // const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
+
+    //     // //ticket amount 
+    //     // const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
+    //     // let dateData;
+    //     // getDateById(item.route_date_id).then((result) => {
+    //     //     dateData= result;
+    //     // });
+    //     // console.log("dateData: ", dateData)
+    //     // const dateName = dateData?.route_date_name || ''
+    //     const dateName = getDateName(item.route_date_id)
+    //     console.log("dateName: ", dateName)
+
+    //     return createData(
+    //         item.route_id,
+    //         item.route_name_en,
+    //         item.route_com_id,
+    //         "dateName",
+    //         item.route_time_id,
+    //         "2", //realTicketAmount
+    //         item.route_status,
+    //         item.route_color
+    //     )
+    // })
 
     // Handle delete route
     const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {

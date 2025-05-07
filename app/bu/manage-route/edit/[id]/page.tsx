@@ -75,9 +75,9 @@ function Page() {
             setRouteNameTH(routeIndexData.route_name_th);
             setRouteComId(parseInt(routeIndexData.route_com_id));
             setRouteStatusId(parseInt(routeIndexData.route_status));
-            setRouteScheduleId(parseInt(routeIndexData.route_date_id));
+            setSchedule(routeIndexData.route_date_id)
             setSelectedTime(parseInt(routeIndexData.route_time_id));
-            setSchedule("2");
+            setSchedule(parseInt(routeIndexData.route_date_id).toString());
             setRouteColor(routeIndexData.route_color)
             getLocations(1, 5, '');
         }
@@ -111,7 +111,6 @@ function Page() {
     const [routeNameTH, setRouteNameTH] = useState<string>('')
     const [routeStatusId, setRouteStatusId] = useState<number>()
     const [routeComId, setRouteComId] = useState<number>()
-    const [routeScheduleId, setRouteScheduleId] = useState<number>()
     const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
     const [listA, setListA] = useState<LocationItem[]>([]);
     const [listB, setListB] = useState<LocationItem[]>([]);
@@ -127,6 +126,7 @@ function Page() {
     const [schedule, setSchedule] = useState<string>('');
     const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
         setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
+        console.log(event.target.value)
     };
 
 
@@ -145,11 +145,12 @@ function Page() {
             route_color: routeColor,
             route_status: Number(routeStatusId),
             route_com_id: Number(routeComId),
-            route_date_id: Number(routeScheduleId),
+            route_date_id: Number(schedule),
             route_time_id: Number(selectedTime),
             route_array: routeArray
         };
 
+        console.log(payload)
         const result = await updateRoute(Number(params.id), payload);
 
         if (result.success) {

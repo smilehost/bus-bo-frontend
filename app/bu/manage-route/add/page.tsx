@@ -52,7 +52,6 @@ function Page() {
     //get locations
     useEffect(() => {
         setRouteStatusId(1)
-        setRouteScheduleId(1);
         setRouteComId(1);
         getLocations(1, 5, '');
     }, [getLocations])
@@ -67,7 +66,6 @@ function Page() {
     const [routeNameTH, setRouteNameTH] = useState<string>('')
     const [routeStatusId, setRouteStatusId] = useState<number>()
     const [routeComId, setRouteComId] = useState<number>()
-    const [routeScheduleId, setRouteScheduleId] = useState<number>()
     const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
     const [listA, setListA] = useState<LocationItem[]>([]);
     const [listB, setListB] = useState<LocationItem[]>([]);
@@ -100,11 +98,12 @@ function Page() {
             route_color: routeColor,
             route_status: Number(routeStatusId),
             route_com_id: Number(routeComId),
-            route_date_id: Number(routeScheduleId),
+            route_date_id: Number(schedule),
             route_time_id: Number(selectedTime),
             route_array: routeArray
         };
 
+        console.log(payload)
         const result = await addRoute(payload);
 
         if (result.success) {

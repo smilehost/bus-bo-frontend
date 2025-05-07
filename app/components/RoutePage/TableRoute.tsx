@@ -107,7 +107,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <div className='flex gap-2 min-w-max'>
-                  <Link href={`${pathname}/ticket/${row.id}`} className='cursor-pointer'>
+                  <Link href={`${pathname}/routeTicket/${row.id}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/money.svg"}
                       width={1000}
