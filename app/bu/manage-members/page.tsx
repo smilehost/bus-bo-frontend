@@ -1,65 +1,61 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-//component
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import MemberTable from "@/app/components/Table/MemberTable";
 import MemberModel from "@/app/components/Model/MemberModal";
-
-//const
-import { FILTER, STATUS } from "@/constants/enum";
-
-//mock
 import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { useMemberStore } from "@/stores/memberStore";
 import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
 import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
+import { STATUS, FILTER } from "@/constants/enum";
 
 function Page() {
   const { companyData } = useCompanyStore();
   const { membersData } = useMemberStore();
   const { userData } = useUserStore();
-  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true);
+
+  const [isLoadingskeleton, setIsLoadingSkeleton] = useState(true);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [members, setMembers] = useState(membersData);
+
+  const [searchStatus, setSearchStatus] = useState<string>("");
+  const [searchCompany, setSearchCompany] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+
+  const [memberModelOpen, setMemberModelOpen] = useState(false);
+  const [isEditStatusOpen, setEditStatusOpen] = useState(false);
+  const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate fetching data (fake delay)
-    const timer = setTimeout(() => setisLoadIngskeleton(false), 1000);
+    const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  //member data
-  const [members, setMembers] = useState(membersData);
-
-  //filter
-  const [searchStatus, setSearchStatus] = useState<string>(""); // Filter by status
-  const [searchCompany, setSearchCompany] = useState<string>(""); // Filter by company
-  const [search, setSearch] = useState<string>(""); // Search input
-
   const filtered = members.filter((item) => {
-    const company =
+    const companyName =
       companyData.find((com) => com.id === item.member_company_id)?.name || "";
-    const matchesStatus =
+    const matchStatus =
       searchStatus && searchStatus !== FILTER.ALL_STATUS
         ? item.member_status === searchStatus
         : true;
-    const matchesCompany =
+    const matchCompany =
       searchCompany && searchCompany !== FILTER.ALL_COMPANIES
-        ? company?.toLowerCase().includes(searchCompany.toLowerCase())
+        ? companyName.toLowerCase().includes(searchCompany.toLowerCase())
         : true;
-    const matchesSearch = search
+    const matchSearch = search
       ? item.member_name.toLowerCase().includes(search.toLowerCase())
       : true;
-    return matchesStatus && matchesCompany && matchesSearch;
+    return matchStatus && matchCompany && matchSearch;
   });
 
-  // Paginated data
   const totalResults = filtered.length;
   const totalPages = Math.ceil(totalResults / rowsPerPage);
   const paginatedMembers = filtered.slice(
@@ -85,25 +81,6 @@ function Page() {
     },
   ];
 
-  //handle memberModel
-  const [memberModelOpen, setMemberModelOpen] = useState(false);
-  const handleOpenMemberModel = () => setMemberModelOpen(true);
-  const handleCloseMemberModel = () => setMemberModelOpen(false);
-
-  //handle edit status modal
-  const [isEditStatusOpen, setEditStatusOpen] = useState(false);
-  const [isEditPasswordOpen, setEditPasswordOpen] = useState(false); // Added state for EditPasswordModel
-  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
-  const handleEditStatus = (newStatus: string) => {
-    console.log("Status updated to:", newStatus);
-    setEditStatusOpen(false);
-  };
-
-  const handleEditPassword = (newPassword: string) => {
-    console.log("Password updated to:", newPassword);
-    setEditPasswordOpen(false);
-  };
-
   const handleNewMember = ({
     name,
     phone,
@@ -111,7 +88,6 @@ function Page() {
     name: string;
     phone: string;
   }) => {
-    console.log("New Member: ", name, phone);
     const newMember = {
       id: String(Date.now()),
       member_name: name,
@@ -122,87 +98,103 @@ function Page() {
       member_lastTransaction: "-",
     };
     setMembers((prev) => [...prev, newMember]);
-    handleCloseMemberModel();
+    setMemberModelOpen(false);
+  };
+
+  const handleEditStatus = (newStatus: string) => {
+    if (selectedMemberId === null) return;
+    setMembers((prev) =>
+      prev.map((m) =>
+        m.id === String(selectedMemberId) ? { ...m, member_status: newStatus as STATUS } : m
+      )
+    );
+    setEditStatusOpen(false);
+  };
+
+  const handleEditPassword = (newPassword: string) => {
+    console.log("Updated password:", newPassword);
+    setEditPasswordOpen(false);
   };
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const rows = Number(e.target.value);
-    setRowsPerPage(rows);
+    setRowsPerPage(Number(e.target.value));
     setCurrentPage(1);
   };
 
-  //get Company
   const getCompanyName = ({ id }: { id: string }) => {
     return companyData.find((com) => com.id === id)?.name || "";
   };
 
   return (
     <>
-      <div>
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Members"
-            description="View and manage customer information"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Member"
-            icon="/icons/plus.svg"
-            onClick={handleOpenMemberModel}
-          />
-        </div>
-
-        <FormFilter
-          setSearch={setSearch}
-          placeholderSearch="Search by phone or name..."
-          filter={filterSearch}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+        <TitlePage
+          title="Manage Members"
+          description="View and manage customer information"
         />
-        {isLoadingskeleton ? (
-          <SkeletonMemberPage rows={5} />
-        ) : (
-          <div className="custom-frame-content">
-            <MemberTable
-              members={paginatedMembers.map((member) => ({
-                id: Number(member.id),
-                name: member.member_name,
-                tel: member.member_phone,
-                status: member.member_status,
-                company: getCompanyName({ id: member.member_company_id }),
-                tripsTotal: member.member_tripsTotal,
-                lastTransaction: member.member_lastTransaction,
-              }))}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              totalResults={totalResults}
-              onEditPassword={(id) => console.log("Edit password for:", id)}
-              onEditStatus={(id, status) =>
-                console.log("Edit status for:", id, "to", status)
-              }
-            />
-          </div>
-        )}
-
-        <MemberModel
-          open={memberModelOpen}
-          onClose={handleCloseMemberModel}
-          onHandle={handleNewMember}
-        />
-        <EditStatusModel
-          open={isEditStatusOpen}
-          onClose={() => setEditStatusOpen(false)}
-          currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
-          onSave={handleEditStatus}
-        />
-
-        <EditPasswordModel
-          open={isEditPasswordOpen}
-          onClose={() => setEditPasswordOpen(false)}
-          onSave={handleEditPassword}
+        <ButtonBG
+          text="Add New Member"
+          icon="/icons/plus.svg"
+          onClick={() => setMemberModelOpen(true)}
+          size="h-[38px]"
         />
       </div>
+
+      <FormFilter
+        setSearch={setSearch}
+        placeholderSearch="Search by phone or name..."
+        filter={filterSearch}
+      />
+
+      {isLoadingskeleton ? (
+        <SkeletonMemberPage rows={5} />
+      ) : (
+        <MemberTable
+          members={paginatedMembers.map((m) => ({
+            id: Number(m.id),
+            name: m.member_name,
+            tel: m.member_phone,
+            status: m.member_status,
+            company: getCompanyName({ id: m.member_company_id }),
+            tripsTotal: m.member_tripsTotal,
+            lastTransaction: m.member_lastTransaction,
+          }))}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          totalResults={totalResults}
+          onEditStatus={(id, status) => {
+            setSelectedMemberId(id);
+            setCurrentStatus(status);
+            setEditStatusOpen(true);
+          }}
+          onEditPassword={(id) => {
+            setSelectedMemberId(id);
+            setEditPasswordOpen(true);
+          }}
+        />
+      )}
+
+      <MemberModel
+        open={memberModelOpen}
+        onClose={() => setMemberModelOpen(false)}
+        onHandle={handleNewMember}
+      />
+
+      <EditStatusModel
+        open={isEditStatusOpen}
+        onClose={() => setEditStatusOpen(false)}
+        currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
+        onSave={handleEditStatus}
+      />
+
+      <EditPasswordModel
+        open={isEditPasswordOpen}
+        onClose={() => setEditPasswordOpen(false)}
+        onSave={handleEditPassword}
+      />
     </>
   );
 }

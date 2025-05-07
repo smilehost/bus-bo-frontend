@@ -1,31 +1,20 @@
-import React, { useState } from "react";
-import Image from "next/image";
-
-// components
-import Profile from "@/app/components/Profile";
+import React from "react";
 import StatusText from "@/app/components/StatusText";
-import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
-import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
 import Pagination from "../Pagination/Pagination";
-
-// const
 import { STATUS } from "@/constants/enum";
 
-// ประเภทของ Actions
 type ActionType = "status" | "password" | "details";
 
-// Props สำหรับ ActionButton component
 type ActionButtonProps = {
   type: ActionType;
   onClick?: () => void;
 };
 
-// Component สำหรับปุ่ม Action
 const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
   const buttonConfig = {
     status: {
       className:
-        "px-2.5 py-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-all duration-200 hover:shadow-md flex items-center gap-2 border border-blue-100",
+        "p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-blue-100 cursor-pointer",
       title: "Edit Status",
       icon: (
         <svg
@@ -40,7 +29,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
     },
     password: {
       className:
-        "px-2.5 py-1.5 bg-amber-50 rounded-lg text-amber-600 hover:bg-amber-100 transition-all duration-200 hover:shadow-md flex items-center gap-2 border border-amber-100",
+        "p-1.5 bg-amber-50 rounded-lg text-amber-600 hover:bg-amber-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-amber-100 cursor-pointer",
       title: "Edit Password",
       icon: (
         <svg
@@ -61,7 +50,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
     },
     details: {
       className:
-        "px-2.5 py-1.5 bg-emerald-50 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:shadow-md flex items-center gap-2 border border-emerald-100",
+        "p-1.5 bg-emerald-50 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-emerald-100 cursor-pointer",
       title: "View Details",
       icon: (
         <svg
@@ -107,7 +96,7 @@ type MemberTableProps = {
   onRowsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   totalResults: number;
   onEditPassword: (id: number) => void;
-  onEditStatus?: (id: number, status: STATUS) => void;
+  onEditStatus: (id: number, status: STATUS) => void;
 };
 
 function MemberTable({
@@ -121,19 +110,6 @@ function MemberTable({
   onEditPassword,
   onEditStatus,
 }: MemberTableProps) {
-  const [isEditStatusOpen, setEditStatusOpen] = useState(false);
-  const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<STATUS | null>(null);
-
-  const handleEditStatus = (newStatus: STATUS) => {
-    console.log("Updated Status:", newStatus);
-    setCurrentStatus(newStatus);
-  };
-
-  const handleEditPassword = (newPassword: string) => {
-    console.log("Updated Password:", newPassword);
-  };
-
   return (
     <div className="flex flex-col space-y-6">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
@@ -148,28 +124,28 @@ function MemberTable({
           <table className="w-full border-collapse bg-white">
             <thead>
               <tr>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center w-12">
                   No.
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
                   Name
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
                   Phone
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
                   Company
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
                   Trips Total
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
                   Last Transaction
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
                   Status
                 </th>
-                <th className="py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center w-24">
                   Actions
                 </th>
               </tr>
@@ -187,7 +163,12 @@ function MemberTable({
                     key={member.id}
                     className={`transition-all duration-300 ease-out hover:bg-blue-50/70 ${
                       index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                    }`}
+                    } animate-fade-in`}
+                    style={{
+                      animationDelay: `${index * 80}ms`,
+                      animationDuration: "600ms",
+                      animationFillMode: "both",
+                    }}
                   >
                     <td className="py-4 px-6 border-b border-gray-200 text-center font-medium text-gray-700">
                       {index + 1 + (currentPage - 1) * rowsPerPage}
@@ -214,10 +195,7 @@ function MemberTable({
                       <div className="flex justify-center space-x-2">
                         <ActionButton
                           type="status"
-                          onClick={() => {
-                            setEditStatusOpen(true);
-                            setCurrentStatus(member.status);
-                          }}
+                          onClick={() => onEditStatus(member.id, member.status)}
                         />
                         <ActionButton
                           type="password"
@@ -237,27 +215,13 @@ function MemberTable({
         </div>
       </div>
 
-      {/* Pagination */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={onPageChange}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={onRowsPerPageChange} 
+        onRowsPerPageChange={onRowsPerPageChange}
         totalResults={totalResults}
-      />
-
-      {/* Modals */}
-      <EditStatusModel
-        open={isEditStatusOpen}
-        onClose={() => setEditStatusOpen(false)}
-        currentStatus={currentStatus ?? STATUS.ACTIVE}
-        onSave={handleEditStatus}
-      />
-      <EditPasswordModel
-        open={isEditPasswordOpen}
-        onClose={() => setEditPasswordOpen(false)}
-        onSave={handleEditPassword}
       />
     </div>
   );

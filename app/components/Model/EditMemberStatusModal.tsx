@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
@@ -26,6 +26,10 @@ function EditStatusModel({
     onSave(status as STATUS);
     onClose();
   };
+
+  useEffect(() => {
+    setStatus(currentStatus);
+  }, [currentStatus]);
 
   return (
     <Dialog open={open} onClose={onClose}>
