@@ -1,33 +1,27 @@
-// InputLabel.tsx
-import React from "react";
+import React from 'react'
+import LabelText from './LabelText'
 
 type InputLabelProps = {
-  label: string;
-  placeholder?: string;
-  type: string;
-  value: string;
-  setValue: (val: string) => void;
-};
-
-function InputLabel({
-  label,
-  placeholder,
-  type,
-  value,
-  setValue,
-}: InputLabelProps) {
-  return (
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-semibold">{label}</label>
-      <input
-        type={type}
-        className="p-2 border rounded"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-    </div>
-  );
+    label: string,
+    placeholder: string,
+    setValue: (value: string) => void;
+    value?: string | undefined;
+    type: string,
+    size?: string
+}
+function InputLabel({ label, placeholder, setValue, type, size, value }: InputLabelProps) {
+    return (
+        <div className='flex flex-col gap-2'>
+            <LabelText text={label} />
+            <input
+                value={value}
+                type={type}
+                placeholder={placeholder}
+                className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] ${size}`}
+                onChange={(e) => setValue(e.target.value)}
+            />
+        </div>
+    )
 }
 
-export default InputLabel;
+export default InputLabel

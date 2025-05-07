@@ -1,69 +1,74 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react';
 
 //type
-import { TicketPriceType } from '@/types/types';
+import { TicketPriceTypeFixed } from '@/app/bu/manage-route/routeTicket/[id]/page';
 
 type TicketPriceFixedProps = {
-    listType: TicketPriceType[];
-    setTicketTypePrice: (value: TicketPriceType[]) => void;
-}
+  listType: TicketPriceTypeFixed[];
+  setTicketTypePrice: (value: TicketPriceTypeFixed[]) => void;
+  setCheckConfirm: (value: boolean) => void;
+};
 
+function TicketPriceFixed({ listType, setTicketTypePrice, setCheckConfirm }: TicketPriceFixedProps) {
+  const [priceList, setPriceList] = useState<TicketPriceTypeFixed[]>([]);
 
-function TicketPriceFixed({ listType, setTicketTypePrice }: TicketPriceFixedProps) {
-    const [priceList, setPriceList] = useState<TicketPriceType[]>([]);
+  // sync priceList with incoming listType (only when listType changes)
+  useEffect(() => {
+    setPriceList(listType);
+  }, [listType]);
 
-    // useEffect(() => {
-    //     const converted = listType.map(item => ({
-    //         type: item.type,
-    //         price: item.price
-    //     }));
-    //     setPriceList(converted);
-    // }, [listType]);
+  const handlePriceChange = (index: number, value: string) => {
+    const cleanedValue = value.replace(/^0+(?!$)/, ''); // ตัด 0 ข้างหน้า
+    const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue); // ป้องกัน NaN
 
-    // // handle change on each input
-    // const handlePriceChange = (index: number, value: string) => {
-    //     const newList = [...priceList];
-    //     newList[index].price = parseInt(value);
-    //     setPriceList(newList);
-    //     setTicketTypePrice(newList);
-    // };
+    const updated = [...priceList];
+    updated[index].price = numericValue;
 
+    const isValidTicketPrice = updated.every(tp => tp.price && tp.price > 0) && updated.length > 0;
 
-    return (
-        <div className=''>
-            <div className='flex text-[#6B7280] bg-[#F9FAFB] text-[14px]'>
-                <div className='flex-1 py-3 text-center'>
-                    <p>Type</p>
-                </div>
-                <div className='flex-1 py-3 text-center'>
-                    <p>Price</p>
-                </div>
-            </div>
+    if (!isValidTicketPrice) {
+      setCheckConfirm(true);
+    }else{
+      setCheckConfirm(false);
+    }
 
-            {priceList.map((item, index) => (
-                <div key={index} className='flex text-[16px] border-b border-[#E5E7EB]'>
-                    <div className='flex-1 py-4 text-center'>
-                        <p>{item.name}</p>
-                    </div>
-                    <div className='flex-1 py-4 flex justify-center'>
-                        <div className='flex gap-3'>
-                            <input
-                                type="number"
-                                // value={item.price.toString()}
-                                // onChange={(e) => handlePriceChange(index, e.target.value)}
-                                className='custom-border-gray text-center rounded-md w-[100px]'
-                            />
-                            <p>THB</p>
-                        </div>
-                    </div>
-                </div>
-            ))}
+    setPriceList(updated);
+    setTicketTypePrice(updated);
+  };
 
+  return (
+    <div>
+      <div className='flex text-[#6B7280] bg-[#F9FAFB] text-[14px]'>
+        <div className='flex-1 py-3 text-center'>
+          <p>Type</p>
         </div>
-    );
+        <div className='flex-1 py-3 text-center'>
+          <p>Price</p>
+        </div>
+      </div>
+
+      {priceList.map((item, index) => (
+        <div key={index} className='flex text-[16px] border-b border-[#E5E7EB]'>
+          <div className='flex-1 py-4 text-center'>
+            <p>{item.name}</p>
+          </div>
+          <div className='flex-1 py-4 flex justify-center'>
+            <div className='flex gap-3'>
+              <input
+                type="number"
+                value={item.price.toString()}
+                onChange={(e) => handlePriceChange(index, e.target.value)}
+                className='custom-border-gray text-center rounded-md w-[100px]'
+              />
+              <p>THB</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-
-export default TicketPriceFixed
+export default TicketPriceFixed;

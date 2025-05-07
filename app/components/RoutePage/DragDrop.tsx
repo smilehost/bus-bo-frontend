@@ -1,14 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { ReactSortable } from 'react-sortablejs';
-import { StationProps } from '@/types/stations';
 import { Dispatch, SetStateAction } from 'react';
-
+import { LocationItem } from '@/types/location.type';
 
 type DragDropProps = {
-  listA: StationProps[],
-  listB: StationProps[],
-  setListA: Dispatch<SetStateAction<StationProps[]>>,
-  setListB: Dispatch<SetStateAction<StationProps[]>>,
+  listA: LocationItem[],
+  listB: LocationItem[],
+  setListA: Dispatch<SetStateAction<LocationItem[]>>,
+  setListB: Dispatch<SetStateAction<LocationItem[]>>,
 }
 
 function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
@@ -37,7 +36,7 @@ function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className=' mt-4 max-h-[300px] overflow-y-scroll'>
+        <div className=' mt-4 h-[300px] overflow-y-scroll'>
           <ReactSortable
             list={listA}
             setList={setListA}
@@ -61,7 +60,7 @@ function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
       {/* List B */}
       <div className=" p-4 rounded-md w-[200px] lg:w-[350px] xl:w-[434px]">
         <p className="text-center text-[12px] font-medium">Stations this Route</p>
-        <div className=' overflow-hidden mt-5 max-h-[300px] overflow-y-scroll'>
+        <div className=' overflow-hidden mt-5 h-[300px] overflow-y-scroll'>
           <ReactSortable
             list={listB}
             setList={setListB}

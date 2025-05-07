@@ -3,6 +3,11 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
 
+// Mock token only in browser
+if (typeof window !== "undefined" && !localStorage.getItem("token_bo")) {
+  localStorage.setItem("token_bo", "mock-token-1234");
+}
+
 const instance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -39,7 +44,7 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ Interceptor หลังรับ response
+// Interceptor หลังรับ response
 instance.interceptors.response.use(
   (response) => {
     const code = response.data?.code;

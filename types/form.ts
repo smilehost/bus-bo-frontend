@@ -1,6 +1,7 @@
 import { SelectChangeEvent } from "@mui/material";
 
 export type dataProps = {
+    id?: number
     name?: string
 }
 

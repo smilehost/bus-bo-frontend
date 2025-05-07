@@ -17,6 +17,7 @@ interface DateState {
   createDate: (date: DateItem) => Promise<void>;
   updateDate: (id: number, date: DateItem) => Promise<void>;
   deleteDate: (id: number) => Promise<void>;
+  getDateById: (id: number) => Promise<DateItem | undefined>;
 }
 
 export const useDateStore = create<DateState>((set) => ({
@@ -94,6 +95,16 @@ export const useDateStore = create<DateState>((set) => ({
       route_date_com_id: 1,
     };
     await DateService.updateDate(id, payload);
+  },
+
+  getDateById: async (id: number): Promise<DateItem | undefined> => {
+    try {
+      const res = await DateService.fetchDateById(id) as { result: DateItem };
+      return res.result;
+    } catch (error) {
+      console.error("getRouteById error:", error);
+      return undefined;
+    }
   },
 
   deleteDate: async (id) => {

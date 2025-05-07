@@ -1,43 +1,60 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { STATUS, FILTER } from '@/constants/enum'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 
 //companent 
 import TableRoute from '@/app/components/RoutePage/TableRoute'
-import TitlePage from '@/app/components/Title/TitlePage'
-import { Confirm } from '@/app/components/Dialog/Confirm'
+import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 
-//mock
+//api
 import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
-import { useTicketStore } from '@/stores/ticketStore'
-import { useTimeStore } from '@/stores/timeStore'
+import { useTicketStore } from '@/stores/routeTicketStore'
 import { useScheduleStore } from '@/stores/scheduleStore'
-import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
+import { useDateStore } from '@/stores/dateStore'
+import { useTimeStore } from '@/stores/timeStore'
+
+//type
+import { Route } from '@/types/types'
+
+//toast
+import { toast } from 'react-toastify'
 
 function Page() {
 
-    //mock
+    //api
     // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
     const { companyData } = useCompanyStore();
-    const { routeData } = useRouteStore();
+    const { routeData, getRoutes, deleteRoute } = useRouteStore();
+    const { getDateById } = useDateStore();
     const { ticketData } = useTicketStore();
-    const { timeData } = useTimeStore();
+    const { timeData, getTimeById } = useTimeStore();
     const { scheduleData } = useScheduleStore();
 
     const router = useRouter();
     const pathname = usePathname();
 
-    const [routes, setRoutes] = useState(routeData); // Data for routes
+    const [routes, setRoutes] = useState<Route[]>(); // Data for routes
     const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
     const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
     const [search, setSearch] = useState<string>(''); // Search input
+
+    const fetchRouteData = () => {
+        getRoutes(1, 5, '');
+    }
+    useEffect(() => {
+        fetchRouteData();
+    }, []);
+
+    useEffect(() => {
+        setRoutes(routeData);
+    }, [routeData]);
 
     // Function to create data for table
     const createData = (
@@ -53,65 +70,115 @@ function Page() {
         return { id, route, company, schedule, time, ticket_amount, status, routeColor };
     };
 
-    // Filter routes based on search values
-    const filteredRoutes = routes.filter((item) => {
-        const company = companyData.find((com) => com.id === item.company_id)?.name || ''
-        const matchesStatus = searchStatus && searchStatus !== FILTER.ALL_STATUS ? item.status === searchStatus : true;
-        const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? company.toLowerCase().includes(searchCompany.toLowerCase()) : true;
-        const matchesSearch = search ? item.route.toLowerCase().includes(search.toLowerCase()) : true;
+    // // Filter routes based on search values
+    // const filteredRoutes = routes?.data?.filter((item) => {
+    //     const company = companyData.find((com) => com.id === item.route_com_id)?.name || ''
+    //     const matchesStatus = searchStatus && searchStatus !== FILTER.ALL_STATUS ? item.route_status === searchStatus : true;
+    //     const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? company.toLowerCase().includes(searchCompany.toLowerCase()) : true;
+    //     const matchesSearch = search ? item.route.toLowerCase().includes(search.toLowerCase()) : true;
 
-        return matchesStatus && matchesCompany && matchesSearch;
-    });
+    //     return matchesStatus && matchesCompany && matchesSearch;
+    // });
 
 
     // Generate rows for table
-    const rows = filteredRoutes.map((item) => {
-        //schedule 
-        const scheduleId = item.schedule_id
-        const realSchedule = scheduleData.find((value) => value.id === scheduleId)?.name || ''
+    const [rows, setRows] = useState<any[]>([]); // State for table rows
+    useEffect(() => {
+        if (routes?.data) {
+            generateRows();
+        }
+    }, [routes]);
+    const generateRows = async () => {
+        const rows = await Promise.all(
+            routes?.data?.map(async (item) => {
+                const date = await getDateById(item.route_date_id);
+                const time = await getTimeById(item.route_time_id);
+                const dateName = date?.route_date_name || '';
+                const timeName = time?.route_time_array || '';
 
-        //schedule 
-        const companyId = item.company_id
-        const realCompany = companyData.find((value) => value.id === companyId)?.name || ''
+                return createData(
+                    item.route_id,
+                    item.route_name_en,
+                    item.route_com_id, // company?.name || ''
+                    dateName,
+                    timeName, // time?.name || ''
+                    "2", // ticketCount.toString()
+                    item.route_status,
+                    item.route_color
+                );
+            }) || []
+        );
 
-        //time 
-        const timeId = item.times_id
-        const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
+        setRows(rows); // สมมติคุณมี useState สำหรับ rows
+    };
+    // const getDateName = (id: number) => {
+    //     return getDateById(id).then((result) => {
+    //         return result?.route_date_name || ''
+    //     });
+    // }
+    // const rows = routes?.data?.map((item) => {
+    //     // //schedule 
+    //     // const scheduleId = item.schedule_id
+    //     // const realSchedule = scheduleData.find((value) => value.id === scheduleId)?.name || ''
 
+    //     // //schedule 
+    //     // const companyId = item.company_id
+    //     // const realCompany = companyData.find((value) => value.id === companyId)?.name || ''
 
-        //ticket amount 
-        const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
+    //     // //time 
+    //     // const timeId = item.times_id
+    //     // const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
 
-        return createData(
-            item.id,
-            item.route,
-            realCompany,
-            realSchedule,
-            realTimes,
-            realTicketAmount,
-            item.status,
-            item.routeColor
-        )
-    })
+    //     // //ticket amount 
+    //     // const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
+    //     // let dateData;
+    //     // getDateById(item.route_date_id).then((result) => {
+    //     //     dateData= result;
+    //     // });
+    //     // console.log("dateData: ", dateData)
+    //     // const dateName = dateData?.route_date_name || ''
+    //     const dateName = getDateName(item.route_date_id)
+    //     console.log("dateName: ", dateName)
+
+    //     return createData(
+    //         item.route_id,
+    //         item.route_name_en,
+    //         item.route_com_id,
+    //         "dateName",
+    //         item.route_time_id,
+    //         "2", //realTicketAmount
+    //         item.route_status,
+    //         item.route_color
+    //     )
+    // })
 
     // Handle delete route
-    const handleDeleteRoute = async ({ route, index }: { route: string, index: number }) => {
-        const confirmed = await Confirm({
+    const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
+        const inputName = await ConfirmWithInput({
             title: `Delete "${route}"?`,
-            text: "Do you want to delete this route?",
+            text: `Please type the route name below to confirm deletion.`,
             confirmText: "Delete",
-            cancelText: "Cancel"
-        })
+            cancelText: "Cancel",
+            placeholder: "Type route name here"
+        });
 
-        if (confirmed) {
-            setRoutes(prev => prev.filter((_, i) => i !== index))
+        if (inputName === route) {
+            const result = await deleteRoute(id);
+
+            if (result.success) {
+                fetchRouteData();
+                toast.success("delete route successfully!");
+            } else {
+                toast.error(`Error: ${result.message}`);
+            }
+        } else if (inputName !== null) {
             await Alert({
-                title: "Deleted!",
-                text: "The route has been deleted.",
-                type: "success"
-            })
+                title: "Name mismatch!",
+                text: "The typed name does not match the route name.",
+                type: "error"
+            });
         }
-    }
+    };
 
     const RedirectoAdd = () => {
         router.push(`${pathname}/add`)
@@ -139,44 +206,16 @@ function Page() {
             size: "w-[170px]"
         },
     ]
-    const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
-          useEffect(() => {
-                  // Simulate fetching data (fake delay)
-                  const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-                  return () => clearTimeout(timer);
-                }, []);
 
     return (
         <>
-
-            <>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-                <TitlePage
-                  title="Manage Routes"
-                  description="View and manage bus routes"
-                />
-                <ButtonBG
-                  size="h-[38px]"
-                  text="Add New Route"
-                  icon="/icons/plus.svg"
-                  onClick={RedirectoAdd}
-                />
-              </div>
-      
-              <FormFilter
-                setSearch={setSearch}
-                placeholderSearch="Search routes..."
-                filter={filterSearch}
-              />
-              {isLoadingskeleton ? <SkeletonRoute /> :
-              <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
+            <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
+            <FormFilter setSearch={setSearch} placeholderSearch='Search routes...' filter={filterSearch} />
+            <div className='bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden'>
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-              </div>
-}
-            </>
+            </div>
         </>
-      );
-      
+    )
 }
 
 export default Page

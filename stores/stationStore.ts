@@ -12,9 +12,10 @@ type StationStore = {
     addStation: (newStation: Station) => void;
     updateStation: (id: string, updatedStation: Station) => void;
     deleteStation: (id: string) => void;
+    getStationNameById: (id: string) => string;
 };
 
-export const useStationStore = create<StationStore>((set) => ({
+export const useStationStore = create<StationStore>((set, get) => ({
     stationData: [
         { id: '1', name: 'Khon Kaen Bus Terminal', coordinates: '' },
         { id: '2', name: 'Bangkok (Mo Chit) Terminal', coordinates: '' },
@@ -39,4 +40,9 @@ export const useStationStore = create<StationStore>((set) => ({
     deleteStation: (id) => set((state) => ({
         stationData: state.stationData.filter((station) => station.id !== id),
     })),
+
+    getStationNameById: (id: string) => {
+        const station = get().stationData.find((s) => s.id === id);
+        return station?.name || '';
+    },
 }));
