@@ -1,27 +1,3 @@
-<<<<<<< HEAD
-"use client"
-
-import React from 'react'
-import Navbar from '../../components/Navbar/Navbar'
-import Header from '../../components/Header/Header'
-
-function Page() {
-    return (
-        <div className='flex'>
-            <Navbar />
-            <div className='w-full'>
-                <Header />
-                <div className='p-7'>
-                    <div className='border h-[50px]'>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-export default Page
-=======
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -116,4 +92,3 @@ export default function SellTicketPage() {
     </div>
   );
 }
->>>>>>> 634d7958fa8939177f1c1b041007e0224a034f36
