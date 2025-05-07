@@ -7,12 +7,12 @@ import DateModal from "@/app/components/Model/DateModal";
 import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
 import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
-import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
-import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 import { DateItem } from "@/types/date.type";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
+import { Confirm } from "@/app/components/Dialog/Confirm";
 
 export default function DateManagerClient() {
   const { dates, getDates, createDate, updateDate, deleteDate } =

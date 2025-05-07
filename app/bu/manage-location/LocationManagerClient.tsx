@@ -5,13 +5,13 @@ import LocationTable from "@/app/components/Table/LocationTable";
 import LocationModal from "@/app/components/Model/LocationModal";
 import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
 import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
-import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 import { debounce } from "@/utils/debounce";
 import { useLocationStore } from "@/stores/locationStore";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
 function Page() {
   const {
@@ -207,7 +207,7 @@ function Page() {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 totalResults={filteredLocations.length}
-                isLoading={isLoading}
+                // isLoading={isLoading}
               />
             )}
           </div>
