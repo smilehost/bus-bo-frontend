@@ -7,7 +7,7 @@ export enum USER_TIER {
 export enum STATUS {
     ACTIVE = "Active",
     INACTIVE = "Inactive",
-    CANCELLED = "Canceled",
+    CANCELLED = "Cancelled",
 }
 
 export enum FILTER {

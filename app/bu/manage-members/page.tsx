@@ -6,8 +6,8 @@ import React, { useEffect, useState } from "react";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 import FormFilter from "@/app/components/Filter/FormFilter";
-import ItemUser from "@/app/components/MembersPage/ItemUser";
-import MemberModel from "@/app/components/Model/MemberModel";
+import MemberTable from "@/app/components/Table/MemberTable";
+import MemberModel from "@/app/components/Model/MemberModal";
 
 //const
 import { FILTER, STATUS } from "@/constants/enum";
@@ -17,12 +17,14 @@ import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { useMemberStore } from "@/stores/memberStore";
 import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
+import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
+import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
 
 function Page() {
   const { companyData } = useCompanyStore();
   const { membersData } = useMemberStore();
   const { userData } = useUserStore();
-  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true); // ✅ loading state
+  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true); 
   const [rowsPerPage, setRowsPerPage] = useState(4);
 
   useEffect(() => {
@@ -78,6 +80,20 @@ function Page() {
   const handleOpenMemberModel = () => setMemberModelOpen(true);
   const handleCloseMemberModel = () => setMemberModelOpen(false);
 
+  //handle edit status modal
+  const [isEditStatusOpen, setEditStatusOpen] = useState(false);
+  const [isEditPasswordOpen, setEditPasswordOpen] = useState(false); // Added state for EditPasswordModel
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
+  const handleEditStatus = (newStatus: string) => {
+    console.log("Status updated to:", newStatus);
+    setEditStatusOpen(false);
+  };
+
+  const handleEditPassword = (newPassword: string) => {
+    console.log("Password updated to:", newPassword);
+    setEditPasswordOpen(false);
+  };
+
   const handleNewMember = ({
     name,
     phone,
@@ -106,33 +122,34 @@ function Page() {
 
   return (
     <>
-      
-        <div>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-            <TitlePage
-              title="Manage Members"
-              description="View and manage customer information"
-            />
-            <ButtonBG
-              size="h-[38px]"
-              text="Add New Member"
-              icon="/icons/plus.svg"
-              onClick={handleOpenMemberModel}
-            />
-          </div>
-
-          <FormFilter
-            setSearch={setSearch}
-            placeholderSearch="Search by phone or name..."
-            filter={filterSearch}
+      <div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          <TitlePage
+            title="Manage Members"
+            description="View and manage customer information"
           />
-          {isLoadingskeleton ? <SkeletonMemberPage rows={5} /> :
+          <ButtonBG
+            size="h-[38px]"
+            text="Add New Member"
+            icon="/icons/plus.svg"
+            onClick={handleOpenMemberModel}
+          />
+        </div>
+
+        <FormFilter
+          setSearch={setSearch}
+          placeholderSearch="Search by phone or name..."
+          filter={filterSearch}
+        />
+        {isLoadingskeleton ? (
+          <SkeletonMemberPage rows={5} />
+        ) : (
           <div className="custom-frame-content">
             {filtered?.map((item, index) => {
               const company = getCompanyName({ id: item.member_company_id });
               return (
                 <React.Fragment key={index}>
-                  <ItemUser
+                  <MemberTable
                     name={item.member_name}
                     tel={item.member_phone}
                     status={item.member_status}
@@ -140,6 +157,20 @@ function Page() {
                     tripsTotal={item.member_tripsTotal}
                     lastTransaction={item.member_lastTransaction}
                     index={index}
+                    currentPage={1}
+                    totalPages={Math.ceil(filtered.length / rowsPerPage)}
+                    onPageChange={(page) =>
+                      console.log("Page changed to:", page)
+                    }
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={(rows) => setRowsPerPage(rows)}
+                    totalResults={filtered.length}
+                    onEditPassword={(id) =>
+                      console.log("Edit password for:", id)
+                    }
+                    onEditStatus={(id, status) =>
+                      console.log("Edit status for:", id, "to", status)
+                    }
                   />
                   {index < filtered.length - 1 && (
                     <hr className="border-t border-[#E5E7EB]" />
@@ -148,15 +179,26 @@ function Page() {
               );
             })}
           </div>
-          }
+        )}
 
-          <MemberModel
-            open={memberModelOpen}
-            onClose={handleCloseMemberModel}
-            onHandle={handleNewMember}
-          />
-        </div>
-      
+        <MemberModel
+          open={memberModelOpen}
+          onClose={handleCloseMemberModel}
+          onHandle={handleNewMember}
+        />
+        <EditStatusModel
+          open={isEditStatusOpen}
+          onClose={() => setEditStatusOpen(false)}
+          currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
+          onSave={handleEditStatus}
+        />
+
+        <EditPasswordModel
+          open={isEditPasswordOpen}
+          onClose={() => setEditPasswordOpen(false)}
+          onSave={handleEditPassword}
+        />
+      </div>
     </>
   );
 }
