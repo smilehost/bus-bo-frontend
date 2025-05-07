@@ -2,6 +2,7 @@ import { api } from "@/services/axios.service";
 import {
     CreateRoutePayload,
     FetchRouteQuery,
+    UpdateRoutePayload,
 } from "@/payloads/route.payload";
 
 export const RouteService = {
@@ -26,4 +27,19 @@ export const RouteService = {
             params: id,
         });
     },
+
+      async updateRoute(id: number, payload: UpdateRoutePayload) {
+        return await api.put({
+          path: "/api/route",
+          params: id,
+          body: payload,
+        });
+      },
+    
+      async deleteRoute(id: number) {
+        return await api.delete({
+          path: "/api/route",
+          params: id,
+        });
+      },
 }

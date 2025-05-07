@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 //type
-import { StationProps } from '@/types/stations';
-import { RouteType } from '@/types/routes';
+import { LocationItem } from '@/types/location.type';
 import { RouteData } from '@/types/types';
 
 //component 
@@ -15,16 +15,22 @@ import TitleHeader from '@/app/components/Title/TitleHeader';
 //mui
 import { SelectChangeEvent } from '@mui/material';
 
-//mock
-import { useStationStore } from '@/stores/stationStore';
+//api
 import { useRouteStore } from '@/stores/routeStore';
+import { useLocationStore } from '@/stores/locationStore';
+
+//toast
+import { toast } from 'react-toastify';
 
 
 function Page() {
 
-    //mock
-    const { stationData } = useStationStore();
-    const { getRouteById } = useRouteStore();
+    //router
+    const router = useRouter();
+
+    //api
+    const { getRouteById, updateRoute } = useRouteStore();
+    const { locations, getLocations } = useLocationStore();
 
     const params = useParams()
     //set default value
@@ -33,15 +39,14 @@ function Page() {
     useEffect(() => {
         const fetchData = async () => {
             if (params?.id) {
-                const route = await getRouteById(Number(params.id)); // แปลง id เป็น number ถ้าจาก URL
+                const route: RouteData | undefined = await getRouteById(Number(params.id)); // แปลง id เป็น number ถ้าจาก URL
                 setRouteIndexData(route);
             }
         };
 
         fetchData();
-    }, [params?.id, getRouteById]);
 
-    console.log("routeIndexData: ", routeIndexData)
+    }, [params?.id, getRouteById]);
 
     // useEffect(() => {
     //     if (params?.id !== undefined) {
@@ -63,70 +68,97 @@ function Page() {
     //     }
     // }, [params, routeData])
 
-    // useEffect(() => {
-    //     if (routeIndexData) {
-    //         setRouteName(routeIndexData.route);
-    //         setSelectedTime(routeIndexData.times.toString());
-    //         setSchedule(routeIndexData.schedule.toString());
-    //         setRouteColor(routeIndexData.routeColor.toString())
+    //get location data
+    useEffect(() => {
+        if (routeIndexData) {
+            setRouteName(routeIndexData.route_name_en);
+            setRouteNameTH(routeIndexData.route_name_th);
+            setRouteComId(parseInt(routeIndexData.route_com_id));
+            setRouteStatusId(parseInt(routeIndexData.route_status));
+            setRouteScheduleId(parseInt(routeIndexData.route_date_id));
+            setSelectedTime(parseInt(routeIndexData.route_time_id));
+            setSchedule("2");
+            setRouteColor(routeIndexData.route_color)
+            getLocations(1, 5, '');
+        }
+    }, [routeIndexData, getLocations]);
 
-    //         // ดึง station ที่ id ตรงกับ routeIndexData.stations
-    //         const stationObjects = routeIndexData.stations.map((stationId) => {
-    //             return transformedList.find((s) => s.id === stationId);
-    //         }).filter(Boolean) as StationProps[];
+    //get locations
+    useEffect(() => {
+        if (!routeIndexData) return;
+        // console.log("locations: ", locations)
+        setListA(locations);
 
-    //         setListB(stationObjects);
+        const stations = routeIndexData.route_array.split(',').map((station) => station.trim());
 
-    //         // เอา station ที่ยังไม่ถูกเลือก (ไม่อยู่ใน listB)
-    //         const filteredListA = transformedList.filter(
-    //             (station) => !stationObjects.some((s) => s.id === station.id)
-    //         );
-    //         setListA(filteredListA);
-    //     }
-    // }, [routeIndexData]);
+        // ดึง station ที่ id ตรงกับ routeIndexData.stations
+        const stationObjects = stations.map((stationId) => {
+            return locations.find((s) => s.id === parseInt(stationId));
+        }).filter(Boolean) as LocationItem[];
 
-    // const transformedList = stationData.map((station) => ({
-    //     id: station.id,
-    //     name: station.name,
-    // }));
+        setListB(stationObjects);
 
-    // //select route name
-    // const [routeName, setRouteName] = useState<string>('')
+        // เอา station ที่ยังไม่ถูกเลือก (ไม่อยู่ใน listB)
+        const filteredListA = locations.filter(
+            (station) => !stationObjects.some((s) => s?.id === station.id)
+        );
 
-    // //route color
-    // const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
-
-    // //select station
-    // const [listA, setListA] = useState<StationProps[]>(transformedList);
-    // const [listB, setListB] = useState<StationProps[]>([]);
-    // const [listStations, setListStations] = useState<string[]>([]);
-
-    // //select time
-    // const [selectedTime, setSelectedTime] = useState<string>(''); // ค่าที่จะเก็บเวลา
-    // const handleChangeTime = (event: SelectChangeEvent<string>) => {
-    //     setSelectedTime(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
-    // };
-
-    // //select schedule
-    // const [schedule, setSchedule] = useState<string>('');
-    // const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
-    //     setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
-    // };
+        setListA(filteredListA);
+    }, [locations]);
 
 
-    // useEffect(() => {
-    //     const stationIds = listB.map(station => station.id);
-    //     setListStations(stationIds);
-    // }, [listB]);
+    const [routeName, setRouteName] = useState<string>('')
+    const [routeNameTH, setRouteNameTH] = useState<string>('')
+    const [routeStatusId, setRouteStatusId] = useState<number>()
+    const [routeComId, setRouteComId] = useState<number>()
+    const [routeScheduleId, setRouteScheduleId] = useState<number>()
+    const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
+    const [listA, setListA] = useState<LocationItem[]>([]);
+    const [listB, setListB] = useState<LocationItem[]>([]);
+    const [listStations, setListStations] = useState<number[]>([]);
 
-    // const handleSubmit = (e: React.FormEvent) => {
-    //     e.preventDefault()
-    //     console.log("Route Name: ", routeName)
-    //     console.log("Route Color: ", routeColor)
-    //     console.log("Time: ", selectedTime)
-    //     console.log("Schedule: ", schedule)
-    //     console.log("listStations", listStations)
-    // }
+    //select time
+    const [selectedTime, setSelectedTime] = useState<number>(); // ค่าที่จะเก็บเวลา
+    const handleChangeTime = (event: SelectChangeEvent<string>) => {
+        setSelectedTime(parseInt(event.target.value)); // อัปเดตค่าเมื่อเลือกเวลาใหม่
+    };
+
+    //select schedule
+    const [schedule, setSchedule] = useState<string>('');
+    const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
+        setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
+    };
+
+
+    useEffect(() => {
+        const stationIds = listB?.map(station => station.id);
+        setListStations(stationIds);
+    }, [listB]);
+
+    const handleSubmit = async () => {
+
+        const routeArray = listStations.map((id) => id).join(',');
+        const payload = {
+            route_id: Number(params.id),
+            route_name_th: routeNameTH,
+            route_name_en: routeName,
+            route_color: routeColor,
+            route_status: Number(routeStatusId),
+            route_com_id: Number(routeComId),
+            route_date_id: Number(routeScheduleId),
+            route_time_id: Number(selectedTime),
+            route_array: routeArray
+        };
+
+        const result = await updateRoute(Number(params.id), payload);
+
+        if (result.success) {
+            toast.success("Update route successfully!");
+            router.back();
+        } else {
+            toast.error(`Error: ${result.message}`);
+        }
+    };
 
     if (!routeIndexData) {
         return null;
@@ -134,7 +166,9 @@ function Page() {
     return (
         <div>
             <TitleHeader text={"Edit Route"} />
-            {/* <FormRoute
+            <FormRoute
+                routeNameTH={routeNameTH}
+                setRouteNameTH={setRouteNameTH}
                 routeName={routeName}
                 setRouteName={setRouteName}
                 routeColor={routeColor}
@@ -143,12 +177,13 @@ function Page() {
                 setListA={setListA}
                 listB={listB}
                 setListB={setListB}
-                selectedTime={selectedTime}
+                selectedTime={selectedTime?.toString() || ''}
                 handleChangeTime={handleChangeTime}
                 schedule={schedule}
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
-            /> */}
+
+            />
         </div>
     )
 }

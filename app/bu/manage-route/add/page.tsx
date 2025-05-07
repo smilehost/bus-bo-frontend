@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
 
 //type
-import { StationProps } from '@/types/stations';
+import { LocationItem } from '@/types/location.type';
 
 //component 
 import FormRoute from '@/app/components/Form/FormRoute';
@@ -12,33 +13,70 @@ import TitleHeader from '@/app/components/Title/TitleHeader';
 //mui
 import { SelectChangeEvent } from '@mui/material';
 
-//mock
-import { useStationStore } from '@/stores/stationStore';
+//api
+import { useRouteStore } from '@/stores/routeStore';
+import { useLocationStore } from '@/stores/locationStore';
+
+//toast
+import { toast } from 'react-toastify';
 
 function Page() {
 
-    //mock
-    const { stationData } = useStationStore();
+    //router
+    const router = useRouter();
 
-    //select route name
+    //api
+    const { addRoute } = useRouteStore();
+    const { locations, getLocations } = useLocationStore();
+
+    // useEffect(() => {
+    //     if (params?.id !== undefined) {
+    //         const foundRoute = routeData.find((value) => value.id === params?.id);
+    //         if (foundRoute) {
+    //             const routeIndexData: RouteType = {
+    //                 id: foundRoute.id,
+    //                 route: foundRoute.route,
+    //                 company: foundRoute.company_id,
+    //                 schedule: foundRoute.schedule_id,
+    //                 times: foundRoute.times_id,
+    //                 status: foundRoute.status,
+    //                 routeColor: foundRoute.routeColor,
+    //                 stations: foundRoute.stations
+    //             };
+
+    //             setRouteIndexData(routeIndexData);
+    //         }
+    //     }
+    // }, [params, routeData])
+
+    //get locations
+    useEffect(() => {
+        setRouteStatusId(1)
+        setRouteScheduleId(1);
+        setRouteComId(1);
+        getLocations(1, 5, '');
+    }, [getLocations])
+    useEffect(() => {
+        // console.log("locations: ", locations)
+        setListA(locations);
+
+    }, [locations]);
+
+
     const [routeName, setRouteName] = useState<string>('')
-
-    //route color
-    const [routeColor, setRouteColor] = useState<string>('#3B82F6')
-
-    //select station
-    const transformedList = stationData.map((station, index) => ({
-        id: (index + 1).toString(),
-        name: station.name,
-    }));
-    const [listA, setListA] = useState<StationProps[]>(transformedList);
-    const [listB, setListB] = useState<StationProps[]>([]);
-    const [listStations, setListStations] = useState<string[]>([]);
+    const [routeNameTH, setRouteNameTH] = useState<string>('')
+    const [routeStatusId, setRouteStatusId] = useState<number>()
+    const [routeComId, setRouteComId] = useState<number>()
+    const [routeScheduleId, setRouteScheduleId] = useState<number>()
+    const [routeColor, setRouteColor] = useState<string>('#3B82F6'); // ตั้งค่าสีเริ่มต้น
+    const [listA, setListA] = useState<LocationItem[]>([]);
+    const [listB, setListB] = useState<LocationItem[]>([]);
+    const [listStations, setListStations] = useState<number[]>([]);
 
     //select time
-    const [selectedTime, setSelectedTime] = useState<string>(''); // ค่าที่จะเก็บเวลา
+    const [selectedTime, setSelectedTime] = useState<number>(); // ค่าที่จะเก็บเวลา
     const handleChangeTime = (event: SelectChangeEvent<string>) => {
-        setSelectedTime(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
+        setSelectedTime(parseInt(event.target.value)); // อัปเดตค่าเมื่อเลือกเวลาใหม่
     };
 
     //select schedule
@@ -49,23 +87,41 @@ function Page() {
 
 
     useEffect(() => {
-        const stationIds = listB.map(station => station.id);
+        const stationIds = listB?.map(station => station.id);
         setListStations(stationIds);
     }, [listB]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        console.log("Route Name: ", routeName)
-        console.log("Route Color: ", routeColor)
-        console.log("Time: ", selectedTime)
-        console.log("Schedule: ", schedule)
-        console.log("listStations", listStations)
-    }
+    const handleSubmit = async () => {
+
+        const routeArray = listStations.map((id) => id).join(',');
+        const payload = {
+            route_name_th: routeNameTH,
+            route_name_en: routeName,
+            route_color: routeColor,
+            route_status: Number(routeStatusId),
+            route_com_id: Number(routeComId),
+            route_date_id: Number(routeScheduleId),
+            route_time_id: Number(selectedTime),
+            route_array: routeArray
+        };
+
+        const result = await addRoute(payload);
+
+        if (result.success) {
+            toast.success("Update route successfully!");
+            router.back();
+        } else {
+            toast.error(`Error: ${result.message}`);
+        }
+    };
+
 
     return (
         <div>
-            <TitleHeader text={"Add New Route"} />
+            <TitleHeader text={"Create Route"} />
             <FormRoute
+                routeNameTH={routeNameTH}
+                setRouteNameTH={setRouteNameTH}
                 routeName={routeName}
                 setRouteName={setRouteName}
                 routeColor={routeColor}
@@ -74,11 +130,12 @@ function Page() {
                 setListA={setListA}
                 listB={listB}
                 setListB={setListB}
-                selectedTime={selectedTime}
+                selectedTime={selectedTime?.toString() || ''}
                 handleChangeTime={handleChangeTime}
                 schedule={schedule}
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
+
             />
         </div>
     )

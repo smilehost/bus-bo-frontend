@@ -7,7 +7,7 @@ export type Schedule = { id: string; name: string };
 export type Station = { id: string; name: string; coordinates: string };
 
 export type RouteData = {
-    id: string;
+    route_id: string;
     route_name_th: string;
     route_name_en: string;
     route_color: string;

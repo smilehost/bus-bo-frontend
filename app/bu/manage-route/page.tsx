@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 
 //companent 
 import TableRoute from '@/app/components/RoutePage/TableRoute'
-import { confirmDialog } from '@/app/components/Dialog/Confirm'
+import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
@@ -22,12 +22,15 @@ import { useScheduleStore } from '@/stores/scheduleStore'
 //type
 import { Route } from '@/types/types'
 
+//toast
+import { toast } from 'react-toastify'
+
 function Page() {
 
     //mock
     // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
     const { companyData } = useCompanyStore();
-    const { routeData, getRoutes, getRouteById } = useRouteStore();
+    const { routeData, getRoutes, deleteRoute } = useRouteStore();
     const { ticketData } = useTicketStore();
     const { timeData } = useTimeStore();
     const { scheduleData } = useScheduleStore();
@@ -40,8 +43,11 @@ function Page() {
     const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
     const [search, setSearch] = useState<string>(''); // Search input
 
-    useEffect(() => {
+    const fetchRouteData = () => {
         getRoutes(1, 5, '');
+    }
+    useEffect(() => {
+        fetchRouteData();
     }, []);
 
     useEffect(() => {
@@ -102,23 +108,32 @@ function Page() {
     })
 
     // Handle delete route
-    const handleDeleteRoute = async ({ route, index }: { route: string, index: number }) => {
-        const confirmed = await confirmDialog({
+    const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
+        const inputName = await ConfirmWithInput({
             title: `Delete "${route}"?`,
-            text: "Do you want to delete this route?",
+            text: `Please type the route name below to confirm deletion.`,
             confirmText: "Delete",
-            cancelText: "Cancel"
-        })
+            cancelText: "Cancel",
+            placeholder: "Type route name here"
+        });
 
-        if (confirmed) {
-            setRoutes(prev => prev.filter((_, i) => i !== index))
+        if (inputName === route) {
+            const result = await deleteRoute(id);
+
+            if (result.success) {
+                fetchRouteData();
+                toast.success("delete route successfully!");
+            } else {
+                toast.error(`Error: ${result.message}`);
+            }
+        } else if (inputName !== null) {
             await Alert({
-                title: "Deleted!",
-                text: "The route has been deleted.",
-                type: "success"
-            })
+                title: "Name mismatch!",
+                text: "The typed name does not match the route name.",
+                type: "error"
+            });
         }
-    }
+    };
 
     const RedirectoAdd = () => {
         router.push(`${pathname}/add`)

@@ -9,6 +9,10 @@ export interface CreateRoutePayload {
     route_array: string  
 }
 
+export interface UpdateRoutePayload extends CreateRoutePayload {
+  route_id: number;
+}
+
 export interface FetchRouteQuery {
     page: number;
     size: number;

@@ -3,73 +3,88 @@ import { create } from 'zustand';
 import { Route } from '@/types/types';
 
 import { RouteService } from '@/services/route.service';
+import { RouteData } from '@/types/types';
+
+import { CreateRoutePayload, UpdateRoutePayload } from '@/payloads/route.payload';
 
 interface RouteStore {
   routeData: Route[];
+  isLoading: boolean;
   setRouteData: (newData: Route[]) => void;
-  addRoute: (newRoute: Route) => void;
-  updateRoute: (id: string, updatedRoute: Route) => void;
-  deleteRoute: (id: string) => void;
-  getRouteById: (id: number) => Promise<Route | undefined>;
+  addRoute: (newRoute: CreateRoutePayload) => void;
+  updateRoute: (
+    id: number,
+    updatedRoute: UpdateRoutePayload
+  ) => Promise<{ success: boolean; message?: string }>;
+  deleteRoute: (
+    id: number,
+  ) => Promise<{ success: boolean; message?: string }>;
+  getRouteById: (id: number) => Promise<RouteData | undefined>;
   getRoutes: (page: number, size: number, search: string) => Promise<void>;
 };
 
-// interface RouteState {
-//   page: number,
-//   size: number,
-//   total: number,
-//   totalPages: number,
-//   data: [
-//     {
-//       route_id: number,
-//       route_name_th: string,
-//       route_name_en: string,
-//       route_color: string,
-//       route_status: number,
-//       route_com_id: number,
-//       route_date_id: number,
-//       route_time_id: number,
-//       route_array: string
-//     },
-//   ]
-// }
-
-// export const fetchRoutesFromApi = async () => {
-//     try {
-//         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/route/2`, {
-//             headers: {
-//                 'com_id': 1,
-//             }
-//         }); // เปลี่ยน URL ตาม API จริง
-//         const routes: Route[] = response.data;
-
-//         useRouteStore.getState().setRouteData(routes); // อัปเดต store
-//     } catch (error) {
-//         console.error('Failed to fetch routes:', error);
-//     }
-// };
-
-export const useRouteStore = create<RouteStore>((set, get) => ({
+export const useRouteStore = create<RouteStore>((set) => ({
   routeData: [],
+  isLoading: false,
 
   setRouteData: (newData) => set({ routeData: newData }),
 
-  addRoute: (newRoute) =>
-    set((state) => ({
-      routeData: [...state.routeData, newRoute],
-    })),
+  addRoute: async (
+    newRoute
+  ): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const payload: CreateRoutePayload = {
+        route_name_th: newRoute.route_name_th,
+        route_name_en: newRoute.route_name_en,
+        route_color: newRoute.route_color,
+        route_status: Number(newRoute.route_status),
+        route_com_id: Number(newRoute.route_com_id),
+        route_date_id: Number(newRoute.route_date_id),
+        route_time_id: Number(newRoute.route_time_id),
+        route_array: newRoute.route_array
+      };
+      await RouteService.createRoute(payload);
+      return { success: true };
+    } catch (error) {
+      console.error("create route error:", error);
+      return { success: false, message: (error as any)?.message || "Unknown error" };
+    }
+  },
 
-  updateRoute: (id, updatedRoute) =>
-    set((state) => ({
-      routeData: state.routeData.map((route) =>
-        route.id === id ? updatedRoute : route
-      ),
-    })),
 
-  deleteRoute: (id) =>
-    set((state) => ({
-      routeData: state.routeData.filter((route) => route.route_id !== id),
-    })),
+  updateRoute: async (
+    id,
+    updatedRoute
+  ): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const payload: UpdateRoutePayload = {
+        route_id: Number(id),
+        route_name_th: updatedRoute.route_name_th,
+        route_name_en: updatedRoute.route_name_en,
+        route_color: updatedRoute.route_color,
+        route_status: Number(updatedRoute.route_status),
+        route_com_id: Number(updatedRoute.route_com_id),
+        route_date_id: Number(updatedRoute.route_date_id),
+        route_time_id: Number(updatedRoute.route_time_id),
+        route_array: updatedRoute.route_array
+      };
+      await RouteService.updateRoute(id, payload);
+      return { success: true };
+    } catch (error) {
+      console.error("updateRoute error:", error);
+      return { success: false, message: (error as any)?.message || "Unknown error" };
+    }
+  },
+
+  deleteRoute: async (id): Promise<{ success: boolean; message?: string }> => {
+    try {
+      await RouteService.deleteRoute(id);
+      return { success: true };
+    } catch (error) {
+      console.error("delete route error:", error);
+      return { success: false, message: (error as any)?.message || "Unknown error" };
+    }
+  },
 
   getRoutes: async (page: number, size: number, search?: string) => {
     try {
@@ -86,16 +101,16 @@ export const useRouteStore = create<RouteStore>((set, get) => ({
     }
   },
 
-  getRouteById: async (id: number): Promise<Route | undefined> => {
+  getRouteById: async (id: number): Promise<RouteData | undefined> => {
     try {
-      const res = await RouteService.getRouteById(id) as { result: Route };
+      const res = await RouteService.getRouteById(id) as { result: RouteData };
       return res.result;
     } catch (error) {
       console.error("getRouteById error:", error);
       return undefined;
     }
   }
-  
+
 }));
 
 
