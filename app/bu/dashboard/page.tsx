@@ -1,4 +1,4 @@
-'use client';
+'use client'; // เพราะมี useState, Chart ต้อง render ฝั่ง client
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -44,7 +44,6 @@ export default function DashboardPage() {
   const totalPassengers = routeData.reduce((sum, route) => sum + route.passengers, 0);
   const totalAmount = routeData.reduce((sum, route) => sum + route.amount, 0);
 
-function Page() {
   return (
     <>
     {isLoadingskeleton ? (
@@ -185,5 +184,3 @@ function StatsCard({ title, value, icon, change, iconBg }: { title: string; valu
     </div>
   );
 }
-
-export default Page;

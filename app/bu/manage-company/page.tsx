@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 //components
 import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
-import { Confirm } from "@/app/components/Dialog/Confirm";
+import { confirmDialog } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 
 type Company = {
@@ -43,7 +43,7 @@ export default function ManageCompanies() {
   ) => {
     if (!name.trim()) return;
 
-    const isConfirmed = await Confirm({
+    const isConfirmed = await confirmDialog({
       title: editingCompany ? "Confirm Update" : "Confirm Create",
       text: editingCompany
         ? "Are you sure you want to update this company?"
@@ -99,7 +99,7 @@ export default function ManageCompanies() {
   };
 
   const handleDeleteCompany = async (id: number) => {
-    const isConfirmed = await Confirm({
+    const isConfirmed = await confirmDialog({
       title: "Confirm Delete",
       text: "Are you sure you want to delete this company?",
       confirmText: "Delete",
