@@ -188,8 +188,25 @@ function MemberTable({
                     <td className="py-4 px-6 border-b border-gray-200 text-center text-gray-700">
                       {member.lastTransaction}
                     </td>
-                    <td className="py-4 px-6 border-b border-gray-200 text-center">
-                      <StatusText type={member.status} />
+                    <td className="py-4 px-6 border-b border-gray-200">
+                      <div className="flex items-center justify-center">
+                        {member.status === STATUS.ACTIVE ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
+                            <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
+                            <span>Active</span>
+                          </span>
+                        ) : member.status === STATUS.INACTIVE ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shadow-sm">
+                            <span className="mr-1.5 h-2 w-2 rounded-full bg-yellow-500"></span>
+                            <span>Inactive</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
+                            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+                            <span>Cancelled</span>
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200 text-center">
                       <div className="flex justify-center space-x-2">
