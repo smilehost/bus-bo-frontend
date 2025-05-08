@@ -14,7 +14,7 @@ function ButtonBG({ size, text, icon, onClick, disbled }: ButtonBG) {
         onClick()
     }
     return (
-        <div onClick={handleClick} className={`${disbled ? "bg-gray-400" : "custom-btn-bg-main"}  custom-border-gray  border-1 border-[#D1D5DB] ${size} px-4 py-2 rounded-lg text-xs text-white cursor-pointer flex justify-center items-center gap-2`}>
+        <button onClick={onClick} className={`custom-btn-bg-main custom-border-gray  border-1 border-[#D1D5DB] ${size} px-4 py-2 rounded-lg text-xs text-white cursor-pointer flex justify-center items-center gap-2`}>
             {icon && (
                 <Image
                     src={icon}
@@ -25,7 +25,7 @@ function ButtonBG({ size, text, icon, onClick, disbled }: ButtonBG) {
                 />
             )}
             <p> {text}</p>
-        </div>
+        </button>
     )
 }
 

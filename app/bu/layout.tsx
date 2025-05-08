@@ -20,8 +20,11 @@ export default function RootLayout({
 
 
     const allMenu = [
-        { id: 1, icon: "/icons/home.svg", text: "Dashboard", link: `dashboard` },
-        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "" },
+        { id: 1, 
+      icon: "/icons/home.svg", 
+      text: "Dashboard", 
+      link: `dashboard` },
+        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "sell-ticket" },
         {
             id: 3,
             icon: "/icons/route.svg",
@@ -59,10 +62,13 @@ export default function RootLayout({
             link: `manage-members`,
         },
         {
-            id: 9,
-            icon: "/icons/report.svg",
-            text: "Reports",
-            link: "",
+            id: 9, 
+     
+            icon: "/icons/report.svg", 
+     
+            text: "Reports", 
+     
+            link: `/reports`,
         },
         {
             id: 10,

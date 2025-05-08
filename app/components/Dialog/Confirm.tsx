@@ -1,35 +1,33 @@
-'use client'
+"use client";
 
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 type ConfirmProps = {
-    title?: string
-    text?: string
-    confirmText?: string
-    cancelText?: string
-    type?: string
-}
+  title?: string;
+  text?: string;
+  confirmText?: string;
+  cancelText?: string;
+  type?: "success" | "error" | "warning" | "info" | "question";
+};
 
-// ใช้เป็นฟังก์ชัน async ที่ return Promise<boolean>
-export async function confirmDialog({
-    title = "Are you sure?",
-    text = "This action cannot be undone.",
-    confirmText = "Yes",
-    cancelText = "Cancel",
+export async function Confirm({
+  title = "",
+  text = "",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  type = "question",
 }: ConfirmProps): Promise<boolean> {
-    const result = await Swal.fire({
-        title,
-        text,
-        icon: "warning",
-        showCancelButton: true,
-        customClass: {
-            confirmButton: 'custom-btn-bg-main custom-border-gray',
-            cancelButton: 'bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded ml-4',
-        },
-        buttonsStyling: false, // ต้องปิด styling เดิมของ Swal ถึงจะใช้ customClass ได้
-        confirmButtonText: confirmText,
-        cancelButtonText: cancelText,
-    })
-
-    return result.isConfirmed
+  return Swal.fire({
+    title,
+    text,
+    icon: type,
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    customClass: {
+      confirmButton: "swal2-confirm-btn",
+      cancelButton: "swal2-cancel-btn",
+    },
+    buttonsStyling: false,
+  }).then((result) => result.isConfirmed);
 }

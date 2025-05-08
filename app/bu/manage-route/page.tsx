@@ -25,6 +25,8 @@ import { Route } from '@/types/types'
 
 //toast
 import { toast } from 'react-toastify'
+import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
+import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 function Page() {
 
@@ -44,12 +46,17 @@ function Page() {
     const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
     const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
     const [search, setSearch] = useState<string>(''); // Search input
+    const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
     const fetchRouteData = () => {
+        
         getRoutes(1, 5, '');
     }
     useEffect(() => {
+        const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
         fetchRouteData();
+        cancelSkeleton();
+
     }, []);
 
     useEffect(() => {
@@ -211,9 +218,11 @@ function Page() {
         <>
             <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
             <FormFilter setSearch={setSearch} placeholderSearch='Search routes...' filter={filterSearch} />
-            <div className='bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden'>
+            {isLoadingskeleton ? <SkeletonRoute /> :
+              <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
                 <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-            </div>
+              </div>
+}
         </>
     )
 }
