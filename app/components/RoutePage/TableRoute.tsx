@@ -32,7 +32,7 @@ type RouteData = {
 
 type TableRouteProps = {
   rows: RouteData[];
-  handleDeleteRoute: ({ route, index }: { route: string, index: number }) => void;
+  handleDeleteRoute: ({ route, id }: { route: string, id: number }) => void;
 };
 
 function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
@@ -88,11 +88,18 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
-            <StyledTableRow key={index}>
+          {rows?.map((row, index) => (
+            <StyledTableRow key={index} className={`transition-all duration-300 ease-out hover:bg-blue-50/70 ${
+              index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+            } animate-fade-in`}
+            style={{
+              animationDelay: `${index * 50}ms`,
+              animationDuration: "600ms",
+              animationFillMode: "both",
+            }}>
               <StyledTableCell align="left">
                 <div className='flex gap-3 items-center'>
-                  <div className={`w-[8px] h-[32px] rounded-lg`}
+                  <div className={`w-[8px] h-[32px] rounded-lg flex-shrink-0`}
                     style={{ backgroundColor: row.routeColor }}
                   />
                   {row.route}
@@ -107,7 +114,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
               </StyledTableCell>
               <StyledTableCell align="left">
                 <div className='flex gap-2 min-w-max'>
-                  <Link href={`${pathname}/ticket/${row.id}`} className='cursor-pointer'>
+                  <Link href={`${pathname}/routeTicket/${row.id}`} className='cursor-pointer'>
                     <Image
                       src={"/icons/money.svg"}
                       width={1000}
@@ -127,7 +134,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
                       className='w-[16px] h-[16px]'
                     />
                   </Link>
-                  <div onClick={() => handleDeleteRoute({ route: row.route, index: index })} className='cursor-pointer'>
+                  <div onClick={() => handleDeleteRoute({ route: row.route, id: Number(row.id) })} className='cursor-pointer'>
                     <Image
                       src={"/icons/garbage.svg"}
                       width={1000}

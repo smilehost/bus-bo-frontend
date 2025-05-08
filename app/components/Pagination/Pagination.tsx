@@ -97,7 +97,7 @@ const Pagination: React.FC<PaginationProps> = ({
     <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
       <div className="flex items-center space-x-1 mb-4 md:mb-0">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 cursor-pointer"
+          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Previous Page"
@@ -158,7 +158,7 @@ const Pagination: React.FC<PaginationProps> = ({
         </label>
         <select
           id="rows-per-page"
-          className="border border-gray-300 rounded-md text-gray-700 px-3 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer transition-shadow shadow-sm hover:shadow"
+          className="border border-gray-300 rounded-md text-gray-700 px-3 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           value={rowsPerPage}
           onChange={onRowsPerPageChange}
         >

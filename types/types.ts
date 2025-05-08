@@ -6,16 +6,24 @@ export type Time = { id: string; name: string; times: string[]; status: STATUS }
 export type Schedule = { id: string; name: string };
 export type Station = { id: string; name: string; coordinates: string };
 
+export type RouteData = {
+    route_id: string;
+    route_name_th: string;
+    route_name_en: string;
+    route_color: string;
+    route_status: STATUS;
+    route_com_id: string;
+    route_date_id: string;
+    route_time_id: string;
+    route_array: string;
+};
+
 export type Route = {
-    id: string;
-    route: string;
-    status: STATUS;
-    routeColor: string;
-    stations: string[];
-    ticket_amount?: string;
-    times_id: string;
-    company_id: string;
-    schedule_id: string;
+    data: RouteData[],
+    page: number,
+    size: number,
+    total: number,
+    totalPages: number
 };
 
 export type TicketPriceType = {
@@ -25,17 +33,18 @@ export type TicketPriceType = {
 }
 
 export type TicketRoutePrice = {
-    id: string,
+    id?: string,
     from: string,
     to: string,
     price: number,
     ticket_price_type_id: string,
+    route_ticket_price_id: string
 }
 
 export type TicketListProps = { type: string; price: number };
 
 export type TicketProps = {
-    id: string;
+    id?: string;
     ticketName_th: string;
     ticketName_en: string;
     ticket_type: TICKET_TYPE;

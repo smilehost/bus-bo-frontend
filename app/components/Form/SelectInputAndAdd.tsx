@@ -39,7 +39,7 @@ function SelectInputAndAdd({ data, value, onChange }: SelectProps) {
                         
                     >
                         {data.map((item, index) => (
-                            <MenuItem key={index} value={index + 1}>{item.name}</MenuItem>
+                            <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
                         ))}
                     </Select>
                     <div className='cursor-pointer h-[38px] px-4 flex justify-center items-center border-1 border-l-0 border-[#D1D5DB] rounded-r-md'

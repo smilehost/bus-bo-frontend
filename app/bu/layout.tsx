@@ -5,15 +5,18 @@ import { USER_TIER } from "@/constants/enum";
 import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
 import { useUserStore } from "@/stores/userStore";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-  const userData = useUserStore((state) => state.userData);
-  const user_tier = userData.user_tier;
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { userData } = useUserStore();
+
+    const user_tier = userData.user_tier;
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
     const allMenu = [
@@ -89,6 +92,7 @@ export default function RootLayout({
 
     return (
         <div className="flex h-screen bg-white ">
+            <ToastContainer />
             <aside
                 className={`fixed inset-y-0 left-0 z-10 w-64 transform bg-white  shadow-lg transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
