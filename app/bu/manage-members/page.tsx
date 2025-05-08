@@ -13,6 +13,8 @@ import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
 import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
 import { STATUS, FILTER } from "@/constants/enum";
+import { Confirm } from "@/app/components/Dialog/Confirm";
+import { Alert } from "@/app/components/Dialog/Alert";
 
 function Page() {
   const { companyData } = useCompanyStore();
@@ -34,6 +36,7 @@ function Page() {
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string | null>(null);
   const [editingMember, setEditingMember] = useState<any>(null); // เก็บข้อมูลสมาชิกที่กำลังแก้ไข
+  const [isSubmitting, setIsSubmitting] = useState(false); // เพิ่มสถานะการประมวลผล
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
@@ -52,7 +55,8 @@ function Page() {
         ? companyName.toLowerCase().includes(searchCompany.toLowerCase())
         : true;
     const matchSearch = search
-      ? item.member_name.toLowerCase().includes(search.toLowerCase())
+      ? item.member_name.toLowerCase().includes(search.toLowerCase()) ||
+        item.member_phone.toLowerCase().includes(search.toLowerCase())
       : true;
     return matchStatus && matchCompany && matchSearch;
   });
@@ -82,27 +86,63 @@ function Page() {
     },
   ];
 
-  const handleNewMember = ({
+  const handleNewMember = async ({
     name,
     phone,
   }: {
     name: string;
     phone: string;
   }) => {
-    const newMember = {
-      id: String(Date.now()),
-      member_name: name,
-      member_phone: phone,
-      member_status: STATUS.ACTIVE,
-      member_company_id: userData.company_id,
-      member_tripsTotal: 0,
-      member_lastTransaction: "-",
-    };
-    setMembers((prev) => [...prev, newMember]);
+    if (isSubmitting) return; // ป้องกันการส่งข้อมูลซ้ำ
+    setIsSubmitting(true);
+
+    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setMemberModelOpen(false);
+
+    try {
+      const isConfirmed = await Confirm({
+        title: "Confirm Create",
+        text: "Do you want to create this member?",
+        confirmText: "Create",
+        cancelText: "Cancel",
+        type: "question",
+      });
+
+      if (!isConfirmed) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      const newMember = {
+        id: String(Date.now()),
+        member_name: name,
+        member_phone: phone,
+        member_status: STATUS.ACTIVE,
+        member_company_id: userData.company_id,
+        member_tripsTotal: 0,
+        member_lastTransaction: "-",
+      };
+
+      setMembers((prev) => [...prev, newMember]);
+
+      await Alert({
+        title: "Created!",
+        text: "Member created successfully",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Create Member error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to create member.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleEditMember = ({
+  const handleEditMember = async ({
     id,
     name,
     phone,
@@ -111,31 +151,135 @@ function Page() {
     name: string;
     phone: string;
   }) => {
-    setMembers((prev) =>
-      prev.map((m) =>
-        m.id === String(id)
-          ? { ...m, member_name: name, member_phone: phone }
-          : m
-      )
-    );
+    if (isSubmitting) return; // ป้องกันการส่งข้อมูลซ้ำ
+    setIsSubmitting(true);
+
+    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setMemberModelOpen(false);
+
+    try {
+      const isConfirmed = await Confirm({
+        title: "Confirm Update",
+        text: "Do you want to update this member?",
+        confirmText: "Update",
+        cancelText: "Cancel",
+        type: "question",
+      });
+
+      if (!isConfirmed) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.id === String(id)
+            ? { ...m, member_name: name, member_phone: phone }
+            : m
+        )
+      );
+
+      await Alert({
+        title: "Updated!",
+        text: "Member updated successfully",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Edit Member error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to update member.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleEditStatus = (newStatus: string) => {
-    if (selectedMemberId === null) return;
-    setMembers((prev) =>
-      prev.map((m) =>
-        m.id === String(selectedMemberId)
-          ? { ...m, member_status: newStatus as STATUS }
-          : m
-      )
-    );
+  const handleEditStatus = async (newStatus: string) => {
+    if (selectedMemberId === null || isSubmitting) return;
+    setIsSubmitting(true);
+
+    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setEditStatusOpen(false);
+
+    try {
+      const isConfirmed = await Confirm({
+        title: "Confirm Status Change",
+        text: `Do you want to change status to ${newStatus}?`,
+        confirmText: "Update",
+        cancelText: "Cancel",
+        type: "question",
+      });
+
+      if (!isConfirmed) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.id === String(selectedMemberId)
+            ? { ...m, member_status: newStatus as STATUS }
+            : m
+        )
+      );
+
+      await Alert({
+        title: "Updated!",
+        text: "Member status updated successfully",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Edit Status error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to update member status.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleEditPassword = (newPassword: string) => {
-    console.log("Updated password:", newPassword);
+  const handleEditPassword = async (newPassword: string) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setEditPasswordOpen(false);
+
+    try {
+      const isConfirmed = await Confirm({
+        title: "Confirm Password Change",
+        text: "Do you want to update the password?",
+        confirmText: "Update",
+        cancelText: "Cancel",
+        type: "question",
+      });
+
+      if (!isConfirmed) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log("Updated password:", newPassword);
+
+      await Alert({
+        title: "Updated!",
+        text: "Password updated successfully",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Edit Password error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to update password.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -162,6 +306,7 @@ function Page() {
             setMemberModelOpen(true);
           }}
           size="h-[38px]"
+          disbled={isSubmitting}
         />
       </div>
 
@@ -191,52 +336,62 @@ function Page() {
           onRowsPerPageChange={handleRowsPerPageChange}
           totalResults={totalResults}
           onEditStatus={(id, status) => {
-            setSelectedMemberId(id);
-            setCurrentStatus(status);
-            setEditStatusOpen(true);
-          }}
-          onEditPassword={(id) => {
-            setSelectedMemberId(id);
-            setEditPasswordOpen(true);
-          }}
-          onEditMember={(id) => {
-            const memberToEdit = members.find((m) => m.id === String(id));
-            if (memberToEdit) {
-              setEditingMember({
-                id: Number(memberToEdit.id),
-                name: memberToEdit.member_name,
-                phone: memberToEdit.member_phone,
-              });
-              setMemberModelOpen(true);
+            if (!isSubmitting) {
+              setSelectedMemberId(id);
+              setCurrentStatus(status);
+              setEditStatusOpen(true);
             }
           }}
+          onEditPassword={(id) => {
+            if (!isSubmitting) {
+              setSelectedMemberId(id);
+              setEditPasswordOpen(true);
+            }
+          }}
+          onEditMember={(id) => {
+            if (!isSubmitting) {
+              const memberToEdit = members.find((m) => m.id === String(id));
+              if (memberToEdit) {
+                setEditingMember({
+                  id: Number(memberToEdit.id),
+                  name: memberToEdit.member_name,
+                  phone: memberToEdit.member_phone,
+                });
+                setMemberModelOpen(true);
+              }
+            }
+          }}
+          // {/* isSubmitting={isSubmitting} */}
         />
       )}
 
       <MemberModel
         open={memberModelOpen}
-        onClose={() => setMemberModelOpen(false)}
-        onHandle={(member) => {
+        onClose={() => !isSubmitting && setMemberModelOpen(false)}
+        onHandle={async (member) => {
           if (member.id) {
-            handleEditMember({ ...member, id: member.id as number }); 
+            await handleEditMember({ ...member, id: member.id as number });
           } else {
-            handleNewMember(member);
+            await handleNewMember(member);
           }
         }}
         editingMember={editingMember}
+        // isSubmitting={isSubmitting}
       />
 
       <EditStatusModel
         open={isEditStatusOpen}
-        onClose={() => setEditStatusOpen(false)}
+        onClose={() => !isSubmitting && setEditStatusOpen(false)}
         currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
         onSave={handleEditStatus}
+        // isSubmitting={isSubmitting}
       />
 
       <EditPasswordModel
         open={isEditPasswordOpen}
-        onClose={() => setEditPasswordOpen(false)}
+        onClose={() => !isSubmitting && setEditPasswordOpen(false)}
         onSave={handleEditPassword}
+        // isSubmitting={isSubmitting}
       />
     </>
   );
