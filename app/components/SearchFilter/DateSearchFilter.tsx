@@ -14,13 +14,13 @@ function SearchFilter({
   setStatusFilter,
 }: SearchFilterProps) {
   return (
-    <div className="flex justify-between mb-4">
+    <div className="flex flex-col md:flex-row md:justify-between mb-4 gap-4">
       <input
         type="text"
         placeholder="Search by name..."
-        className="border p-2 rounded-md w-3/4"
+        className="border p-2 rounded-md flex-1"
         value={searchTerm}
-        onChange={setSearchTerm} // ✅ ใช้ e => ส่งให้ฟังก์ชัน handleSearchChange ที่มี debounce
+        onChange={setSearchTerm}
       />
       <div className="flex items-center">
         <span className="mr-2">Filters:</span>
