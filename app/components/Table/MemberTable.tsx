@@ -51,7 +51,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
     details: {
       className:
         "p-1.5 bg-emerald-50 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-emerald-100 cursor-pointer",
-      title: "View Details",
+      title: "Edit Member",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -97,6 +97,7 @@ type MemberTableProps = {
   totalResults: number;
   onEditPassword: (id: number) => void;
   onEditStatus: (id: number, status: STATUS) => void;
+  onEditMember: (id: number) => void;
 };
 
 function MemberTable({
@@ -109,6 +110,7 @@ function MemberTable({
   totalResults,
   onEditPassword,
   onEditStatus,
+  onEditMember,
 }: MemberTableProps) {
   return (
     <div className="flex flex-col space-y-6">
@@ -220,7 +222,7 @@ function MemberTable({
                         />
                         <ActionButton
                           type="details"
-                          onClick={() => console.log("View Details")}
+                          onClick={() => onEditMember(member.id)}
                         />
                       </div>
                     </td>

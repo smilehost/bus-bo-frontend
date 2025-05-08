@@ -33,6 +33,7 @@ function Page() {
   const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string | null>(null);
+  const [editingMember, setEditingMember] = useState<any>(null); // เก็บข้อมูลสมาชิกที่กำลังแก้ไข
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
@@ -101,11 +102,32 @@ function Page() {
     setMemberModelOpen(false);
   };
 
+  const handleEditMember = ({
+    id,
+    name,
+    phone,
+  }: {
+    id: number;
+    name: string;
+    phone: string;
+  }) => {
+    setMembers((prev) =>
+      prev.map((m) =>
+        m.id === String(id)
+          ? { ...m, member_name: name, member_phone: phone }
+          : m
+      )
+    );
+    setMemberModelOpen(false);
+  };
+
   const handleEditStatus = (newStatus: string) => {
     if (selectedMemberId === null) return;
     setMembers((prev) =>
       prev.map((m) =>
-        m.id === String(selectedMemberId) ? { ...m, member_status: newStatus as STATUS } : m
+        m.id === String(selectedMemberId)
+          ? { ...m, member_status: newStatus as STATUS }
+          : m
       )
     );
     setEditStatusOpen(false);
@@ -135,7 +157,10 @@ function Page() {
         <ButtonBG
           text="Add New Member"
           icon="/icons/plus.svg"
-          onClick={() => setMemberModelOpen(true)}
+          onClick={() => {
+            setEditingMember(null); // รีเซ็ตข้อมูลการแก้ไข
+            setMemberModelOpen(true);
+          }}
           size="h-[38px]"
         />
       </div>
@@ -174,13 +199,31 @@ function Page() {
             setSelectedMemberId(id);
             setEditPasswordOpen(true);
           }}
+          onEditMember={(id) => {
+            const memberToEdit = members.find((m) => m.id === String(id));
+            if (memberToEdit) {
+              setEditingMember({
+                id: Number(memberToEdit.id),
+                name: memberToEdit.member_name,
+                phone: memberToEdit.member_phone,
+              });
+              setMemberModelOpen(true);
+            }
+          }}
         />
       )}
 
       <MemberModel
         open={memberModelOpen}
         onClose={() => setMemberModelOpen(false)}
-        onHandle={handleNewMember}
+        onHandle={(member) => {
+          if (member.id) {
+            handleEditMember({ ...member, id: member.id as number }); 
+          } else {
+            handleNewMember(member);
+          }
+        }}
+        editingMember={editingMember}
       />
 
       <EditStatusModel

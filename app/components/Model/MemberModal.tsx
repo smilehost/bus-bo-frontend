@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import Image from "next/image";
 
@@ -8,25 +8,38 @@ import InputLabel from "../Form/InputLabel";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
-import SelectInput from "../Form/SelectInput"; // ต้องมีหรือสร้าง component นี้
 
-type MemberModelProps = {
+type MemberModalProps = {
   open: boolean;
   onClose: () => void;
   onHandle: (member: {
+    id?: number;
     name: string;
     phone: string;
     company: string;
     role: string;
   }) => void;
+  editingMember?: {
+    id: number;
+    name: string;
+    phone: string;
+    company: string;
+    role: string;
+  };
 };
 
-function MemberModel({ open, onClose, onHandle }: MemberModelProps) {
-  //new member
+function MemberModal({
+  open,
+  onClose,
+  onHandle,
+  editingMember,
+}: MemberModalProps) {
   const [newName, setNewName] = useState<string>("");
   const [newPhone, setNewPhone] = useState<string>("");
   const [newCompany, setNewCompany] = useState<string>("");
   const [newRole, setNewRole] = useState<string>("Admin");
+
+  const isEditing = !!editingMember;
 
   // ข้อมูลตัวเลือกสำหรับ dropdown
   const companyOptions = [
@@ -43,19 +56,37 @@ function MemberModel({ open, onClose, onHandle }: MemberModelProps) {
     { value: "Manager", label: "Manager" },
   ];
 
+  // โหลดข้อมูลสมาชิกเมื่อเป็นการแก้ไข
+  useEffect(() => {
+    if (editingMember) {
+      setNewName(editingMember.name);
+      setNewPhone(editingMember.phone);
+      setNewCompany(editingMember.company);
+      setNewRole(editingMember.role);
+    } else {
+      // รีเซ็ตค่าถ้าเป็นการเพิ่มสมาชิกใหม่
+      setNewName("");
+      setNewPhone("");
+      setNewCompany("");
+      setNewRole("Admin");
+    }
+  }, [editingMember]);
+
   const handleSubmit = () => {
-    if (!newName || !newPhone || !newCompany) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    if (!newName || !newPhone) {
+      alert("กรุณากรอกข้อมูลชื่อและเบอร์โทรให้ครบถ้วน");
       return;
     }
+
     onHandle({
-      name: newName,
-      phone: newPhone,
-      company: newCompany,
-      role: newRole,
+      id: editingMember?.id, 
+      name: newName || editingMember?.name || "", 
+      phone: newPhone || editingMember?.phone || "", 
+      company: newCompany || editingMember?.company || "", 
+      role: newRole || editingMember?.role || "Admin", 
     });
 
-    // รีเซ็ตค่าหลังจากเพิ่มสมาชิก
+    // รีเซ็ตค่าหลังจากบันทึก
     setNewName("");
     setNewPhone("");
     setNewCompany("");
@@ -68,8 +99,12 @@ function MemberModel({ open, onClose, onHandle }: MemberModelProps) {
         <div className="w-[448px] py-2 relative">
           <div className="">
             <TitleModel
-              title="Add New Member"
-              description="Fill in the member details below"
+              title={isEditing ? "Edit Member" : "Add New Member"}
+              description={
+                isEditing
+                  ? "Update the member details below"
+                  : "Fill in the member details below"
+              }
             />
             <div className="mt-7 flex flex-col gap-4">
               <InputLabel
@@ -130,7 +165,11 @@ function MemberModel({ open, onClose, onHandle }: MemberModelProps) {
           </div>
           <div className="flex gap-3 justify-end mt-7">
             <ButtonDefault size="" text="Cancel" onClick={onClose} />
-            <ButtonBG size="" text="Add Member" onClick={handleSubmit} />
+            <ButtonBG
+              size=""
+              text={isEditing ? "Update Member" : "Add Member"}
+              onClick={handleSubmit}
+            />
           </div>
           <div
             className="absolute top-0 right-0 cursor-pointer"
@@ -150,4 +189,4 @@ function MemberModel({ open, onClose, onHandle }: MemberModelProps) {
   );
 }
 
-export default MemberModel;
+export default MemberModal;
