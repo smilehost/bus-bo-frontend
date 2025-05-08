@@ -6,24 +6,33 @@ import ButtonBG from "@/app/components/Form/ButtonBG";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import MemberTable from "@/app/components/Table/MemberTable";
 import MemberModel from "@/app/components/Model/MemberModal";
-
-//const
-import { FILTER, STATUS } from "@/constants/enum";
-
-//mock
 import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { useMemberStore } from "@/stores/memberStore";
 import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
 import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
+import { STATUS, FILTER } from "@/constants/enum";
 
 function Page() {
   const { companyData } = useCompanyStore();
   const { membersData } = useMemberStore();
   const { userData } = useUserStore();
-  const [isLoadingskeleton, setisLoadIngskeleton] = useState(true); 
-  const [rowsPerPage, setRowsPerPage] = useState(4);
+
+  const [isLoadingskeleton, setIsLoadingSkeleton] = useState(true);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [members, setMembers] = useState(membersData);
+
+  const [searchStatus, setSearchStatus] = useState<string>("");
+  const [searchCompany, setSearchCompany] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+
+  const [memberModelOpen, setMemberModelOpen] = useState(false);
+  const [isEditStatusOpen, setEditStatusOpen] = useState(false);
+  const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
@@ -72,25 +81,6 @@ function Page() {
     },
   ];
 
-  //handle memberModel
-  const [memberModelOpen, setMemberModelOpen] = useState(false);
-  const handleOpenMemberModel = () => setMemberModelOpen(true);
-  const handleCloseMemberModel = () => setMemberModelOpen(false);
-
-  //handle edit status modal
-  const [isEditStatusOpen, setEditStatusOpen] = useState(false);
-  const [isEditPasswordOpen, setEditPasswordOpen] = useState(false); // Added state for EditPasswordModel
-  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
-  const handleEditStatus = (newStatus: string) => {
-    console.log("Status updated to:", newStatus);
-    setEditStatusOpen(false);
-  };
-
-  const handleEditPassword = (newPassword: string) => {
-    console.log("Password updated to:", newPassword);
-    setEditPasswordOpen(false);
-  };
-
   const handleNewMember = ({
     name,
     phone,
@@ -137,83 +127,74 @@ function Page() {
 
   return (
     <>
-      <div>
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Members"
-            description="View and manage customer information"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Member"
-            icon="/icons/plus.svg"
-            onClick={handleOpenMemberModel}
-          />
-        </div>
-
-        <FormFilter
-          setSearch={setSearch}
-          placeholderSearch="Search by phone or name..."
-          filter={filterSearch}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+        <TitlePage
+          title="Manage Members"
+          description="View and manage customer information"
         />
-        {isLoadingskeleton ? (
-          <SkeletonMemberPage rows={5} />
-        ) : (
-          <div className="custom-frame-content">
-            {filtered?.map((item, index) => {
-              const company = getCompanyName({ id: item.member_company_id });
-              return (
-                <React.Fragment key={index}>
-                  <MemberTable
-                    name={item.member_name}
-                    tel={item.member_phone}
-                    status={item.member_status}
-                    company={company}
-                    tripsTotal={item.member_tripsTotal}
-                    lastTransaction={item.member_lastTransaction}
-                    index={index}
-                    currentPage={1}
-                    totalPages={Math.ceil(filtered.length / rowsPerPage)}
-                    onPageChange={(page) =>
-                      console.log("Page changed to:", page)
-                    }
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={(rows) => setRowsPerPage(rows)}
-                    totalResults={filtered.length}
-                    onEditPassword={(id) =>
-                      console.log("Edit password for:", id)
-                    }
-                    onEditStatus={(id, status) =>
-                      console.log("Edit status for:", id, "to", status)
-                    }
-                  />
-                  {index < filtered.length - 1 && (
-                    <hr className="border-t border-[#E5E7EB]" />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        )}
-
-        <MemberModel
-          open={memberModelOpen}
-          onClose={handleCloseMemberModel}
-          onHandle={handleNewMember}
-        />
-        <EditStatusModel
-          open={isEditStatusOpen}
-          onClose={() => setEditStatusOpen(false)}
-          currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
-          onSave={handleEditStatus}
-        />
-
-        <EditPasswordModel
-          open={isEditPasswordOpen}
-          onClose={() => setEditPasswordOpen(false)}
-          onSave={handleEditPassword}
+        <ButtonBG
+          text="Add New Member"
+          icon="/icons/plus.svg"
+          onClick={() => setMemberModelOpen(true)}
+          size="h-[38px]"
         />
       </div>
+
+      <FormFilter
+        setSearch={setSearch}
+        placeholderSearch="Search by phone or name..."
+        filter={filterSearch}
+      />
+
+      {isLoadingskeleton ? (
+        <SkeletonMemberPage rows={5} />
+      ) : (
+        <MemberTable
+          members={paginatedMembers.map((m) => ({
+            id: Number(m.id),
+            name: m.member_name,
+            tel: m.member_phone,
+            status: m.member_status,
+            company: getCompanyName({ id: m.member_company_id }),
+            tripsTotal: m.member_tripsTotal,
+            lastTransaction: m.member_lastTransaction,
+          }))}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          totalResults={totalResults}
+          onEditStatus={(id, status) => {
+            setSelectedMemberId(id);
+            setCurrentStatus(status);
+            setEditStatusOpen(true);
+          }}
+          onEditPassword={(id) => {
+            setSelectedMemberId(id);
+            setEditPasswordOpen(true);
+          }}
+        />
+      )}
+
+      <MemberModel
+        open={memberModelOpen}
+        onClose={() => setMemberModelOpen(false)}
+        onHandle={handleNewMember}
+      />
+
+      <EditStatusModel
+        open={isEditStatusOpen}
+        onClose={() => setEditStatusOpen(false)}
+        currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
+        onSave={handleEditStatus}
+      />
+
+      <EditPasswordModel
+        open={isEditPasswordOpen}
+        onClose={() => setEditPasswordOpen(false)}
+        onSave={handleEditPassword}
+      />
     </>
   );
 }
