@@ -207,7 +207,7 @@ function Page() {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 totalResults={filteredLocations.length}
-                // isLoading={isLoading}
+                isLoading={isLoading}
               />
             )}
           </div>

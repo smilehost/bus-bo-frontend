@@ -89,7 +89,14 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
         </TableHead>
         <TableBody>
           {rows?.map((row, index) => (
-            <StyledTableRow key={index}>
+            <StyledTableRow key={index} className={`transition-all duration-300 ease-out hover:bg-blue-50/70 ${
+              index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+            } animate-fade-in`}
+            style={{
+              animationDelay: `${index * 50}ms`,
+              animationDuration: "600ms",
+              animationFillMode: "both",
+            }}>
               <StyledTableCell align="left">
                 <div className='flex gap-3 items-center'>
                   <div className={`w-[8px] h-[32px] rounded-lg flex-shrink-0`}
