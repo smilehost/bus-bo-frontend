@@ -12,7 +12,7 @@ type FilterProps = {
 }
 
 type FormFilterProps = {
-    setSearch?: React.Dispatch<React.SetStateAction<string>>;
+    setSearch: (value: string) => void;
     placeholderSearch?: string
     filter: FilterProps[];
 }
