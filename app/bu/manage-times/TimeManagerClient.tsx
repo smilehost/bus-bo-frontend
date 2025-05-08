@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Model/TimeModal";
 import { useTimeStore } from "@/stores/timeStore";
@@ -10,28 +10,57 @@ import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
 function Page() {
-  const {
-    times,
-    total,
-    isLoading,
-    getTimes,
-    createTime,
-    updateTime,
-    deleteTime,
-  } = useTimeStore();
+  const { times, getTimes, createTime, updateTime, deleteTime } =
+    useTimeStore();
 
+  const [filteredTimes, setFilteredTimes] = useState<TimeItem[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [filteredTimes, setFilteredTimes] = useState(times); // State สำหรับผลลัพธ์การค้นหา
   const [showModal, setShowModal] = useState(false);
-  const [editingTime, setEditingTime] = useState<
-    ((typeof times)[0] & { times?: string[]; startTime?: string }) | undefined
-  >(undefined);
+  // Define the interface for the time item
+  interface TimeItem {
+    id: number;
+    name: string;
+    schedule: string[];
+    times?: string[];
+    startTime?: string;
+  }
+
+  const [editingTime, setEditingTime] = useState<TimeItem | undefined>(
+    undefined
+  );
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+
+  const fetchTimes = async () => {
+    setIsLoading(true);
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
+    try {
+      await getTimes(currentPage, rowsPerPage);
+    } catch (error) {
+      console.error("Failed to load data", error);
+    }
+    cancelSkeleton();
+    setIsLoading(false);
+    setIsLoadingskeleton(false);
+  };
+
+  const filterTimes = useCallback(() => {
+    let tempTimes = [...times];
+    if (debouncedSearch) {
+      tempTimes = tempTimes.filter((time) =>
+        time.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+    setFilteredTimes(tempTimes);
+    setTotalResults(tempTimes.length);
+  }, [times, debouncedSearch]);
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -41,15 +70,12 @@ function Page() {
   );
 
   useEffect(() => {
-    getTimes(currentPage, rowsPerPage);
+    fetchTimes();
   }, [currentPage, rowsPerPage]);
 
   useEffect(() => {
-    const filtered = times.filter((time) =>
-      time.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-    setFilteredTimes(filtered);
-  }, [debouncedSearch, times]);
+    filterTimes();
+  }, [debouncedSearch, times, filterTimes]);
 
   const handleAddTime = () => {
     setEditingTime(undefined);
@@ -104,7 +130,7 @@ function Page() {
         });
       }
       setShowModal(false);
-      getTimes(currentPage, rowsPerPage);
+      fetchTimes();
     } catch (error) {
       console.error("Save Time error:", error);
       await Alert({
@@ -133,7 +159,7 @@ function Page() {
         text: "Time deleted successfully",
         type: "success",
       });
-      getTimes(currentPage, rowsPerPage);
+      fetchTimes();
     } catch (error) {
       console.error("Delete Time error:", error);
       await Alert({
@@ -163,51 +189,47 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        <>
-          {/* <PageHeader onAddTime={handleAddTime} /> */}
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-            <TitlePage
-              title="Manage Time"
-              description="View and manage time information"
-            />
-            <ButtonBG
-              size="h-[38px]"
-              text="Add New Time"
-              icon="/icons/plus.svg"
-              onClick={handleAddTime}
-            />
-          </div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          <TitlePage
+            title="Manage Time"
+            description="View and manage time information"
+          />
+          <ButtonBG
+            size="h-[38px]"
+            text="Add New Time"
+            icon="/icons/plus.svg"
+            onClick={handleAddTime}
+          />
+        </div>
 
-          <div className="bg-white rounded-md shadow p-5">
-            {/* Search input */}
-            <div className="flex justify-between mb-4">
-              <input
-                type="text"
-                placeholder="Search by name..."
-                className="border p-2 rounded-md w-full"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-            </div>
-            {isLoadingskeleton ? (
-              <SkeletonManageTime rows={5} />
-            ) : (
-              <TimeTable
-                times={paginatedTimes.map((time) => ({
-                  ...time,
-                }))}
-                onEdit={handleEditTime}
-                onDelete={handleDeleteTime}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                totalResults={filteredTimes.length}
-                isLoading={isLoading}
-              />
-            )}
+        <div className="bg-white rounded-md shadow p-5">
+          <div className="flex justify-between mb-4">
+            <input
+              type="text"
+              placeholder="Search by name..."
+              className="border p-2 rounded-md w-full"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
-        </>
+          {isLoadingskeleton ? (
+            <SkeletonManageTime rows={5} />
+          ) : (
+            <TimeTable
+              times={paginatedTimes.map((time) => ({
+                ...time,
+              }))}
+              onEdit={handleEditTime}
+              onDelete={handleDeleteTime}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              totalResults={totalResults}
+              isLoading={isLoading}
+            />
+          )}
+        </div>
       </div>
 
       {showModal && (

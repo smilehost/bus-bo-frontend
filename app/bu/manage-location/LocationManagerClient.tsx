@@ -13,30 +13,64 @@ import { debounce } from "@/utils/debounce";
 import { useLocationStore } from "@/stores/locationStore";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
+// Define interfaces for location data
+interface Location {
+  id: number;
+  name: string;
+  lat: string;
+  long: string;
+}
+
+interface LocationFormData {
+  name: string;
+  latitude: number;
+  longitude: number;
+}
+
 function Page() {
   const {
     locations,
-    total,
-    isLoading,
     getLocations,
     createLocation,
     updateLocation,
     deleteLocation,
   } = useLocationStore();
 
+  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<any>(undefined);
+  const [editingLocation, setEditingLocation] = useState<Location | undefined>(
+    undefined
+  );
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
-  const fetchData = async () => {
+  const fetchLocations = async () => {
+    setIsLoading(true);
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    await getLocations(currentPage, rowsPerPage);
+    try {
+      await getLocations(currentPage, rowsPerPage);
+    } catch (error) {
+      console.error("Failed to load data", error);
+    }
     cancelSkeleton();
+    setIsLoading(false);
   };
+
+  const filterLocations = useCallback(() => {
+    let tempLocations = [...locations];
+    if (debouncedSearch) {
+      tempLocations = tempLocations.filter((location) =>
+        location.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+    setFilteredLocations(tempLocations);
+    setTotalResults(tempLocations.length);
+  }, [locations, debouncedSearch]);
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -46,8 +80,12 @@ function Page() {
   );
 
   useEffect(() => {
-    fetchData();
+    fetchLocations();
   }, [currentPage, rowsPerPage]);
+
+  useEffect(() => {
+    filterLocations();
+  }, [debouncedSearch, locations, filterLocations]);
 
   const handleAddLocation = () => {
     setEditingLocation(undefined);
@@ -62,11 +100,7 @@ function Page() {
     }
   };
 
-  const handleSaveLocation = async (data: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  }) => {
+  const handleSaveLocation = async (data: LocationFormData) => {
     const location = {
       id: editingLocation?.id || 0,
       name: data.name,
@@ -103,7 +137,7 @@ function Page() {
         });
       }
       setShowModal(false);
-      fetchData();
+      fetchLocations();
     } catch (error) {
       console.error("Save Location error:", error);
       await Alert({
@@ -132,7 +166,7 @@ function Page() {
         text: "Location deleted.",
         type: "success",
       });
-      fetchData();
+      fetchLocations();
     } catch (error) {
       console.error("Delete Location error:", error);
       await Alert({
@@ -154,10 +188,6 @@ function Page() {
     setCurrentPage(1);
   };
 
-  const filteredLocations = locations.filter((loc) =>
-    loc.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-  );
-
   const paginatedLocations = filteredLocations.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
@@ -166,52 +196,49 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-7">
-        <>
-          {/* <PageHeader onAddLocation={handleAddLocation} /> */}
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-            <TitlePage
-              title="Manage Location"
-              description="View and manage location information"
-            />
-            <ButtonBG
-              size="h-[38px]"
-              text="Add New Location"
-              icon="/icons/plus.svg"
-              onClick={handleAddLocation}
-            />
-          </div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          <TitlePage
+            title="Manage Location"
+            description="View and manage location information"
+          />
+          <ButtonBG
+            size="h-[38px]"
+            text="Add New Location"
+            icon="/icons/plus.svg"
+            onClick={handleAddLocation}
+          />
+        </div>
 
-          <div className="bg-white rounded-md shadow p-5">
-            <SearchFilter
-              searchTerm={searchTerm}
-              setSearchTerm={(value: string) =>
-                handleSearchChange({
-                  target: { value },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
+        <div className="bg-white rounded-md shadow p-5">
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+          />
+          {isLoadingskeleton ? (
+            <SkeletonLocationTable rows={5} />
+          ) : (
+            <LocationTable
+              locations={paginatedLocations.map((location) => ({
+                id: location.id,
+                name: location.name,
+                latitude: parseFloat(location.lat),
+                longitude: parseFloat(location.long),
+              }))}
+              onEdit={handleEditLocation}
+              onDelete={handleDeleteLocation}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              totalResults={totalResults}
+              isLoading={isLoading}
             />
-            {isLoadingskeleton ? (
-              <SkeletonLocationTable rows={5} />
-            ) : (
-              <LocationTable
-                locations={paginatedLocations.map((location) => ({
-                  id: location.id,
-                  name: location.name,
-                  latitude: parseFloat(location.lat),
-                  longitude: parseFloat(location.long),
-                }))}
-                onEdit={handleEditLocation}
-                onDelete={handleDeleteLocation}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                totalResults={filteredLocations.length}
-                isLoading={isLoading}
-              />
-            )}
-          </div>
-        </>
+          )}
+        </div>
       </div>
 
       {showModal && (
