@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 import FormFilter from "@/app/components/Filter/FormFilter";
@@ -15,6 +15,8 @@ import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
 import { STATUS, FILTER } from "@/constants/enum";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
+import { debounce } from "@/utils/debounce"; 
+import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 
 function Page() {
   const { companyData } = useCompanyStore();
@@ -29,14 +31,23 @@ function Page() {
   const [searchStatus, setSearchStatus] = useState<string>("");
   const [searchCompany, setSearchCompany] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search); // ✅ state เพิ่มเติม
 
   const [memberModelOpen, setMemberModelOpen] = useState(false);
   const [isEditStatusOpen, setEditStatusOpen] = useState(false);
   const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string | null>(null);
-  const [editingMember, setEditingMember] = useState<any>(null); // เก็บข้อมูลสมาชิกที่กำลังแก้ไข
-  const [isSubmitting, setIsSubmitting] = useState(false); // เพิ่มสถานะการประมวลผล
+  const [editingMember, setEditingMember] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ✅ debounce function
+  const debouncedFetch = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 350),
+    []
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
@@ -54,9 +65,11 @@ function Page() {
       searchCompany && searchCompany !== FILTER.ALL_COMPANIES
         ? companyName.toLowerCase().includes(searchCompany.toLowerCase())
         : true;
-    const matchSearch = search
-      ? item.member_name.toLowerCase().includes(search.toLowerCase()) ||
-        item.member_phone.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = debouncedSearch
+      ? item.member_name
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase()) ||
+        item.member_phone.toLowerCase().includes(debouncedSearch.toLowerCase())
       : true;
     return matchStatus && matchCompany && matchSearch;
   });
@@ -93,12 +106,9 @@ function Page() {
     name: string;
     phone: string;
   }) => {
-    if (isSubmitting) return; // ป้องกันการส่งข้อมูลซ้ำ
+    if (isSubmitting) return;
     setIsSubmitting(true);
-
-    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setMemberModelOpen(false);
-
     try {
       const isConfirmed = await Confirm({
         title: "Confirm Create",
@@ -107,12 +117,7 @@ function Page() {
         cancelText: "Cancel",
         type: "question",
       });
-
-      if (!isConfirmed) {
-        setIsSubmitting(false);
-        return;
-      }
-
+      if (!isConfirmed) return;
       const newMember = {
         id: String(Date.now()),
         member_name: name,
@@ -122,16 +127,13 @@ function Page() {
         member_tripsTotal: 0,
         member_lastTransaction: "-",
       };
-
       setMembers((prev) => [...prev, newMember]);
-
       await Alert({
         title: "Created!",
         text: "Member created successfully",
         type: "success",
       });
-    } catch (error) {
-      console.error("Create Member error:", error);
+    } catch (err) {
       await Alert({
         title: "Error!",
         text: "Failed to create member.",
@@ -151,12 +153,9 @@ function Page() {
     name: string;
     phone: string;
   }) => {
-    if (isSubmitting) return; // ป้องกันการส่งข้อมูลซ้ำ
+    if (isSubmitting) return;
     setIsSubmitting(true);
-
-    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setMemberModelOpen(false);
-
     try {
       const isConfirmed = await Confirm({
         title: "Confirm Update",
@@ -165,12 +164,7 @@ function Page() {
         cancelText: "Cancel",
         type: "question",
       });
-
-      if (!isConfirmed) {
-        setIsSubmitting(false);
-        return;
-      }
-
+      if (!isConfirmed) return;
       setMembers((prev) =>
         prev.map((m) =>
           m.id === String(id)
@@ -178,14 +172,12 @@ function Page() {
             : m
         )
       );
-
       await Alert({
         title: "Updated!",
         text: "Member updated successfully",
         type: "success",
       });
-    } catch (error) {
-      console.error("Edit Member error:", error);
+    } catch (err) {
       await Alert({
         title: "Error!",
         text: "Failed to update member.",
@@ -199,10 +191,7 @@ function Page() {
   const handleEditStatus = async (newStatus: string) => {
     if (selectedMemberId === null || isSubmitting) return;
     setIsSubmitting(true);
-
-    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setEditStatusOpen(false);
-
     try {
       const isConfirmed = await Confirm({
         title: "Confirm Status Change",
@@ -211,12 +200,7 @@ function Page() {
         cancelText: "Cancel",
         type: "question",
       });
-
-      if (!isConfirmed) {
-        setIsSubmitting(false);
-        return;
-      }
-
+      if (!isConfirmed) return;
       setMembers((prev) =>
         prev.map((m) =>
           m.id === String(selectedMemberId)
@@ -224,17 +208,15 @@ function Page() {
             : m
         )
       );
-
       await Alert({
         title: "Updated!",
         text: "Member status updated successfully",
         type: "success",
       });
-    } catch (error) {
-      console.error("Edit Status error:", error);
+    } catch (err) {
       await Alert({
         title: "Error!",
-        text: "Failed to update member status.",
+        text: "Failed to update status.",
         type: "error",
       });
     } finally {
@@ -245,10 +227,7 @@ function Page() {
   const handleEditPassword = async (newPassword: string) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-
-    // ปิด Modal ก่อนเพื่อไม่ให้เกิดการซ้อนทับ UI
     setEditPasswordOpen(false);
-
     try {
       const isConfirmed = await Confirm({
         title: "Confirm Password Change",
@@ -257,21 +236,14 @@ function Page() {
         cancelText: "Cancel",
         type: "question",
       });
-
-      if (!isConfirmed) {
-        setIsSubmitting(false);
-        return;
-      }
-
+      if (!isConfirmed) return;
       console.log("Updated password:", newPassword);
-
       await Alert({
         title: "Updated!",
         text: "Password updated successfully",
         type: "success",
       });
-    } catch (error) {
-      console.error("Edit Password error:", error);
+    } catch (err) {
       await Alert({
         title: "Error!",
         text: "Failed to update password.",
@@ -292,108 +264,115 @@ function Page() {
   };
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <TitlePage
-          title="Manage Members"
-          description="View and manage customer information"
-        />
-        <ButtonBG
-          text="Add New Member"
-          icon="/icons/plus.svg"
-          onClick={() => {
-            setEditingMember(null); // รีเซ็ตข้อมูลการแก้ไข
-            setMemberModelOpen(true);
+    <div className="flex h-screen bg-gray-100">
+      <div className="flex-1 flex flex-col p-0">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          <TitlePage
+            title="Manage Members"
+            description="View and manage customer information"
+          />
+          <ButtonBG
+            text="Add New Member"
+            icon="/icons/plus.svg"
+            onClick={() => {
+              setEditingMember(null);
+              setMemberModelOpen(true);
+            }}
+            size="h-[38px]"
+            disbled={isSubmitting}
+          />
+        </div>
+
+        <div className="bg-white rounded-md shadow p-5">
+          <SearchFilter
+            searchTerm={search}
+            setSearchTerm={(e) => {
+              const value = typeof e === "string" ? e : e.target.value;
+              setSearch(value);
+              debouncedFetch(value);
+            }}
+            statusFilter={searchStatus}
+            setStatusFilter={setSearchStatus}
+            companyFilter={searchCompany} // ✅ ส่งค่า companyFilter
+            setCompanyFilter={setSearchCompany} // ✅ ส่งฟังก์ชัน setCompanyFilter
+          />
+
+          {isLoadingskeleton ? (
+            <SkeletonMemberPage rows={5} />
+          ) : (
+            <MemberTable
+              members={paginatedMembers.map((m) => ({
+                id: Number(m.id),
+                name: m.member_name,
+                tel: m.member_phone,
+                status: m.member_status,
+                company: getCompanyName({ id: m.member_company_id }),
+                tripsTotal: m.member_tripsTotal,
+                lastTransaction: m.member_lastTransaction,
+              }))}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              totalResults={totalResults}
+              onEditStatus={(id, status) => {
+                if (!isSubmitting) {
+                  setSelectedMemberId(id);
+                  setCurrentStatus(status);
+                  setEditStatusOpen(true);
+                }
+              }}
+              onEditPassword={(id) => {
+                if (!isSubmitting) {
+                  setSelectedMemberId(id);
+                  setEditPasswordOpen(true);
+                }
+              }}
+              onEditMember={(id) => {
+                if (!isSubmitting) {
+                  const memberToEdit = members.find((m) => m.id === String(id));
+                  if (memberToEdit) {
+                    setEditingMember({
+                      id: Number(memberToEdit.id),
+                      name: memberToEdit.member_name,
+                      phone: memberToEdit.member_phone,
+                    });
+                    setMemberModelOpen(true);
+                  }
+                }
+              }}
+            />
+          )}
+        </div>
+
+        <MemberModel
+          open={memberModelOpen}
+          onClose={() => !isSubmitting && setMemberModelOpen(false)}
+          onHandle={async (member) => {
+            if (member.id) {
+              await handleEditMember({ ...member, id: member.id as number });
+            } else {
+              await handleNewMember(member);
+            }
           }}
-          size="h-[38px]"
-          disbled={isSubmitting}
+          editingMember={editingMember}
+        />
+
+        <EditStatusModel
+          open={isEditStatusOpen}
+          onClose={() => !isSubmitting && setEditStatusOpen(false)}
+          currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
+          onSave={handleEditStatus}
+        />
+
+        <EditPasswordModel
+          open={isEditPasswordOpen}
+          onClose={() => !isSubmitting && setEditPasswordOpen(false)}
+          onSave={handleEditPassword}
         />
       </div>
-
-      <FormFilter
-        setSearch={setSearch}
-        placeholderSearch="Search by phone or name..."
-        filter={filterSearch}
-      />
-
-      {isLoadingskeleton ? (
-        <SkeletonMemberPage rows={5} />
-      ) : (
-        <MemberTable
-          members={paginatedMembers.map((m) => ({
-            id: Number(m.id),
-            name: m.member_name,
-            tel: m.member_phone,
-            status: m.member_status,
-            company: getCompanyName({ id: m.member_company_id }),
-            tripsTotal: m.member_tripsTotal,
-            lastTransaction: m.member_lastTransaction,
-          }))}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          totalResults={totalResults}
-          onEditStatus={(id, status) => {
-            if (!isSubmitting) {
-              setSelectedMemberId(id);
-              setCurrentStatus(status);
-              setEditStatusOpen(true);
-            }
-          }}
-          onEditPassword={(id) => {
-            if (!isSubmitting) {
-              setSelectedMemberId(id);
-              setEditPasswordOpen(true);
-            }
-          }}
-          onEditMember={(id) => {
-            if (!isSubmitting) {
-              const memberToEdit = members.find((m) => m.id === String(id));
-              if (memberToEdit) {
-                setEditingMember({
-                  id: Number(memberToEdit.id),
-                  name: memberToEdit.member_name,
-                  phone: memberToEdit.member_phone,
-                });
-                setMemberModelOpen(true);
-              }
-            }
-          }}
-          // {/* isSubmitting={isSubmitting} */}
-        />
-      )}
-
-      <MemberModel
-        open={memberModelOpen}
-        onClose={() => !isSubmitting && setMemberModelOpen(false)}
-        onHandle={async (member) => {
-          if (member.id) {
-            await handleEditMember({ ...member, id: member.id as number });
-          } else {
-            await handleNewMember(member);
-          }
-        }}
-        editingMember={editingMember}
-        // isSubmitting={isSubmitting}
-      />
-
-      <EditStatusModel
-        open={isEditStatusOpen}
-        onClose={() => !isSubmitting && setEditStatusOpen(false)}
-        currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
-        onSave={handleEditStatus}
-        // isSubmitting={isSubmitting}
-      />
-
-      <EditPasswordModel
-        open={isEditPasswordOpen}
-        onClose={() => !isSubmitting && setEditPasswordOpen(false)}
-        onSave={handleEditPassword}
-        // isSubmitting={isSubmitting}
-      />
-    </>
+    </div>
   );
 }
 

@@ -158,7 +158,7 @@ const Pagination: React.FC<PaginationProps> = ({
         </label>
         <select
           id="rows-per-page"
-          className="border border-gray-300 rounded-md text-gray-700 px-3 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          className="border border-gray-300 rounded-md text-gray-700 px-3 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
           value={rowsPerPage}
           onChange={onRowsPerPageChange}
         >

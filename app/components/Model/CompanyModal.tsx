@@ -2,39 +2,41 @@
 
 import React, { useEffect, useState } from "react";
 
+type CompanyFormData = {
+  name: string;
+  status: "Active" | "Inactive";
+};
+
 type CompanyModalProps = {
-  isOpen: boolean;
   onClose: () => void;
-  onAdd: (name: string, status: "Active" | "Inactive") => void;
-  newCompanyName: string;
-  setNewCompanyName: (value: string) => void;
-  editingCompanyStatus?: "Active" | "Inactive";
+  onSave: (data: CompanyFormData) => void;
+  editingCompany?: CompanyFormData;
 };
 
 export default function CompanyModal({
-  isOpen,
   onClose,
-  onAdd,
-  newCompanyName,
-  setNewCompanyName,
-  editingCompanyStatus = "Active",
+  onSave,
+  editingCompany,
 }: CompanyModalProps) {
-  const [status, setStatus] = useState<"Active" | "Inactive">(
-    editingCompanyStatus
-  );
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState<"Active" | "Inactive">("Active");
 
   useEffect(() => {
-    setStatus(editingCompanyStatus || "Active");
-  }, [editingCompanyStatus]);
-
-  if (!isOpen) return null;
+    if (editingCompany) {
+      setName(editingCompany.name);
+      setStatus(editingCompany.status);
+    } else {
+      setName("");
+      setStatus("Active");
+    }
+  }, [editingCompany]);
 
   const handleSave = () => {
-    if (!newCompanyName.trim()) {
+    if (!name.trim()) {
       alert("Please enter a valid company name.");
       return;
     }
-    onAdd(newCompanyName, status);
+    onSave({ name, status });
   };
 
   return (
@@ -48,7 +50,7 @@ export default function CompanyModal({
         </button>
 
         <h2 className="text-xl font-semibold text-center mb-6">
-          {editingCompanyStatus ? "Edit Company" : "Add New Company"}
+          {editingCompany ? "Edit Company" : "Add New Company"}
         </h2>
 
         <div className="space-y-4">
@@ -58,8 +60,8 @@ export default function CompanyModal({
             </label>
             <input
               type="text"
-              value={newCompanyName}
-              onChange={(e) => setNewCompanyName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Enter Company name"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
@@ -92,7 +94,7 @@ export default function CompanyModal({
               onClick={handleSave}
               className="px-4 py-2 rounded-md bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:opacity-90 cursor-pointer"
             >
-              {editingCompanyStatus ? "Update Company" : "Add Company"}
+              {editingCompany ? "Update Company" : "Add Company"}
             </button>
           </div>
         </div>

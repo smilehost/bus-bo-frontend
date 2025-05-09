@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Model/TimeModal";
+import SearchFilter from "@/app/components/SearchFilter/TimeSearchFilter"; // ✅ Import SearchFilter
 import { useTimeStore } from "@/stores/timeStore";
 import { debounce } from "@/utils/debounce";
 import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
@@ -23,6 +24,7 @@ function Page() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
+
   // Define the interface for the time item
   interface TimeItem {
     id: number;
@@ -203,15 +205,14 @@ function Page() {
         </div>
 
         <div className="bg-white rounded-md shadow p-5">
-          <div className="flex justify-between mb-4">
-            <input
-              type="text"
-              placeholder="Search by name..."
-              className="border p-2 rounded-md w-full"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </div>
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+          />
           {isLoadingskeleton ? (
             <SkeletonManageTime rows={5} />
           ) : (
