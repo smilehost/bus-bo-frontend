@@ -50,6 +50,15 @@ function Page() {
   );
 
   useEffect(() => {
+    setSearch("");
+    setDebouncedSearch("");
+    setSearchStatus(FILTER.ALL_STATUS);
+    setSearchCompany(FILTER.ALL_COMPANIES);
+    setCurrentPage(1);
+  }, []);
+  
+
+  useEffect(() => {
     const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
     return () => clearTimeout(timer);
   }, []);
