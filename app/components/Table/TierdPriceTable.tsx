@@ -283,7 +283,9 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                           !isNaN(matrix[i][j]) ? matrix[i][j].toString() : ''
                         }
                         onChange={(e) => {
-                          const value = parseFloat(e.target.value);
+                          const cleanedValue = e.target.value.replace(/^0+(?!$)/, ''); // ตัด 0 ข้างหน้า
+                          const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue); // ป้องกัน NaN
+                          const value = parseFloat(numericValue);
                           const newMatrix = [...matrix];
                           newMatrix[i][j] = isNaN(value) ? NaN : value;
                           setMatrix(newMatrix);
