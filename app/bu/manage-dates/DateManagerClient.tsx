@@ -215,7 +215,7 @@ export default function DateManagerClient() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col p-7">
+      <div className="flex-1 flex flex-col p-0">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
           <TitlePage
             title="Manage Date"
