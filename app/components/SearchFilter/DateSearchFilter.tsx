@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
 
 interface SearchFilterProps {
@@ -15,6 +17,7 @@ function DateSearchFilter({
   setStatusFilter,
 }: SearchFilterProps) {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const statusRef = useRef<HTMLDivElement>(null);
 
   const clearSearch = () => {
     setSearchTerm({
@@ -22,10 +25,27 @@ function DateSearchFilter({
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
+  // ✅ Detect click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        statusRef.current &&
+        !statusRef.current.contains(event.target as Node)
+      ) {
+        setStatusDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">
       <div className="flex flex-col lg:flex-row justify-between gap-4">
-        {/* Search Input with Icon */}
+        {/* Search Input */}
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
             <Search size={18} />
@@ -47,7 +67,7 @@ function DateSearchFilter({
           )}
         </div>
 
-        {/* Filters Section */}
+        {/* Filter */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-gray-500" />
@@ -55,12 +75,12 @@ function DateSearchFilter({
           </div>
 
           {/* Status Filter */}
-          <div className="relative">
+          <div className="relative" ref={statusRef}>
             <button
               onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
               className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
                 statusFilter !== "All Status"
-                  ? "border-orange-500 bg-orange-50 text-orange-700" // สีส้มเมื่อใช้งาน
+                  ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
               } rounded-lg hover:bg-gray-50 transition-all`}
             >

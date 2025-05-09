@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
 import { useCompanyStore } from "@/stores/companyStore";
 import { STATUS, FILTER } from "@/constants/enum";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
@@ -24,6 +26,9 @@ export default function SearchFilter({
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
 
+  const statusRef = useRef<HTMLDivElement>(null);
+  const companyRef = useRef<HTMLDivElement>(null);
+
   const clearSearch = () => {
     setSearchTerm({
       target: { value: "" },
@@ -38,10 +43,34 @@ export default function SearchFilter({
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
+  // ✅ Detect click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        statusRef.current &&
+        !statusRef.current.contains(event.target as Node)
+      ) {
+        setStatusDropdownOpen(false);
+      }
+
+      if (
+        companyRef.current &&
+        !companyRef.current.contains(event.target as Node)
+      ) {
+        setCompanyDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">
       <div className="flex flex-col lg:flex-row justify-between gap-4">
-        {/* Search Input with Icon */}
+        {/* Search Input */}
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
             <Search size={18} />
@@ -71,12 +100,12 @@ export default function SearchFilter({
           </div>
 
           {/* Status Filter */}
-          <div className="relative">
+          <div className="relative" ref={statusRef}>
             <button
               onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
               className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
                 statusFilter !== FILTER.ALL_STATUS
-                  ? "border-orange-500 bg-orange-50 text-orange-700" // สีส้มเมื่อใช้งาน
+                  ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
               } rounded-lg hover:bg-gray-50 transition-all`}
             >
@@ -117,12 +146,12 @@ export default function SearchFilter({
           </div>
 
           {/* Company Filter */}
-          <div className="relative">
+          <div className="relative" ref={companyRef}>
             <button
               onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
               className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
                 companyFilter !== FILTER.ALL_COMPANIES
-                  ? "border-orange-500 bg-orange-50 text-orange-700" // สีส้มเมื่อใช้งาน
+                  ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
               } rounded-lg hover:bg-gray-50 transition-all`}
             >
@@ -162,7 +191,7 @@ export default function SearchFilter({
             )}
           </div>
 
-          {/* Reset Button - shows only when filters are applied */}
+          {/* Reset Filters */}
           {(statusFilter !== FILTER.ALL_STATUS ||
             companyFilter !== FILTER.ALL_COMPANIES) && (
             <button
