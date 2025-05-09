@@ -2,71 +2,62 @@
 import { create } from 'zustand';
 import { TicketPriceType } from '@/types/types';
 
+import { RouteTicketPriceTypeService } from '@/services/route.ticket.type.service';
+
 type TicketPriceTypeProps = {
     ticketPriceTypeData: TicketPriceType[];
     setData: (newData: TicketPriceType[]) => void;
     addData: (newCompany: TicketPriceType) => void;
     updateData: (id: string, updatedCompany: TicketPriceType) => void;
     deleteData: (id: string) => void;
-    getTypeTicketByCompanyId: (id: string) => TicketPriceType[];
+    getTicketPriceType: () => Promise<TicketPriceType[] | undefined>;
 };
 
 export const useTicketPriceStore = create<TicketPriceTypeProps>((set) => ({
-    ticketPriceTypeData: [
-        {
-            id: "1",
-            name: "Normal",
-            company_id: "1"
-        },
-        {
-            id: "2",
-            name: "Student",
-            company_id: "1"
-        },
-        {
-            id: "3",
-            name: "VIP",
-            company_id: "1"
-        },
-        {
-            id: "4",
-            name: "Vip",
-            company_id: "2"
-        },
-        {
-            id: "5",
-            name: "Super Vip",
-            company_id: "2"
-        },
-    ],
-
-    // ฟังก์ชันการเพิ่มข้อมูล
+    ticketPriceTypeData: [],
+  
+    // เซ็ตข้อมูลใหม่ทั้งหมด
     setData: (newData) => set({ ticketPriceTypeData: newData }),
-
-    // ฟังก์ชันการเพิ่มข้อมูล
-    addData: (newCompany) => set((state) => ({
-        ticketPriceTypeData: [...state.ticketPriceTypeData, newCompany],
+  
+    // เพิ่มข้อมูลใหม่
+    addData: (newItem) => set((state) => ({
+      ticketPriceTypeData: [...state.ticketPriceTypeData, newItem],
     })),
-
-    // ฟังก์ชันการอัปเดตข้อมูล
+  
+    // อัปเดตข้อมูล
     updateData: (id, updatedData) => set((state) => ({
-        ticketPriceTypeData: state.ticketPriceTypeData.map((ticket) =>
-            ticket.id === id ? updatedData : ticket
-        ),
+      ticketPriceTypeData: state.ticketPriceTypeData.map((item) =>
+        item.id === id ? updatedData : item
+      ),
     })),
-
-    // ฟังก์ชันการลบข้อมูล
+  
+    // ลบข้อมูล
     deleteData: (id) => set((state) => ({
-        ticketPriceTypeData: state.ticketPriceTypeData.filter((ticket) => ticket.id !== id),
+      ticketPriceTypeData: state.ticketPriceTypeData.filter((item) => item.id !== id),
     })),
-
-    getTypeTicketByCompanyId: () => [],
-}));
-
-useTicketPriceStore.setState((state) => ({
-    ...state,
-    getTypeTicketByCompanyId: (id: string) => {
-        const { ticketPriceTypeData } = useTicketPriceStore.getState();
-        return ticketPriceTypeData.filter((item) => item.company_id === id);
-    },    
-}));
+  
+    // ดึงข้อมูลจาก API และ map ให้อยู่ใน format ที่ต้องการ
+    getTicketPriceType: async (): Promise<TicketPriceType[] | undefined> => {
+      try {
+        const res = await RouteTicketPriceTypeService.getTicketPriceType() as {
+          result: {
+            route_ticket_price_type_id: number;
+            route_ticket_price_type_name: string;
+            route_ticket_price_type_com_id: number;
+          }[];
+        };
+  
+        const mapped = res.result.map((item) => ({
+          id: item.route_ticket_price_type_id.toString(),
+          name: item.route_ticket_price_type_name,
+          company_id: item.route_ticket_price_type_com_id.toString(),
+        }));
+  
+        set({ ticketPriceTypeData: mapped });
+        return mapped;
+      } catch (error) {
+        console.error("getTicketPriceType error:", error);
+        return undefined;
+      }
+    }
+  }));

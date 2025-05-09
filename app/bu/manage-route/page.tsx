@@ -19,6 +19,7 @@ import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
+import { useTicketStore } from '@/stores/routeTicketStore'
 
 //type
 import { RouteData } from '@/types/types'
@@ -36,6 +37,7 @@ function Page() {
     const { routeData, getRoutes, deleteRoute } = useRouteStore();
     const { times, getTimes } = useTimeStore();
     const { dates, getDates } = useDateStore();
+    const { getTicketByRouteId } = useTicketStore();
 
     const router = useRouter();
     const pathname = usePathname();
@@ -45,6 +47,7 @@ function Page() {
     const [search, setSearch] = useState<string>(''); // Search input
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+    const [ticketByRoute, setTicketByRoute] = useState()
 
     //fetch routes
     const fetchRouteData = async () => {
@@ -69,13 +72,13 @@ function Page() {
     }, [])
 
     useEffect(() => {
-        const pageCurrent = routeData?.page;
-        const pageRows = routeData?.size;
-        setRows(new Array(routeData?.data?.length || 0).fill(null));  // กำหนด array ว่างๆ ที่มีความยาวเท่ากับจำนวนข้อมูลที่มี
-        if (pageCurrent !== currentPage || pageRows !== rowsPerPage) {
-            // ตั้งค่า rows ให้มีความยาวเท่ากับ routeData?.data.length เพื่อป้องกันการยืดหด
-            fetchRouteData(); // ดึงข้อมูลใหม่
-        }
+        // const pageCurrent = routeData?.page;
+        // const pageRows = routeData?.size;
+        // setRows(new Array(routeData?.data?.length || 0).fill(null));  // กำหนด array ว่างๆ ที่มีความยาวเท่ากับจำนวนข้อมูลที่มี
+        // if (pageCurrent !== currentPage || pageRows !== rowsPerPage) {
+        // ตั้งค่า rows ให้มีความยาวเท่ากับ routeData?.data.length เพื่อป้องกันการยืดหด
+        fetchRouteData();
+        // }
     }, [currentPage, rowsPerPage]);
 
     // Function to create data for table
@@ -98,24 +101,34 @@ function Page() {
     useEffect(() => {
         const isReady = routeData?.data?.length && dates.length && times.length;
         if (!isReady) return;
-
-        const newRows = routeData.data.map((item) => {
-            const dateName = dates.find(d => d.id === item.route_date_id)?.name || '';
-            const timeName = times.find(t => t.id === item.route_time_id)?.schedule.join(', ') || '';
-            return createData(
+      
+        const fetchWithTicketCounts = async () => {
+          const newRows = await Promise.all(
+            routeData.data.map(async (item) => {
+              const dateName = dates.find(d => d.id === item.route_date_id)?.name || '';
+              const timeName = times.find(t => t.id === item.route_time_id)?.schedule.join(', ') || '';
+      
+              const tickets = await getTicketByRouteId(item.route_id);
+              const ticketAmount = tickets?.length?.toString() || '0';
+      
+              return createData(
                 item.route_id,
                 item.route_name_en,
                 item.route_com_id,
                 dateName,
                 timeName,
-                "2",
+                ticketAmount,
                 item.route_status,
                 item.route_color
-            );
-        });
-
-        setRows(newRows);
-    }, [routeData?.data, dates, times]);
+              );
+            })
+          );
+      
+          setRows(newRows);
+        };
+      
+        fetchWithTicketCounts();
+      }, [routeData?.data, dates, times]);
 
     // Handle delete route
     const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {

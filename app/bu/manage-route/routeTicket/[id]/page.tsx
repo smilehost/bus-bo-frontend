@@ -23,7 +23,6 @@ import { useUserStore } from '@/stores/userStore'
 
 //type 
 import { TicketProps, TicketPriceType, TicketRoutePrice } from '@/types/types'
-import { Route } from '@/types/types'
 
 //icon
 import { Bolt, Table } from "lucide-react";
@@ -35,6 +34,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import Typography from '@mui/material/Typography';
+import { UpdateRoutePayload } from '@/payloads/route.payload'
 
 export type TicketPriceTypeFixed = {
   id_type: string,
@@ -43,39 +43,16 @@ export type TicketPriceTypeFixed = {
 }
 
 function Page() {
-
   const { updateTicket, addTicket, getTicketByRouteId, getTicketById } = useTicketStore();
   const { getRouteById } = useRouteStore();
-  const { getTypeTicketByCompanyId } = useTicketPriceStore();
-  const { userData } = useUserStore()
+  const { getTicketPriceType } = useTicketPriceStore();
+  const { userData } = useUserStore();
 
   const params = useParams();
+  const routeId = parseInt(params?.id) || '';
 
-  // useEffect(() => {
-  //     handleTestApi();
-  // }, [])
-
-  // const [testApi, setTestApi] = useState();
-  // const handleTestApi = async () => {
-  //     try {
-  //         const response = await axios.get("http://94.237.73.171:8000/api/ticket/priceType", {
-  //             headers: {
-  //                 com_id: `1`
-  //             }
-  //         });
-
-  //         setTestApi(response.data)
-
-  //     } catch (error) {
-  //         console.error("API Error:", error);
-  //     }
-  // };
-  // console.log("testApi: ", testApi)
-
-  //velues
   const [error, setError] = useState<string>('');
-
-  const [routeActive, setRouteActive] = useState<Route>();
+  const [routeActive, setRouteActive] = useState<UpdateRoutePayload>();
   const [tickets, setTickets] = useState<TicketProps[]>();
   const [ticketActive, setTicketActive] = useState<string>();
   const [ticketNameTH, setTicketNameTH] = useState<string>('');
@@ -83,197 +60,211 @@ function Page() {
   const [ticketAmount, setTicketAmount] = useState<string>('');
   const [ticketColor, setTicketColor] = useState<string>('');
   const [ticketType, setTicketType] = useState<TICKET_TYPE>();
-  const [ticketPriceFixed, setTicketPriceFixed] = useState<TicketPriceTypeFixed[]>([])
-  const [ticketPriceList, setTicketPriceList] = useState<TicketRoutePrice[]>([])
-  const [ticketChecked, setTicketChecked] = useState<string[]>([])
+  const [ticketPriceFixed, setTicketPriceFixed] = useState<TicketPriceTypeFixed[]>([]);
+  const [ticketPriceList, setTicketPriceList] = useState<TicketRoutePrice[]>([]);
+  const [ticketChecked, setTicketChecked] = useState<string[]>([]);
   const [ticketTypeList, setTicketTypeList] = useState<TicketPriceType[]>([]);
+  const [newType, setNewType] = useState('');
+  const [activeStep, setActiveStep] = useState(0);
+  const [checkConfirm, setCheckConfirm] = useState(true);
 
-  //get tickets 
-  const routeId = params?.id?.toString() || ''
-  const com_id = userData.company_id
+  // ------------------- UTIL ----------------------
+  const resetTicketForm = () => {
+    setTicketNameTH('');
+    setTicketNameEN('');
+    setTicketAmount('');
+    setTicketColor('');
+    setTicketType(undefined);
+    setTicketPriceList([]);
+    setTicketChecked([]);
+  };
 
-  const getTickets = () => {
-    const ticketData = getTicketByRouteId(routeId)
-    setTickets(ticketData)
-  }
+  const buildFixedPriceList = (): TicketRoutePrice[] => {
+    const stations = routeActive?.route_array.split(',') || [];
+    const ticketPrices: TicketRoutePrice[] = [];
+    let idCounter = 1;
 
-  //Default Ticket
-  useEffect(() => {
-    const routeData = getRouteById(routeId)
-    const priceTypeTemp = getTypeTicketByCompanyId(com_id)
-
-    getTickets()
-    setRouteActive(routeData)
-    setTicketTypeList(priceTypeTemp)
-
-  }, [params, getRouteById, getTicketByRouteId])
-
-  //active ticket
-  useEffect(() => {
-    const ticketId = ticketActive || ''
-    const ticket = getTicketById(ticketId);
-
-    //find price type checked
-    const ticketChecked = Array.from(new Set(
-      ticket?.ticket_price
-        ?.filter((item) =>
-          ticketTypeList.some((type) => type.id === item.ticket_price_type_id)
-        )
-        .map(item => item.ticket_price_type_id)
-    ));
-
-    setTicketChecked(ticketChecked)
-
-    if (!ticketId) {
-      setTicketNameTH("")
-      setTicketNameEN("")
-      setTicketAmount("")
-      setTicketColor("")
-      setTicketType(undefined)
-      setTicketPriceList([])
+    for (let i = 0; i < stations.length - 1; i++) {
+      for (let j = i + 1; j < stations.length; j++) {
+        ticketPriceFixed.forEach((type) => {
+          ticketPrices.push({
+            id: idCounter.toString(),
+            from: stations[i],
+            to: stations[j],
+            price: type.price,
+            ticket_price_type_id: type.id_type,
+            route_ticket_price_id: params.id?.toString() || '',
+          });
+          idCounter++;
+        });
+      }
     }
+    return ticketPrices;
+  };
 
-    if (!ticket) return;
-    setTicketNameTH(ticket?.ticketName_th)
-    setTicketNameEN(ticket?.ticketName_en)
-    setTicketAmount(ticket?.ticket_amount)
-    setTicketColor(ticket?.ticket_color)
-    setTicketType(ticket?.ticket_type)
-    setTicketPriceList(ticket?.ticket_price)
+  // ------------------ DATA FETCH -----------------
+  const fetchTicketByRouteID = async () => {
+    try {
+      const ticketData = await getTicketByRouteId(routeId);
+      setTickets(ticketData);
+      return ticketData; // เผื่อใช้ค่าที่ return ต่อ
+    } catch (error) {
+      console.error("Failed to fetch tickets:", error);
+      return [];
+    }
+  };
 
-  }, [ticketActive])
+  // ดึงข้อมูล default
+  useEffect(() => {
+    const fetchDefaults = async () => {
+      const [routeData, priceTypeTemp] = await Promise.all([
+        getRouteById(routeId),
+        getTicketPriceType()
+      ]);
 
-  const [newType, setNewType] = useState("");
+      await fetchTicketByRouteID(); // ✅ ใช้ฟังก์ชันที่แยกไว้
+
+      setRouteActive(routeData);
+      setTicketTypeList(priceTypeTemp || []);
+    };
+
+    fetchDefaults();
+  }, [routeId]);
+
+  useEffect(() => {
+    const fetchTicket = async () => {
+      if (!ticketActive) {
+        resetTicketForm();
+        return;
+      }
+
+      const ticket = await getTicketById(+ticketActive);
+      if (!ticket) return;
+
+      const checked = Array.from(new Set(
+        ticket.ticket_price?.map(item => item.ticket_price_type_id)
+      ));
+
+      setTicketChecked(checked);
+      setTicketNameTH(ticket.ticketName_th);
+      setTicketNameEN(ticket.ticketName_en);
+      setTicketAmount(ticket.ticket_amount.toString());
+      setTicketColor(ticket.ticket_color);
+      setTicketType(ticket.ticket_type);
+      setTicketPriceList(ticket.ticket_price || []);
+    };
+
+    fetchTicket();
+  }, [ticketActive, ticketTypeList]);
+
+  // ----------------- FORM ACTION ------------------
 
   const handleAddType = () => {
-    if (!newType) {
-      return;
-    }
-    setNewType('')
+    if (!newType) return;
+    setNewType('');
   };
-
-  //Form steps
-  const [activeStep, setActiveStep] = React.useState(0);
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    setCheckConfirm(false)
-    setError('')
+    setActiveStep((prev) => prev - 1);
+    setCheckConfirm(false);
+    setError('');
   };
 
-  //validate click next
   const handleValidateNext = () => {
     if (!ticketNameTH || !ticketNameEN || !ticketAmount || !ticketColor || !ticketType || ticketChecked.length <= 0) {
-      setError("Please fill in completely.")
-      return;
-    }
-
-    setError('')
-
-    //Fixed Price
-    if (ticketType === TICKET_TYPE.FIXED) {
-      const tempTicketPriceFixed = ticketChecked.map((id_type) => ({
-        id_type: id_type,
-        name: ticketTypeList.find((item) => item.id === id_type)?.name || '',
-        price: tickets?.find((ticket) => ticket.id === ticketActive)?.ticket_price?.find((tp) => tp.ticket_price_type_id === id_type)?.price || 0
-      }));
-
-      setTicketPriceFixed(tempTicketPriceFixed);
-    }
-
-    setCheckConfirm(false)
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  }
-
-  //submit ticket
-  const [checkConfirm, setCheckConfirm] = useState(true)
-  const handleSubmit = () => {
-
-    if (!ticketType || !params.id) return;
-
-    //Fixed Price
-    let tempTicketPrice: TicketRoutePrice[] = ticketPriceList.filter((item) => ticketChecked.includes(item.ticket_price_type_id));
-
-    if (ticketType === TICKET_TYPE.FIXED) {
-      const stations = routeActive?.stations
-      if (ticketType === TICKET_TYPE.FIXED && stations && ticketPriceFixed.length > 0) {
-        const ticketPrices: TicketRoutePrice[] = [];
-
-        let idCounter = 1;
-        for (let i = 0; i < stations.length - 1; i++) {
-          for (let j = i + 1; j < stations.length; j++) {
-            const from = stations[i];
-            const to = stations[j];
-
-            // สร้างรายการราคาทุกประเภท
-            ticketPriceFixed.forEach((type) => {
-              ticketPrices.push({
-                id: idCounter.toString(),
-                from: from,
-                to: to,
-                price: type.price,
-                ticket_price_type_id: type.id_type,
-                route_ticket_price_id: params.id?.toString() || '',
-              });
-              idCounter++;
-            });
-          }
-        }
-        tempTicketPrice = ticketPrices;
-      }
-    }
-
-    //Tiered Price
-    if (ticketType === TICKET_TYPE.TIERED) {
-
-    }
-
-    const isValidTicketPrice = tempTicketPrice.every(tp => tp.price && tp.price > 0) && tempTicketPrice.length > 0;
-
-    const isValidTicketPriceType = () => {
-      if (ticketPriceList.length > 0) {
-        return ticketChecked.every((tikketTypeId) => ticketPriceList.some((ticket) => ticket.ticket_price_type_id === tikketTypeId))
-      }
-      return true
-    }
-
-    if (!isValidTicketPrice || !isValidTicketPriceType) {
       setError("Please fill in completely.");
       return;
     }
 
-    setError('')
+    setError('');
 
-    const tempId = ticketActive || ''
-    const tempTicket = {
-      id: tempId,
-      ticketName_th: ticketNameTH,
-      ticketName_en: ticketNameEN,
-      ticket_type: ticketType,
-      ticket_amount: ticketAmount,
-      ticket_color: ticketColor,
-      ticket_price: tempTicketPrice,
-      route_id: params.id.toString()
-    }
-    if (ticketActive) {
-      updateTicket(ticketActive, tempTicket)
-    } else {
-      addTicket(tempTicket)
-      setTicketActive(tempId);
+    if (ticketType === TICKET_TYPE.FIXED) {
+      const tempFixed = ticketChecked.map((id_type) => ({
+        id_type,
+        name: ticketTypeList.find((item) => item.id === id_type)?.name || '',
+        price: ticketPriceList?.find((item) => item.ticket_price_type_id === id_type)?.price || 0
+      }));
+    
+      setTicketPriceFixed(tempFixed);
     }
 
-    getTickets()
-
-    console.log("Submit ticket data");
-    console.log(tempTicket)
+    setCheckConfirm(false);
+    setActiveStep((prev) => prev + 1);
   };
 
-  //update and create TicketPriceList
-  const updateTicketPriceList = (priceTable: TicketRoutePrice[]) => {
+  // console.log("ticketPriceFixed: ", ticketPriceFixed)
 
+  const handleSubmit = async () => {
+    if (!ticketType || !params.id) return;
+
+    let tempTicketPrice: TicketRoutePrice[] = ticketPriceList.filter((item) =>
+      ticketChecked.includes(item.ticket_price_type_id)
+    );
+
+    if (ticketType === TICKET_TYPE.FIXED && ticketPriceFixed.length > 0) {
+      tempTicketPrice = buildFixedPriceList();
+    }
+
+    const isValidTicketPrice = tempTicketPrice.every(tp => tp.price && tp.price > 0) && tempTicketPrice.length > 0;
+    const isValidTicketPriceType = () => {
+      if (ticketPriceList.length > 0) {
+        return ticketChecked.every((id) =>
+          ticketPriceList.some((ticket) => ticket.ticket_price_type_id === id)
+        );
+      }
+      return true;
+    };
+
+    if (!isValidTicketPrice || !isValidTicketPriceType()) {
+      setError("Please fill in completely.");
+      return;
+    }
+
+    setError('');
+
+    const isUpdate = !!ticketActive;
+
+    const formattedPayload = {
+      ...(isUpdate && { route_ticket_id: ticketActive.route_ticket_id }),
+      route_ticket_name_th: ticketNameTH,
+      route_ticket_name_en: ticketNameEN,
+      route_ticket_color: ticketColor,
+      route_ticket_status: 1,
+      route_ticket_route_id: parseInt(params.id),
+      route_ticket_amount: parseInt(ticketAmount),
+      route_ticket_type: ticketType,
+      route_ticket_price: tempTicketPrice.map((item) => ({
+        ...(isUpdate && { route_ticket_price_id: item.route_ticket_price_id }),
+        route_ticket_price_type_id: parseInt(item.ticket_price_type_id),
+        route_ticket_location_start: parseInt(item.from),
+        route_ticket_location_stop: parseInt(item.to),
+        price: item.price.toString(),
+        route_ticket_price_route_id: parseInt(params.id)
+      }))
+    };
+
+    try {
+      if (isUpdate) {
+        console.log("update")
+        console.log("✅ Update Success");
+      } else {
+        await addTicket(formattedPayload); // ใช้ฟังก์ชันเพิ่มใหม่
+        console.log("✅ Create Success");
+      }
+
+      handleBack();
+      resetTicketForm();
+      setTicketActive('');
+      await fetchTicketByRouteID();
+    } catch (error) {
+      console.error("❌ Submit Failed", error);
+    }
+  };
+
+  const updateTicketPriceList = (priceTable: TicketRoutePrice[]) => {
     const updatedList = [...ticketPriceList];
 
-    priceTable?.forEach((newItem) => {
+    priceTable.forEach((newItem) => {
       const index = updatedList.findIndex(
         (oldItem) =>
           oldItem.from === newItem.from &&
@@ -282,24 +273,14 @@ function Page() {
       );
 
       if (index !== -1) {
-        // 🔁 อัปเดตข้อมูลที่มีอยู่
-        updatedList[index] = {
-          ...updatedList[index],
-          ...newItem,
-        };
+        updatedList[index] = { ...updatedList[index], ...newItem };
       } else {
-        // ➕ เพิ่มใหม่
-        updatedList.push({
-          ...newItem,
-        });
+        updatedList.push({ ...newItem });
       }
     });
 
     setTicketPriceList(updatedList);
   };
-
-  // console.log("ticket: ", tickets)
-  // console.log("routeActive: ", routeActive)
 
   return (
     <div>
@@ -428,7 +409,7 @@ function Page() {
                           <React.Fragment key={index}>
                             <TierdPriceTable
                               ticketPrice={ticketPriceByTicketTypePriceId}
-                              stations={routeActive?.stations || []}
+                              stations={routeActive?.route_array.split(',') || []}
                               ticketTypePriceName={ticketTypeList.find((item) => item.id === ticketTypeId)?.name || 'Ticket Price Type'}
                               ticketTypePriceId={ticketTypeId}
                               setError={setError}

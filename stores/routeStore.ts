@@ -51,7 +51,6 @@ export const useRouteStore = create<RouteStore>((set) => ({
     }
   },
 
-
   updateRoute: async (
     id,
     updatedRoute

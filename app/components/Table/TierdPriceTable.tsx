@@ -9,8 +9,8 @@ import ButtonDefault from '@/app/components/Form/ButtonDefault';
 //type 
 import { TicketRoutePrice } from '@/types/types';
 
-//mock
-import { useStationStore } from '@/stores/stationStore';
+//api
+import { useLocationStore } from '@/stores/locationStore';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
@@ -22,7 +22,7 @@ interface TierdPriceTableProps {
 }
 
 function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, setError, handleSaveTable }: TierdPriceTableProps) {
-  const { getStationNameById } = useStationStore();
+  const { getLocationById } = useLocationStore();
 
   //set price เริ่มต้น
   useEffect(() => {
@@ -47,12 +47,23 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
   const [stationName, setStationName] = useState<string[]>([]);
 
   useEffect(() => {
-    const stationNameTemp = stations.map((item) => {
-      return getStationNameById(item)
-    })
+    const fetchStations = async () => {
+      if (!stations || stations.length === 0) return;
 
-    setStationName(stationNameTemp)
-  }, [stations])
+      try {
+        const stationNameTemp = await Promise.all(
+          stations.map((id) => getLocationById(parseInt(id)))
+        );
+
+        setStationName(stationNameTemp.map((s) => s?.route_location_name)); 
+      } catch (error) {
+        console.error('Error loading station names:', error);
+      }
+    };
+
+    fetchStations();
+    
+  }, [stations]);
 
   // const stations = ['A', 'B', 'C', 'D', 'E', 'F'];
 
@@ -87,7 +98,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     const hasRowInput = rowChecked.length > 0 && !!rowValue;
     const hasColInput = colChecked.length > 0 && !!colValue;
-  
+
     if (!hasRowInput && !hasColInput && !changeMatrix) {
       setShowSave(false);
       return;
@@ -143,7 +154,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
             );
 
             updatedPrices.push({
-              id: existing?.id.toString() || '', // ถ้ามีให้ใส่, ถ้าไม่มีจะเป็น undefined
+              route_ticket_price_id: existing?.id ? existing.id.toString() : '', // ตรวจสอบว่า existing?.id เป็น undefined หรือไม่
               from,
               to,
               price,
@@ -161,9 +172,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     if (valid) {
       handleSaveTable(updatedPrices); // ส่งขึ้น parent component
-    } else {
-      setError('Please fill in all The tables.');
-    }
+    } 
   };
 
   //check input
@@ -246,7 +255,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
                     />
-                    <div>{stationName[parseInt(station) - 1]}</div>
+                    <div>{stationName[j +1]}</div>
                   </label>
                 </th>
               ))}
@@ -261,7 +270,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                     checked={rowChecked.includes(i)}
                     onChange={() => toggleCheck(i, 'row')}
                   />
-                  <span>{stationName[parseInt(from) - 1]}</span>
+                  <span className=' max-w-40 xl:max-w-96 custom-ellipsis-style'>{stationName[i]}</span>
                 </td>
                 {stations.slice(1).map((_, j) => (
                   <td key={j} className="border border-gray-200 px-2 py-1 text-center h-14 ">

@@ -33,7 +33,7 @@ export type TicketPriceType = {
 }
 
 export type TicketRoutePrice = {
-    id?: string,
+    id?: number,
     from: string,
     to: string,
     price: number,
@@ -50,7 +50,8 @@ export type TicketProps = {
     ticket_type: TICKET_TYPE;
     ticket_amount: string;
     ticket_color: string;
-    ticket_price: TicketRoutePrice[];
+    ticket_status?: number,
+    ticket_price?: TicketRoutePrice[];
     route_id: string;
 };
 

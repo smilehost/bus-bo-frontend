@@ -12,6 +12,7 @@ interface LocationState {
   createLocation: (location: LocationItem) => Promise<void>;
   updateLocation: (id: number, location: LocationItem) => Promise<void>;
   deleteLocation: (id: number) => Promise<void>;
+  getLocationById: (id: number) => Promise<LocationItem | undefined>;
 }
 
 export const useLocationStore = create<LocationState>((set) => ({
@@ -65,5 +66,15 @@ export const useLocationStore = create<LocationState>((set) => ({
 
   deleteLocation: async (id) => {
     await LocationService.deleteLocation(id);
+  },
+
+  getLocationById: async (id: number): Promise<LocationItem | undefined> => {
+    try {
+      const res = await LocationService.getLocationById(id) as { result: LocationItem };
+      return res.result;
+    } catch (error) {
+      console.error("getRouteById error:", error);
+      return undefined;
+    }
   },
 }));

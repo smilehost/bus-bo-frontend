@@ -48,26 +48,6 @@ function Page() {
 
     }, [params?.id, getRouteById]);
 
-    // useEffect(() => {
-    //     if (params?.id !== undefined) {
-    //         const foundRoute = routeData.find((value) => value.id === params?.id);
-    //         if (foundRoute) {
-    //             const routeIndexData: RouteType = {
-    //                 id: foundRoute.id,
-    //                 route: foundRoute.route,
-    //                 company: foundRoute.company_id,
-    //                 schedule: foundRoute.schedule_id,
-    //                 times: foundRoute.times_id,
-    //                 status: foundRoute.status,
-    //                 routeColor: foundRoute.routeColor,
-    //                 stations: foundRoute.stations
-    //             };
-
-    //             setRouteIndexData(routeIndexData);
-    //         }
-    //     }
-    // }, [params, routeData])
-
     //get location data
     useEffect(() => {
         if (routeIndexData) {
@@ -183,6 +163,7 @@ function Page() {
                 schedule={schedule}
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
+                disable={!!params?.id}
 
             />
         </div>

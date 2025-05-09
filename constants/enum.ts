@@ -16,6 +16,6 @@ export enum FILTER {
 }
 
 export enum TICKET_TYPE {
-    FIXED = "Fixed",
-    TIERED = "Tiered",
+    FIXED = "fix",
+    TIERED = "tier",
 }

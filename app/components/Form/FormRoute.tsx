@@ -37,6 +37,7 @@ type FormRouteProps = {
   schedule: string;
   handleChangeSchedule: (event: SelectChangeEvent<string>) => void;
   handleSubmit: () => void;
+  disable: boolean
 }
 
 function FormRoute({
@@ -54,7 +55,8 @@ function FormRoute({
   handleChangeSchedule,
   handleSubmit,
   setRouteNameTH,
-  routeNameTH
+  routeNameTH,
+  disable = false
 }: FormRouteProps) {
   const router = useRouter();
 
@@ -139,12 +141,13 @@ function FormRoute({
         <p className='text-[16px] font-bold'>Stations</p>
         <p className='text-[12px] text-[#6B7280]'>Add stations in order from start to end</p>
       </div>
-      <div className='border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-sm'>
+      <div className={`${disable ? "custom-disable-bg":"bg-white"} border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-sm`}>
         <DragDrop
           listA={listA}
           setListA={setListA}
           setListB={setListB}
           listB={listB}
+          disable={disable}
         />
       </div>
       <div className='flex flex-col items-end mt-5 '>
@@ -153,7 +156,7 @@ function FormRoute({
         )}
         <div className='mt-3 flex items-center justify-end gap-3'>
           <ButtonDefault size="" text="Cancel" onClick={() => router.back()} />
-          <ButtonBG size="" text="Add Route" onClick={handleValidateSubmit} />
+          <ButtonBG size="" text={`${disable ? "Edit Route": "Add Route"}`} onClick={handleValidateSubmit} />
         </div>
       </div>
     </div>

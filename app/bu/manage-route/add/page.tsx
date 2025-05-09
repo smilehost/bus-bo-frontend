@@ -107,7 +107,7 @@ function Page() {
         const result = await addRoute(payload);
 
         if (result.success) {
-            toast.success("Update route successfully!");
+            toast.success("Create route successfully!");
             router.back();
         } else {
             toast.error(`Error: ${result.message}`);
@@ -134,7 +134,7 @@ function Page() {
                 schedule={schedule}
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
-
+                disable={false}
             />
         </div>
     )
