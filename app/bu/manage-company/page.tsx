@@ -3,10 +3,9 @@
 import CompanyModal from "@/app/components/Model/CompanyModal";
 import SkeletonCompanyTable from "@/app/components/Skeleton/SkeletonCompanyTable";
 import CompanyTable from "@/app/components/Table/CompanyTable";
+import TitlePage from "@/app/components/Title/TitlePage";
+import ButtonBG from "@/app/components/Form/ButtonBG";
 import { useEffect, useState } from "react";
-
-//components
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 
@@ -56,7 +55,6 @@ export default function ManageCompanies() {
     if (!isConfirmed) return;
 
     if (editingCompany) {
-      // Update existing company
       setCompanies((prev) =>
         prev.map((company) =>
           company.id === editingCompany.id
@@ -71,7 +69,6 @@ export default function ManageCompanies() {
       });
       setEditingCompany(null);
     } else {
-      // Add new company
       const newCompany: Company = {
         id: companies.length + 1,
         name,
@@ -120,21 +117,20 @@ export default function ManageCompanies() {
   return (
     <div>
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">Manage Companies</h1>
-          <p className="text-gray-500">View and manage bus companies</p>
-        </div>
-        <button
+        <TitlePage
+          title="Manage Companies"
+          description="View and manage bus companies"
+        />
+        <ButtonBG
+          text="Add New Company"
+          icon="/icons/plus.svg"
           onClick={() => {
             setEditingCompany(null);
             setNewCompanyName("");
             setIsModalOpen(true);
           }}
-          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center justify-center w-full md:w-auto cursor-pointer"
-        >
-          <span className="mr-2 text-xl font-bold">+</span>
-          Add New Company
-        </button>
+          size="h-[38px]"
+        />
       </div>
 
       <div className="mb-4">
