@@ -1,6 +1,6 @@
 // src/stores/date.store.ts
 import { create } from "zustand";
-import { DateItem } from "@/types/date.type";
+import { DateItem } from "@/types/date";
 import { DateService } from "@/services/date.service";
 import { CreateDatePayload, UpdateDatePayload } from "@/payloads/date.payload";
 

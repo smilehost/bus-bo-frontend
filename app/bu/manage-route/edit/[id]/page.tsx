@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 //type
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 import { RouteData } from '@/types/types';
 
 //component 

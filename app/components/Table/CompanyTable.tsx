@@ -4,15 +4,16 @@ import React from "react";
 import Pagination from "../Pagination/Pagination";
 
 type Company = {
-  id: number;
+  id: string;
   name: string;
-  status: "Active" | "Inactive";
+  prefix: string;
+  status: number; // 1 = Active, 0 = Inactive
 };
 
 type CompanyTableProps = {
   companies: Company[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
   currentPage: number;
   onPageChange: (page: number) => void;
   rowsPerPage: number;
@@ -54,6 +55,9 @@ export default function CompanyTable({
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
                   Company Name
                 </th>
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
+                  Prefix
+                </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
                   Status
                 </th>
@@ -65,7 +69,7 @@ export default function CompanyTable({
             <tbody>
               {companies.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-gray-500">
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
                     No companies found
                   </td>
                 </tr>
@@ -85,8 +89,11 @@ export default function CompanyTable({
                     <td className="py-4 px-6 border-b border-gray-200 font-medium text-gray-800">
                       {company.name}
                     </td>
+                    <td className="py-4 px-6 border-b border-gray-200 text-gray-700">
+                      {company.prefix}
+                    </td>
                     <td className="py-4 px-6 border-b border-gray-200 text-center">
-                      {company.status === "Active" ? (
+                      {company.status === 1 ? (
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
                           <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
                           <span>Active</span>

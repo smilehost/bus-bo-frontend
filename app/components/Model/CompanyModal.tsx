@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 
 type CompanyFormData = {
   name: string;
-  status: "Active" | "Inactive";
+  prefix: string;
+  status: number; // 1 = Active, 0 = Inactive
 };
 
 type CompanyModalProps = {
@@ -19,15 +20,18 @@ export default function CompanyModal({
   editingCompany,
 }: CompanyModalProps) {
   const [name, setName] = useState("");
-  const [status, setStatus] = useState<"Active" | "Inactive">("Active");
+  const [prefix, setPrefix] = useState("");
+  const [status, setStatus] = useState(1);
 
   useEffect(() => {
     if (editingCompany) {
       setName(editingCompany.name);
+      setPrefix(editingCompany.prefix);
       setStatus(editingCompany.status);
     } else {
       setName("");
-      setStatus("Active");
+      setPrefix("");
+      setStatus(1);
     }
   }, [editingCompany]);
 
@@ -36,7 +40,7 @@ export default function CompanyModal({
       alert("Please enter a valid company name.");
       return;
     }
-    onSave({ name, status });
+    onSave({ name, prefix, status });
   };
 
   return (
@@ -69,17 +73,28 @@ export default function CompanyModal({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
+              Prefix
+            </label>
+            <input
+              type="text"
+              value={prefix}
+              onChange={(e) => setPrefix(e.target.value)}
+              placeholder="Enter Company prefix (e.g. BST)"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
             </label>
             <select
               value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as "Active" | "Inactive")
-              }
+              onChange={(e) => setStatus(Number(e.target.value))}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value={1}>Active</option>
+              <option value={0}>Inactive</option>
             </select>
           </div>
 

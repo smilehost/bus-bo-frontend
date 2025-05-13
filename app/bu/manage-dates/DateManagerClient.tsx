@@ -10,7 +10,7 @@ import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 import { Alert } from "@/app/components/Dialog/Alert";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
-import { DateItem } from "@/types/date.type";
+import { DateItem } from "@/types/date";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 

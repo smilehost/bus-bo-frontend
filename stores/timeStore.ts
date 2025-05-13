@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { TimeItem } from "@/types/time.type";
+import { TimeItem } from "@/types/time";
 import { TimeService } from "@/services/time.service";
 import { CreateTimePayload, UpdateTimePayload } from "@/payloads/time.payload";
 import { STATUS } from '@/constants/enum';

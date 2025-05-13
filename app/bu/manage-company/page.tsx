@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import CompanyTable from "@/app/components/Table/CompanyTable";
 import CompanyModal from "@/app/components/Model/CompanyModal";
 import SearchFilter from "@/app/components/SearchFilter/CompanySearchFilter";
@@ -11,93 +11,60 @@ import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
 import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
-
-type Company = {
-  id: number;
-  name: string;
-  status: "Active" | "Inactive";
-};
+import { useCompanyStore } from "@/stores/companyStore";
 
 export default function ManageCompaniesPage() {
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
-  const [totalResults, setTotalResults] = useState(0);
+  const {
+    companies,
+    total,
+    isLoading,
+    getCompanies,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+  } = useCompanyStore();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<any | null>(null);
   const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
 
-  const useMockData = true;
-
-  // ✅ เก็บ mock data แบบถาวร
-  const mockRef = useRef<Company[]>([
-    { id: 1, name: "Northern Bus Co.", status: "Active" },
-    { id: 2, name: "Southern Express", status: "Active" },
-    { id: 3, name: "Eastern Transport", status: "Inactive" },
-    
-  ]);
-
   const fetchCompanies = async () => {
-    setIsLoading(true);
     const cancelSkeleton = withSkeletonDelay(setIsLoadingSkeleton);
-    try {
-      if (useMockData) {
-        setCompanies(mockRef.current);
-        setTotalResults(mockRef.current.length);
-      } else {
-        // ใช้ Zustand store หรือ API จริงในอนาคต
-      }
-    } catch (error) {
-      console.error("Failed to load companies:", error);
-    }
+    await getCompanies(currentPage, rowsPerPage, debouncedSearch);
     cancelSkeleton();
-    setIsLoading(false);
   };
-
-  const filterCompanies = useCallback(() => {
-    let temp = [...companies];
-    if (debouncedSearch) {
-      temp = temp.filter((company) =>
-        company.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
-    }
-    setFilteredCompanies(temp);
-    setTotalResults(temp.length);
-  }, [companies, debouncedSearch]);
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
       setDebouncedSearch(value);
-    }, 300),
+    }, 350),
     []
   );
 
   useEffect(() => {
     fetchCompanies();
-  }, [currentPage, rowsPerPage]);
-
-  useEffect(() => {
-    filterCompanies();
-  }, [debouncedSearch, companies]);
+  }, [currentPage, rowsPerPage, debouncedSearch]);
 
   const handleAddCompany = () => {
     setEditingCompany(null);
     setIsModalOpen(true);
   };
 
-  const handleEditCompany = (id: number) => {
-    const company = companies.find((c) => c.id === id);
-    if (company) {
-      setEditingCompany(company);
-      setIsModalOpen(true);
-    }
+  const handleEditCompany = (id: string) => {
+    const found = companies.find((c) => c.id === id);
+    if (found) setEditingCompany(found);
+    setIsModalOpen(true);
   };
 
-  const handleSaveCompany = async (data: { name: string; status: string }) => {
+  const handleSaveCompany = async (data: {
+    name: string;
+    prefix: string;
+    status: number;
+  }) => {
     const isConfirmed = await Confirm({
       title: editingCompany ? "Confirm Update" : "Confirm Create",
       text: editingCompany
@@ -112,27 +79,23 @@ export default function ManageCompaniesPage() {
 
     try {
       if (editingCompany) {
-        mockRef.current = mockRef.current.map((c) =>
-          c.id === editingCompany.id
-            ? {
-                ...c,
-                name: data.name,
-                status: data.status as "Active" | "Inactive",
-              }
-            : c
-        );
+        await updateCompany(editingCompany.id, {
+          id: editingCompany.id,
+          name: data.name,
+          prefix: data.prefix,
+          status: data.status,
+        });
         await Alert({
           title: "Updated!",
           text: "Company updated.",
           type: "success",
         });
       } else {
-        const newCompany: Company = {
-          id: Math.max(...mockRef.current.map((c) => c.id), 0) + 1,
+        await createCompany({
           name: data.name,
-          status: data.status as "Active" | "Inactive",
-        };
-        mockRef.current = [...mockRef.current, newCompany];
+          prefix: data.prefix,
+          status: data.status,
+        });
         await Alert({
           title: "Created!",
           text: "Company created.",
@@ -143,7 +106,7 @@ export default function ManageCompaniesPage() {
       setIsModalOpen(false);
       fetchCompanies();
     } catch (error) {
-      console.error("Save Company error:", error);
+      console.error("Save error:", error);
       await Alert({
         title: "Error!",
         text: "Something went wrong.",
@@ -152,7 +115,7 @@ export default function ManageCompaniesPage() {
     }
   };
 
-  const handleDeleteCompany = async (id: number) => {
+  const handleDeleteCompany = async (id: string) => {
     const isConfirmed = await Confirm({
       title: "Confirm Delete",
       text: "Are you sure you want to delete this company?",
@@ -164,7 +127,7 @@ export default function ManageCompaniesPage() {
     if (!isConfirmed) return;
 
     try {
-      mockRef.current = mockRef.current.filter((c) => c.id !== id);
+      await deleteCompany(id);
       await Alert({
         title: "Deleted!",
         text: "Company deleted.",
@@ -172,7 +135,7 @@ export default function ManageCompaniesPage() {
       });
       fetchCompanies();
     } catch (error) {
-      console.error("Delete Company error:", error);
+      console.error("Delete error:", error);
       await Alert({
         title: "Error!",
         text: "Failed to delete.",
@@ -192,7 +155,10 @@ export default function ManageCompaniesPage() {
     setCurrentPage(1);
   };
 
-  const paginatedCompanies = filteredCompanies.slice(
+  const filtered = companies.filter((c) =>
+    c.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
+  const paginatedCompanies = filtered.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
@@ -233,7 +199,7 @@ export default function ManageCompaniesPage() {
               onPageChange={setCurrentPage}
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleRowsPerPageChange}
-              totalResults={totalResults}
+              totalResults={filtered.length}
               isLoading={isLoading}
             />
           )}
@@ -248,6 +214,7 @@ export default function ManageCompaniesPage() {
             editingCompany
               ? {
                   name: editingCompany.name,
+                  prefix: editingCompany.prefix,
                   status: editingCompany.status,
                 }
               : undefined

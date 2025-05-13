@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 
 //type
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 
 //component 
 import FormRoute from '@/app/components/Form/FormRoute';
