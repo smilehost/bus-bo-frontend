@@ -123,7 +123,7 @@ export default function CompanyTable({
                         </button>
                         <button
                           onClick={() => onDelete(company.id)}
-                          className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
+                          className="hidden p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
                           title="Delete"
                         >
                           <svg

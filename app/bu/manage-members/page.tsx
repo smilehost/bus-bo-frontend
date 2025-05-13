@@ -19,7 +19,7 @@ import { debounce } from "@/utils/debounce";
 import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 
 function Page() {
-  const { companyData } = useCompanyStore();
+  const { companies } = useCompanyStore(); // Replace 'companyData' with the correct property name
   const { membersData } = useMemberStore();
   const { userData } = useUserStore();
 
@@ -31,7 +31,7 @@ function Page() {
   const [searchStatus, setSearchStatus] = useState<string>("");
   const [searchCompany, setSearchCompany] = useState<string>("");
   const [search, setSearch] = useState<string>("");
-  const [debouncedSearch, setDebouncedSearch] = useState(search); // ✅ state เพิ่มเติม
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   const [memberModelOpen, setMemberModelOpen] = useState(false);
   const [isEditStatusOpen, setEditStatusOpen] = useState(false);
@@ -65,7 +65,7 @@ function Page() {
 
   const filtered = members.filter((item) => {
     const companyName =
-      companyData.find((com) => com.id === item.member_company_id)?.name || "";
+      companies.find((com) => com.id === item.member_company_id)?.name || "";
     const matchStatus =
       searchStatus && searchStatus !== FILTER.ALL_STATUS
         ? item.member_status === searchStatus
@@ -90,7 +90,7 @@ function Page() {
     currentPage * rowsPerPage
   );
 
-  const listCompany = companyData.map((item) => item.name);
+  const listCompany = companies.map((item) => item.name);
   const listStatus = [STATUS.ACTIVE, STATUS.INACTIVE, STATUS.CANCELLED];
 
   const filterSearch = [
@@ -269,7 +269,7 @@ function Page() {
   };
 
   const getCompanyName = ({ id }: { id: string }) => {
-    return companyData.find((com) => com.id === id)?.name || "";
+    return companies.find((com) => com.id === id)?.name || "";
   };
 
   return (
