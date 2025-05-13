@@ -3,14 +3,14 @@ import { create } from 'zustand';
 import { TicketProps } from '@/types/types';
 
 import { RouteTicketService } from '@/services/route.ticket.service';
-import { CreateRouteTicketPayload } from '@/payloads/route.ticket.payload';
+import { CreateRouteTicketPayload, UpdateRouteTicketPayload } from '@/payloads/route.ticket.payload';
 
 
 type TicketStore = {
     ticketData: TicketProps[];
     setTicketData: (newData: TicketProps[]) => void;
     addTicket: (newTicket: CreateRouteTicketPayload) => void;
-    updateTicket: (id: string, updatedTicket: TicketProps) => void;
+    updateTicket: (id: number, updatedTicket: UpdateRouteTicketPayload) => Promise<{ success: boolean; message?: string }>
     deleteTicket: (id: string) => void;
     getTicketByRouteId: (id: number) => Promise<TicketProps[] | undefined>;
     getTicketById: (id: number) => Promise<TicketProps | undefined>;
@@ -39,11 +39,29 @@ export const useTicketStore = create<TicketStore>((set) => ({
     },
 
     // ฟังก์ชันการอัปเดตข้อมูล
-    updateTicket: (id, updatedTicket) => set((state) => ({
-        ticketData: state.ticketData.map((ticket) =>
-            ticket.id === id ? updatedTicket : ticket
-        ),
-    })),
+    updateTicket: async (
+        id: number,
+        updatedTicket: UpdateRouteTicketPayload
+    ): Promise<{ success: boolean; message?: string }> => {
+        try {
+            await RouteTicketService.updateTicket(id, updatedTicket);
+
+            // ถ้า API สำเร็จ ค่อยอัปเดตใน state
+            set((state) => ({
+                ticketData: state.ticketData.map((ticket) =>
+                    Number(ticket.id) === id ? { ...ticket, ...updatedTicket } : ticket
+                ),
+            }));
+
+            return { success: true };
+        } catch (error) {
+            console.error("update route error:", error);
+            return {
+                success: false,
+                message: (error as any)?.message || "Unknown error during update",
+            };
+        }
+    },
 
     // ฟังก์ชันการลบข้อมูล
     deleteTicket: (id) => set((state) => ({

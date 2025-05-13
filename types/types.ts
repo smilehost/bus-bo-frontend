@@ -33,12 +33,11 @@ export type TicketPriceType = {
 }
 
 export type TicketRoutePrice = {
-    id?: number,
     from: string,
     to: string,
     price: number,
     ticket_price_type_id: string,
-    route_ticket_price_id: string
+    route_ticket_price_id?: string
 }
 
 export type TicketListProps = { type: string; price: number };

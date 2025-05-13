@@ -24,7 +24,7 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
   }, [search, listA]);
 
   return (
-    <div className={`flex gap-10 justify-center flex-wrap`}>
+    <div className={`flex gap-10 gap-y-20 justify-center flex-wrap`}>
       {/* List A */}
       {!disable && (
         <div className=" p-4  h-[350px] rounded-md w-[200px] lg:w-[350px] xl:w-[434px]">

@@ -11,17 +11,17 @@ import { TicketRoutePrice } from '@/types/types';
 
 //api
 import { useLocationStore } from '@/stores/locationStore';
+import { LocationItem } from '@/types/location.type';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
   stations: string[];
   ticketTypePriceName: string;
   ticketTypePriceId: string;
-  setError: React.Dispatch<React.SetStateAction<string>>;
   handleSaveTable: (value: TicketRoutePrice[]) => void;
 }
 
-function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, setError, handleSaveTable }: TierdPriceTableProps) {
+function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable }: TierdPriceTableProps) {
   const { getLocationById } = useLocationStore();
 
   //set price เริ่มต้น
@@ -51,18 +51,18 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
       if (!stations || stations.length === 0) return;
 
       try {
-        const stationNameTemp = await Promise.all(
-          stations.map((id) => getLocationById(parseInt(id)))
-        );
+        const stationNameTemp = (
+          await Promise.all(stations.map((id) => getLocationById(parseInt(id))))
+        ).filter((s): s is LocationItem => s !== undefined);
 
-        setStationName(stationNameTemp.map((s) => s?.route_location_name)); 
+        setStationName(stationNameTemp.map((s) => s?.name));
       } catch (error) {
         console.error('Error loading station names:', error);
       }
     };
 
     fetchStations();
-    
+
   }, [stations]);
 
   // const stations = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -154,7 +154,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
             );
 
             updatedPrices.push({
-              route_ticket_price_id: existing?.id ? existing.id.toString() : '', // ตรวจสอบว่า existing?.id เป็น undefined หรือไม่
+              route_ticket_price_id: existing?.route_ticket_price_id ? existing.route_ticket_price_id.toString() : '', // ตรวจสอบว่า existing?.id เป็น undefined หรือไม่
               from,
               to,
               price,
@@ -172,7 +172,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     if (valid) {
       handleSaveTable(updatedPrices); // ส่งขึ้น parent component
-    } 
+    }
   };
 
   //check input
@@ -199,7 +199,6 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
     }
     return false;
   };
-  //แก้เงื่อนไขการกด save table ต่อ อย่าลืมซ่อน confirm อีก
 
   return (
     <div >
@@ -255,7 +254,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
                     />
-                    <div>{stationName[j +1]}</div>
+                    <div>{stationName[j + 1]}</div>
                   </label>
                 </th>
               ))}
@@ -277,15 +276,16 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                     {j >= i ? (
                       <input
                         type="number"
-                        className={`custom-border-gray rounded-md px-1 py-0.5 w-16 text-center ${errorMatrix[i][j] ? 'border-red-500 bg-red-100' : ''
-                          }`}
+                        // className={`custom-border-gray rounded-md px-1 py-0.5 w-16 text-center ${errorMatrix[i][j] ? 'border-red-500 bg-red-100' : ''
+                        //   }`}
+                        className={`custom-border-gray rounded-md px-1 py-0.5 w-16 text-center `}
                         value={
                           !isNaN(matrix[i][j]) ? matrix[i][j].toString() : ''
                         }
                         onChange={(e) => {
                           const cleanedValue = e.target.value.replace(/^0+(?!$)/, ''); // ตัด 0 ข้างหน้า
                           const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue); // ป้องกัน NaN
-                          const value = parseFloat(numericValue);
+                          const value = Number(numericValue);
                           const newMatrix = [...matrix];
                           newMatrix[i][j] = isNaN(value) ? NaN : value;
                           setMatrix(newMatrix);
