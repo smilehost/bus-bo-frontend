@@ -108,7 +108,7 @@ export default function SearchFilter({
           <div className="relative" ref={statusRef}>
             <button
               onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
+              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${
                 statusFilter !== FILTER.ALL_STATUS
                   ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
@@ -154,7 +154,7 @@ export default function SearchFilter({
           <div className="relative" ref={companyRef}>
             <button
               onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
-              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
+              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${
                 companyFilter !== FILTER.ALL_COMPANIES
                   ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
