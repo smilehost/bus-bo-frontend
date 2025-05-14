@@ -38,25 +38,25 @@ export type TicketPriceType = {
 };
 
 export type TicketRoutePrice = {
-  id?: string;
-  from: string;
-  to: string;
-  price: number;
-  ticket_price_type_id: string;
-  route_ticket_price_id: string;
-};
+    from: string,
+    to: string,
+    price: number,
+    ticket_price_type_id: string,
+    route_ticket_price_id?: string
+}
 
 export type TicketListProps = { type: string; price: number };
 
 export type TicketProps = {
-  id?: string;
-  ticketName_th: string;
-  ticketName_en: string;
-  ticket_type: TICKET_TYPE;
-  ticket_amount: string;
-  ticket_color: string;
-  ticket_price: TicketRoutePrice[];
-  route_id: string;
+    id?: string;
+    ticketName_th: string;
+    ticketName_en: string;
+    ticket_type: TICKET_TYPE;
+    ticket_amount: string;
+    ticket_color: string;
+    ticket_status?: number,
+    ticket_price?: TicketRoutePrice[];
+    route_id: string;
 };
 
 export type Member = {

@@ -9,20 +9,20 @@ import ButtonDefault from '@/app/components/Form/ButtonDefault';
 //type 
 import { TicketRoutePrice } from '@/types/types';
 
-//mock
-import { useStationStore } from '@/stores/stationStore';
+//api
+import { useLocationStore } from '@/stores/locationStore';
+import { LocationItem } from '@/types/location.type';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
   stations: string[];
   ticketTypePriceName: string;
   ticketTypePriceId: string;
-  setError: React.Dispatch<React.SetStateAction<string>>;
   handleSaveTable: (value: TicketRoutePrice[]) => void;
 }
 
-function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, setError, handleSaveTable }: TierdPriceTableProps) {
-  const { getStationNameById } = useStationStore();
+function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable }: TierdPriceTableProps) {
+  const { getLocationById } = useLocationStore();
 
   //set price เริ่มต้น
   useEffect(() => {
@@ -47,14 +47,23 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
   const [stationName, setStationName] = useState<string[]>([]);
 
   useEffect(() => {
-    const stationNameTemp = stations.map((item) => {
-      return getStationNameById(item)
-    })
+    const fetchStations = async () => {
+      if (!stations || stations.length === 0) return;
 
-    setStationName(stationNameTemp)
-  }, [stations])
+      try {
+        const stationNameTemp = (
+          await Promise.all(stations.map((id) => getLocationById(parseInt(id))))
+        ).filter((s): s is LocationItem => s !== undefined);
 
-  // const stations = ['A', 'B', 'C', 'D', 'E', 'F'];
+        setStationName(stationNameTemp.map((s) => s?.name));
+      } catch (error) {
+        console.error('Error loading station names:', error);
+      }
+    };
+
+    fetchStations();
+
+  }, [stations]);
 
   const [rowChecked, setRowChecked] = useState<number[]>([]);
   const [colChecked, setColChecked] = useState<number[]>([]);
@@ -87,7 +96,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     const hasRowInput = rowChecked.length > 0 && !!rowValue;
     const hasColInput = colChecked.length > 0 && !!colValue;
-  
+
     if (!hasRowInput && !hasColInput && !changeMatrix) {
       setShowSave(false);
       return;
@@ -143,7 +152,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
             );
 
             updatedPrices.push({
-              id: existing?.id.toString() || '', // ถ้ามีให้ใส่, ถ้าไม่มีจะเป็น undefined
+              route_ticket_price_id: existing?.route_ticket_price_id ? existing.route_ticket_price_id.toString() : '', // ตรวจสอบว่า existing?.id เป็น undefined หรือไม่
               from,
               to,
               price,
@@ -161,8 +170,6 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     if (valid) {
       handleSaveTable(updatedPrices); // ส่งขึ้น parent component
-    } else {
-      setError('Please fill in all The tables.');
     }
   };
 
@@ -190,8 +197,8 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
     }
     return false;
   };
-  //แก้เงื่อนไขการกด save table ต่อ อย่าลืมซ่อน confirm อีก
 
+  // console.log("ticketPrice: ", ticketPrice)
   return (
     <div >
       <p className='mb-2 font-medium'>{ticketTypePriceName}</p>
@@ -246,7 +253,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
                     />
-                    <div>{stationName[parseInt(station) - 1]}</div>
+                    <div>{stationName[j + 1]}</div>
                   </label>
                 </th>
               ))}
@@ -261,20 +268,23 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                     checked={rowChecked.includes(i)}
                     onChange={() => toggleCheck(i, 'row')}
                   />
-                  <span>{stationName[parseInt(from) - 1]}</span>
+                  <span className=' max-w-40 xl:max-w-96 custom-ellipsis-style'>{stationName[i]}</span>
                 </td>
                 {stations.slice(1).map((_, j) => (
                   <td key={j} className="border border-gray-200 px-2 py-1 text-center h-14 ">
                     {j >= i ? (
                       <input
                         type="number"
-                        className={`custom-border-gray rounded-md px-1 py-0.5 w-16 text-center ${errorMatrix[i][j] ? 'border-red-500 bg-red-100' : ''
-                          }`}
+                        // className={`custom-border-gray rounded-md px-1 py-0.5 w-16 text-center ${errorMatrix[i][j] ? 'border-red-500 bg-red-100' : ''
+                        //   }`}
+                        className={`custom-border-gray rounded-md px-1 py-0.5 w-16 text-center `}
                         value={
                           !isNaN(matrix[i][j]) ? matrix[i][j].toString() : ''
                         }
                         onChange={(e) => {
-                          const value = parseFloat(e.target.value);
+                          const cleanedValue = e.target.value.replace(/^0+(?!$)/, ''); // ตัด 0 ข้างหน้า
+                          const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue); // ป้องกัน NaN
+                          const value = Number(numericValue);
                           const newMatrix = [...matrix];
                           newMatrix[i][j] = isNaN(value) ? NaN : value;
                           setMatrix(newMatrix);

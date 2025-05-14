@@ -26,6 +26,7 @@ type FormRouteTicketProps = {
   ticketType?: TICKET_TYPE;
   setTicketType: (value: TICKET_TYPE) => void;
   ticketChecked?: string[]
+  initialTicketChecked?: string[]
   setTicketChecked: (value: string[]) => void;
   ticketTypeList?: TicketPriceType[];
   setTicketTypeList: (value: TicketPriceType[]) => void;
@@ -54,6 +55,7 @@ function FormRouteTicket({
   handleAddType,
   handleValidateNext,
   ticketChecked,
+  initialTicketChecked,
   setTicketChecked,
   ticketTypeList,
   handleBack,
@@ -122,12 +124,15 @@ function FormRouteTicket({
                   <div className='flex flex-col gap-1'>
                     {ticketTypeList?.map((item, index) => {
                       const isMatch = ticketChecked?.some((c) => item.id === c)
+                      const isLocked = initialTicketChecked?.includes(item.id); 
+
                       return (
                         <div key={index} className='flex items-center gap-2'>
                           <input
                             type="checkbox"
                             className='cursor-pointer'
                             checked={isMatch}
+                            disabled={isLocked}
                             onChange={() => handleChecked(item.id)}
                           />
                           <p className='text-[14px]'>{item.name}</p>

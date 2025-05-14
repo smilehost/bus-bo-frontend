@@ -1,0 +1,54 @@
+import { api } from "@/services/axios.service";
+import { CreateRouteTicketPayload, UpdateRouteTicketPayload } from '@/payloads/route.ticket.payload'
+
+export const RouteTicketService = {
+
+    async createTicket(payload: CreateRouteTicketPayload) {
+        return await api.post({
+            path: "/api/routeTicket/create",
+            body: payload,
+        });
+    },
+
+    async getTicketById(id: number) {
+        return await api.get({
+            path: "/api/routeTicket/ticket",
+            params: id,
+        });
+    },
+
+    async getTicketByRoute(id: number) {
+        return await api.get({
+            path: "/api/routeTicket/route",
+            params: id,
+        });
+    },
+
+    async getTicketByLocation(id: number) {
+        return await api.get({
+            path: "/api/routeTicket",
+            params: id,
+        });
+    },
+
+    async getTicketPriceType() {
+        return await api.get({
+            path: "/api/routeTicket/priceType"
+        });
+    },
+
+    async updateTicket(id: number, payload: UpdateRouteTicketPayload) {
+        return await api.put({
+            path: "/api/routeTicket",
+            params: id,
+            body: payload,
+        });
+    },
+
+    async deleteTicket(id: number) {
+        return await api.delete({
+            path: "/api/routeTicket",
+            params: id,
+        });
+    },
+}

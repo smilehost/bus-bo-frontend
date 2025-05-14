@@ -16,8 +16,8 @@ export enum FILTER {
 }
 
 export enum TICKET_TYPE {
-    FIXED = "Fixed",
-    TIERED = "Tiered",
+    FIXED = "fix",
+    TIERED = "tier",
 }
 
 export const STATUS_LABELS: Record<number, STATUS> = {

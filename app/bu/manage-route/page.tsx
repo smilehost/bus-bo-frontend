@@ -5,37 +5,48 @@ import { STATUS, FILTER } from '@/constants/enum'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
+import Link from 'next/link'
+import Image from 'next/image'
 
 //companent 
-import TableRoute from '@/app/components/RoutePage/TableRoute'
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
-import Pagination from '@/app/components/Pagination/Pagination'
+import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
+import StatusText from '@/app/components/StatusText'
 
 //api
 import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
-
-//type
-import { RouteData } from '@/types/types'
+import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
 import { toast } from 'react-toastify'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
+export interface RouteTableData {
+    id: string,
+    route: string,
+    company: string,
+    schedule: string,
+    time: string,
+    ticket_amount: string,
+    status: STATUS,
+    routeColor: string
+}
+
 function Page() {
 
     //api
-    // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
     const { companyData } = useCompanyStore();
     const { routeData, getRoutes, deleteRoute } = useRouteStore();
     const { times, getTimes } = useTimeStore();
     const { dates, getDates } = useDateStore();
+    const { getTicketByRouteId } = useTicketStore();
 
     const router = useRouter();
     const pathname = usePathname();
@@ -53,6 +64,11 @@ function Page() {
         cancelSkeleton();
     }
 
+    useEffect(() => {
+        getDates(1, 9999, '');
+        getTimes(1, 9999, '');
+    }, [])
+
     //pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -64,18 +80,7 @@ function Page() {
     };
 
     useEffect(() => {
-        getDates(1, 9999, '');
-        getTimes(1, 9999, '');
-    }, [])
-
-    useEffect(() => {
-        const pageCurrent = routeData?.page;
-        const pageRows = routeData?.size;
-        setRows(new Array(routeData?.data?.length || 0).fill(null));  // กำหนด array ว่างๆ ที่มีความยาวเท่ากับจำนวนข้อมูลที่มี
-        if (pageCurrent !== currentPage || pageRows !== rowsPerPage) {
-            // ตั้งค่า rows ให้มีความยาวเท่ากับ routeData?.data.length เพื่อป้องกันการยืดหด
-            fetchRouteData(); // ดึงข้อมูลใหม่
-        }
+        fetchRouteData();
     }, [currentPage, rowsPerPage]);
 
     // Function to create data for table
@@ -88,33 +93,45 @@ function Page() {
         ticket_amount: string,
         status: STATUS,
         routeColor: string
-    ) => {
+    ): RouteTableData => {
         return { id, route, company, schedule, time, ticket_amount, status, routeColor };
     };
 
     // Generate rows for table
-    const [rows, setRows] = useState<RouteData[]>([]);
-
+    const [rows, setRows] = useState<RouteTableData[]>([]);
     useEffect(() => {
         const isReady = routeData?.data?.length && dates.length && times.length;
-        if (!isReady) return;
+        if (!isReady) {
+            setRows([])
+            return
+        };
 
-        const newRows = routeData.data.map((item) => {
-            const dateName = dates.find(d => d.id === item.route_date_id)?.name || '';
-            const timeName = times.find(t => t.id === item.route_time_id)?.schedule.join(', ') || '';
-            return createData(
-                item.route_id,
-                item.route_name_en,
-                item.route_com_id,
-                dateName,
-                timeName,
-                "2",
-                item.route_status,
-                item.route_color
+        const fetchWithTicketCounts = async () => {
+            const newRows = await Promise.all(
+                routeData.data.map(async (item) => {
+                    const dateName = dates.find(d => d.id === Number(item.route_date_id))?.name || '';
+                    const timeName = times.find(t => t.id === Number(item.route_time_id))?.schedule.join(', ') || '';
+
+                    const tickets = await getTicketByRouteId(Number(item.route_id));
+                    const ticketAmount = tickets?.length?.toString() || '0';
+
+                    return createData(
+                        item.route_id,
+                        item.route_name_en,
+                        item.route_com_id,
+                        dateName,
+                        timeName,
+                        ticketAmount,
+                        item.route_status,
+                        item.route_color
+                    );
+                })
             );
-        });
 
-        setRows(newRows);
+            setRows(newRows);
+        };
+
+        fetchWithTicketCounts();
     }, [routeData?.data, dates, times]);
 
     // Handle delete route
@@ -156,7 +173,6 @@ function Page() {
         STATUS.INACTIVE,
         STATUS.CANCELLED
     ]
-
     const filterSearch = [
         {
             defaulteValue: FILTER.ALL_STATUS,
@@ -173,13 +189,12 @@ function Page() {
     ]
 
     //search
-    // useEffect(() => {
-    //     if (!debouncedSearch) {
-    //         fetchRouteData()
-    //     };
-
-    //     getRoutes(currentPage, rowsPerPage, debouncedSearch);
-    // }, [debouncedSearch])
+    useEffect(() => {
+        if (!debouncedSearch) {
+            fetchRouteData();
+        };
+        getRoutes(currentPage, rowsPerPage, debouncedSearch);
+    }, [debouncedSearch])
 
     const debouncedFetch = useCallback(
         debounce((value: string) => {
@@ -193,6 +208,70 @@ function Page() {
         debouncedFetch(e.target.value);
     };
 
+    //table columns
+    const columns: ColumnConfig<RouteTableData>[] = [
+        {
+            key: 'route',
+            label: 'Route',
+            width: '25%',
+            render: (_, row) => (
+                <div className='flex gap-3 items-center'>
+                    <div className='w-[8px] h-[32px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.routeColor }} />
+                    <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
+                </div>
+            ),
+        },
+        { key: 'company', label: 'Company', width: '20%' },
+        { key: 'schedule', label: 'Schedule', width: '20%' },
+        { key: 'time', label: 'Departure Times', width: '20%' },
+        { key: 'ticket_amount', label: 'Tickets', width: '15%', align: 'center' },
+        {
+            key: 'status',
+            label: 'Status',
+            width: '15%',
+            render: (value) => <StatusText type={value} />,
+        },
+        {
+            key: 'id',
+            label: 'Action',
+            width: '25%',
+            render: (_, row) => (
+                <div className='flex gap-2 min-w-max'>
+                    <Link href={`${pathname}/routeTicket/${row?.id}`} className='cursor-pointer'>
+                        <Image
+                            src={"/icons/money.svg"}
+                            width={1000}
+                            height={1000}
+                            alt='icon'
+                            priority
+                            className='w-[16px] h-[16px]'
+                        />
+                    </Link>
+                    <Link href={`${pathname}/edit/${row?.id}`} className='cursor-pointer'>
+                        <Image
+                            src={"/icons/edit.svg"}
+                            width={1000}
+                            height={1000}
+                            alt='icon'
+                            priority
+                            className='w-[16px] h-[16px]'
+                        />
+                    </Link>
+                    <div onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })} className='cursor-pointer'>
+                        <Image
+                            src={"/icons/garbage.svg"}
+                            width={1000}
+                            height={1000}
+                            alt='icon'
+                            priority
+                            className='w-[16px] h-[16px]'
+                        />
+                    </div>
+                </div>
+            ),
+        },
+    ];
+
     return (
         <>
             <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
@@ -204,22 +283,22 @@ function Page() {
                 }
                 placeholderSearch='Search routes...'
                 filter={filterSearch}
+                search={search}
             />
             {isLoadingskeleton ? <SkeletonRoute /> :
-                <div className=" bg-white rounded-lg shadow-xs mt-5 flex flex-col items-center overflow-hidden">
-                    <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-                    <div className='mt-5 w-full'>
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={routeData?.totalPages || 0}
-                            onPageChange={setCurrentPage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={handleRowsPerPageChange}
-                            totalResults={routeData?.total || 0}
-                        />
-                    </div>
-                </div>
+                <TableTemplate
+                    columns={columns}
+                    data={rows}
+                    currentPage={currentPage}
+                    rowsPerPage={rowsPerPage}
+                    totalPages={routeData?.totalPages}
+                    totalResults={routeData?.total}
+                    onPageChange={setCurrentPage}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                    rowKey={(row) => row.id}
+                />
             }
+
         </>
     )
 }
