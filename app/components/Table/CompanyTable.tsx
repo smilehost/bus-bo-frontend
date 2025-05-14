@@ -1,31 +1,47 @@
 "use client";
 
 import React from "react";
+import Pagination from "../Pagination/Pagination";
 
 type Company = {
-  id: number;
+  id: string;
   name: string;
-  status: "Active" | "Inactive";
+  prefix: string;
+  status: number; // 1 = Active, 0 = Inactive
 };
 
 type CompanyTableProps = {
   companies: Company[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  rowsPerPage: number;
+  totalResults: number;
+  isLoading: boolean;
+  onRowsPerPageChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
 export default function CompanyTable({
   companies,
   onEdit,
   onDelete,
+  currentPage,
+  onPageChange,
+  rowsPerPage,
+  totalResults,
+  isLoading,
+  onRowsPerPageChange,
 }: CompanyTableProps) {
+  const totalPages = Math.ceil(totalResults / rowsPerPage);
+
   return (
     <div className="flex flex-col space-y-6">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
         <div className="bg-gray-50 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-medium text-gray-800">Companies</h3>
           <div className="text-sm text-gray-500">
-            Total: {companies.length} entries
+            Total: {totalResults} entries
           </div>
         </div>
 
@@ -33,8 +49,14 @@ export default function CompanyTable({
           <table className="w-full border-collapse bg-white">
             <thead>
               <tr>
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center w-12">
+                  No.
+                </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
                   Company Name
+                </th>
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
+                  Prefix
                 </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
                   Status
@@ -47,7 +69,7 @@ export default function CompanyTable({
             <tbody>
               {companies.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-8 text-center text-gray-500">
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
                     No companies found
                   </td>
                 </tr>
@@ -55,38 +77,39 @@ export default function CompanyTable({
                 companies.map((company, index) => (
                   <tr
                     key={company.id}
-                    className={`transition-all duration-300 ease-out hover:bg-blue-50/70 ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                    } animate-fade-in`}
+                    className="border-t border-gray-200 opacity-0 animate-fade-in-up"
                     style={{
-                      animationDelay: `${index * 80}ms`,
-                      animationDuration: "600ms",
-                      animationFillMode: "both",
+                      animationDelay: `${index * 100}ms`,
+                      animationFillMode: "forwards",
                     }}
                   >
+                    <td className="py-4 px-6 border-b border-gray-200 text-center font-medium text-gray-700">
+                      {index + 1 + (currentPage - 1) * rowsPerPage}
+                    </td>
                     <td className="py-4 px-6 border-b border-gray-200 font-medium text-gray-800">
                       {company.name}
                     </td>
-                    <td className="py-4 px-6 border-b border-gray-200">
-                      <div className="flex items-center justify-center">
-                        {company.status === "Active" ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
-                            <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-                            <span>Active</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
-                            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-                            <span>Inactive</span>
-                          </span>
-                        )}
-                      </div>
+                    <td className="py-4 px-6 border-b border-gray-200 text-gray-700">
+                      {company.prefix}
+                    </td>
+                    <td className="py-4 px-6 border-b border-gray-200 text-center">
+                      {company.status === 1 ? (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
+                          <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
+                          <span>Active</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
+                          <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+                          <span>Inactive</span>
+                        </span>
+                      )}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200">
                       <div className="flex justify-center space-x-2">
                         <button
                           onClick={() => onEdit(company.id)}
-                          className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer"
+                          className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm"
                           title="Edit"
                         >
                           <svg
@@ -98,9 +121,10 @@ export default function CompanyTable({
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                           </svg>
                         </button>
+                        {/* ซ่อนปุ่ม Delete */}
                         <button
                           onClick={() => onDelete(company.id)}
-                          className="p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm cursor-pointer"
+                          className="hidden p-1.5 bg-red-50 rounded-lg text-red-600 hover:bg-red-100 transition-colors hover:shadow-sm"
                           title="Delete"
                         >
                           <svg
@@ -125,6 +149,15 @@ export default function CompanyTable({
           </table>
         </div>
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={onRowsPerPageChange}
+        totalResults={totalResults}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // src/stores/location.store.ts
 import { create } from "zustand";
-import { LocationItem } from "@/types/location.type";
+import { LocationItem } from "@/types/location";
 import { LocationService } from "@/services/location.service";
 import { CreateLocationPayload, UpdateLocationPayload } from "@/payloads/location.payload";
 

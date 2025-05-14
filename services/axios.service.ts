@@ -45,7 +45,7 @@ instance.interceptors.response.use(
     const code = response.data?.code;
     if (code === 20000 || code === 10011 || code === 22006) {
       console.warn("Token expired or unauthorized!", response.data);
-      localStorage.clear();
+      // localStorage.clear();
       if (process.env.NODE_ENV !== "development") {
         window.location.href = CONTEXT_PATH;
       }
@@ -54,7 +54,7 @@ instance.interceptors.response.use(
   },
   (error) => {
     console.error("API Error:", error);
-    localStorage.clear();
+    // localStorage.clear();
     if (process.env.NODE_ENV !== "development") {
       window.location.href = CONTEXT_PATH;
     }

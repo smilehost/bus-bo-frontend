@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { STATUS, FILTER } from '@/constants/enum'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
+import { debounce } from "@/utils/debounce";
 
 //companent 
 import TableRoute from '@/app/components/RoutePage/TableRoute'
@@ -11,17 +12,16 @@ import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
+import Pagination from '@/app/components/Pagination/Pagination'
 
 //api
 import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
-import { useTicketStore } from '@/stores/routeTicketStore'
-import { useScheduleStore } from '@/stores/scheduleStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
 
 //type
-import { Route } from '@/types/types'
+import { RouteData } from '@/types/types'
 
 //toast
 import { toast } from 'react-toastify'
@@ -34,34 +34,49 @@ function Page() {
     // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
     const { companyData } = useCompanyStore();
     const { routeData, getRoutes, deleteRoute } = useRouteStore();
-    const { getDateById } = useDateStore();
-    const { ticketData } = useTicketStore();
-    const { timeData, getTimeById } = useTimeStore();
-    const { scheduleData } = useScheduleStore();
+    const { times, getTimes } = useTimeStore();
+    const { dates, getDates } = useDateStore();
 
     const router = useRouter();
     const pathname = usePathname();
 
-    const [routes, setRoutes] = useState<Route[]>(); // Data for routes
     const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
     const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
     const [search, setSearch] = useState<string>(''); // Search input
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
-    const fetchRouteData = () => {
-        
-        getRoutes(1, 5, '');
-    }
-    useEffect(() => {
+    //fetch routes
+    const fetchRouteData = async () => {
         const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-        fetchRouteData();
+        await getRoutes(currentPage, rowsPerPage, debouncedSearch);
         cancelSkeleton();
+    }
 
-    }, []);
+    //pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSize = Number(e.target.value);
+        setRowsPerPage(newSize);
+        setCurrentPage(1);
+    };
 
     useEffect(() => {
-        setRoutes(routeData);
-    }, [routeData]);
+        getDates(1, 9999, '');
+        getTimes(1, 9999, '');
+    }, [])
+
+    useEffect(() => {
+        const pageCurrent = routeData?.page;
+        const pageRows = routeData?.size;
+        setRows(new Array(routeData?.data?.length || 0).fill(null));  // กำหนด array ว่างๆ ที่มีความยาวเท่ากับจำนวนข้อมูลที่มี
+        if (pageCurrent !== currentPage || pageRows !== rowsPerPage) {
+            // ตั้งค่า rows ให้มีความยาวเท่ากับ routeData?.data.length เพื่อป้องกันการยืดหด
+            fetchRouteData(); // ดึงข้อมูลใหม่
+        }
+    }, [currentPage, rowsPerPage]);
 
     // Function to create data for table
     const createData = (
@@ -77,87 +92,30 @@ function Page() {
         return { id, route, company, schedule, time, ticket_amount, status, routeColor };
     };
 
-    // // Filter routes based on search values
-    // const filteredRoutes = routes?.data?.filter((item) => {
-    //     const company = companyData.find((com) => com.id === item.route_com_id)?.name || ''
-    //     const matchesStatus = searchStatus && searchStatus !== FILTER.ALL_STATUS ? item.route_status === searchStatus : true;
-    //     const matchesCompany = searchCompany && searchCompany !== FILTER.ALL_COMPANIES ? company.toLowerCase().includes(searchCompany.toLowerCase()) : true;
-    //     const matchesSearch = search ? item.route.toLowerCase().includes(search.toLowerCase()) : true;
-
-    //     return matchesStatus && matchesCompany && matchesSearch;
-    // });
-
-
     // Generate rows for table
-    const [rows, setRows] = useState<any[]>([]); // State for table rows
+    const [rows, setRows] = useState<RouteData[]>([]);
+
     useEffect(() => {
-        if (routes?.data) {
-            generateRows();
-        }
-    }, [routes]);
-    const generateRows = async () => {
-        const rows = await Promise.all(
-            routes?.data?.map(async (item) => {
-                const date = await getDateById(item.route_date_id);
-                const time = await getTimeById(item.route_time_id);
-                const dateName = date?.route_date_name || '';
-                const timeName = time?.route_time_array || '';
+        const isReady = routeData?.data?.length && dates.length && times.length;
+        if (!isReady) return;
 
-                return createData(
-                    item.route_id,
-                    item.route_name_en,
-                    item.route_com_id, // company?.name || ''
-                    dateName,
-                    timeName, // time?.name || ''
-                    "2", // ticketCount.toString()
-                    item.route_status,
-                    item.route_color
-                );
-            }) || []
-        );
+        const newRows = routeData.data.map((item) => {
+            const dateName = dates.find(d => d.id === item.route_date_id)?.name || '';
+            const timeName = times.find(t => t.id === item.route_time_id)?.schedule.join(', ') || '';
+            return createData(
+                item.route_id,
+                item.route_name_en,
+                item.route_com_id,
+                dateName,
+                timeName,
+                "2",
+                item.route_status,
+                item.route_color
+            );
+        });
 
-        setRows(rows); // สมมติคุณมี useState สำหรับ rows
-    };
-    // const getDateName = (id: number) => {
-    //     return getDateById(id).then((result) => {
-    //         return result?.route_date_name || ''
-    //     });
-    // }
-    // const rows = routes?.data?.map((item) => {
-    //     // //schedule 
-    //     // const scheduleId = item.schedule_id
-    //     // const realSchedule = scheduleData.find((value) => value.id === scheduleId)?.name || ''
-
-    //     // //schedule 
-    //     // const companyId = item.company_id
-    //     // const realCompany = companyData.find((value) => value.id === companyId)?.name || ''
-
-    //     // //time 
-    //     // const timeId = item.times_id
-    //     // const realTimes = timeData.find((value) => value.id === timeId)?.times.join(', ') || ''
-
-    //     // //ticket amount 
-    //     // const realTicketAmount = ticketData.filter((value) => value.route_id === item.id).length.toString();
-    //     // let dateData;
-    //     // getDateById(item.route_date_id).then((result) => {
-    //     //     dateData= result;
-    //     // });
-    //     // console.log("dateData: ", dateData)
-    //     // const dateName = dateData?.route_date_name || ''
-    //     const dateName = getDateName(item.route_date_id)
-    //     console.log("dateName: ", dateName)
-
-    //     return createData(
-    //         item.route_id,
-    //         item.route_name_en,
-    //         item.route_com_id,
-    //         "dateName",
-    //         item.route_time_id,
-    //         "2", //realTicketAmount
-    //         item.route_status,
-    //         item.route_color
-    //     )
-    // })
+        setRows(newRows);
+    }, [routeData?.data, dates, times]);
 
     // Handle delete route
     const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
@@ -214,15 +172,54 @@ function Page() {
         },
     ]
 
+    //search
+    // useEffect(() => {
+    //     if (!debouncedSearch) {
+    //         fetchRouteData()
+    //     };
+
+    //     getRoutes(currentPage, rowsPerPage, debouncedSearch);
+    // }, [debouncedSearch])
+
+    const debouncedFetch = useCallback(
+        debounce((value: string) => {
+            setDebouncedSearch(value);
+        }, 350),
+        []
+    );
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+        debouncedFetch(e.target.value);
+    };
+
     return (
         <>
             <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
-            <FormFilter setSearch={setSearch} placeholderSearch='Search routes...' filter={filterSearch} />
+            <FormFilter
+                setSearch={(value: string) =>
+                    handleSearchChange({
+                        target: { value },
+                    } as React.ChangeEvent<HTMLInputElement>)
+                }
+                placeholderSearch='Search routes...'
+                filter={filterSearch}
+            />
             {isLoadingskeleton ? <SkeletonRoute /> :
-              <div className="bg-white rounded-lg shadow-xs mt-5 flex items-center overflow-hidden">
-                <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
-              </div>
-}
+                <div className=" bg-white rounded-lg shadow-xs mt-5 flex flex-col items-center overflow-hidden">
+                    <TableRoute rows={rows} handleDeleteRoute={handleDeleteRoute} />
+                    <div className='mt-5 w-full'>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={routeData?.totalPages || 0}
+                            onPageChange={setCurrentPage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleRowsPerPageChange}
+                            totalResults={routeData?.total || 0}
+                        />
+                    </div>
+                </div>
+            }
         </>
     )
 }

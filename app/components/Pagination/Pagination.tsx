@@ -38,7 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
       buttons.push(
         <button
           key="1"
-          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50"
+          className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50"
           onClick={() => onPageChange(1)}
         >
           1
@@ -58,7 +58,7 @@ const Pagination: React.FC<PaginationProps> = ({
       buttons.push(
         <button
           key={i}
-          className={`w-8 h-8 flex items-center justify-center rounded-md mx-0.5 transition-all duration-200 ${
+          className={`w-9 h-9 flex items-center justify-center rounded-md mx-0.5 transition-all duration-200 ${
             currentPage === i
               ? "bg-blue-600 text-white border border-blue-600 shadow-sm"
               : "border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -82,7 +82,7 @@ const Pagination: React.FC<PaginationProps> = ({
       buttons.push(
         <button
           key={totalPages}
-          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50"
+          className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50"
           onClick={() => onPageChange(totalPages)}
         >
           {totalPages}
@@ -97,7 +97,7 @@ const Pagination: React.FC<PaginationProps> = ({
     <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
       <div className="flex items-center space-x-1 mb-4 md:mb-0">
         <button
-          className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+          className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 cursor-pointer"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Previous Page"
@@ -158,7 +158,7 @@ const Pagination: React.FC<PaginationProps> = ({
         </label>
         <select
           id="rows-per-page"
-          className="border border-gray-300 rounded-md text-gray-700 px-3 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          className="border border-gray-300 rounded-md text-gray-700 px-3 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
           value={rowsPerPage}
           onChange={onRowsPerPageChange}
         >

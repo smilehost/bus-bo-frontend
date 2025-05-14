@@ -1,41 +1,97 @@
-// src/store/companyStore.ts
-import { create } from 'zustand';
-import { Company } from '@/types/types';
+import { create } from "zustand";
+import { CompanyItem } from "@/types/company"; 
+import {
+  CreateCompanyPayload,
+  UpdateCompanyPayload,
+  FetchCompanyQuery,
+} from "@/payloads/company.payload";
+import { CompanyService } from "@/services/company.service";
 
-type CompanyStore = {
-    companyData: Company[];
-    setCompanyData: (newData: Company[]) => void;
-    addCompany: (newCompany: Company) => void;
-    updateCompany: (id: string, updatedCompany: Company) => void;
-    deleteCompany: (id: string) => void;
-};
+interface CompanyStore {
+  companies: CompanyItem[]; 
+  total: number;
+  isLoading: boolean;
+
+  getCompanies: (
+    page: number,
+    size: number,
+    search?: string,
+    status?: string
+  ) => Promise<void>;
+  createCompany: (company: Omit<CompanyItem, "id">) => Promise<void>;
+  updateCompany: (id: string, company: CompanyItem) => Promise<void>;
+  deleteCompany: (id: string) => Promise<void>;
+  getCompanyById: (id: string) => Promise<CompanyItem | undefined>;
+}
 
 export const useCompanyStore = create<CompanyStore>((set) => ({
-    companyData: [
-        { id: '1', name: 'Northern Bus Co.' },
-        { id: '2', name: 'Southern Express' },
-        { id: '3', name: 'Eastern Transport' },
-        { id: '4', name: 'Western Motors' },
-        { id: '5', name: 'Bussing Transit' },
-    ],
-    
-    // ฟังก์ชันการเพิ่มข้อมูล
-    setCompanyData: (newData) => set({ companyData: newData }),
+  companies: [],
+  total: 0,
+  isLoading: false,
 
-    // ฟังก์ชันการเพิ่มข้อมูล
-    addCompany: (newCompany) => set((state) => ({
-        companyData: [...state.companyData, newCompany],
-    })),
+  getCompanies: async (page, size, search, status) => {
+    set({ isLoading: true });
+    try {
+      const query: FetchCompanyQuery = {
+        page,
+        size,
+        search: search || "",
+        status: status || "",
+      };
+      const res = await CompanyService.fetchCompanies(query);
+      const rawData = (res as { result: any[] }).result || [];
 
-    // ฟังก์ชันการอัปเดตข้อมูล
-    updateCompany: (id, updatedCompany) => set((state) => ({
-        companyData: state.companyData.map((company) =>
-            company.id === id ? updatedCompany : company
-        ),
-    })),
+      const mapped: CompanyItem[] = rawData.map((item: any) => ({
+        id: item.com_id.toString(),
+        name: item.com_name,
+        prefix: item.com_prefix,
+        status: item.com_status,
+      }));
 
-    // ฟังก์ชันการลบข้อมูล
-    deleteCompany: (id) => set((state) => ({
-        companyData: state.companyData.filter((company) => company.id !== id),
-    })),
+      set({ companies: mapped, total: mapped.length });
+    } catch (error) {
+      console.error("getCompanies error:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  createCompany: async (company) => {
+    const payload: CreateCompanyPayload = {
+      com_name: company.name,
+      com_prefix: company.prefix,
+      com_status: company.status,
+    };
+    await CompanyService.createCompany(payload);
+  },
+
+  updateCompany: async (id, company) => {
+    const payload: UpdateCompanyPayload = {
+      com_id: typeof id === "string" ? parseInt(id) : id, // ปลอดภัยทั้ง string/number
+      com_name: company.name,
+      com_prefix: company.prefix,
+      com_status: company.status,
+    };
+    await CompanyService.updateCompany(typeof id === "string" ? parseInt(id, 10) : id, payload);
+  },
+
+  deleteCompany: async (id) => {
+    await CompanyService.deleteCompany(id);
+  },
+
+  getCompanyById: async (id) => {
+    try {
+      const res = await CompanyService.fetchCompanyById(id);
+      const item = (res as { result: any }).result;
+      return {
+        id: item.com_id.toString(),
+        name: item.com_name,
+        prefix: item.com_prefix,
+        status: item.com_status,
+      };
+    } catch (error) {
+      console.error("getCompanyById error:", error);
+      return undefined;
+    }
+  },
 }));

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { Dispatch, SetStateAction } from 'react';
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 
 type DragDropProps = {
   listA: LocationItem[],
@@ -48,7 +48,7 @@ function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
               <div
                 key={item.id || index}
                 className={`${filteredListA.length - 1 === index && "rounded-b-md"
-                  } ${0 === index && "rounded-t-md border-t"} border-b border-r border-l w-full px-4 py-1 border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
+                  } ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style border-b border-r border-l w-full px-4 py-1 border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
               >
                 {item.name}
               </div>
@@ -74,7 +74,7 @@ function DragDrop({ listA, listB, setListA, setListB }: DragDropProps) {
                   {index + 1}
                 </div>
                 <div
-                  className={`${listB.length - 1 === index && "rounded-b-md "} ${0 === index && "rounded-t-md border-t"} border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
+                  className={`${listB.length - 1 === index && "rounded-b-md "} ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
                 >
                   {item.name}
                 </div>

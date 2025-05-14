@@ -10,7 +10,7 @@ import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 import { Alert } from "@/app/components/Dialog/Alert";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
-import { DateItem } from "@/types/date.type";
+import { DateItem } from "@/types/date";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 
@@ -215,7 +215,7 @@ export default function DateManagerClient() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col p-7">
+      <div className="flex-1 flex flex-col p-0">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
           <TitlePage
             title="Manage Date"

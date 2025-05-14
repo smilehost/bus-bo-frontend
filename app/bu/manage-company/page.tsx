@@ -1,53 +1,75 @@
 "use client";
 
-import CompanyModal from "@/app/components/Model/CompanyModal";
-import SkeletonCompanyTable from "@/app/components/Skeleton/SkeletonCompanyTable";
+import React, { useEffect, useState, useCallback } from "react";
 import CompanyTable from "@/app/components/Table/CompanyTable";
-import { useEffect, useState } from "react";
-
-//components
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
+import CompanyModal from "@/app/components/Model/CompanyModal";
+import SearchFilter from "@/app/components/SearchFilter/CompanySearchFilter";
+import SkeletonCompanyTable from "@/app/components/Skeleton/SkeletonCompanyTable";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
+import TitlePage from "@/app/components/Title/TitlePage";
+import ButtonBG from "@/app/components/Form/ButtonBG";
+import { debounce } from "@/utils/debounce";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
+import { useCompanyStore } from "@/stores/companyStore";
 
-type Company = {
-  id: number;
-  name: string;
-  status: "Active" | "Inactive";
-};
+export default function ManageCompaniesPage() {
+  const {
+    companies,
+    total,
+    isLoading,
+    getCompanies,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+  } = useCompanyStore();
 
-export default function ManageCompanies() {
-  const [companies, setCompanies] = useState<Company[]>([
-    { id: 1, name: "Northern Bus Co.", status: "Active" },
-    { id: 2, name: "Southern Express", status: "Active" },
-    { id: 3, name: "Eastern Transport", status: "Inactive" },
-  ]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCompanyName, setNewCompanyName] = useState("");
-  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
-  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+  const [editingCompany, setEditingCompany] = useState<any | null>(null);
+  const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const fetchCompanies = async () => {
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingSkeleton);
+    await getCompanies(currentPage, rowsPerPage, debouncedSearch);
+    cancelSkeleton();
+  };
 
-  const filteredCompanies = companies.filter((company) =>
-    company.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const debouncedFetch = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 350),
+    []
   );
 
-  const handleAddOrEditCompany = async (
-    name: string,
-    status: "Active" | "Inactive"
-  ) => {
-    if (!name.trim()) return;
+  useEffect(() => {
+    fetchCompanies();
+  }, [currentPage, rowsPerPage, debouncedSearch]);
 
+  const handleAddCompany = () => {
+    setEditingCompany(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditCompany = (id: string) => {
+    const found = companies.find((c) => c.id === id);
+    if (found) setEditingCompany(found);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveCompany = async (data: {
+    name: string;
+    prefix: string;
+    status: number;
+  }) => {
     const isConfirmed = await Confirm({
       title: editingCompany ? "Confirm Update" : "Confirm Create",
       text: editingCompany
-        ? "Are you sure you want to update this company?"
-        : "Are you sure you want to create this company?",
+        ? "Do you want to update this company?"
+        : "Do you want to create this company?",
       confirmText: editingCompany ? "Update" : "Create",
       cancelText: "Cancel",
       type: "question",
@@ -55,50 +77,45 @@ export default function ManageCompanies() {
 
     if (!isConfirmed) return;
 
-    if (editingCompany) {
-      // Update existing company
-      setCompanies((prev) =>
-        prev.map((company) =>
-          company.id === editingCompany.id
-            ? { ...company, name, status }
-            : company
-        )
-      );
-      await Alert({
-        title: "Updated!",
-        text: "Company updated successfully.",
-        type: "success",
-      });
-      setEditingCompany(null);
-    } else {
-      // Add new company
-      const newCompany: Company = {
-        id: companies.length + 1,
-        name,
-        status,
-      };
-      setCompanies((prev) => [...prev, newCompany]);
-      await Alert({
-        title: "Created!",
-        text: "Company created successfully.",
-        type: "success",
-      });
-    }
+    try {
+      if (editingCompany) {
+        await updateCompany(editingCompany.id, {
+          id: editingCompany.id,
+          name: data.name,
+          prefix: data.prefix,
+          status: data.status,
+        });
+        await Alert({
+          title: "Updated!",
+          text: "Company updated.",
+          type: "success",
+        });
+      } else {
+        await createCompany({
+          name: data.name,
+          prefix: data.prefix,
+          status: data.status,
+        });
+        await Alert({
+          title: "Created!",
+          text: "Company created.",
+          type: "success",
+        });
+      }
 
-    setNewCompanyName("");
-    setIsModalOpen(false);
-  };
-
-  const handleEditCompany = (id: number) => {
-    const company = companies.find((c) => c.id === id);
-    if (company) {
-      setEditingCompany(company);
-      setNewCompanyName(company.name);
-      setIsModalOpen(true);
+      setIsModalOpen(false);
+      fetchCompanies();
+    } catch (error) {
+      console.error("Save error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Something went wrong.",
+        type: "error",
+      });
     }
   };
 
-  const handleDeleteCompany = async (id: number) => {
+  const handleDeleteCompany = async (id: string) => {
     const isConfirmed = await Confirm({
       title: "Confirm Delete",
       text: "Are you sure you want to delete this company?",
@@ -109,62 +126,101 @@ export default function ManageCompanies() {
 
     if (!isConfirmed) return;
 
-    setCompanies((prev) => prev.filter((company) => company.id !== id));
-    await Alert({
-      title: "Deleted!",
-      text: "Company deleted successfully.",
-      type: "success",
-    });
+    try {
+      await deleteCompany(id);
+      await Alert({
+        title: "Deleted!",
+        text: "Company deleted.",
+        type: "success",
+      });
+      fetchCompanies();
+    } catch (error) {
+      console.error("Delete error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to delete.",
+        type: "error",
+      });
+    }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    debouncedFetch(e.target.value);
+  };
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = Number(e.target.value);
+    setRowsPerPage(newSize);
+    setCurrentPage(1);
+  };
+
+  const filtered = companies.filter((c) =>
+    c.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
+  const paginatedCompanies = filtered.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
   return (
-    <div>
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">Manage Companies</h1>
-          <p className="text-gray-500">View and manage bus companies</p>
+    <div className="flex h-screen bg-gray-100">
+      <div className="flex-1 flex flex-col p-0">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+          <TitlePage
+            title="Manage Companies"
+            description="View and manage bus companies"
+          />
+          <ButtonBG
+            size="h-[38px]"
+            text="Add New Company"
+            icon="/icons/plus.svg"
+            onClick={handleAddCompany}
+          />
         </div>
-        <button
-          onClick={() => {
-            setEditingCompany(null);
-            setNewCompanyName("");
-            setIsModalOpen(true);
-          }}
-          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center justify-center w-full md:w-auto cursor-pointer"
-        >
-          <span className="mr-2 text-xl font-bold">+</span>
-          Add New Company
-        </button>
+
+        <div className="bg-white rounded-md shadow p-5">
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+          />
+          {isLoadingSkeleton ? (
+            <SkeletonCompanyTable rows={5} />
+          ) : (
+            <CompanyTable
+              companies={paginatedCompanies}
+              onEdit={handleEditCompany}
+              onDelete={handleDeleteCompany}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              totalResults={filtered.length}
+              isLoading={isLoading}
+            />
+          )}
+        </div>
       </div>
 
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search companies..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-        />
-      </div>
-
-      {isLoadingskeleton ? (
-        <SkeletonCompanyTable rows={5} />
-      ) : (
-        <CompanyTable
-          companies={filteredCompanies}
-          onEdit={handleEditCompany}
-          onDelete={handleDeleteCompany}
+      {isModalOpen && (
+        <CompanyModal
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveCompany}
+          editingCompany={
+            editingCompany
+              ? {
+                  name: editingCompany.name,
+                  prefix: editingCompany.prefix,
+                  status: editingCompany.status,
+                }
+              : undefined
+          }
         />
       )}
-
-      <CompanyModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAddOrEditCompany}
-        newCompanyName={newCompanyName}
-        setNewCompanyName={setNewCompanyName}
-        editingCompanyStatus={editingCompany?.status}
-      />
     </div>
   );
 }

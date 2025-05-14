@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { SelectChangeEvent } from '@mui/material';
 
@@ -12,13 +12,14 @@ import DragDrop from '@/app/components/RoutePage/DragDrop'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
+import TextError from '../TextError';
 
 //api
 import { useTimeStore } from '@/stores/timeStore';
 import { useDateStore } from '@/stores/dateStore';
 
 //type
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 
 type FormRouteProps = {
   routeNameTH?: string | undefined;
@@ -60,10 +61,36 @@ function FormRoute({
   const { dates, getDates } = useDateStore();
   const { times, getTimes } = useTimeStore();
 
+  const [error, setError] = useState<string>('')
+
   useEffect(() => {
     getTimes(1, 5, '')
     getDates(1, 5, '')
   }, [])
+
+  const handleValidateSubmit = () => {
+    const payload = {
+      route_name_th: routeNameTH,
+      route_name_en: routeName,
+      route_color: routeColor,
+      route_date_id: schedule,
+      route_time_id: selectedTime,
+      route_array: listB
+    };
+
+    if (!payload.route_name_th ||
+      !payload.route_name_en ||
+      !payload.route_color ||
+      !payload.route_date_id ||
+      !payload.route_time_id ||
+      payload.route_array.length < 2
+    ) {
+      setError("Please fill in completely.")
+      return;
+    }
+    setError("")
+    handleSubmit();
+  }
 
   // console.log(listA, listB)
   return (
@@ -120,9 +147,14 @@ function FormRoute({
           listB={listB}
         />
       </div>
-      <div className='mt-5 flex items-center justify-end gap-3'>
-        <ButtonDefault size="" text="Cancel" onClick={() => router.back()} />
-        <ButtonBG size="" text="Add Route" onClick={handleSubmit} />
+      <div className='flex flex-col items-end mt-5 '>
+        {error && (
+          <TextError text={error} />
+        )}
+        <div className='mt-3 flex items-center justify-end gap-3'>
+          <ButtonDefault size="" text="Cancel" onClick={() => router.back()} />
+          <ButtonBG size="" text="Add Route" onClick={handleValidateSubmit} />
+        </div>
       </div>
     </div>
   )
