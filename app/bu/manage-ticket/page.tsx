@@ -12,6 +12,8 @@ import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import StatusText from '@/app/components/StatusText'
 import { Confirm } from '@/app/components/Dialog/Confirm'
+import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
+import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //api
 import { useCompanyStore } from '@/stores/companyStore'
@@ -19,8 +21,8 @@ import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
 import { toast } from 'react-toastify'
-import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
-import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
+
+//type
 import { TicketProps } from '@/types/types'
 
 //const 
@@ -195,9 +197,9 @@ function Page() {
     },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
-      render: (value) => (
+      render: (idStatus) => (
         <div className='flex justify-center'>
-          <StatusText id={value} />
+          <StatusText id={Number(idStatus)} />
         </div>
       ),
     },

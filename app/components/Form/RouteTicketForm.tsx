@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
 
 //component
 import FormRouteTicket from '@/app/components/Form/FormRouteTicket'

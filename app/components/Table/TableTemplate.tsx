@@ -16,7 +16,7 @@ export type ColumnConfig<T> = {
     label: string;
     align?: 'left' | 'right' | 'center';
     width?: string;
-    render?: (value: any, row: T) => React.ReactNode;
+    render?: (value: T[keyof T], row: T) => React.ReactNode;
 };
 
 type TableTemplateProps<T> = {

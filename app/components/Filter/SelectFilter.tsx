@@ -49,7 +49,7 @@ function SelectFilter({ width, defaultValue, listValue, onChange }: SelectFilter
         >
             <MenuItem value={defaultValue}>{defaultValue}</MenuItem>
             {listValue?.map((item, index) => (
-                <MenuItem key={index} value={item.value}>{item.value}</MenuItem>
+                <MenuItem key={index} value={item.key}>{item.value}</MenuItem>
             ))}
         </Select>
     )
