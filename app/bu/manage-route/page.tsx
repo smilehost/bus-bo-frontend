@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { STATUS, FILTER } from '@/constants/enum'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
@@ -17,7 +16,7 @@ import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplat
 import StatusText from '@/app/components/StatusText'
 
 //api
-import { useCompanyStore } from '@/stores/companyStore'
+// import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
@@ -27,6 +26,10 @@ import { useTicketStore } from '@/stores/routeTicketStore'
 import { toast } from 'react-toastify'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
+
+//const 
+import { statusOptions } from '@/constants/options'
+import { STATUS, FILTER } from '@/constants/enum'
 
 export interface RouteTableData {
     id: string,
@@ -42,7 +45,7 @@ export interface RouteTableData {
 function Page() {
 
     //api
-    const { companyData } = useCompanyStore();
+    // const { companyData } = useCompanyStore();
     const { routeData, getRoutes, deleteRoute } = useRouteStore();
     const { times, getTimes } = useTimeStore();
     const { dates, getDates } = useDateStore();
@@ -167,25 +170,26 @@ function Page() {
     }
 
     //filter
-    const listCompany = companyData.map((item) => item.name)
-    const listStatus = [
-        STATUS.ACTIVE,
-        STATUS.INACTIVE,
-        STATUS.CANCELLED
-    ]
+    // const listCompany = companyData.map((item) => {
+    //     return {
+    //         key: 1,
+    //         value: item.name
+    //     }
+    // })
+
     const filterSearch = [
         {
             defaulteValue: FILTER.ALL_STATUS,
-            listValue: listStatus,
+            listValue: statusOptions,
             setSearchValue: setSearchStatus,
             size: "w-[130px]"
         },
-        {
-            defaulteValue: FILTER.ALL_COMPANIES,
-            listValue: listCompany,
-            setSearchValue: setSearchCompany,
-            size: "w-[170px]"
-        },
+        // {
+        //     defaulteValue: FILTER.ALL_COMPANIES,
+        //     listValue: listCompany,
+        //     setSearchValue: setSearchCompany,
+        //     size: "w-[170px]"
+        // },
     ]
 
     //search
@@ -229,7 +233,7 @@ function Page() {
             key: 'status',
             label: 'Status',
             width: '15%',
-            render: (value) => <StatusText type={value} />,
+            render: (value) => <StatusText id={value} />,
         },
         {
             key: 'id',

@@ -1,30 +1,265 @@
-"use client";
+"use client"
 
-import ButtonBG from "@/app/components/Form/ButtonBG";
-import TicketTable from "@/app/components/Table/TicketTable";
-import TicketTableSkeleton from "@/app/components/Table/TicketTableSkeleton";
-import TitlePage from "@/app/components/Title/TitlePage";
-import { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
+import { debounce } from "@/utils/debounce";
+import Link from 'next/link'
+import Image from 'next/image'
 
-export default function ManageTicketPage() {
-  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
-  useEffect(() => {
-    // Simulate fetching data (fake delay)
-    const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-  return (
-    <main className="">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-            <TitlePage
-              title="Manage Tickets"
-              description="View and manage ticket information"
-            />
-            <button className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 cursor-pointer">
-          🧾 Export Tickets
-          </button>
-        </div>
-      {isLoadingskeleton ? <TicketTableSkeleton rows={5} /> : <TicketTable />}
-    </main>
-  );
+//companent 
+import FormFilter from '@/app/components/Filter/FormFilter'
+import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
+import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
+import StatusText from '@/app/components/StatusText'
+import { Confirm } from '@/app/components/Dialog/Confirm'
+
+//api
+import { useCompanyStore } from '@/stores/companyStore'
+import { useTicketStore } from '@/stores/routeTicketStore'
+
+//toast
+import { toast } from 'react-toastify'
+import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
+import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
+import { TicketProps } from '@/types/types'
+
+//const 
+import { FILTER } from '@/constants/enum'
+import { statusOptions } from '@/constants/options';
+
+
+export interface TicketTableData {
+  id: number,
+  ticketNameEN: string,
+  ticketNameTH: string,
+  status: number,
+  amount: number,
+  ticketColor: string
 }
+
+function Page() {
+
+  //api
+  const { companyData } = useCompanyStore();
+  const { getTicketByRouteId, deleteTicket } = useTicketStore();
+
+  const pathname = usePathname();
+
+  const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
+  const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
+  const [search, setSearch] = useState<string>(''); // Search input
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+  const [tickets, setTickets] = useState<TicketProps[]>([])
+
+  //fetch tickets
+  const fetchTicketData = async () => {
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
+    const ticketTemp = await getTicketByRouteId(50);
+    cancelSkeleton();
+    if (ticketTemp) {
+      setTickets(ticketTemp)
+    }
+  }
+
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = Number(e.target.value);
+    setRowsPerPage(newSize);
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    fetchTicketData();
+  }, [currentPage, rowsPerPage]);
+
+  // Function to create data for table
+  const createData = (
+    id: number,
+    ticketNameEN: string,
+    ticketNameTH: string,
+    status: number,
+    amount: number,
+    ticketColor: string
+  ): TicketTableData => {
+    return { id, ticketNameEN, ticketNameTH, status, amount, ticketColor };
+  };
+
+  // Generate rows for table
+  const [rows, setRows] = useState<TicketTableData[]>([]);
+  useEffect(() => {
+    const isReady = tickets;
+    if (!isReady) {
+      setRows([])
+      return
+    };
+    const fetchWithTicketCounts = async () => {
+      const newRows = await Promise.all(
+        tickets?.map(async (item) => {
+          return createData(
+            Number(item.id),
+            item.ticketName_en,
+            item.ticketName_th,
+            Number(item.ticket_status),
+            Number(item.ticket_amount),
+            item.ticket_color
+          );
+        })
+      );
+      setRows(newRows);
+    };
+    fetchWithTicketCounts();
+  }, [tickets]);
+
+  // Handle delete route
+  const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
+    const isConfirmed = await Confirm({
+      title: `Delete "${ticketName}"?`,
+      text: `Are you sure you want to delete it.`,
+      confirmText: "Delete",
+      cancelText: "Cancel",
+    });
+    if (isConfirmed) {
+      const result = await deleteTicket(id);
+      if (result.success) {
+        fetchTicketData();
+        toast.success("delete ticket successfully!");
+      } else {
+        toast.error(`Error: ${result.message}`);
+      }
+    }
+  };
+
+  const ExportTickets = () => {
+    console.log("ไปไหน")
+  }
+
+  //filter
+  const listCompany = companyData.map((item) => {
+    return {
+      key: 1,
+      value: item.name
+    }
+  })
+  const filterSearch = [
+    {
+      defaulteValue: FILTER.ALL_STATUS,
+      listValue: statusOptions,
+      setSearchValue: setSearchStatus,
+      size: "w-[130px]"
+    },
+    {
+      defaulteValue: FILTER.ALL_PAYMENT,
+      listValue: listCompany,
+      setSearchValue: setSearchCompany,
+      size: "w-[170px]"
+    },
+  ]
+
+  //search
+  useEffect(() => {
+    if (!debouncedSearch) {
+      fetchTicketData();
+    };
+    // getRoutes(currentPage, rowsPerPage, debouncedSearch);
+  }, [debouncedSearch])
+
+  const debouncedFetch = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearch(value);
+    }, 350),
+    []
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    debouncedFetch(e.target.value);
+  };
+
+  //table columns
+  const columns: ColumnConfig<TicketTableData>[] = [
+    {
+      key: 'ticketNameEN', label: 'Ticket', width: '25%',
+      render: (_, row) => (
+        <div className='flex gap-3 items-center'>
+          <div className='w-[8px] h-[40px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.ticketColor }} />
+          <div className='flex flex-col gap-1'>
+            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'status', label: 'Status', width: '20%', align: 'center',
+      render: (value) => (
+        <div className='flex justify-center'>
+          <StatusText id={value} />
+        </div>
+      ),
+    },
+    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
+    {
+      key: 'id', label: 'Action', width: '25%', align: 'right',
+      render: (_, row) => (
+        <div className='flex justify-end gap-2 min-w-max'>
+          <Link href={`${pathname}/${row?.id}`} className='cursor-pointer'>
+            <Image
+              src={"/icons/money.svg"}
+              width={1000}
+              height={1000}
+              alt='icon'
+              priority
+              className='w-[16px] h-[16px]'
+            />
+          </Link>
+          <div onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })} className='cursor-pointer'>
+            <Image
+              src={"/icons/garbage.svg"}
+              width={1000}
+              height={1000}
+              alt='icon'
+              priority
+              className='w-[16px] h-[16px]'
+            />
+          </div>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <TitlePageAndButton title='Manage Tickets' description='View and manage ticket information' btnText='Export Tickets' handleOpenModel={ExportTickets} />
+      <FormFilter
+        setSearch={(value: string) =>
+          handleSearchChange({
+            target: { value },
+          } as React.ChangeEvent<HTMLInputElement>)
+        }
+        placeholderSearch='Search ticket ID, route, or phone...'
+        filter={filterSearch}
+        search={search}
+      />
+      {isLoadingskeleton ? <SkeletonRoute /> :
+        <TableTemplate
+          columns={columns}
+          data={rows}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalPages={1}
+          totalResults={tickets.length}
+          onPageChange={setCurrentPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          rowKey={(row) => row.id}
+        />
+      }
+
+    </>
+  )
+}
+
+export default Page

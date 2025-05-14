@@ -11,7 +11,9 @@ type TicketStore = {
     setTicketData: (newData: TicketProps[]) => void;
     addTicket: (newTicket: CreateRouteTicketPayload) => void;
     updateTicket: (id: number, updatedTicket: UpdateRouteTicketPayload) => Promise<{ success: boolean; message?: string }>
-    deleteTicket: (id: string) => void;
+    deleteTicket: (
+    id: number,
+  ) => Promise<{ success: boolean; message?: string }>;
     getTicketByRouteId: (id: number) => Promise<TicketProps[] | undefined>;
     getTicketById: (id: number) => Promise<TicketProps | undefined>;
 };
@@ -64,9 +66,15 @@ export const useTicketStore = create<TicketStore>((set) => ({
     },
 
     // ฟังก์ชันการลบข้อมูล
-    deleteTicket: (id) => set((state) => ({
-        ticketData: state.ticketData.filter((ticket) => ticket.id !== id),
-    })),
+    deleteTicket: async (id): Promise<{ success: boolean; message?: string }> => {
+        try {
+            await RouteTicketService.deleteTicket(id);
+            return { success: true };
+        } catch (error) {
+            console.error("delete ticket error:", error);
+            return { success: false, message: (error as any)?.message || "Unknown error" };
+        }
+    },
 
     getTicketById: async (id: number): Promise<TicketProps | undefined> => {
         try {

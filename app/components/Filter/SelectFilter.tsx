@@ -5,10 +5,14 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select'
 
+export type ListValueProps = {
+    key: number,
+    value: string
+}
 export type SelectFilterProps = {
     width: string;
     defaultValue: string;
-    listValue?: string[];
+    listValue?: ListValueProps[];
     onChange?: (event: SelectChangeEvent) => void; // ✅ เพิ่ม onChange ที่ถูกต้อง
 
 }
@@ -45,7 +49,7 @@ function SelectFilter({ width, defaultValue, listValue, onChange }: SelectFilter
         >
             <MenuItem value={defaultValue}>{defaultValue}</MenuItem>
             {listValue?.map((item, index) => (
-                <MenuItem key={index} value={item}>{item}</MenuItem>
+                <MenuItem key={index} value={item.value}>{item.value}</MenuItem>
             ))}
         </Select>
     )

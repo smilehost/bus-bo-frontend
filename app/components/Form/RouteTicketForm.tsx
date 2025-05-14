@@ -1,6 +1,8 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 //component
 import FormRouteTicket from '@/app/components/Form/FormRouteTicket'
@@ -9,6 +11,7 @@ import TierdPriceTable from '@/app/components/Table/TierdPriceTable'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import TextError from '@/app/components/TextError'
+import TicketBox from '../Box/TicketBox'
 
 //const 
 import { TICKET_TYPE } from '@/constants/enum'
@@ -21,8 +24,8 @@ import { useTicketPriceStore } from '@/stores/routeTicketPriceTypeStore'
 //type 
 import { TicketProps, TicketPriceType, TicketRoutePrice, RouteData } from '@/types/types'
 
-//icon
-import { Bolt, Table } from "lucide-react";
+//toast
+import { toast } from 'react-toastify'
 
 //mui
 import Box from '@mui/material/Box';
@@ -45,6 +48,8 @@ export interface RouteTicketFormProps {
 }
 
 function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicketFormProps) {
+
+    const router = useRouter();
     const { updateTicket, addTicket, getTicketByRouteId, getTicketById } = useTicketStore();
     const { getRouteById } = useRouteStore();
     const { getTicketPriceType } = useTicketPriceStore();
@@ -202,7 +207,6 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
             setTicketPriceFixed(tempFixed);
         }
 
-        setCheckConfirm(true)
         setActiveStep((prev) => prev + 1);
     };
 
@@ -265,19 +269,23 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
         try {
             if (isUpdate) {
                 await updateTicket(ticketId, formattedPayload)
-                console.log("✅ Update Success");
+                toast.success("Update Success!");
+                if (ticketActiveConfig) {
+                    router.push("/bu/manage-ticket")
+                }
             } else {
                 await addTicket(formattedPayload); // ใช้ฟังก์ชันเพิ่มใหม่
-                console.log("✅ Create Success");
+                toast.success("Create Success!")
             }
-            handleBack();
             if (!ticketActiveConfig) {
                 resetTicketForm();
+                handleBack();
             }
             setTicketActive(ticketActiveConfig);
             await fetchTicketByRouteID();
         } catch (error) {
             console.error("❌ Submit Failed", error);
+            toast.error("Submit Failed!");
         }
     };
 
@@ -316,42 +324,41 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
     return (
         <div>
             {tickets && tickets.length > 0 && (
-                <div className='mt-4'>
-                    <p className='font-medium'>Tickets</p>
-                    <div className='flex flex-wrap gap-4 mt-1'>
-                        {tickets.map((item, index) => (
-                            <div key={index}
-                                className={`${ticketActive === item.id ? "bg-gray-200" : "bg-white"} w-[200px] cursor-pointer shadow-xs px-7 rounded-md relative overflow-hidden`}
-                                onClick={() => {
-                                    if (activeStep > 0) return;
-                                    if (ticketActive === item.id) {
-                                        setTicketActive(ticketActiveConfig);
-                                        setError('')
-                                    } else {
-                                        setTicketActive(item.id);
-                                        setError('')
-                                    }
-                                }}
-                            >
-                                <div className={` w-[8px] h-full absolute left-0`}
-                                    style={{
-                                        backgroundColor: item.ticket_color
+                <div className="mt-4">
+                    <p className="font-medium">Tickets</p>
+                    <div className="flex flex-wrap gap-4 mt-1">
+                        {!ticketActiveConfig
+                            ? tickets.map((item, index) => (
+                                <TicketBox
+                                    key={index}
+                                    ticket={item}
+                                    isActive={ticketActive === item.id}
+                                    onClick={() => {
+                                        if (activeStep > 0) return;
+                                        setError("");
+                                        if (ticketActiveConfig && item.id) return setTicketActive(item.id);
+                                        if (ticketActive === item.id) return setTicketActive(ticketActiveConfig);
+                                        if (item.id) setTicketActive(item.id);
                                     }}
                                 />
-                                <div className='flex flex-col gap-1 py-2'>
-                                    <p className='text-[12px] custom-ellipsis-style'>{item.ticketName_th}</p>
-                                    <p className='text-[12px] custom-ellipsis-style'>{item.ticketName_en}</p>
-                                </div>
-                                {item.ticket_type === TICKET_TYPE.FIXED ? (
-                                    <Bolt size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
-                                ) : (item.ticket_type === TICKET_TYPE.TIERED) && (
-                                    <Table size={16} className="text-gray-500 absolute top-0 right-0 m-2" />
-                                )}
-                            </div>
-                        ))}
+                            ))
+                            : (
+                                <TicketBox
+                                    ticket={{
+                                        ticket_color: ticketData[0].ticket_color,
+                                        ticketName_en: ticketData[0].ticketName_en,
+                                        ticketName_th: ticketData[0].ticketName_th,
+                                        ticket_type: ticketData[0].ticket_type ?? TICKET_TYPE.FIXED,
+                                        ticket_amount: '0',
+                                        route_id: '0'
+                                    }}
+                                    isActive={true}
+                                />
+                            )}
                     </div>
                 </div>
             )}
+
             <div className='p-5 custom-frame-content'>
                 <Box sx={{}}>
                     <Stepper activeStep={activeStep} orientation="vertical">

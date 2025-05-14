@@ -119,3 +119,4 @@ function TableTemplate<T>({
 }
 
 export default TableTemplate;
+

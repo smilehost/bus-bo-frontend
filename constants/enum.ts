@@ -7,12 +7,12 @@ export enum USER_TIER {
 export enum STATUS {
     ACTIVE = "Active",
     INACTIVE = "Inactive",
-    CANCELLED = "Cancelled",
 }
 
 export enum FILTER {
     ALL_STATUS = "All Status",
-    ALL_COMPANIES = "All Companies"
+    ALL_COMPANIES = "All Companies",
+    ALL_PAYMENT = "All Payments"
 }
 
 export enum TICKET_TYPE {

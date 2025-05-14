@@ -4,9 +4,12 @@ import Image from 'next/image'
 //components
 import SelectFilter from './SelectFilter'
 
+//type 
+import { ListValueProps } from './SelectFilter'
+
 type FilterProps = {
     defaulteValue: string;
-    listValue: string[];
+    listValue: ListValueProps[];
     setSearchValue?: React.Dispatch<React.SetStateAction<string>>;
     size: string
 }
