@@ -28,7 +28,6 @@ export const CompanyService = {
   },
 
   async updateCompany(id: number, payload: UpdateCompanyPayload) {
-    console.log("📦 payload ที่ส่งให้ backend:", payload);
     return await api.put({
       path: "/api/company",
       params: id,

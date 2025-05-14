@@ -1,5 +1,4 @@
 import React from "react";
-import StatusText from "@/app/components/StatusText";
 import Pagination from "../Pagination/Pagination";
 import { STATUS } from "@/constants/enum";
 
@@ -14,7 +13,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
   const buttonConfig = {
     status: {
       className:
-        "p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-blue-100 cursor-pointer",
+        "p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-blue-100",
       title: "Edit Status",
       icon: (
         <svg
@@ -29,7 +28,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
     },
     password: {
       className:
-        "p-1.5 bg-amber-50 rounded-lg text-amber-600 hover:bg-amber-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-amber-100 cursor-pointer",
+        "p-1.5 bg-amber-50 rounded-lg text-amber-600 hover:bg-amber-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-amber-100",
       title: "Edit Password",
       icon: (
         <svg
@@ -50,7 +49,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
     },
     details: {
       className:
-        "p-1.5 bg-emerald-50 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-emerald-100 cursor-pointer",
+        "p-1.5 bg-emerald-50 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors hover:shadow-sm cursor-pointer flex items-center gap-2 border border-emerald-100",
       title: "Edit Member",
       icon: (
         <svg
@@ -81,13 +80,12 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick }) => {
 
 type MemberTableProps = {
   members: {
-    id: number;
+    id: string | number;
     name: string;
-    tel: string;
-    status: STATUS;
+    username: string;
+    role: string;
+    status: number;
     company: string;
-    tripsTotal: number;
-    lastTransaction: string;
   }[];
   currentPage: number;
   totalPages: number;
@@ -95,9 +93,9 @@ type MemberTableProps = {
   rowsPerPage: number;
   onRowsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   totalResults: number;
-  onEditPassword: (id: number) => void;
-  onEditStatus: (id: number, status: STATUS) => void;
-  onEditMember: (id: number) => void;
+  onEditPassword: (id: string) => void;
+  onEditStatus: (id: string, status: number) => void;
+  onEditMember: (id: string) => void;
 };
 
 function MemberTable({
@@ -133,16 +131,13 @@ function MemberTable({
                   Name
                 </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
-                  Phone
+                  Username
                 </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
                   Company
                 </th>
-                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
-                  Trips Total
-                </th>
-                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
-                  Last Transaction
+                <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-left">
+                  Role
                 </th>
                 <th className="sticky top-0 py-4 px-6 bg-gray-50 border-b-2 border-gray-200 font-semibold text-gray-600 text-center">
                   Status
@@ -155,7 +150,7 @@ function MemberTable({
             <tbody>
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-gray-500">
+                  <td colSpan={7} className="py-8 text-center text-gray-500">
                     No data found
                   </td>
                 </tr>
@@ -179,25 +174,22 @@ function MemberTable({
                       {member.name}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200 text-gray-700">
-                      {member.tel}
+                      {member.username}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200 text-gray-700">
                       {member.company}
                     </td>
-                    <td className="py-4 px-6 border-b border-gray-200 text-center text-gray-700">
-                      {member.tripsTotal}
-                    </td>
-                    <td className="py-4 px-6 border-b border-gray-200 text-center text-gray-700">
-                      {member.lastTransaction}
+                    <td className="py-4 px-6 border-b border-gray-200 text-gray-700">
+                      {member.role === "1" ? "Admin" : "Salesman"}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200">
                       <div className="flex items-center justify-center">
-                        {member.status === STATUS.ACTIVE ? (
+                        {member.status === 1 ? (
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
                             <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
                             <span>Active</span>
                           </span>
-                        ) : member.status === STATUS.INACTIVE ? (
+                        ) : member.status === 0 ? (
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shadow-sm">
                             <span className="mr-1.5 h-2 w-2 rounded-full bg-yellow-500"></span>
                             <span>Inactive</span>
@@ -214,15 +206,17 @@ function MemberTable({
                       <div className="flex justify-center space-x-2">
                         <ActionButton
                           type="status"
-                          onClick={() => onEditStatus(member.id, member.status)}
+                          onClick={() =>
+                            onEditStatus(member.id.toString(), member.status)
+                          }
                         />
                         <ActionButton
                           type="password"
-                          onClick={() => onEditPassword(member.id)}
+                          onClick={() => onEditPassword(member.id.toString())}
                         />
                         <ActionButton
                           type="details"
-                          onClick={() => onEditMember(member.id)}
+                          onClick={() => onEditMember(member.id.toString())}
                         />
                       </div>
                     </td>

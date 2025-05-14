@@ -3,13 +3,12 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
-import { STATUS } from "@/constants/enum";
 
 type EditStatusModelProps = {
   open: boolean;
   onClose: () => void;
-  currentStatus: STATUS;
-  onSave: (newStatus: STATUS) => void;
+  currentStatus: number; // ใช้ number แทน STATUS enum string
+  onSave: (newStatus: number) => void;
 };
 
 function EditStatusModel({
@@ -18,12 +17,16 @@ function EditStatusModel({
   currentStatus,
   onSave,
 }: EditStatusModelProps) {
-  const [status, setStatus] = useState<string>(currentStatus);
+  const [status, setStatus] = useState<number>(currentStatus);
 
-  const statusOptions = ["Active", "Inactive", "Cancelled"];
+  const statusOptions = [
+    { label: "Active", value: 1 },
+    { label: "Inactive", value: 0 },
+    { label: "Cancelled", value: 2 },
+  ];
 
   const handleSave = () => {
-    onSave(status as STATUS);
+    onSave(status);
     onClose();
   };
 
@@ -41,11 +44,11 @@ function EditStatusModel({
             <select
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500"
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => setStatus(Number(e.target.value))}
             >
               {statusOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>

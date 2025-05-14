@@ -19,3 +19,9 @@ export enum TICKET_TYPE {
     FIXED = "Fixed",
     TIERED = "Tiered",
 }
+
+export const STATUS_LABELS: Record<number, STATUS> = {
+  1: STATUS.ACTIVE,
+  0: STATUS.INACTIVE,
+  2: STATUS.CANCELLED,
+};
