@@ -8,9 +8,9 @@ import { RouteData } from '@/types/types';
 import { CreateRoutePayload, UpdateRoutePayload } from '@/payloads/route.payload';
 
 interface RouteStore {
-  routeData: Route[];
+  routeData: Route;
   isLoading: boolean;
-  setRouteData: (newData: Route[]) => void;
+  setRouteData: (newData: Route) => void;
   addRoute: (newRoute: CreateRoutePayload) => void;
   updateRoute: (
     id: number,
@@ -24,7 +24,13 @@ interface RouteStore {
 };
 
 export const useRouteStore = create<RouteStore>((set) => ({
-  routeData: [],
+  routeData: {
+    data: [],
+    page: 1,
+    size: 10,
+    total: 0,
+    totalPages: 0
+  },
   isLoading: false,
 
   setRouteData: (newData) => set({ routeData: newData }),
@@ -91,12 +97,20 @@ export const useRouteStore = create<RouteStore>((set) => ({
         page,
         size,
         search,
-      }) as { result: Route[] };
+      }) as { result: Route };
 
       set({ routeData: res.result }); // อัปเดต routeData โดยตรง
     } catch (error) {
       console.error("getRoutes error:", error);
-      set({ routeData: [] }); // เคลียร์ข้อมูลกรณี error
+      set({
+        routeData: {
+          data: [],
+          page: 1,
+          size: 10,
+          total: 0,
+          totalPages: 0
+        },
+      }); // เคลียร์ข้อมูลกรณี error
     }
   },
 

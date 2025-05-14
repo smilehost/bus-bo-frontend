@@ -65,8 +65,6 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
   }, [stations]);
 
-  // const stations = ['A', 'B', 'C', 'D', 'E', 'F'];
-
   const [rowChecked, setRowChecked] = useState<number[]>([]);
   const [colChecked, setColChecked] = useState<number[]>([]);
   const [rowValue, setRowValue] = useState('');
@@ -200,6 +198,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
     return false;
   };
 
+  // console.log("ticketPrice: ", ticketPrice)
   return (
     <div >
       <p className='mb-2 font-medium'>{ticketTypePriceName}</p>

@@ -21,18 +21,25 @@ import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
 import { useTicketStore } from '@/stores/routeTicketStore'
 
-//type
-import { RouteData } from '@/types/types'
-
 //toast
 import { toast } from 'react-toastify'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
+export interface TableCreateType {
+    id: string,
+    route: string,
+    company: string,
+    schedule: string,
+    time: string,
+    ticket_amount: string,
+    status: STATUS,
+    routeColor: string
+}
+
 function Page() {
 
     //api
-    // const { companyData, addCompany, updateCompany, deleteCompany } = useCompanyStore();
     const { companyData } = useCompanyStore();
     const { routeData, getRoutes, deleteRoute } = useRouteStore();
     const { times, getTimes } = useTimeStore();
@@ -47,7 +54,6 @@ function Page() {
     const [search, setSearch] = useState<string>(''); // Search input
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
-    const [ticketByRoute, setTicketByRoute] = useState()
 
     //fetch routes
     const fetchRouteData = async () => {
@@ -91,44 +97,47 @@ function Page() {
         ticket_amount: string,
         status: STATUS,
         routeColor: string
-    ) => {
+    ): TableCreateType => {
         return { id, route, company, schedule, time, ticket_amount, status, routeColor };
     };
 
     // Generate rows for table
-    const [rows, setRows] = useState<RouteData[]>([]);
+    const [rows, setRows] = useState<TableCreateType[]>([]);
 
     useEffect(() => {
         const isReady = routeData?.data?.length && dates.length && times.length;
-        if (!isReady) return;
-      
-        const fetchWithTicketCounts = async () => {
-          const newRows = await Promise.all(
-            routeData.data.map(async (item) => {
-              const dateName = dates.find(d => d.id === item.route_date_id)?.name || '';
-              const timeName = times.find(t => t.id === item.route_time_id)?.schedule.join(', ') || '';
-      
-              const tickets = await getTicketByRouteId(item.route_id);
-              const ticketAmount = tickets?.length?.toString() || '0';
-      
-              return createData(
-                item.route_id,
-                item.route_name_en,
-                item.route_com_id,
-                dateName,
-                timeName,
-                ticketAmount,
-                item.route_status,
-                item.route_color
-              );
-            })
-          );
-      
-          setRows(newRows);
+        if (!isReady) {
+            setRows([])
+            return
         };
-      
+
+        const fetchWithTicketCounts = async () => {
+            const newRows = await Promise.all(
+                routeData.data.map(async (item) => {
+                    const dateName = dates.find(d => d.id === Number(item.route_date_id))?.name || '';
+                    const timeName = times.find(t => t.id === Number(item.route_time_id))?.schedule.join(', ') || '';
+
+                    const tickets = await getTicketByRouteId(Number(item.route_id));
+                    const ticketAmount = tickets?.length?.toString() || '0';
+
+                    return createData(
+                        item.route_id,
+                        item.route_name_en,
+                        item.route_com_id,
+                        dateName,
+                        timeName,
+                        ticketAmount,
+                        item.route_status,
+                        item.route_color
+                    );
+                })
+            );
+
+            setRows(newRows);
+        };
+
         fetchWithTicketCounts();
-      }, [routeData?.data, dates, times]);
+    }, [routeData?.data, dates, times]);
 
     // Handle delete route
     const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
@@ -186,13 +195,13 @@ function Page() {
     ]
 
     //search
-    // useEffect(() => {
-    //     if (!debouncedSearch) {
-    //         fetchRouteData()
-    //     };
+    useEffect(() => {
+        if (!debouncedSearch) {
+            fetchRouteData();
+        };
+        getRoutes(currentPage, rowsPerPage, debouncedSearch);
 
-    //     getRoutes(currentPage, rowsPerPage, debouncedSearch);
-    // }, [debouncedSearch])
+    }, [debouncedSearch])
 
     const debouncedFetch = useCallback(
         debounce((value: string) => {
@@ -217,6 +226,7 @@ function Page() {
                 }
                 placeholderSearch='Search routes...'
                 filter={filterSearch}
+                search={search}
             />
             {isLoadingskeleton ? <SkeletonRoute /> :
                 <div className=" bg-white rounded-lg shadow-xs mt-5 flex flex-col items-center overflow-hidden">

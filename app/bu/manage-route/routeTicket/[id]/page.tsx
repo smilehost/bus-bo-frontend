@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation';
 //component
 import RouteTicketForm from '@/app/components/Form/RouteTicketForm'
+import TitleHeader from '@/app/components/Title/TitleHeader';
 
 //store
 import { useTicketStore } from '@/stores/routeTicketStore'
 import { TicketProps } from '@/types/types';
+
 function Page() {
   const { id } = useParams();
   const { getTicketByRouteId } = useTicketStore();
@@ -27,11 +29,10 @@ function Page() {
     fetchData();
   }, [id, getTicketByRouteId]);
 
-  //13/05/68 ติดปัญหา add เกิน > 3 stations ไม่ได้ api ถูกแล้วน่าจะแค่แสดงผลผิด
-
   return (
     <div>
-      {ticketData && <RouteTicketForm ticketData={ticketData} routeId={routeId}/>}
+      <TitleHeader text={"Add New Route Ticket"} />
+      {ticketData && <RouteTicketForm ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
     </div>
   )
 }

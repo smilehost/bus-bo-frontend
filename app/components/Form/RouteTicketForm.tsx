@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react'
 
 //component
-import TitleHeader from '@/app/components/Title/TitleHeader'
 import FormRouteTicket from '@/app/components/Form/FormRouteTicket'
 import TicketPriceFixed from '@/app/components/Form/TicketPriceFixed'
 import TierdPriceTable from '@/app/components/Table/TierdPriceTable'
@@ -42,18 +41,18 @@ export type TicketPriceTypeFixed = {
 export interface RouteTicketFormProps {
     ticketData: TicketProps[]
     routeId: number
+    ticketActiveConfig: string
 }
 
-function RouteTicketForm({ ticketData, routeId }: RouteTicketFormProps) {
+function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicketFormProps) {
     const { updateTicket, addTicket, getTicketByRouteId, getTicketById } = useTicketStore();
     const { getRouteById } = useRouteStore();
     const { getTicketPriceType } = useTicketPriceStore();
 
-
     const [error, setError] = useState<string>('');
     const [routeActive, setRouteActive] = useState<RouteData>();
     const [tickets, setTickets] = useState<TicketProps[]>();
-    const [ticketActive, setTicketActive] = useState<string>();
+    const [ticketActive, setTicketActive] = useState<string>(ticketActiveConfig);
     const [ticketNameTH, setTicketNameTH] = useState<string>('');
     const [ticketNameEN, setTicketNameEN] = useState<string>('');
     const [ticketAmount, setTicketAmount] = useState<string>('');
@@ -272,8 +271,10 @@ function RouteTicketForm({ ticketData, routeId }: RouteTicketFormProps) {
                 console.log("✅ Create Success");
             }
             handleBack();
-            resetTicketForm();
-            setTicketActive('');
+            if (!ticketActiveConfig) {
+                resetTicketForm();
+            }
+            setTicketActive(ticketActiveConfig);
             await fetchTicketByRouteID();
         } catch (error) {
             console.error("❌ Submit Failed", error);
@@ -314,7 +315,6 @@ function RouteTicketForm({ ticketData, routeId }: RouteTicketFormProps) {
 
     return (
         <div>
-            <TitleHeader text={"Add New Route Ticket"} />
             {tickets && tickets.length > 0 && (
                 <div className='mt-4'>
                     <p className='font-medium'>Tickets</p>
@@ -325,7 +325,7 @@ function RouteTicketForm({ ticketData, routeId }: RouteTicketFormProps) {
                                 onClick={() => {
                                     if (activeStep > 0) return;
                                     if (ticketActive === item.id) {
-                                        setTicketActive(undefined);
+                                        setTicketActive(ticketActiveConfig);
                                         setError('')
                                     } else {
                                         setTicketActive(item.id);
