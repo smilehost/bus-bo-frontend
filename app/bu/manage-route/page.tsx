@@ -13,7 +13,6 @@ import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
-import Pagination from '@/app/components/Pagination/Pagination'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import StatusText from '@/app/components/StatusText'
 
@@ -65,6 +64,11 @@ function Page() {
         cancelSkeleton();
     }
 
+    useEffect(() => {
+        getDates(1, 9999, '');
+        getTimes(1, 9999, '');
+    }, [])
+
     //pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -76,18 +80,7 @@ function Page() {
     };
 
     useEffect(() => {
-        getDates(1, 9999, '');
-        getTimes(1, 9999, '');
-    }, [])
-
-    useEffect(() => {
-        // const pageCurrent = routeData?.page;
-        // const pageRows = routeData?.size;
-        // setRows(new Array(routeData?.data?.length || 0).fill(null));  // กำหนด array ว่างๆ ที่มีความยาวเท่ากับจำนวนข้อมูลที่มี
-        // if (pageCurrent !== currentPage || pageRows !== rowsPerPage) {
-        // ตั้งค่า rows ให้มีความยาวเท่ากับ routeData?.data.length เพื่อป้องกันการยืดหด
         fetchRouteData();
-        // }
     }, [currentPage, rowsPerPage]);
 
     // Function to create data for table
@@ -106,7 +99,6 @@ function Page() {
 
     // Generate rows for table
     const [rows, setRows] = useState<RouteTableData[]>([]);
-
     useEffect(() => {
         const isReady = routeData?.data?.length && dates.length && times.length;
         if (!isReady) {
@@ -181,7 +173,6 @@ function Page() {
         STATUS.INACTIVE,
         STATUS.CANCELLED
     ]
-
     const filterSearch = [
         {
             defaulteValue: FILTER.ALL_STATUS,
@@ -203,7 +194,6 @@ function Page() {
             fetchRouteData();
         };
         getRoutes(currentPage, rowsPerPage, debouncedSearch);
-
     }, [debouncedSearch])
 
     const debouncedFetch = useCallback(
@@ -218,7 +208,7 @@ function Page() {
         debouncedFetch(e.target.value);
     };
 
-    //table
+    //table columns
     const columns: ColumnConfig<RouteTableData>[] = [
         {
             key: 'route',
@@ -282,7 +272,6 @@ function Page() {
         },
     ];
 
-
     return (
         <>
             <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
@@ -297,19 +286,17 @@ function Page() {
                 search={search}
             />
             {isLoadingskeleton ? <SkeletonRoute /> :
-                <div className=" bg-white rounded-lg shadow-xs mt-5 flex flex-col items-center overflow-hidden">
-                    <TableTemplate data={rows} columns={columns} rowKey={(rows) => rows.id} />
-                    <div className='mt-5 w-full'>
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={routeData?.totalPages || 0}
-                            onPageChange={setCurrentPage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={handleRowsPerPageChange}
-                            totalResults={routeData?.total || 0}
-                        />
-                    </div>
-                </div>
+                <TableTemplate
+                    columns={columns}
+                    data={rows}
+                    currentPage={currentPage}
+                    rowsPerPage={rowsPerPage}
+                    totalPages={routeData?.totalPages}
+                    totalResults={routeData?.total}
+                    onPageChange={setCurrentPage}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                    rowKey={(row) => row.id}
+                />
             }
 
         </>
