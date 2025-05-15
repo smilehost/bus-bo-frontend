@@ -34,7 +34,7 @@ export default function RootLayout({
         {
             id: 4,
             icon: "/icons/ticket.svg",
-            text: "Manage Tickets",
+            text: "Manage Route Ticket",
             link: `manage-ticket`,
         },
         {

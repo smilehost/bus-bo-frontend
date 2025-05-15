@@ -240,7 +240,7 @@ function Page() {
         </div>
       ),
     },
-    { key: 'company', label: 'Company', width: '20%' },
+    // { key: 'company', label: 'Company', width: '20%' },
     { key: 'schedule', label: 'Schedule', width: '20%' },
     { key: 'time', label: 'Departure Times', width: '20%' },
     { key: 'ticket_amount', label: 'Tickets', width: '15%', align: 'center' },
