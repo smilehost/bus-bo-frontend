@@ -5,6 +5,11 @@ import { useCompanyStore } from "@/stores/companyStore";
 import { STATUS, FILTER } from "@/constants/enum";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
 
+interface Company {
+  id: string;
+  name: string;
+}
+
 interface SearchFilterProps {
   searchTerm: string;
   setSearchTerm: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -12,6 +17,7 @@ interface SearchFilterProps {
   setStatusFilter: (value: string) => void;
   companyFilter: string;
   setCompanyFilter: (value: string) => void;
+  companies: Company[];
 }
 
 export default function SearchFilter({
@@ -22,7 +28,7 @@ export default function SearchFilter({
   companyFilter,
   setCompanyFilter,
 }: SearchFilterProps) {
-  const { companyData } = useCompanyStore();
+  const { companies } = useCompanyStore();
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
 
@@ -43,7 +49,6 @@ export default function SearchFilter({
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
-  // ✅ Detect click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -103,7 +108,7 @@ export default function SearchFilter({
           <div className="relative" ref={statusRef}>
             <button
               onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
+              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${
                 statusFilter !== FILTER.ALL_STATUS
                   ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
@@ -129,16 +134,16 @@ export default function SearchFilter({
                 >
                   {FILTER.ALL_STATUS}
                 </div>
-                {Object.values(STATUS).map((status) => (
+                {Object.values(STATUS).map((label) => (
                   <div
-                    key={status}
+                    key={label}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
                     onClick={() => {
-                      setStatusFilter(status);
+                      setStatusFilter(label);
                       setStatusDropdownOpen(false);
                     }}
                   >
-                    {status}
+                    {label}
                   </div>
                 ))}
               </div>
@@ -149,13 +154,18 @@ export default function SearchFilter({
           <div className="relative" ref={companyRef}>
             <button
               onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
-              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border ${
+              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${
                 companyFilter !== FILTER.ALL_COMPANIES
                   ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
               } rounded-lg hover:bg-gray-50 transition-all`}
             >
-              <span className="mr-2 truncate">{companyFilter}</span>
+              <span className="mr-2 truncate">
+                {companyFilter === FILTER.ALL_COMPANIES
+                  ? FILTER.ALL_COMPANIES
+                  : companies.find((c) => c.id.toString() === companyFilter)
+                      ?.name || "-"}
+              </span>
               <ChevronDown
                 size={16}
                 className={`transform transition-transform ${
@@ -175,12 +185,12 @@ export default function SearchFilter({
                 >
                   {FILTER.ALL_COMPANIES}
                 </div>
-                {companyData.map((company) => (
+                {companies.map((company) => (
                   <div
                     key={company.id}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm truncate"
                     onClick={() => {
-                      setCompanyFilter(company.name);
+                      setCompanyFilter(company.id.toString()); // ✅ ใช้ id แทน name
                       setCompanyDropdownOpen(false);
                     }}
                   >

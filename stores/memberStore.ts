@@ -1,73 +1,118 @@
-// src/store/memberStore.ts
-import { create } from 'zustand';
-import { Member } from '@/types/types';
-import { STATUS } from '@/constants/enum';
+import { create } from "zustand";
+import { MemberItem } from "@/types/member";
+import {
+  CreateMemberPayload,
+  UpdateMemberPayload,
+  FetchMemberQuery,
+} from "@/payloads/member.payload";
+import { MemberService } from "@/services/member.service";
 
-type MemberStore = {
-    membersData: Member[];
-    setMemberData: (newData: Member[]) => void;
-    addMember: (newMember: Member) => void;
-    updateMember: (id: string, updatedMember: Member) => void;
-    deleteMember: (id: string) => void;
-};
+interface MemberStore {
+  members: MemberItem[];
+  total: number;
+  isLoading: boolean;
+
+  getMembers: (
+    page: number,
+    size: number,
+    search?: string,
+    status?: string,
+    companyId?: string
+  ) => Promise<void>;
+
+  createMember: (member: CreateMemberPayload) => Promise<void>;
+  updateMember: (id: string, member: Partial<MemberItem>) => Promise<void>;
+  deleteMember: (id: string) => Promise<void>;
+  getMemberById: (id: string) => Promise<MemberItem | undefined>;
+  changePassword: (userId: string, newPassword: string) => Promise<void>;
+  changeStatus: (userId: string, newStatus: number) => Promise<void>; // ✅ เพิ่มเมธอด
+}
 
 export const useMemberStore = create<MemberStore>((set) => ({
-    membersData: [
-        {
-            id: '1',
-            member_name: 'Emily Davis',
-            member_phone: '555-123-4567',
-            member_status: STATUS.ACTIVE,
-            member_company_id: '2',
-            member_tripsTotal: 15,
-            member_lastTransaction: '5/10/2023',
-        },
-        {
-            id: '2',
-            member_name: 'John Smith',
-            member_phone: '555-123-4567',
-            member_status: STATUS.INACTIVE,
-            member_company_id: '3',
-            member_tripsTotal: 3,
-            member_lastTransaction: '5/10/2023',
-        },
-        {
-            id: '3',
-            member_name: 'Suphanat Jomoro',
-            member_phone: '555-123-4567',
-            member_status: STATUS.CANCELLED,
-            member_company_id: '1',
-            member_tripsTotal: 22,
-            member_lastTransaction: '5/10/2023',
-        },
-        {
-            id: '4',
-            member_name: 'Michael Brown',
-            member_phone: '555-123-4567',
-            member_status: STATUS.ACTIVE,
-            member_company_id: '4',
-            member_tripsTotal: 5,
-            member_lastTransaction: '5/10/2023',
-        },
-    ],
+  members: [],
+  total: 0,
+  isLoading: false,
 
-    // เซตข้อมูลสมาชิกทั้งหมด (เช่น ตอน fetch จาก API)
-    setMemberData: (newData) => set({ membersData: newData }),
+  getMembers: async (page, size, search, status, companyId) => {
+    set({ isLoading: true });
+    try {
+      const query: FetchMemberQuery = {
+        page,
+        size,
+        search: search || "",
+        status: status || "",
+        companyId: companyId || "",
+      };
+      const res = await MemberService.fetchMembers(query);
+      const rawData = (res as { result: any[] }).result || [];
+      const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData.length;
 
-    // เพิ่มสมาชิกใหม่
-    addMember: (newMember) => set((state) => ({
-        membersData: [...state.membersData, newMember],
-    })),
+      const mapped: MemberItem[] = rawData.map((item: any) => ({
+        id: item.account_id.toString(),
+        username: item.account_username,
+        name: item.account_name,
+        role: item.account_role,
+        status: item.account_status,
+        companyId: item.account_com_id,
+      }));
 
-    // อัปเดตข้อมูลสมาชิก
-    updateMember: (id, updatedMember) => set((state) => ({
-        membersData: state.membersData.map((member) =>
-            member.id === id ? updatedMember : member
-        ),
-    })),
+      set({ members: mapped, total: totalCount });
+    } catch (error) {
+      console.error("getMembers error:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
-    // ลบสมาชิก
-    deleteMember: (id) => set((state) => ({
-        membersData: state.membersData.filter((member) => member.id !== id),
-    })),
+  createMember: async (member) => {
+    await MemberService.createMember(member);
+  },
+
+  updateMember: async (id, member) => {
+    const payload: UpdateMemberPayload = {
+      account_id: parseInt(id, 10),
+      account_name: member.name!,
+    };
+    await MemberService.updateMember(id, payload);
+  },
+
+  deleteMember: async (id) => {
+    await MemberService.deleteMember(id);
+  },
+
+  getMemberById: async (id) => {
+    try {
+      const res = await MemberService.fetchMemberById(id);
+      const item = (res as { result: any }).result;
+      return {
+        id: item.account_id.toString(),
+        username: item.account_username,
+        name: item.account_name,
+        role: item.account_role,
+        status: item.account_status,
+        companyId: item.account_com_id,
+      };
+    } catch (error) {
+      console.error("getMemberById error:", error);
+      return undefined;
+    }
+  },
+
+  changePassword: async (userId: string, newPassword: string) => {
+    try {
+      await MemberService.changePassword(userId, newPassword);
+    } catch (error) {
+      console.error("Change password error:", error);
+      throw error;
+    }
+  },
+
+  changeStatus: async (userId: string, newStatus: number) => {
+    try {
+      await MemberService.changeStatus(userId, newStatus);
+    } catch (error) {
+      console.error("Change status error:", error);
+      throw error;
+    }
+  },
 }));

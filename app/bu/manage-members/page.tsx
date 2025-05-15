@@ -1,47 +1,45 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import TitlePage from "@/app/components/Title/TitlePage";
 import ButtonBG from "@/app/components/Form/ButtonBG";
-import FormFilter from "@/app/components/Filter/FormFilter";
+import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 import MemberTable from "@/app/components/Table/MemberTable";
-import MemberModel from "@/app/components/Model/MemberModal";
-import { useUserStore } from "@/stores/userStore";
-import { useCompanyStore } from "@/stores/companyStore";
-import { useMemberStore } from "@/stores/memberStore";
-import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
+import MemberModal from "@/app/components/Model/MemberModal";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
 import EditStatusModel from "@/app/components/Model/EditMemberStatusModal";
-import { STATUS, FILTER } from "@/constants/enum";
+import SkeletonMemberPage from "@/app/components/Skeleton/SkeletonMemberPage";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
-import { debounce } from "@/utils/debounce"; 
-import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
+import { debounce } from "@/utils/debounce";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
+import { useMemberStore } from "@/stores/memberStore";
+import { useCompanyStore } from "@/stores/companyStore";
+import { STATUS_LABELS, FILTER } from "@/constants/enum";
+import { MemberItem } from "@/types/member";
 
-function Page() {
-  const { companies } = useCompanyStore(); // Replace 'companyData' with the correct property name
-  const { membersData } = useMemberStore();
-  const { userData } = useUserStore();
+export default function ManageMembersPage() {
+  const { members, getMembers, createMember, updateMember } = useMemberStore();
+  const { companies, getCompanies } = useCompanyStore();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchStatus, setSearchStatus] = useState<FILTER>(FILTER.ALL_STATUS);
+  const [searchCompany, setSearchCompany] = useState<FILTER>(
+    FILTER.ALL_COMPANIES
+  );
+  const [filteredMembers, setFilteredMembers] = useState<MemberItem[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
 
-  const [isLoadingskeleton, setIsLoadingSkeleton] = useState(true);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [members, setMembers] = useState(membersData);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
 
-  const [searchStatus, setSearchStatus] = useState<string>("");
-  const [searchCompany, setSearchCompany] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
-
-  const [memberModelOpen, setMemberModelOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<MemberItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditStatusOpen, setEditStatusOpen] = useState(false);
   const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
-  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
-  const [currentStatus, setCurrentStatus] = useState<string | null>(null);
-  const [editingMember, setEditingMember] = useState<any>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<MemberItem | null>(null);
 
-  // ✅ debounce function
   const debouncedFetch = useCallback(
     debounce((value: string) => {
       setDebouncedSearch(value);
@@ -49,218 +47,43 @@ function Page() {
     []
   );
 
+  const fetchMembers = async () => {
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingSkeleton);
+    await getMembers(1, 9999); // โหลดทั้งหมดครั้งเดียว
+    cancelSkeleton();
+  };
+
   useEffect(() => {
-    setSearch("");
-    setDebouncedSearch("");
-    setSearchStatus(FILTER.ALL_STATUS);
-    setSearchCompany(FILTER.ALL_COMPANIES);
+    fetchMembers();
+    getCompanies(1, 10);
+  }, []);
+
+  useEffect(() => {
+    let temp = [...members];
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      temp = temp.filter(
+        (m) =>
+          m.name.toLowerCase().includes(q) ||
+          m.username.toLowerCase().includes(q)
+      );
+    }
+    if (searchStatus !== FILTER.ALL_STATUS) {
+      temp = temp.filter((m) => STATUS_LABELS[m.status] === searchStatus.toString());
+    }
+    if (searchCompany !== FILTER.ALL_COMPANIES) {
+      temp = temp.filter(
+        (m) => m.companyId?.toString() === searchCompany.toString()
+      );
+    }
+    setFilteredMembers(temp);
+    setTotalResults(temp.length);
     setCurrentPage(1);
-  }, []);
-  
+  }, [debouncedSearch, searchStatus, searchCompany, members, companies]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoadingSkeleton(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const filtered = members.filter((item) => {
-    const companyName =
-      companies.find((com) => com.id === item.member_company_id)?.name || "";
-    const matchStatus =
-      searchStatus && searchStatus !== FILTER.ALL_STATUS
-        ? item.member_status === searchStatus
-        : true;
-    const matchCompany =
-      searchCompany && searchCompany !== FILTER.ALL_COMPANIES
-        ? companyName.toLowerCase().includes(searchCompany.toLowerCase())
-        : true;
-    const matchSearch = debouncedSearch
-      ? item.member_name
-          .toLowerCase()
-          .includes(debouncedSearch.toLowerCase()) ||
-        item.member_phone.toLowerCase().includes(debouncedSearch.toLowerCase())
-      : true;
-    return matchStatus && matchCompany && matchSearch;
-  });
-
-  const totalResults = filtered.length;
-  const totalPages = Math.ceil(totalResults / rowsPerPage);
-  const paginatedMembers = filtered.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
-  const listCompany = companies.map((item) => item.name);
-  const listStatus = [STATUS.ACTIVE, STATUS.INACTIVE, STATUS.CANCELLED];
-
-  const filterSearch = [
-    {
-      defaulteValue: FILTER.ALL_STATUS,
-      listValue: listStatus,
-      setSearchValue: setSearchStatus,
-      size: "w-[130px]",
-    },
-    {
-      defaulteValue: FILTER.ALL_COMPANIES,
-      listValue: listCompany,
-      setSearchValue: setSearchCompany,
-      size: "w-[170px]",
-    },
-  ];
-
-  const handleNewMember = async ({
-    name,
-    phone,
-  }: {
-    name: string;
-    phone: string;
-  }) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    setMemberModelOpen(false);
-    try {
-      const isConfirmed = await Confirm({
-        title: "Confirm Create",
-        text: "Do you want to create this member?",
-        confirmText: "Create",
-        cancelText: "Cancel",
-        type: "question",
-      });
-      if (!isConfirmed) return;
-      const newMember = {
-        id: String(Date.now()),
-        member_name: name,
-        member_phone: phone,
-        member_status: STATUS.ACTIVE,
-        member_company_id: userData.company_id,
-        member_tripsTotal: 0,
-        member_lastTransaction: "-",
-      };
-      setMembers((prev) => [...prev, newMember]);
-      await Alert({
-        title: "Created!",
-        text: "Member created successfully",
-        type: "success",
-      });
-    } catch (err) {
-      await Alert({
-        title: "Error!",
-        text: "Failed to create member.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEditMember = async ({
-    id,
-    name,
-    phone,
-  }: {
-    id: number;
-    name: string;
-    phone: string;
-  }) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    setMemberModelOpen(false);
-    try {
-      const isConfirmed = await Confirm({
-        title: "Confirm Update",
-        text: "Do you want to update this member?",
-        confirmText: "Update",
-        cancelText: "Cancel",
-        type: "question",
-      });
-      if (!isConfirmed) return;
-      setMembers((prev) =>
-        prev.map((m) =>
-          m.id === String(id)
-            ? { ...m, member_name: name, member_phone: phone }
-            : m
-        )
-      );
-      await Alert({
-        title: "Updated!",
-        text: "Member updated successfully",
-        type: "success",
-      });
-    } catch (err) {
-      await Alert({
-        title: "Error!",
-        text: "Failed to update member.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEditStatus = async (newStatus: string) => {
-    if (selectedMemberId === null || isSubmitting) return;
-    setIsSubmitting(true);
-    setEditStatusOpen(false);
-    try {
-      const isConfirmed = await Confirm({
-        title: "Confirm Status Change",
-        text: `Do you want to change status to ${newStatus}?`,
-        confirmText: "Update",
-        cancelText: "Cancel",
-        type: "question",
-      });
-      if (!isConfirmed) return;
-      setMembers((prev) =>
-        prev.map((m) =>
-          m.id === String(selectedMemberId)
-            ? { ...m, member_status: newStatus as STATUS }
-            : m
-        )
-      );
-      await Alert({
-        title: "Updated!",
-        text: "Member status updated successfully",
-        type: "success",
-      });
-    } catch (err) {
-      await Alert({
-        title: "Error!",
-        text: "Failed to update status.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEditPassword = async (newPassword: string) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    setEditPasswordOpen(false);
-    try {
-      const isConfirmed = await Confirm({
-        title: "Confirm Password Change",
-        text: "Do you want to update the password?",
-        confirmText: "Update",
-        cancelText: "Cancel",
-        type: "question",
-      });
-      if (!isConfirmed) return;
-      console.log("Updated password:", newPassword);
-      await Alert({
-        title: "Updated!",
-        text: "Password updated successfully",
-        type: "success",
-      });
-    } catch (err) {
-      await Alert({
-        title: "Error!",
-        text: "Failed to update password.",
-        type: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    debouncedFetch(e.target.value);
   };
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -268,9 +91,146 @@ function Page() {
     setCurrentPage(1);
   };
 
-  const getCompanyName = ({ id }: { id: string }) => {
-    return companies.find((com) => com.id === id)?.name || "";
+  const getCompanyName = (id: string) =>
+    companies.find((c) => c.id.toString() === id)?.name || "-";
+
+  const handleCreateOrUpdate = async (data: {
+    id?: string;
+    name: string;
+    username: string;
+    companyId: string;
+    role: string;
+    password?: string;
+    status: number;
+  }) => {
+    try {
+      setIsModalOpen(false);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const isConfirmed = await Confirm({
+        title: data.id ? "Confirm Update" : "Confirm Create",
+        text: data.id
+          ? "Do you want to update this member?"
+          : "Do you want to create this member?",
+        confirmText: data.id ? "Update" : "Create",
+        cancelText: "Cancel",
+        type: "question",
+      });
+
+      if (!isConfirmed) return;
+
+      if (data.id) {
+        await updateMember(data.id, {
+          ...data,
+          companyId: Number(data.companyId),
+        } as MemberItem);
+        await Alert({
+          title: "Updated!",
+          text: "Member updated.",
+          type: "success",
+        });
+      } else {
+        await createMember({
+          username: data.username,
+          password: data.password || "",
+          name: data.name,
+          role: data.role,
+        });
+        await Alert({
+          title: "Created!",
+          text: "Member created.",
+          type: "success",
+        });
+      }
+
+      fetchMembers();
+    } catch (err) {
+      console.error(err);
+      await Alert({
+        title: "Error!",
+        text: "Failed to save member.",
+        type: "error",
+      });
+    }
   };
+
+  const handleEditStatus = async (newStatus: number) => {
+    if (!selectedMember) return;
+
+    const isConfirmed = await Confirm({
+      title: "Confirm Status Change",
+      text: "Do you want to update the status?",
+      confirmText: "Update",
+      cancelText: "Cancel",
+      type: "question",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await useMemberStore
+        .getState()
+        .changeStatus(selectedMember.id, newStatus);
+      await Alert({
+        title: "Updated!",
+        text: "Status changed.",
+        type: "success",
+      });
+      fetchMembers();
+    } catch (error) {
+      console.error("Status update error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to change status.",
+        type: "error",
+      });
+    }
+
+    setEditStatusOpen(false);
+  };
+
+  const handleEditPassword = async (userId: string, newPassword: string) => {
+    const isConfirmed = await Confirm({
+      title: "Confirm Password Change",
+      text: "Do you want to change the password?",
+      confirmText: "Update",
+      cancelText: "Cancel",
+      type: "question",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await useMemberStore.getState().changePassword(userId, newPassword);
+      await Alert({
+        title: "Updated!",
+        text: "Password changed.",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Password update error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to change password.",
+        type: "error",
+      });
+    }
+
+    setEditPasswordOpen(false);
+  };
+
+  const paginated = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredMembers.slice(start, end).map((m) => ({
+      id: m.id,
+      name: m.name,
+      username: m.username,
+      role: m.role,
+      status: m.status,
+      company: getCompanyName(m.companyId.toString()),
+    }));
+  }, [filteredMembers, currentPage, rowsPerPage]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -281,108 +241,96 @@ function Page() {
             description="View and manage customer information"
           />
           <ButtonBG
+            size="h-[38px]"
             text="Add New Member"
             icon="/icons/plus.svg"
             onClick={() => {
               setEditingMember(null);
-              setMemberModelOpen(true);
+              setIsModalOpen(true);
             }}
-            size="h-[38px]"
-            disbled={isSubmitting}
           />
         </div>
 
         <div className="bg-white rounded-md shadow p-5">
           <SearchFilter
-            searchTerm={search}
-            setSearchTerm={(e) => {
-              const value = typeof e === "string" ? e : e.target.value;
-              setSearch(value);
-              debouncedFetch(value);
-            }}
+            searchTerm={searchTerm}
+            setSearchTerm={handleSearchChange}
             statusFilter={searchStatus}
-            setStatusFilter={setSearchStatus}
-            companyFilter={searchCompany} // ✅ ส่งค่า companyFilter
-            setCompanyFilter={setSearchCompany} // ✅ ส่งฟังก์ชัน setCompanyFilter
+            setStatusFilter={(value: string) =>
+              setSearchStatus(value as FILTER)
+            }
+            companyFilter={searchCompany}
+            setCompanyFilter={(value: string) =>
+              setSearchCompany(value as FILTER)
+            }
+            companies={companies}
           />
 
-          {isLoadingskeleton ? (
+          {isLoadingSkeleton ? (
             <SkeletonMemberPage rows={5} />
           ) : (
             <MemberTable
-              members={paginatedMembers.map((m) => ({
-                id: Number(m.id),
-                name: m.member_name,
-                tel: m.member_phone,
-                status: m.member_status,
-                company: getCompanyName({ id: m.member_company_id }),
-                tripsTotal: m.member_tripsTotal,
-                lastTransaction: m.member_lastTransaction,
-              }))}
+              members={paginated}
               currentPage={currentPage}
-              totalPages={totalPages}
+              totalPages={Math.ceil(totalResults / rowsPerPage)}
               onPageChange={setCurrentPage}
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleRowsPerPageChange}
               totalResults={totalResults}
               onEditStatus={(id, status) => {
-                if (!isSubmitting) {
-                  setSelectedMemberId(id);
-                  setCurrentStatus(status);
+                const found = members.find((m) => m.id === id);
+                if (found) {
+                  setSelectedMember(found);
                   setEditStatusOpen(true);
                 }
               }}
               onEditPassword={(id) => {
-                if (!isSubmitting) {
-                  setSelectedMemberId(id);
+                const found = members.find((m) => m.id === id);
+                if (found) {
+                  setSelectedMember(found);
                   setEditPasswordOpen(true);
                 }
               }}
               onEditMember={(id) => {
-                if (!isSubmitting) {
-                  const memberToEdit = members.find((m) => m.id === String(id));
-                  if (memberToEdit) {
-                    setEditingMember({
-                      id: Number(memberToEdit.id),
-                      name: memberToEdit.member_name,
-                      phone: memberToEdit.member_phone,
-                    });
-                    setMemberModelOpen(true);
-                  }
+                const found = members.find((m) => m.id === id);
+                if (found) {
+                  setEditingMember(found);
+                  setIsModalOpen(true);
                 }
               }}
             />
           )}
         </div>
 
-        <MemberModel
-          open={memberModelOpen}
-          onClose={() => !isSubmitting && setMemberModelOpen(false)}
-          onHandle={async (member) => {
-            if (member.id) {
-              await handleEditMember({ ...member, id: member.id as number });
-            } else {
-              await handleNewMember(member);
-            }
-          }}
-          editingMember={editingMember}
+        <MemberModal
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onHandle={handleCreateOrUpdate}
+          editingMember={
+            editingMember
+              ? {
+                  ...editingMember,
+                  id: editingMember.id.toString(),
+                  companyId: editingMember.companyId.toString(),
+                }
+              : undefined
+          }
         />
 
         <EditStatusModel
           open={isEditStatusOpen}
-          onClose={() => !isSubmitting && setEditStatusOpen(false)}
-          currentStatus={(currentStatus as STATUS) || STATUS.ACTIVE}
+          onClose={() => setEditStatusOpen(false)}
+          currentStatus={selectedMember?.status || 1}
           onSave={handleEditStatus}
         />
 
         <EditPasswordModel
           open={isEditPasswordOpen}
-          onClose={() => !isSubmitting && setEditPasswordOpen(false)}
+          onClose={() => setEditPasswordOpen(false)}
+          userId={selectedMember?.id || ""}
           onSave={handleEditPassword}
         />
       </div>
     </div>
   );
 }
-
-export default Page;
