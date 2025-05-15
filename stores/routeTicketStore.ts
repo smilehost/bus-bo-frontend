@@ -12,6 +12,7 @@ type TicketStore = {
     setTicketData: (newData: TicketProps[]) => void;
     addTicket: (newTicket: CreateRouteTicketPayload) => void;
     updateTicket: (id: number, updatedTicket: UpdateRouteTicketPayload) => Promise<{ success: boolean; message?: string }>
+    updateTicketStatus: (id: number, status: number) => Promise<{ success: boolean; message?: string }>
     deleteTicket: (
         id: number,
     ) => Promise<{ success: boolean; message?: string }>;
@@ -109,6 +110,28 @@ export const useTicketStore = create<TicketStore>((set) => ({
             return { success: true };
         } catch (error) {
             console.error("update route error:", error);
+            return {
+                success: false,
+                message: (error as any)?.message || "Unknown error during update",
+            };
+        }
+    },
+
+    updateTicketStatus: async (id, status) => {
+        try {
+            await RouteTicketService.updateTicketStatus(id, { route_ticket_status: status });
+
+            // อัปเดตสถานะใน state ทันที
+            set((state) => ({
+                ticketData: state.ticketData.map((ticket) =>
+                    Number(ticket.id) === id
+                        ? { ...ticket, ticket_status: status }
+                        : ticket
+                ),
+            }));
+            return { success: true };
+        } catch (error) {
+            console.error("updateTicketStatus error:", error);
             return {
                 success: false,
                 message: (error as any)?.message || "Unknown error during update",

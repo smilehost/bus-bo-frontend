@@ -47,7 +47,7 @@ function Page() {
 
   //api
   // const { companyData } = useCompanyStore();
-  const { routeData, getRoutes, deleteRoute, updateRoute } = useRouteStore();
+  const { routeData, getRoutes, deleteRoute, updateRouteStatus } = useRouteStore();
   const { times, getTimes } = useTimeStore();
   const { dates, getDates } = useDateStore();
   const { getTicketByRouteId } = useTicketStore();
@@ -177,22 +177,7 @@ function Page() {
     });
 
     if (isStatusConfirmed) {
-      const routeDataTemp = routeData.data.find((item) => Number(item.route_id) === idRoute);
-      if (!routeDataTemp) return console.error("Route not found");
-
-      const formatRouteData = {
-        route_id: Number(routeDataTemp.route_id),
-        route_name_th: routeDataTemp.route_name_th,
-        route_name_en: routeDataTemp.route_name_en,
-        route_color: routeDataTemp.route_color,
-        route_status: nextStatus,
-        route_com_id: Number(routeDataTemp.route_com_id),
-        route_date_id: Number(routeDataTemp.route_date_id),
-        route_time_id: Number(routeDataTemp.route_time_id),
-        route_array: routeDataTemp.route_array,
-      };
-
-      const result = await updateRoute(idRoute, formatRouteData);
+      const result = await updateRouteStatus(idRoute, nextStatus);
       if (result.success) {
         toast.success("Change status sucessfuly!")
         fetchRouteData();
@@ -270,7 +255,7 @@ function Page() {
       label: 'Status',
       width: '15%',
       render: (_, row) => (
-        <div onClick={() => handleChangeStatus({ idStatus: String(row.status), idRoute: Number(row.id) })}>
+        <div className='cursor-pointer' onClick={() => handleChangeStatus({ idStatus: String(row.status), idRoute: Number(row.id) })}>
           <StatusText id={Number(row.status)} />
         </div>
       ),

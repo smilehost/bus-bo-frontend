@@ -53,6 +53,14 @@ export const RouteTicketService = {
         });
     },
 
+    async updateTicketStatus(id: number, payload: { route_ticket_status: number }) {
+        return await api.put({
+            path: "/api/routeTicket",
+            params: id,
+            body: payload,
+        });
+    },
+
     async deleteTicket(id: number) {
         return await api.delete({
             path: "/api/routeTicket",

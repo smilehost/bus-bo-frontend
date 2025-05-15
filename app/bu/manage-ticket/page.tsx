@@ -43,7 +43,7 @@ function Page() {
 
   //stores
   // const { companyData } = useCompanyStore();
-  const { ticketDataList, getTickets, deleteTicket, updateTicket, getTicketById } = useTicketStore();
+  const { ticketDataList, getTickets, deleteTicket, updateTicket, getTicketById, updateTicketStatus } = useTicketStore();
 
   const pathname = usePathname();
 
@@ -153,32 +153,8 @@ function Page() {
 
 
     if (isStatusConfirmed) {
-      const ticketDataTemp = ticketDataList.data.find((item) => Number(item.id) === idTicket);
-      if (!ticketDataTemp) return console.error("Ticket not found");
-
-      const ticketPrice = await getTicketById(idTicket);
-      if (!ticketPrice) return console.error("Ticket price data not found");
-
-      const updatePayload = {
-        route_ticket_id: Number(ticketDataTemp.id),
-        route_ticket_name_th: ticketDataTemp.ticketName_th,
-        route_ticket_name_en: ticketDataTemp.ticketName_en,
-        route_ticket_color: ticketDataTemp.ticket_color,
-        route_ticket_route_id: Number(ticketDataTemp.route_id),
-        route_ticket_amount: parseInt(ticketDataTemp.ticket_amount),
-        route_ticket_type: ticketDataTemp.ticket_type,
-        route_ticket_status: nextStatus,
-        route_ticket_price: ticketPrice.ticket_price?.map((item) => ({
-          route_ticket_price_id: Number(item.route_ticket_price_id),
-          route_ticket_price_type_id: Number(item.ticket_price_type_id),
-          route_ticket_location_start: parseInt(item.from),
-          route_ticket_location_stop: parseInt(item.to),
-          price: item.price.toString(),
-          route_ticket_price_route_id: Number(ticketPrice.route_id)
-        }))
-      };
-
-      const result = await updateTicket(idTicket, updatePayload);
+      
+      const result = await updateTicketStatus(idTicket, nextStatus);
 
       if (result.success) {
         toast.success("Status changed successfully!");

@@ -129,7 +129,6 @@ function Page() {
             route_array: routeArray
         };
 
-        console.log(payload)
         const result = await updateRoute(Number(params.id), payload);
 
         if (result.success) {

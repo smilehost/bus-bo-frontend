@@ -16,6 +16,10 @@ interface RouteStore {
     id: number,
     updatedRoute: UpdateRoutePayload
   ) => Promise<{ success: boolean; message?: string }>;
+  updateRouteStatus: (
+    id: number,
+    status: number
+  ) => Promise<{ success: boolean; message?: string }>;
   deleteRoute: (
     id: number,
   ) => Promise<{ success: boolean; message?: string }>;
@@ -78,6 +82,22 @@ export const useRouteStore = create<RouteStore>((set) => ({
     } catch (error) {
       console.error("updateRoute error:", error);
       return { success: false, message: (error as any)?.message || "Unknown error" };
+    }
+  },
+
+  updateRouteStatus: async (id, status) => {
+    try {
+      const payload = {
+        route_status: status,
+      };
+      await RouteService.updateRouteStatus(id, payload);
+      return { success: true };
+    } catch (error) {
+      console.error("updateRouteStatus error:", error);
+      return {
+        success: false,
+        message: (error as any)?.message || "Unknown error",
+      };
     }
   },
 

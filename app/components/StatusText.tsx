@@ -11,7 +11,7 @@ const StatusText: React.FC<StatusTextProps> = ({ id }) => {
       text: STATUS.ACTIVE,
       className: "bg-[#DCFCE7] text-[#166534]",
     },
-    2: {
+    0: {
       text: STATUS.INACTIVE,
       className: "bg-[#F3F4F6] text-[#4B5563]",
     },
