@@ -15,8 +15,8 @@ import { Confirm } from '@/app/components/Dialog/Confirm'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
-//api
-import { useCompanyStore } from '@/stores/companyStore'
+//store
+// import { useCompanyStore } from '@/stores/companyStore'
 import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
@@ -41,14 +41,14 @@ export interface TicketTableData {
 
 function Page() {
 
-  //api
-  const { companyData } = useCompanyStore();
+  //stores
+  // const { companyData } = useCompanyStore();
   const { getTicketByRouteId, deleteTicket } = useTicketStore();
 
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
+  // const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -135,17 +135,35 @@ function Page() {
     }
   };
 
+  // Handle Change Status
+  const handleChangeStatus = async ({ idStatus }: { idStatus: string | number }) => {
+    const currentStatus = Number(idStatus);
+    const nextStatus = currentStatus === 1 ? 2 : 1;
+    const statusText = nextStatus === 1 ? "Active" : "Inactive";
+
+    const isStatusConfirmed = await Confirm({
+      title: "Change Status?",
+      text: `Do you want to change the status to "${statusText}"`,
+      confirmText: "Confirm",
+      cancelText: "Cancel",
+    });
+
+    if (isStatusConfirmed) {
+      console.log(`Status changed to ${statusText} (${nextStatus})`);
+    }
+  };
+
   const ExportTickets = () => {
     console.log("ไปไหน")
   }
 
   //filter
-  const listCompany = companyData.map((item) => {
-    return {
-      key: 1,
-      value: item.name
-    }
-  })
+  // const listCompany = companyData.map((item) => {
+  //   return {
+  //     key: 1,
+  //     value: item.name
+  //   }
+  // })
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
@@ -153,15 +171,15 @@ function Page() {
       setSearchValue: setSearchStatus,
       size: "w-[130px]"
     },
-    {
-      defaulteValue: FILTER.ALL_PAYMENT,
-      listValue: listCompany,
-      setSearchValue: setSearchCompany,
-      size: "w-[170px]"
-    },
+    // {
+    //   defaulteValue: FILTER.ALL_PAYMENT,
+    //   listValue: listCompany,
+    //   setSearchValue: setSearchCmpany,
+    //   size: "w-[170px]"
+    // },
   ]
 
-  //search
+  //Search
   useEffect(() => {
     if (!debouncedSearch) {
       fetchTicketData();
@@ -198,7 +216,7 @@ function Page() {
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
       render: (idStatus) => (
-        <div className='flex justify-center'>
+        <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus })}>
           <StatusText id={Number(idStatus)} />
         </div>
       ),

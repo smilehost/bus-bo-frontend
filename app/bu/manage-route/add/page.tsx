@@ -29,26 +29,6 @@ function Page() {
     const { addRoute } = useRouteStore();
     const { locations, getLocations } = useLocationStore();
 
-    // useEffect(() => {
-    //     if (params?.id !== undefined) {
-    //         const foundRoute = routeData.find((value) => value.id === params?.id);
-    //         if (foundRoute) {
-    //             const routeIndexData: RouteType = {
-    //                 id: foundRoute.id,
-    //                 route: foundRoute.route,
-    //                 company: foundRoute.company_id,
-    //                 schedule: foundRoute.schedule_id,
-    //                 times: foundRoute.times_id,
-    //                 status: foundRoute.status,
-    //                 routeColor: foundRoute.routeColor,
-    //                 stations: foundRoute.stations
-    //             };
-
-    //             setRouteIndexData(routeIndexData);
-    //         }
-    //     }
-    // }, [params, routeData])
-
     //get locations
     useEffect(() => {
         setRouteStatusId(1)
@@ -61,7 +41,7 @@ function Page() {
 
     }, [locations]);
 
-
+    //use state
     const [routeName, setRouteName] = useState<string>('')
     const [routeNameTH, setRouteNameTH] = useState<string>('')
     const [routeStatusId, setRouteStatusId] = useState<number>()
@@ -90,7 +70,6 @@ function Page() {
     }, [listB]);
 
     const handleSubmit = async () => {
-
         const routeArray = listStations.map((id) => id).join(',');
         const payload = {
             route_name_th: routeNameTH,
@@ -113,7 +92,6 @@ function Page() {
             toast.error(`Error: ${result.message}`);
         }
     };
-
 
     return (
         <div>

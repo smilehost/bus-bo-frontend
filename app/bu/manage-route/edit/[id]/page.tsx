@@ -116,7 +116,6 @@ function Page() {
     }, [listB]);
 
     const handleSubmit = async () => {
-
         const routeArray = listStations.map((id) => id).join(',');
         const payload = {
             route_id: Number(params.id),

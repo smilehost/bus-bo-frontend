@@ -25,7 +25,7 @@ function Page() {
       const data = await getTicketByRouteId(routeId);
       setTicketData(data);
     };
-
+    
     fetchData();
   }, [id, getTicketByRouteId]);
 

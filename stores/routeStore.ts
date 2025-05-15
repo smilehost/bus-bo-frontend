@@ -11,7 +11,7 @@ interface RouteStore {
   routeData: Route;
   isLoading: boolean;
   setRouteData: (newData: Route) => void;
-  addRoute: (newRoute: CreateRoutePayload) => void;
+  addRoute: (newRoute: CreateRoutePayload) => Promise<{ success: boolean; message?: string }>;
   updateRoute: (
     id: number,
     updatedRoute: UpdateRoutePayload
