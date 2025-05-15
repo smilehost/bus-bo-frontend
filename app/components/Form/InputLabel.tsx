@@ -8,8 +8,10 @@ type InputLabelProps = {
     value?: string | undefined;
     type: string,
     size?: string
+    autoComplete?: string;
+    disabled?: boolean;
 }
-function InputLabel({ label, placeholder, setValue, type, size, value }: InputLabelProps) {
+function InputLabel({ label, placeholder, setValue, type, size, value, disabled }: InputLabelProps) {
     return (
         <div className='flex flex-col gap-2'>
             <LabelText text={label} />
@@ -19,6 +21,7 @@ function InputLabel({ label, placeholder, setValue, type, size, value }: InputLa
                 placeholder={placeholder}
                 className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] ${size}`}
                 onChange={(e) => setValue(e.target.value)}
+                disabled={disabled}
             />
         </div>
     )

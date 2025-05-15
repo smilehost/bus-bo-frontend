@@ -63,11 +63,8 @@ export default function RootLayout({
         },
         {
             id: 9, 
-     
             icon: "/icons/report.svg", 
-     
             text: "Reports", 
-     
             link: `/reports`,
         },
         {

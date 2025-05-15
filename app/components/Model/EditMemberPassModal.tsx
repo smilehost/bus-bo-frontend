@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
@@ -7,20 +7,33 @@ import ButtonDefault from "../Form/ButtonDefault";
 type EditPasswordModelProps = {
   open: boolean;
   onClose: () => void;
-  onSave: (newPassword: string) => void;
+  userId: string; // เพิ่ม userId ที่ต้องใช้ตอนส่ง API
+  onSave: (userId: string, newPassword: string) => void;
 };
 
-function EditPasswordModel({ open, onClose, onSave }: EditPasswordModelProps) {
+function EditPasswordModel({
+  open,
+  onClose,
+  userId,
+  onSave,
+}: EditPasswordModelProps) {
   const [password, setPassword] = useState<string>("");
 
   const handleSave = () => {
-    if (!password) {
+    if (!password.trim()) {
       alert("Please enter a new password.");
       return;
     }
-    onSave(password);
+    onSave(userId, password.trim());
     onClose();
   };
+
+  // รีเซ็ตทุกครั้งเมื่อเปิด modal
+  useEffect(() => {
+    if (open) {
+      setPassword("");
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -37,6 +50,7 @@ function EditPasswordModel({ open, onClose, onSave }: EditPasswordModelProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter new password"
+              autoComplete="new-password"
             />
           </div>
           <div className="flex gap-3 justify-end mt-6">

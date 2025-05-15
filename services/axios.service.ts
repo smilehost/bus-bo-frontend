@@ -3,11 +3,6 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
 
-// Mock token only in browser
-if (typeof window !== "undefined" && !localStorage.getItem("token_bo")) {
-  localStorage.setItem("token_bo", "mock-token-1234");
-}
-
 const instance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -15,25 +10,42 @@ const instance = axios.create({
   },
 });
 
-// Interceptor ก่อนส่ง request
+// ดึง com_id จาก localStorage
+function getComId(): string | null {
+  try {
+    const store = localStorage.getItem("token_bo");
+    if (!store) return null;
+    const parsed = JSON.parse(store);
+    return parsed?.state?.com_id?.toString() || null;
+  } catch (error) {
+    console.error("Failed to parse com_id from token_bo:", error);
+    return null;
+  }
+}
+
+// ✅ Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token_bo");
+    const com_id = getComId();
+
     if (config.headers) {
       config.headers.set("Authorization", token ? `Bearer ${token}` : "");
-      config.headers.set("com_id", "1"); // ใส่ com_id แค่ใน header เท่านั้น
+      if (com_id) {
+        config.headers.set("com_id", com_id);
+      }
     }
   }
   return config;
 });
 
-// Interceptor หลังรับ response
+// ✅ Interceptor หลังรับ response
 instance.interceptors.response.use(
   (response) => {
     const code = response.data?.code;
     if (code === 20000 || code === 10011 || code === 22006) {
       console.warn("Token expired or unauthorized!", response.data);
-      localStorage.clear();
+      // localStorage.clear();
       if (process.env.NODE_ENV !== "development") {
         window.location.href = CONTEXT_PATH;
       }
@@ -42,7 +54,7 @@ instance.interceptors.response.use(
   },
   (error) => {
     console.error("API Error:", error);
-    localStorage.clear();
+    // localStorage.clear();
     if (process.env.NODE_ENV !== "development") {
       window.location.href = CONTEXT_PATH;
     }
@@ -50,7 +62,7 @@ instance.interceptors.response.use(
   }
 );
 
-// Service layer (สำหรับเรียกใช้งาน)
+// ✅ Service layer
 interface Payload {
   path: string;
   params?: string | number;

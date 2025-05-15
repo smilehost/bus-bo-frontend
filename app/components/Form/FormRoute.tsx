@@ -19,7 +19,7 @@ import { useTimeStore } from '@/stores/timeStore';
 import { useDateStore } from '@/stores/dateStore';
 
 //type
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 
 type FormRouteProps = {
   routeNameTH?: string | undefined;

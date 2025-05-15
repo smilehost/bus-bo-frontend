@@ -6,10 +6,7 @@ interface SearchFilterProps {
   setSearchTerm: (value: string) => void;
 }
 
-function LocationSearchFilter({
-  searchTerm,
-  setSearchTerm,
-}: SearchFilterProps) {
+function CompanySearchFilter({ searchTerm, setSearchTerm }: SearchFilterProps) {
   const clearSearch = () => {
     setSearchTerm("");
   };
@@ -24,7 +21,7 @@ function LocationSearchFilter({
           </div>
           <input
             type="text"
-            placeholder="Search by location..."
+            placeholder="Search by company..."
             className="pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -43,4 +40,4 @@ function LocationSearchFilter({
   );
 }
 
-export default LocationSearchFilter;
+export default CompanySearchFilter;

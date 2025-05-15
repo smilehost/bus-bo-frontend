@@ -6,7 +6,7 @@ import { STATUS } from '@/constants/enum';
 //component
 import LabelText from '@/app/components/Form/LabelText'
 
-import { TimeItem } from '@/types/time.type';
+import { TimeItem } from '@/types/time';
 
 export type TimeGroup = {
   name: string;

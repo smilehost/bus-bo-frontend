@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { Dispatch, SetStateAction } from 'react';
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 
 type DragDropProps = {
   listA: LocationItem[],

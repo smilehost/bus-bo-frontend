@@ -2,39 +2,45 @@
 
 import React, { useEffect, useState } from "react";
 
+type CompanyFormData = {
+  name: string;
+  prefix: string;
+  status: number; // 1 = Active, 0 = Inactive
+};
+
 type CompanyModalProps = {
-  isOpen: boolean;
   onClose: () => void;
-  onAdd: (name: string, status: "Active" | "Inactive") => void;
-  newCompanyName: string;
-  setNewCompanyName: (value: string) => void;
-  editingCompanyStatus?: "Active" | "Inactive";
+  onSave: (data: CompanyFormData) => void;
+  editingCompany?: CompanyFormData;
 };
 
 export default function CompanyModal({
-  isOpen,
   onClose,
-  onAdd,
-  newCompanyName,
-  setNewCompanyName,
-  editingCompanyStatus = "Active",
+  onSave,
+  editingCompany,
 }: CompanyModalProps) {
-  const [status, setStatus] = useState<"Active" | "Inactive">(
-    editingCompanyStatus
-  );
+  const [name, setName] = useState("");
+  const [prefix, setPrefix] = useState("");
+  const [status, setStatus] = useState(1);
 
   useEffect(() => {
-    setStatus(editingCompanyStatus || "Active");
-  }, [editingCompanyStatus]);
-
-  if (!isOpen) return null;
+    if (editingCompany) {
+      setName(editingCompany.name);
+      setPrefix(editingCompany.prefix);
+      setStatus(editingCompany.status);
+    } else {
+      setName("");
+      setPrefix("");
+      setStatus(1);
+    }
+  }, [editingCompany]);
 
   const handleSave = () => {
-    if (!newCompanyName.trim()) {
+    if (!name.trim()) {
       alert("Please enter a valid company name.");
       return;
     }
-    onAdd(newCompanyName, status);
+    onSave({ name, prefix, status });
   };
 
   return (
@@ -48,7 +54,7 @@ export default function CompanyModal({
         </button>
 
         <h2 className="text-xl font-semibold text-center mb-6">
-          {editingCompanyStatus ? "Edit Company" : "Add New Company"}
+          {editingCompany ? "Edit Company" : "Add New Company"}
         </h2>
 
         <div className="space-y-4">
@@ -58,9 +64,22 @@ export default function CompanyModal({
             </label>
             <input
               type="text"
-              value={newCompanyName}
-              onChange={(e) => setNewCompanyName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Enter Company name"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Prefix
+            </label>
+            <input
+              type="text"
+              value={prefix}
+              onChange={(e) => setPrefix(e.target.value)}
+              placeholder="Enter Company prefix (e.g. BST)"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
@@ -71,13 +90,11 @@ export default function CompanyModal({
             </label>
             <select
               value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as "Active" | "Inactive")
-              }
+              onChange={(e) => setStatus(Number(e.target.value))}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value={1}>Active</option>
+              <option value={0}>Inactive</option>
             </select>
           </div>
 
@@ -92,7 +109,7 @@ export default function CompanyModal({
               onClick={handleSave}
               className="px-4 py-2 rounded-md bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:opacity-90 cursor-pointer"
             >
-              {editingCompanyStatus ? "Update Company" : "Add Company"}
+              {editingCompany ? "Update Company" : "Add Company"}
             </button>
           </div>
         </div>

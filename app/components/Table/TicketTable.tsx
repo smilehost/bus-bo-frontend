@@ -3,7 +3,6 @@ type Ticket = {
   id: string;
   route: string;
   journey: string;
-  passengers: number;
   datetime: string;
   status: "Active" | "Canceled";
   amount: number;
@@ -15,7 +14,6 @@ const tickets: Ticket[] = [
     id: "T12345",
     route: "Northern Express",
     journey: "Central Station → North Terminal",
-    passengers: 1,
     datetime: "5/15/2023 08:00",
     status: "Active",
     amount: 4,
@@ -25,7 +23,6 @@ const tickets: Ticket[] = [
     id: "T12346",
     route: "Southern Route",
     journey: "Central Station → South Terminal",
-    passengers: 2,
     datetime: "5/15/2023 09:30",
     status: "Active",
     amount: 5,
@@ -35,7 +32,6 @@ const tickets: Ticket[] = [
     id: "T12347",
     route: "Eastern Circuit",
     journey: "East Terminal → Riverside",
-    passengers: 1,
     datetime: "5/16/2023 10:00",
     status: "Canceled",
     amount: 15,
@@ -45,7 +41,6 @@ const tickets: Ticket[] = [
     id: "T12348",
     route: "Western Line",
     journey: "Central Station → Mountain View",
-    passengers: 3,
     datetime: "5/16/2023 14:00",
     status: "Active",
     amount: 5,
@@ -65,10 +60,8 @@ export default function TicketTable() {
       <table className="min-w-full divide-y divide-gray-200 text-sm">
         <thead className="bg-gray-50 text-left text-gray-600 font-medium">
           <tr>
-            <th className="px-4 py-3">Ticket ID</th>
             <th className="px-4 py-3">Route</th>
-            <th className="px-4 py-3">Journey</th>
-            <th className="px-4 py-3">Date & Time</th>
+            <th className="px-4 py-3">Ticket Name</th>
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Amount</th>
             <th className="px-4 py-3">Price</th>
@@ -88,7 +81,6 @@ export default function TicketTable() {
                 className={`border-t border-gray-200 opacity-0 animate-fade-in-up`}
   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
               >
-                <td className="px-4 py-3 font-medium">{ticket.id}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div
@@ -101,11 +93,7 @@ export default function TicketTable() {
                 </td>
                 <td className="px-4 py-3 text-gray-500">
                   <div>{ticket.journey}</div>
-                  <div className="text-xs">
-                    {ticket.passengers} passenger(s)
-                  </div>
                 </td>
-                <td className="px-4 py-3">{ticket.datetime}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${
