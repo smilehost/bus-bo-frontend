@@ -246,6 +246,8 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
     //check update or create
     const isUpdate = !!ticketActive;
 
+    const ticketTemp = ticketData.find((item) => Number(item.id) === Number(ticketActive));
+    
     //set payload
     const ticketId = Number(ticketActive)
     const formattedPayload = {
@@ -253,7 +255,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
       route_ticket_name_th: ticketNameTH,
       route_ticket_name_en: ticketNameEN,
       route_ticket_color: ticketColor,
-      route_ticket_status: 1,
+      route_ticket_status: ticketTemp?.ticket_status || 1,
       route_ticket_route_id: Number(routeId),
       route_ticket_amount: parseInt(ticketAmount),
       route_ticket_type: ticketType,

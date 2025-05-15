@@ -20,7 +20,7 @@ interface RouteStore {
     id: number,
   ) => Promise<{ success: boolean; message?: string }>;
   getRouteById: (id: number) => Promise<RouteData | undefined>;
-  getRoutes: (page: number, size: number, search: string) => Promise<void>;
+  getRoutes: (page: number, size: number, search: string, status: string) => Promise<void>;
 };
 
 export const useRouteStore = create<RouteStore>((set) => ({
@@ -91,12 +91,13 @@ export const useRouteStore = create<RouteStore>((set) => ({
     }
   },
 
-  getRoutes: async (page: number, size: number, search?: string) => {
+  getRoutes: async (page: number, size: number, search?: string, status?: string) => {
     try {
       const res = await RouteService.fetchRoutes({
         page,
         size,
         search,
+        status
       }) as { result: Route };
 
       set({ routeData: res.result }); // อัปเดต routeData โดยตรง

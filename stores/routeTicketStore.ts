@@ -1,6 +1,6 @@
 // src/store/ticketStore.ts
 import { create } from 'zustand';
-import { TicketProps } from '@/types/types';
+import { Ticket, TicketProps } from '@/types/types';
 
 import { RouteTicketService } from '@/services/route.ticket.service';
 import { CreateRouteTicketPayload, UpdateRouteTicketPayload } from '@/payloads/route.ticket.payload';
@@ -8,21 +8,72 @@ import { CreateRouteTicketPayload, UpdateRouteTicketPayload } from '@/payloads/r
 
 type TicketStore = {
     ticketData: TicketProps[];
+    ticketDataList: Ticket;
     setTicketData: (newData: TicketProps[]) => void;
     addTicket: (newTicket: CreateRouteTicketPayload) => void;
     updateTicket: (id: number, updatedTicket: UpdateRouteTicketPayload) => Promise<{ success: boolean; message?: string }>
     deleteTicket: (
-    id: number,
-  ) => Promise<{ success: boolean; message?: string }>;
+        id: number,
+    ) => Promise<{ success: boolean; message?: string }>;
     getTicketByRouteId: (id: number) => Promise<TicketProps[] | undefined>;
     getTicketById: (id: number) => Promise<TicketProps | undefined>;
+    getTickets: (page: number, size: number, search: string, status: string) => Promise<void>;
 };
 
 export const useTicketStore = create<TicketStore>((set) => ({
     ticketData: [],
+    ticketDataList: {
+        data: [],
+        page: 1,
+        size: 10,
+        total: 0,
+        totalPages: 0
+    },
 
     // ฟังก์ชันการตั้งค่าข้อมูล
     setTicketData: (newData) => set({ ticketData: newData }),
+
+    getTickets: async (page: number, size: number, search?: string, status?: string) => {
+        try {
+            const res = await RouteTicketService.fetchTickets({
+                page,
+                size,
+                search,
+                status
+            }) as { result: any };
+
+            const rawData = res.result.data as UpdateRouteTicketPayload[];
+
+            const transformedData: TicketProps[] = rawData.map((item) => ({
+                id: String(item.route_ticket_id),
+                ticketName_th: item.route_ticket_name_th,
+                ticketName_en: item.route_ticket_name_en,
+                ticket_type: item.route_ticket_type,
+                ticket_amount: String(item.route_ticket_amount),
+                ticket_color: item.route_ticket_color,
+                ticket_status: item.route_ticket_status,
+                route_id: String(item.route_ticket_route_id),
+            }));
+
+            set({
+                ticketDataList: {
+                    ...res.result,
+                    data: transformedData,
+                },
+            });
+        } catch (error) {
+            console.error("getTicket error:", error);
+            set({
+                ticketDataList: {
+                    data: [],
+                    page: 1,
+                    size: 10,
+                    total: 0,
+                    totalPages: 0
+                },
+            });
+        }
+    },
 
     // ฟังก์ชันการเพิ่มข้อมูล
     addTicket: async (

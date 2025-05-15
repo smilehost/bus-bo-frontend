@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { LocationItem } from '@/types/location';
 
 //component 
-import FormRoute from '@/app/components/Form/FormRoute';
+import FormRoute from '@/app/components/Form/FormRoute/FormRoute';
 import TitleHeader from '@/app/components/Title/TitleHeader';
 
 //mui

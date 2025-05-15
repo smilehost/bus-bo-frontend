@@ -7,6 +7,10 @@ import MenuItemLink from "../components/Menu/MenuItem";
 import { useUserStore } from "@/stores/userStore";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { usePathname } from "next/navigation";
+
+//component
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 
 export default function RootLayout({
     children,
@@ -15,15 +19,19 @@ export default function RootLayout({
 }) {
     const { userData } = useUserStore();
 
+    const pathName = usePathname();
+
     const user_tier = userData.user_tier;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
     const allMenu = [
-        { id: 1, 
-      icon: "/icons/home.svg", 
-      text: "Dashboard", 
-      link: `dashboard` },
+        {
+            id: 1,
+            icon: "/icons/home.svg",
+            text: "Dashboard",
+            link: `dashboard`
+        },
         { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "sell-ticket" },
         {
             id: 3,
@@ -62,9 +70,9 @@ export default function RootLayout({
             link: `manage-members`,
         },
         {
-            id: 9, 
-            icon: "/icons/report.svg", 
-            text: "Reports", 
+            id: 9,
+            icon: "/icons/report.svg",
+            text: "Reports",
             link: `/reports`,
         },
         {
@@ -158,8 +166,13 @@ export default function RootLayout({
                     </div>
                 </header>
                 <main className="flex-1 overflow-auto bg-gray-100 ">
-                    <div className="container mx-auto px-4 sm:px-6 py-4 md:py-6">
-                        {children}
+                    <div className="container mx-auto px-4 sm:px-6 ">
+                        <div className="mt-3">
+                            <Breadcrumb path={pathName}/>
+                        </div>
+                        <div className="py-4 md:py-6">
+                            {children}
+                        </div>
                     </div>
                 </main>
             </div>

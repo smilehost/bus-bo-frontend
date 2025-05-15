@@ -12,7 +12,7 @@ import DragDrop from '@/app/components/RoutePage/DragDrop'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import ButtonDefault from '@/app/components/Form/ButtonDefault'
 import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
-import TextError from '../TextError';
+import TextError from '../../TextError';
 
 //api
 import { useTimeStore } from '@/stores/timeStore';
@@ -20,6 +20,9 @@ import { useDateStore } from '@/stores/dateStore';
 
 //type
 import { LocationItem } from '@/types/location';
+
+//style
+import styles from './FormRoute.module.scss'
 
 type FormRouteProps = {
   routeNameTH?: string | undefined;
@@ -97,8 +100,8 @@ function FormRoute({
   // console.log(listA, listB)
   return (
     <div className='custom-frame-content px-5 py-7 mt-5 w-full'>
-      <div className="lg:mx-20 flex flex-col gap-3">
-        <div className='flex justify-between flex-wrap gap-3 '>
+      <div className={` mx-auto flex flex-col gap-3 ${styles.customSizeContainer}`}>
+        <div className='flex justify-between flex-wrap gap-3'>
           {/* route name en*/}
           <InputLabel
             label="Route Name EN"
@@ -106,7 +109,7 @@ function FormRoute({
             type="text"
             setValue={setRouteName}
             value={routeName}
-            size='min-w-[300px] xl:w-[400px] max-w-[400px]'
+            size={'min-w-[300px] xl:w-[400px] max-w-[400px]'}
           />
           {/* route name th*/}
           <InputLabel
@@ -141,14 +144,16 @@ function FormRoute({
         <p className='text-[16px] font-bold'>Stations</p>
         <p className='text-[12px] text-[#6B7280]'>Add stations in order from start to end</p>
       </div>
-      <div className={`${disable ? "custom-disable-bg":"bg-white"} border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-sm`}>
-        <DragDrop
-          listA={listA}
-          setListA={setListA}
-          setListB={setListB}
-          listB={listB}
-          disable={disable}
-        />
+      <div className={`${disable ? "custom-disable-bg" : "bg-white"} border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-sm`}>
+        <div className={` ${styles.customSizeContainer} mx-auto`}>
+          <DragDrop
+            listA={listA}
+            setListA={setListA}
+            setListB={setListB}
+            listB={listB}
+            disable={disable}
+          />
+        </div>
       </div>
       <div className='flex flex-col items-end mt-5 '>
         {error && (
@@ -156,7 +161,7 @@ function FormRoute({
         )}
         <div className='mt-3 flex items-center justify-end gap-3'>
           <ButtonDefault size="" text="Cancel" onClick={() => router.back()} />
-          <ButtonBG size="" text={`${disable ? "Edit Route": "Add Route"}`} onClick={handleValidateSubmit} />
+          <ButtonBG size="" text={`${disable ? "Edit Route" : "Add Route"}`} onClick={handleValidateSubmit} />
         </div>
       </div>
     </div>

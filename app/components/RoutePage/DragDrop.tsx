@@ -24,10 +24,10 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
   }, [search, listA]);
 
   return (
-    <div className={`flex gap-10 gap-y-20 justify-center flex-wrap`}>
+    <div className={`flex gap-10 gap-y-20 justify-between flex-wrap`}>
       {/* List A */}
       {!disable && (
-        <div className=" p-4  h-[350px] rounded-md w-[200px] lg:w-[350px] xl:w-[434px]">
+        <div className=" py-4 h-[350px] rounded-md w-[250px] lg:w-[350px] xl:w-[400px]">
           <p className="text-center text-[12px] font-medium">Station List</p>
           <div className='mt-3'>
             <input
@@ -60,7 +60,7 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
       )}
 
       {/* List B */}
-      <div className={` p-4 rounded-md ${disable ? "w-full custom-disable-bg":"w-[200px] lg:w-[350px] xl:w-[434px]"}`}>
+      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg":"w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
         <p className="text-center text-[12px] font-medium">Stations this Route</p>
         <div className=' overflow-hidden mt-5 h-[350px] overflow-y-scroll'>
           <ReactSortable

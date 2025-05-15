@@ -1,7 +1,15 @@
 import { api } from "@/services/axios.service";
-import { CreateRouteTicketPayload, UpdateRouteTicketPayload } from '@/payloads/route.ticket.payload'
+import { CreateRouteTicketPayload, UpdateRouteTicketPayload, FetchTicketQuery } from '@/payloads/route.ticket.payload'
 
 export const RouteTicketService = {
+
+    async fetchTickets(query: FetchTicketQuery,
+    ) {
+        return await api.get({
+            path: "/api/routeTicket/all",
+            query: query as unknown as Record<string, string | number>,
+        });
+    },
 
     async createTicket(payload: CreateRouteTicketPayload) {
         return await api.post({

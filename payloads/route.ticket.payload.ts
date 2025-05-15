@@ -29,3 +29,10 @@ export interface RouteTicketPriceType {
 export interface UpdateRouteTicketPayload extends CreateRouteTicketPayload {
     route_ticket_id?: number;
 }
+
+export interface FetchTicketQuery {
+    page: number;
+    size: number;
+    search?: string;
+    status?: string;
+}

@@ -26,6 +26,14 @@ export type Route = {
     totalPages: number
 };
 
+export type Ticket = {
+    data: TicketProps[],
+    page: number,
+    size: number,
+    total: number,
+    totalPages: number
+};
+
 export type TicketPriceType = {
     id: string,
     name: string,

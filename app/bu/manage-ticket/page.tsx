@@ -43,7 +43,7 @@ function Page() {
 
   //stores
   // const { companyData } = useCompanyStore();
-  const { getTicketByRouteId, deleteTicket } = useTicketStore();
+  const { ticketDataList, getTickets, deleteTicket, updateTicket, getTicketById } = useTicketStore();
 
   const pathname = usePathname();
 
@@ -57,12 +57,15 @@ function Page() {
   //fetch tickets
   const fetchTicketData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    const ticketTemp = await getTicketByRouteId(50);
+    await getTickets(currentPage, rowsPerPage, '', '');;
     cancelSkeleton();
-    if (ticketTemp) {
-      setTickets(ticketTemp)
-    }
   }
+
+  useEffect(() => {
+    if (ticketDataList) {
+      setTickets(ticketDataList.data)
+    }
+  }, [ticketDataList])
 
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -136,7 +139,7 @@ function Page() {
   };
 
   // Handle Change Status
-  const handleChangeStatus = async ({ idStatus }: { idStatus: string | number }) => {
+  const handleChangeStatus = async ({ idStatus, idTicket }: { idStatus: string | number, idTicket: number }) => {
     const currentStatus = Number(idStatus);
     const nextStatus = currentStatus === 1 ? 2 : 1;
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
@@ -148,8 +151,41 @@ function Page() {
       cancelText: "Cancel",
     });
 
+
     if (isStatusConfirmed) {
-      console.log(`Status changed to ${statusText} (${nextStatus})`);
+      const ticketDataTemp = ticketDataList.data.find((item) => Number(item.id) === idTicket);
+      if (!ticketDataTemp) return console.error("Ticket not found");
+
+      const ticketPrice = await getTicketById(idTicket);
+      if (!ticketPrice) return console.error("Ticket price data not found");
+
+      const updatePayload = {
+        route_ticket_id: Number(ticketDataTemp.id),
+        route_ticket_name_th: ticketDataTemp.ticketName_th,
+        route_ticket_name_en: ticketDataTemp.ticketName_en,
+        route_ticket_color: ticketDataTemp.ticket_color,
+        route_ticket_route_id: Number(ticketDataTemp.route_id),
+        route_ticket_amount: parseInt(ticketDataTemp.ticket_amount),
+        route_ticket_type: ticketDataTemp.ticket_type,
+        route_ticket_status: nextStatus,
+        route_ticket_price: ticketPrice.ticket_price?.map((item) => ({
+          route_ticket_price_id: Number(item.route_ticket_price_id),
+          route_ticket_price_type_id: Number(item.ticket_price_type_id),
+          route_ticket_location_start: parseInt(item.from),
+          route_ticket_location_stop: parseInt(item.to),
+          price: item.price.toString(),
+          route_ticket_price_route_id: Number(ticketPrice.route_id)
+        }))
+      };
+
+      const result = await updateTicket(idTicket, updatePayload);
+
+      if (result.success) {
+        toast.success("Status changed successfully!");
+        fetchTicketData?.();
+      } else {
+        toast.error(`Failed to change status: ${result.message}`);
+      }
     }
   };
 
@@ -184,8 +220,8 @@ function Page() {
     if (!debouncedSearch) {
       fetchTicketData();
     };
-    // getRoutes(currentPage, rowsPerPage, debouncedSearch);
-  }, [debouncedSearch])
+    getTickets(currentPage, rowsPerPage, debouncedSearch, searchStatus);
+  }, [debouncedSearch, searchStatus])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -215,9 +251,9 @@ function Page() {
     },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
-      render: (idStatus) => (
-        <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus })}>
-          <StatusText id={Number(idStatus)} />
+      render: (_, row) => (
+        <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus: row.status, idTicket: row.id })}>
+          <StatusText id={Number(row.status)} />
         </div>
       ),
     },
@@ -270,8 +306,8 @@ function Page() {
           data={rows}
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
-          totalPages={1}
-          totalResults={tickets.length}
+          totalPages={ticketDataList.totalPages}
+          totalResults={ticketDataList.total}
           onPageChange={setCurrentPage}
           onRowsPerPageChange={handleRowsPerPageChange}
           rowKey={(row) => row.id}

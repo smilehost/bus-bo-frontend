@@ -47,7 +47,7 @@ function Page() {
 
   //api
   // const { companyData } = useCompanyStore();
-  const { routeData, getRoutes, deleteRoute } = useRouteStore();
+  const { routeData, getRoutes, deleteRoute, updateRoute } = useRouteStore();
   const { times, getTimes } = useTimeStore();
   const { dates, getDates } = useDateStore();
   const { getTicketByRouteId } = useTicketStore();
@@ -64,7 +64,7 @@ function Page() {
   //fetch routes from store
   const fetchRouteData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    await getRoutes(currentPage, rowsPerPage, debouncedSearch);
+    await getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
     cancelSkeleton();
   }
   //fetch dates, times from store
@@ -164,7 +164,7 @@ function Page() {
   };
 
   // Handle Change Status
-  const handleChangeStatus = async ({ idStatus }: { idStatus: string }) => {
+  const handleChangeStatus = async ({ idStatus, idRoute }: { idStatus: string, idRoute: number }) => {
     const currentStatus = Number(idStatus);
     const nextStatus = currentStatus === 1 ? 2 : 1;
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
@@ -177,7 +177,28 @@ function Page() {
     });
 
     if (isStatusConfirmed) {
-      console.log(`Status changed to ${statusText} (${nextStatus})`);
+      const routeDataTemp = routeData.data.find((item) => Number(item.route_id) === idRoute);
+      if (!routeDataTemp) return console.error("Route not found");
+
+      const formatRouteData = {
+        route_id: Number(routeDataTemp.route_id),
+        route_name_th: routeDataTemp.route_name_th,
+        route_name_en: routeDataTemp.route_name_en,
+        route_color: routeDataTemp.route_color,
+        route_status: nextStatus,
+        route_com_id: Number(routeDataTemp.route_com_id),
+        route_date_id: Number(routeDataTemp.route_date_id),
+        route_time_id: Number(routeDataTemp.route_time_id),
+        route_array: routeDataTemp.route_array,
+      };
+
+      const result = await updateRoute(idRoute, formatRouteData);
+      if (result.success) {
+        toast.success("Change status sucessfuly!")
+        fetchRouteData();
+      } else {
+        toast.error(`Change status error: ${result.message}`)
+      }
     }
   };
 
@@ -206,14 +227,14 @@ function Page() {
     //     size: "w-[170px]"
     // },
   ]
-  
+
   //search
   useEffect(() => {
     if (!debouncedSearch) {
       fetchRouteData();
     };
-    getRoutes(currentPage, rowsPerPage, debouncedSearch);
-  }, [debouncedSearch])
+    getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
+  }, [debouncedSearch, searchStatus])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -248,9 +269,9 @@ function Page() {
       key: 'status',
       label: 'Status',
       width: '15%',
-      render: (idStatus) => (
-        <div onClick={() => handleChangeStatus({ idStatus })}>
-          <StatusText id={Number(idStatus)} />
+      render: (_, row) => (
+        <div onClick={() => handleChangeStatus({ idStatus: String(row.status), idRoute: Number(row.id) })}>
+          <StatusText id={Number(row.status)} />
         </div>
       ),
     },
