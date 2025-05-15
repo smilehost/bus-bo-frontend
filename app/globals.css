@@ -33,6 +33,9 @@ body {
   @apply whitespace-nowrap text-ellipsis overflow-hidden;
 }
 
+.custom-disable-bg {
+  @apply bg-gray-100
+}
 /* 🎯 เพิ่ม Animation Fade-In-Up (แบบเดียวกับที่ทำให้ Table Animate) */
 @keyframes fadeInUp {
   0% {

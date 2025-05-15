@@ -8,10 +8,9 @@ import { TicketPriceTypeFixed } from '@/app/bu/manage-route/routeTicket/[id]/pag
 type TicketPriceFixedProps = {
   listType: TicketPriceTypeFixed[];
   setTicketTypePrice: (value: TicketPriceTypeFixed[]) => void;
-  setCheckConfirm: (value: boolean) => void;
 };
 
-function TicketPriceFixed({ listType, setTicketTypePrice, setCheckConfirm }: TicketPriceFixedProps) {
+function TicketPriceFixed({ listType, setTicketTypePrice }: TicketPriceFixedProps) {
   const [priceList, setPriceList] = useState<TicketPriceTypeFixed[]>([]);
 
   // sync priceList with incoming listType (only when listType changes)
@@ -25,14 +24,6 @@ function TicketPriceFixed({ listType, setTicketTypePrice, setCheckConfirm }: Tic
 
     const updated = [...priceList];
     updated[index].price = numericValue;
-
-    const isValidTicketPrice = updated.every(tp => tp.price && tp.price > 0) && updated.length > 0;
-
-    if (!isValidTicketPrice) {
-      setCheckConfirm(true);
-    }else{
-      setCheckConfirm(false);
-    }
 
     setPriceList(updated);
     setTicketTypePrice(updated);

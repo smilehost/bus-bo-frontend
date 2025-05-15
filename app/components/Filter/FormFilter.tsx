@@ -4,9 +4,12 @@ import Image from 'next/image'
 //components
 import SelectFilter from './SelectFilter'
 
+//type 
+import { ListValueProps } from './SelectFilter'
+
 type FilterProps = {
     defaulteValue: string;
-    listValue: string[];
+    listValue: ListValueProps[];
     setSearchValue?: React.Dispatch<React.SetStateAction<string>>;
     size: string
 }
@@ -15,14 +18,16 @@ type FormFilterProps = {
     setSearch: (value: string) => void;
     placeholderSearch?: string
     filter: FilterProps[];
+    search: string
 }
 
-function FormFilter({ setSearch, placeholderSearch, filter }: FormFilterProps) {
+function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilterProps) {
     return (
         <div className='custom-frame-content mt-5 p-3 flex items-center'>
             <div className='flex-1'>
                 {setSearch && (
                     <input
+                        value={search}
                         type="text"
                         className='rounded-lg border-[#D1D5DB] border-1 h-[38px] px-5 w-full'
                         placeholder={placeholderSearch}
