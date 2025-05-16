@@ -111,7 +111,7 @@ export default function DateManagerClient() {
     };
 
     setShowModal(false);
-    await new Promise((resolve) => setTimeout(resolve, 100)); 
+    await new Promise((resolve) => setTimeout(resolve, 300)); 
 
     const isConfirmed = await Confirm({
       title: editingDate ? "Confirm Update" : "Confirm Create",

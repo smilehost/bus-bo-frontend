@@ -105,7 +105,7 @@ export default function ManageMembersPage() {
   }) => {
     try {
       setIsModalOpen(false);
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const isConfirmed = await Confirm({
         title: data.id ? "Confirm Update" : "Confirm Create",
