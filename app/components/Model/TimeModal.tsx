@@ -76,7 +76,7 @@ const CustomTimePicker = ({
           <div className="flex h-64">
             <div className="w-1/2 overflow-y-auto border-r border-gray-200">
               <div className="py-1 text-center text-xs font-medium text-gray-500">
-                ชั่วโมง
+                Hour
               </div>
               {hours.map((hour) => (
                 <div
@@ -92,7 +92,7 @@ const CustomTimePicker = ({
             </div>
             <div className="w-1/2 overflow-y-auto">
               <div className="py-1 text-center text-xs font-medium text-gray-500">
-                นาที
+                Minutes
               </div>
               {minutes.map((minute) => (
                 <div
