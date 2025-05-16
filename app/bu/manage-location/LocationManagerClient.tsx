@@ -106,6 +106,8 @@ function Page() {
       lat: data.latitude.toString(),
       long: data.longitude.toString(),
     };
+    setShowModal(false);
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
       title: editingLocation ? "Confirm Update" : "Confirm Create",
@@ -230,16 +232,17 @@ function Page() {
 
       {showModal && (
         <LocationModal
+          open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveLocation}
           editingLocation={
             editingLocation
               ? {
-                name: editingLocation.name,
-                latitude: parseFloat(editingLocation.lat),
-                longitude: parseFloat(editingLocation.long),
-              }
-              : undefined
+                  name: editingLocation.name,
+                  latitude: parseFloat(editingLocation.lat),
+                  longitude: parseFloat(editingLocation.long),
+                }
+              : null
           }
         />
       )}

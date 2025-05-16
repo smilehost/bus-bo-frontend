@@ -101,6 +101,8 @@ function Page() {
     times: string[];
   }) => {
     const schedule = data.times.length > 0 ? data.times : [data.startTime];
+    setShowModal(false);
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
       title: editingTime ? "Confirm Update" : "Confirm Create",
@@ -222,6 +224,7 @@ function Page() {
 
       {showModal && (
         <TimeModal
+          open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveTime}
           editingTime={
