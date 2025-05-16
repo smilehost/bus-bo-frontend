@@ -15,7 +15,7 @@ type FilterProps = {
 }
 
 type FormFilterProps = {
-    setSearch: (value: string) => void;
+    setSearch?: (value: string) => void;
     placeholderSearch?: string
     filter: FilterProps[];
     search: string

@@ -18,7 +18,7 @@ import { TICKET_TYPE } from '@/constants/enum'
 //stores
 import { useTicketStore } from '@/stores/routeTicketStore'
 import { useRouteStore } from '@/stores/routeStore'
-import { useTicketPriceStore } from '@/stores/routeTicketPriceTypeStore'
+import { useTicketPriceTypeStore } from '@/stores/routeTicketPriceTypeStore'
 
 //type 
 import { TicketProps, TicketPriceType, TicketRoutePrice, RouteData } from '@/types/types'
@@ -52,7 +52,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
   //stores
   const { updateTicket, addTicket, getTicketByRouteId, getTicketById } = useTicketStore();
   const { getRouteById } = useRouteStore();
-  const { getTicketPriceType } = useTicketPriceStore();
+  const { getTicketPriceType } = useTicketPriceTypeStore();
 
   //use state
   const [error, setError] = useState<string>('');

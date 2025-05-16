@@ -56,7 +56,7 @@ export const RouteTicketService = {
     async updateTicketStatus(id: number, payload: { route_ticket_status: number }) {
         return await api.put({
             path: "/api/routeTicket",
-            params: id,
+            params: `${id}/status`,
             body: payload,
         });
     },

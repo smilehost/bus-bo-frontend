@@ -7,18 +7,21 @@ export const ConfirmWithInput = async ({
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     placeholder = '',
+    defaultValue = ''
 }: {
     title: string;
     text: string;
     confirmText?: string;
     cancelText?: string;
     placeholder?: string;
+    defaultValue?: string;
 }): Promise<string | null> => {
     const result = await Swal.fire({
         title,
         text,
         input: 'text',
         inputPlaceholder: placeholder,
+        inputValue: defaultValue, // ✅ ใส่ default value ที่นี่
         showCancelButton: true,
         confirmButtonText: confirmText,
         cancelButtonText: cancelText,

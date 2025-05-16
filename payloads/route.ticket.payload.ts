@@ -20,12 +20,6 @@ export interface CreateRouteTicketPayload {
     route_ticket_price?: RoutePriceTicket[]
 }
 
-export interface RouteTicketPriceType {
-    route_ticket_price_type_id: number,
-    route_ticket_price_type_name: string,
-    route_ticket_price_type_com_id: number,
-}
-
 export interface UpdateRouteTicketPayload extends CreateRouteTicketPayload {
     route_ticket_id?: number;
 }

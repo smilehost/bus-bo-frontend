@@ -43,7 +43,7 @@ function Page() {
 
   //stores
   // const { companyData } = useCompanyStore();
-  const { ticketDataList, getTickets, deleteTicket, updateTicket, getTicketById, updateTicketStatus } = useTicketStore();
+  const { ticketDataList, getTickets, deleteTicket, updateTicketStatus } = useTicketStore();
 
   const pathname = usePathname();
 
@@ -141,7 +141,7 @@ function Page() {
   // Handle Change Status
   const handleChangeStatus = async ({ idStatus, idTicket }: { idStatus: string | number, idTicket: number }) => {
     const currentStatus = Number(idStatus);
-    const nextStatus = currentStatus === 1 ? 2 : 1;
+    const nextStatus = currentStatus === 1 ? 0 : 1;
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
 
     const isStatusConfirmed = await Confirm({
@@ -153,7 +153,7 @@ function Page() {
 
 
     if (isStatusConfirmed) {
-      
+
       const result = await updateTicketStatus(idTicket, nextStatus);
 
       if (result.success) {
@@ -225,6 +225,7 @@ function Page() {
         </div>
       ),
     },
+    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
       render: (_, row) => (
@@ -233,7 +234,6 @@ function Page() {
         </div>
       ),
     },
-    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     {
       key: 'id', label: 'Action', width: '25%', align: 'right',
       render: (_, row) => (
@@ -265,14 +265,14 @@ function Page() {
 
   return (
     <>
-      <TitlePageAndButton title='Manage Tickets' description='View and manage ticket information' btnText='Export Tickets' handleOpenModel={ExportTickets} />
+      <TitlePageAndButton title='Manage Route Tickets' description='View and manage route ticket information.' btnText='Add New Route Ticket' handleOpenModel={ExportTickets} />
       <FormFilter
         setSearch={(value: string) =>
           handleSearchChange({
             target: { value },
           } as React.ChangeEvent<HTMLInputElement>)
         }
-        placeholderSearch='Search ticket ID, route, or phone...'
+        placeholderSearch='Search route tickets...'
         filter={filterSearch}
         search={search}
       />
