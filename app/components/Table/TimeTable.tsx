@@ -42,7 +42,7 @@ function TimeTable({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-hidden">
           <table className="w-full border-collapse bg-white">
             <thead>
               <tr>
