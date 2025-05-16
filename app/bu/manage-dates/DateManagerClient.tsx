@@ -11,7 +11,7 @@ import { Alert } from "@/app/components/Dialog/Alert";
 import { DateItem } from "@/types/date";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
+import TitlePage from "@/app/components/Title/TitlePage";
 
 export default function DateManagerClient() {
   const { dates, getDates, createDate, updateDate, deleteDate } =
@@ -222,7 +222,7 @@ export default function DateManagerClient() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePageAndButton title="Manage Date" description="View and manage date information" btnText='Add New Date' handleOpenModel={handleAddDate} />
+        <TitlePage title="Manage Date" description="View and manage date information" btnText='Add New Date' handleOpenModel={handleAddDate} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}

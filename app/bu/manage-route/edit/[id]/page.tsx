@@ -10,7 +10,7 @@ import { RouteData } from '@/types/types';
 
 //component 
 import FormRoute from '@/app/components/Form/FormRoute/FormRoute';
-import TitleHeader from '@/app/components/Title/TitleHeader';
+import TitlePage from '@/app/components/Title/TitlePage';
 
 //mui
 import { SelectChangeEvent } from '@mui/material';
@@ -144,7 +144,7 @@ function Page() {
     }
     return (
         <div>
-            <TitleHeader text={"Edit Route"} />
+            <TitlePage title={"Edit Route"} />
             <FormRoute
                 routeNameTH={routeNameTH}
                 setRouteNameTH={setRouteNameTH}

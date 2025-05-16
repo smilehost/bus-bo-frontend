@@ -15,7 +15,7 @@ import { useMemberStore } from "@/stores/memberStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { STATUS_LABELS, FILTER } from "@/constants/enum";
 import { MemberItem } from "@/types/member";
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
+import TitlePage from "@/app/components/Title/TitlePage";
 
 export default function ManageMembersPage() {
   const { members, getMembers, createMember, updateMember } = useMemberStore();
@@ -239,7 +239,7 @@ export default function ManageMembersPage() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePageAndButton title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
+        <TitlePage title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}

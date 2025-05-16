@@ -10,7 +10,7 @@ import { Alert } from "@/app/components/Dialog/Alert";
 import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { useCompanyStore } from "@/stores/companyStore";
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
+import TitlePage from "@/app/components/Title/TitlePage";
 
 export default function ManageCompaniesPage() {
   const {
@@ -164,7 +164,7 @@ export default function ManageCompaniesPage() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePageAndButton title="Manage Companies" description="View and manage bus companies" btnText='Add New Company' handleOpenModel={handleAddCompany} />
+        <TitlePage title="Manage Companies" description="View and manage bus companies" btnText='Add New Company' handleOpenModel={handleAddCompany} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}

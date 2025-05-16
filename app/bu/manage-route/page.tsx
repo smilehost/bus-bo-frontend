@@ -11,7 +11,6 @@ import Image from 'next/image'
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
-import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import StatusText from '@/app/components/StatusText'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
@@ -34,6 +33,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm';
 
 //icons
 import { Waypoints } from 'lucide-react';
+import TitlePage from '@/app/components/Title/TitlePage';
 
 export interface RouteTableData {
   id: string,
@@ -311,7 +311,7 @@ function Page() {
 
   return (
     <>
-      <TitlePageAndButton title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
+      <TitlePage title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
       <FormFilter
         setSearch={(value: string) =>
           handleSearchChange({

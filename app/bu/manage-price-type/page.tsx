@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 //companent 
-import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
@@ -21,6 +20,7 @@ import { Alert } from '@/app/components/Dialog/Alert'
 
 //utils
 import { getComId } from '@/utils/getComId'
+import TitlePage from '@/app/components/Title/TitlePage'
 
 
 export interface TicketTypeTableData {
@@ -196,7 +196,7 @@ function Page() {
 
   return (
     <>
-      <TitlePageAndButton title='Manage Ticket Types' description='View and manage ticket type information' btnText='Add New Type' handleOpenModel={handleOpenTicketTypeModal} />
+      <TitlePage title='Manage Ticket Types' description='View and manage ticket type information' btnText='Add New Type' handleOpenModel={handleOpenTicketTypeModal} />
       {isLoadingskeleton ? <SkeletonRoute /> :
         <TableTemplate
           columns={columns}
