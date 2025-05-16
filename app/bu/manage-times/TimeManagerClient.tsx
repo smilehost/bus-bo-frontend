@@ -10,7 +10,7 @@ import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
+import TitlePage from "@/app/components/Title/TitlePage";
 
 function Page() {
   const { times, getTimes, createTime, updateTime, deleteTime } =
@@ -192,7 +192,7 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePageAndButton title="Manage Time" description="View and manage time information" btnText='Add New Time' handleOpenModel={handleAddTime} />
+        <TitlePage title="Manage Time" description="View and manage time information" btnText='Add New Time' handleOpenModel={handleAddTime} />
         <div className="bg-white rounded-md shadow p-5 mt-5 ">
           <SearchFilter
             searchTerm={searchTerm}

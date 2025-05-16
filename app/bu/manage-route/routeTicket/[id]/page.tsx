@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation';
 //component
 import RouteTicketForm from '@/app/components/Form/RouteTicketForm'
-import TitleHeader from '@/app/components/Title/TitleHeader';
+import TitlePage from '@/app/components/Title/TitlePage';
 
 //store
 import { useTicketStore } from '@/stores/routeTicketStore'
@@ -31,7 +31,7 @@ function Page() {
 
   return (
     <div>
-      <TitleHeader text={"Add New Route Ticket"} />
+      <TitlePage title={"Add New Route Ticket"} />
       {ticketData && <RouteTicketForm ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
     </div>
   )

@@ -10,7 +10,7 @@ import { Alert } from "@/app/components/Dialog/Alert";
 import { debounce } from "@/utils/debounce";
 import { useLocationStore } from "@/stores/locationStore";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
-import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
+import TitlePage from "@/app/components/Title/TitlePage";
 
 // Define interfaces for location data
 interface Location {
@@ -197,7 +197,7 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePageAndButton title="Manage Location" description="View and manage location information" btnText='Add New Location' handleOpenModel={handleAddLocation} />
+        <TitlePage title="Manage Location" description="View and manage location information" btnText='Add New Location' handleOpenModel={handleAddLocation} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}

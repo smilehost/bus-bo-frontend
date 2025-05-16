@@ -276,7 +276,6 @@ function Page() {
   return (
     <>
       <TitlePage title='Manage Route Tickets' description='View and manage route ticket information.' />
-      {/* <TitlePageAndButton title='Manage Route Tickets' description='View and manage route ticket information.' btnText='Add New Route Ticket' handleOpenModel={RedirecAdd} /> */}
       <FormFilter
         setSearch={(value: string) =>
           handleSearchChange({
