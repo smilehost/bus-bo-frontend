@@ -32,9 +32,10 @@ export const useTicketPriceTypeStore = create<TicketPriceTypeProps>((set) => ({
       // console.log("From API: ",payload)
       await RouteTicketPriceTypeService.createTicketType(payload);
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("create ticket type error:", error);
-      return { success: false, message: (error as any)?.message || "Unknown error" };
+      const err = error as { message?: string };
+      return { success: false, message: err.message || "Unknown error" };
     }
   },
 
@@ -52,22 +53,33 @@ export const useTicketPriceTypeStore = create<TicketPriceTypeProps>((set) => ({
       }));
 
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("update ticket type error:", error);
+      const err = error as { message?: string };
       return {
         success: false,
-        message: (error as any)?.message || "Unknown error during update",
+        message: err.message || "Unknown error during update",
       };
     }
   },
 
   deleteTicketType: async (id): Promise<{ success: boolean; message?: string }> => {
     try {
-      await RouteTicketPriceTypeService.deleteTicketType(id);
-      return { success: true };
-    } catch (error) {
+      const res = await RouteTicketPriceTypeService.deleteTicketType(id) as { message: string };
+      return {
+        success: true,
+        message: res.message || 'Deleted successfully',
+      };
+    } catch (error: unknown) {
       console.error("delete ticket type error:", error);
-      return { success: false, message: (error as any)?.message || "Unknown error" };
+      const axiosError = error as { response?: { data?: { message?: string } }, message?: string };
+      return {
+        success: false,
+        message:
+          axiosError?.response?.data?.message ||
+          axiosError?.message ||
+          "Unknown error",
+      };
     }
   },
 

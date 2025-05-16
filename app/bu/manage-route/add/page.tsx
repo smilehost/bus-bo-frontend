@@ -82,7 +82,6 @@ function Page() {
             route_array: routeArray
         };
 
-        console.log(payload)
         const result = await addRoute(payload);
 
         if (result.success) {

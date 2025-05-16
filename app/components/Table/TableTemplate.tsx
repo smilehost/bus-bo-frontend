@@ -63,7 +63,7 @@ function TableTemplate<T>({
 }: TableTemplateProps<T>) {
     return (
         <div className=" bg-white rounded-lg shadow-xs mt-5 flex flex-col items-center overflow-hidden">
-            <TableContainer component={Paper} className='min-h-[700px]'>
+            <TableContainer component={Paper} className='min-h-[700px] overflow-y-hidden'>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -71,7 +71,9 @@ function TableTemplate<T>({
                                 <StyledTableCell
                                     key={index}
                                     align={col.align || 'left'}
-                                    sx={{ width: col.width }}
+                                    sx={{ width: col.width,
+                                        fontSize: '16px !important'
+                                     }}
                                 >
                                     {col.label}
                                 </StyledTableCell>
@@ -91,7 +93,9 @@ function TableTemplate<T>({
                                 }}
                             >
                                 {columns.map((col, colIndex) => (
-                                    <StyledTableCell key={colIndex} align={col.align || 'left'}>
+                                    <StyledTableCell key={colIndex} align={col.align || 'left'}
+                                    sx={{ fontSize: '16px !important' }}
+                                    >
                                         {col.render
                                             ? col.render(row[col.key], row)
                                             : (row[col.key] as React.ReactNode)}

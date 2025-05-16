@@ -24,6 +24,7 @@ import { getComId } from '@/utils/getComId'
 
 
 export interface TicketTypeTableData {
+  no: number,
   id: number,
   name: string,
   company_id: number
@@ -50,11 +51,12 @@ function Page() {
 
   // Function to create data for table
   const createData = (
+    no: number,
     id: number,
     name: string,
     company_id: number
   ): TicketTypeTableData => {
-    return { id, name, company_id };
+    return { no, id, name, company_id };
   };
 
   // Generate rows for table
@@ -69,7 +71,8 @@ function Page() {
       const newRows = await Promise.all(
         ticketPriceTypeData?.map(async (item, index) => {
           return createData(
-            index+1,
+            index + 1,
+            Number(item.id),
             item.name,
             Number(item.company_id),
           );
@@ -139,10 +142,9 @@ function Page() {
 
     if (inputName === name) {
       const result = await deleteTicketType(id);
-
       if (result.success) {
         fetchTicketTypeData();
-        toast.success("delete route successfully!");
+        toast.success("delete price type successfully!");
       } else {
         toast.error(`Error: ${result.message}`);
       }
@@ -161,7 +163,7 @@ function Page() {
 
   //table columns
   const columns: ColumnConfig<TicketTypeTableData>[] = [
-    { key: 'id', label: '#', width: '5%', align: 'left' },
+    { key: 'no', label: 'No.', width: '5%', align: 'left' },
     { key: 'name', label: 'Price Type', width: '20%', align: 'left' },
     {
       key: 'company_id', label: 'Actions', width: '20%', align: 'right',

@@ -1,11 +1,13 @@
 import React from 'react'
-import Image from 'next/image'
 
 //components
 import SelectFilter from './SelectFilter'
 
 //type 
 import { ListValueProps } from './SelectFilter'
+
+//icon 
+import { Funnel } from 'lucide-react'
 
 type FilterProps = {
     defaulteValue: string;
@@ -36,12 +38,8 @@ function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilter
                 )}
             </div>
             <div className='flex items-center mx-4 gap-2'>
-                <Image
-                    src={"/icons/filter.svg"}
-                    width={18}
-                    height={18}
-                    priority
-                    alt='icon'
+                <Funnel size={18}
+                    style={{ color: "#6B7280" }}
                 />
                 <p className='text-[12px] text-[#6B7280]'>Filters:</p>
             </div>

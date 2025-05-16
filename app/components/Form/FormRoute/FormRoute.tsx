@@ -5,13 +5,11 @@ import { useRouter } from 'next/navigation';
 import { SelectChangeEvent } from '@mui/material';
 
 //component 
-import SelectTime from '@/app/components/Form/SelectTime'
 import ColorRoute from '@/app/components/Form/ColorRoute'
 import InputLabel from '@/app/components/Form/InputLabel'
 import DragDrop from '@/app/components/RoutePage/DragDrop'
 import ButtonBG from '@/app/components/Form/ButtonBG'
 import ButtonDefault from '@/app/components/Form/ButtonDefault'
-import SelectInputAndAdd from '@/app/components/Form/SelectInputAndAdd'
 import TextError from '../../TextError';
 
 //api
@@ -23,6 +21,8 @@ import { LocationItem } from '@/types/location';
 
 //style
 import styles from './FormRoute.module.scss'
+import SelectInputUnified from '../SelectInputUnified';
+import { Confirm } from '../../Dialog/Confirm';
 
 type FormRouteProps = {
   routeNameTH?: string | undefined;
@@ -97,6 +97,18 @@ function FormRoute({
     handleSubmit();
   }
 
+  //redirec
+  const RedirecTo = async ({ path }: { path: string }) => {
+    const isConfirmed = await Confirm({
+      title: `Go to "${path}"?`,
+      confirmText: "Confirm",
+      cancelText: "Cancel",
+    });
+    if (isConfirmed) {
+      router.push(`/bu/${path}`)
+    }
+  }
+
   // console.log(listA, listB)
   return (
     <div className='custom-frame-content px-5 py-7 mt-5 w-full'>
@@ -123,17 +135,25 @@ function FormRoute({
         </div>
         <div className='flex justify-between flex-wrap gap-3'>
           {/* time */}
-          <SelectTime
-            selectedTime={selectedTime}
+          <SelectInputUnified
+            label="Times"
+            value={selectedTime}
+            withRenderValue
+            withStartAdornment
             onChange={handleChangeTime}
-            timeData={times}
+            data={times}
+            onAddClick={() => RedirecTo({path: 'manage-times'})}
           />
           {/* Schedule */}
-          <SelectInputAndAdd
-            data={dates}
+
+          <SelectInputUnified
+            label="Schedule"
             value={schedule}
             onChange={handleChangeSchedule}
+            data={dates}
+            onAddClick={() => RedirecTo({path: 'manage-dates'})}
           />
+
         </div>
         <div className='flex justify-between flex-wrap gap-3'>
           {/* color */}

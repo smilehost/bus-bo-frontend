@@ -7,11 +7,10 @@ import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
 import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
-import TitlePage from "@/app/components/Title/TitlePage";
-import ButtonBG from "@/app/components/Form/ButtonBG";
 import { debounce } from "@/utils/debounce";
 import { useLocationStore } from "@/stores/locationStore";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
+import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
 
 // Define interfaces for location data
 interface Location {
@@ -196,20 +195,8 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Location"
-            description="View and manage location information"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Location"
-            icon="/icons/plus.svg"
-            onClick={handleAddLocation}
-          />
-        </div>
-
-        <div className="bg-white rounded-md shadow p-5">
+        <TitlePageAndButton title="Manage Location" description="View and manage location information" btnText='Add New Location' handleOpenModel={handleAddLocation} />
+        <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={(value: string) =>
@@ -248,10 +235,10 @@ function Page() {
           editingLocation={
             editingLocation
               ? {
-                  name: editingLocation.name,
-                  latitude: parseFloat(editingLocation.lat),
-                  longitude: parseFloat(editingLocation.long),
-                }
+                name: editingLocation.name,
+                latitude: parseFloat(editingLocation.lat),
+                longitude: parseFloat(editingLocation.long),
+              }
               : undefined
           }
         />

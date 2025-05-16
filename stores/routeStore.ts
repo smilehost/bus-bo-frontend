@@ -55,9 +55,13 @@ export const useRouteStore = create<RouteStore>((set) => ({
       };
       await RouteService.createRoute(payload);
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("create route error:", error);
-      return { success: false, message: (error as any)?.message || "Unknown error" };
+      let message = "Unknown error";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      return { success: false, message };
     }
   },
 
@@ -79,9 +83,15 @@ export const useRouteStore = create<RouteStore>((set) => ({
       };
       await RouteService.updateRoute(id, payload);
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("updateRoute error:", error);
-      return { success: false, message: (error as any)?.message || "Unknown error" };
+
+      let message = "Unknown error";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+
+      return { success: false, message };
     }
   },
 
@@ -92,12 +102,15 @@ export const useRouteStore = create<RouteStore>((set) => ({
       };
       await RouteService.updateRouteStatus(id, payload);
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("updateRouteStatus error:", error);
-      return {
-        success: false,
-        message: (error as any)?.message || "Unknown error",
-      };
+
+      let message = "Unknown error";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+
+      return { success: false, message };
     }
   },
 
@@ -105,9 +118,15 @@ export const useRouteStore = create<RouteStore>((set) => ({
     try {
       await RouteService.deleteRoute(id);
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("delete route error:", error);
-      return { success: false, message: (error as any)?.message || "Unknown error" };
+
+      let message = "Unknown error";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+
+      return { success: false, message };
     }
   },
 
