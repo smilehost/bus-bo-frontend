@@ -7,6 +7,10 @@ import MenuItemLink from "../components/Menu/MenuItem";
 import { useUserStore } from "@/stores/userStore";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { usePathname } from "next/navigation";
+
+//component
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 
 export default function RootLayout({
     children,
@@ -15,15 +19,19 @@ export default function RootLayout({
 }) {
     const { userData } = useUserStore();
 
+    const pathName = usePathname();
+
     const user_tier = userData.user_tier;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
     const allMenu = [
-        { id: 1, 
-      icon: "/icons/home.svg", 
-      text: "Dashboard", 
-      link: `dashboard` },
+        {
+            id: 1,
+            icon: "/icons/home.svg",
+            text: "Dashboard",
+            link: `dashboard`
+        },
         { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "sell-ticket" },
         {
             id: 3,
@@ -34,8 +42,14 @@ export default function RootLayout({
         {
             id: 4,
             icon: "/icons/ticket.svg",
-            text: "Manage Tickets",
+            text: "Manage Route Ticket",
             link: `manage-ticket`,
+        },
+        {
+            id: 11,
+            icon: "/icons/company.svg",
+            text: "Manage Ticket Type",
+            link: `manage-ticket-type`,
         },
         {
             id: 5,
@@ -72,14 +86,15 @@ export default function RootLayout({
             icon: "/icons/company.svg",
             text: "Manage Company",
             link: `manage-company`,
-        }
+        },
+
     ];
 
     const [roleMenu, setRoleMenu] = useState<number[]>();
 
     useEffect(() => {
         if (user_tier === USER_TIER.ADMIN) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
         } else if (user_tier === USER_TIER.SUPER_ADMIN) {
             setRoleMenu([1, 2, 3, 4, 7, 8, 10]);
         }
@@ -158,8 +173,13 @@ export default function RootLayout({
                     </div>
                 </header>
                 <main className="flex-1 overflow-auto bg-gray-100 ">
-                    <div className="container mx-auto px-4 sm:px-6 py-4 md:py-6">
-                        {children}
+                    <div className="container mx-auto px-4 sm:px-6 ">
+                        <div className="mt-3">
+                            <Breadcrumb path={pathName} />
+                        </div>
+                        <div className="py-4 md:py-6">
+                            {children}
+                        </div>
                     </div>
                 </main>
             </div>

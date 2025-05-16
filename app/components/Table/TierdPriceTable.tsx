@@ -201,7 +201,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
   // console.log("ticketPrice: ", ticketPrice)
   return (
     <div >
-      <p className='mb-2 font-medium'>{ticketTypePriceName}</p>
+      <p className='mb-2 text-xl font-bold'>{ticketTypePriceName}</p>
       <div className="mb-4 flex flex-wrap gap-4 items-center">
         <label>
           Row Value:{' '}

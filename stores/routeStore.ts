@@ -16,11 +16,15 @@ interface RouteStore {
     id: number,
     updatedRoute: UpdateRoutePayload
   ) => Promise<{ success: boolean; message?: string }>;
+  updateRouteStatus: (
+    id: number,
+    status: number
+  ) => Promise<{ success: boolean; message?: string }>;
   deleteRoute: (
     id: number,
   ) => Promise<{ success: boolean; message?: string }>;
   getRouteById: (id: number) => Promise<RouteData | undefined>;
-  getRoutes: (page: number, size: number, search: string) => Promise<void>;
+  getRoutes: (page: number, size: number, search: string, status: string) => Promise<void>;
 };
 
 export const useRouteStore = create<RouteStore>((set) => ({
@@ -81,6 +85,22 @@ export const useRouteStore = create<RouteStore>((set) => ({
     }
   },
 
+  updateRouteStatus: async (id, status) => {
+    try {
+      const payload = {
+        route_status: status,
+      };
+      await RouteService.updateRouteStatus(id, payload);
+      return { success: true };
+    } catch (error) {
+      console.error("updateRouteStatus error:", error);
+      return {
+        success: false,
+        message: (error as any)?.message || "Unknown error",
+      };
+    }
+  },
+
   deleteRoute: async (id): Promise<{ success: boolean; message?: string }> => {
     try {
       await RouteService.deleteRoute(id);
@@ -91,12 +111,13 @@ export const useRouteStore = create<RouteStore>((set) => ({
     }
   },
 
-  getRoutes: async (page: number, size: number, search?: string) => {
+  getRoutes: async (page: number, size: number, search?: string, status?: string) => {
     try {
       const res = await RouteService.fetchRoutes({
         page,
         size,
         search,
+        status
       }) as { result: Route };
 
       set({ routeData: res.result }); // อัปเดต routeData โดยตรง

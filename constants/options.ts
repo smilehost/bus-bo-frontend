@@ -6,7 +6,7 @@ export const statusOptions = [
         value: STATUS.ACTIVE
     },
     {
-        key: 2,
+        key: 0,
         value: STATUS.INACTIVE
     }
 ]

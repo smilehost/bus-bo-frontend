@@ -43,7 +43,7 @@ function Page() {
 
   //stores
   // const { companyData } = useCompanyStore();
-  const { getTicketByRouteId, deleteTicket } = useTicketStore();
+  const { ticketDataList, getTickets, deleteTicket, updateTicketStatus } = useTicketStore();
 
   const pathname = usePathname();
 
@@ -57,12 +57,15 @@ function Page() {
   //fetch tickets
   const fetchTicketData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    const ticketTemp = await getTicketByRouteId(50);
+    await getTickets(currentPage, rowsPerPage, '', '');;
     cancelSkeleton();
-    if (ticketTemp) {
-      setTickets(ticketTemp)
-    }
   }
+
+  useEffect(() => {
+    if (ticketDataList) {
+      setTickets(ticketDataList.data)
+    }
+  }, [ticketDataList])
 
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -136,9 +139,9 @@ function Page() {
   };
 
   // Handle Change Status
-  const handleChangeStatus = async ({ idStatus }: { idStatus: string | number }) => {
+  const handleChangeStatus = async ({ idStatus, idTicket }: { idStatus: string | number, idTicket: number }) => {
     const currentStatus = Number(idStatus);
-    const nextStatus = currentStatus === 1 ? 2 : 1;
+    const nextStatus = currentStatus === 1 ? 0 : 1;
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
 
     const isStatusConfirmed = await Confirm({
@@ -148,8 +151,17 @@ function Page() {
       cancelText: "Cancel",
     });
 
+
     if (isStatusConfirmed) {
-      console.log(`Status changed to ${statusText} (${nextStatus})`);
+
+      const result = await updateTicketStatus(idTicket, nextStatus);
+
+      if (result.success) {
+        toast.success("Status changed successfully!");
+        fetchTicketData?.();
+      } else {
+        toast.error(`Failed to change status: ${result.message}`);
+      }
     }
   };
 
@@ -184,8 +196,8 @@ function Page() {
     if (!debouncedSearch) {
       fetchTicketData();
     };
-    // getRoutes(currentPage, rowsPerPage, debouncedSearch);
-  }, [debouncedSearch])
+    getTickets(currentPage, rowsPerPage, debouncedSearch, searchStatus);
+  }, [debouncedSearch, searchStatus])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -213,15 +225,15 @@ function Page() {
         </div>
       ),
     },
+    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
-      render: (idStatus) => (
-        <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus })}>
-          <StatusText id={Number(idStatus)} />
+      render: (_, row) => (
+        <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus: row.status, idTicket: row.id })}>
+          <StatusText id={Number(row.status)} />
         </div>
       ),
     },
-    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     {
       key: 'id', label: 'Action', width: '25%', align: 'right',
       render: (_, row) => (
@@ -253,14 +265,14 @@ function Page() {
 
   return (
     <>
-      <TitlePageAndButton title='Manage Tickets' description='View and manage ticket information' btnText='Export Tickets' handleOpenModel={ExportTickets} />
+      <TitlePageAndButton title='Manage Route Tickets' description='View and manage route ticket information.' btnText='Add New Route Ticket' handleOpenModel={ExportTickets} />
       <FormFilter
         setSearch={(value: string) =>
           handleSearchChange({
             target: { value },
           } as React.ChangeEvent<HTMLInputElement>)
         }
-        placeholderSearch='Search ticket ID, route, or phone...'
+        placeholderSearch='Search route tickets...'
         filter={filterSearch}
         search={search}
       />
@@ -270,8 +282,8 @@ function Page() {
           data={rows}
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
-          totalPages={1}
-          totalResults={tickets.length}
+          totalPages={ticketDataList.totalPages}
+          totalResults={ticketDataList.total}
           onPageChange={setCurrentPage}
           onRowsPerPageChange={handleRowsPerPageChange}
           rowKey={(row) => row.id}

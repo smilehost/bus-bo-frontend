@@ -18,7 +18,7 @@ import { TICKET_TYPE } from '@/constants/enum'
 //stores
 import { useTicketStore } from '@/stores/routeTicketStore'
 import { useRouteStore } from '@/stores/routeStore'
-import { useTicketPriceStore } from '@/stores/routeTicketPriceTypeStore'
+import { useTicketPriceTypeStore } from '@/stores/routeTicketPriceTypeStore'
 
 //type 
 import { TicketProps, TicketPriceType, TicketRoutePrice, RouteData } from '@/types/types'
@@ -52,7 +52,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
   //stores
   const { updateTicket, addTicket, getTicketByRouteId, getTicketById } = useTicketStore();
   const { getRouteById } = useRouteStore();
-  const { getTicketPriceType } = useTicketPriceStore();
+  const { getTicketPriceType } = useTicketPriceTypeStore();
 
   //use state
   const [error, setError] = useState<string>('');
@@ -63,6 +63,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
   const [ticketNameEN, setTicketNameEN] = useState<string>('');
   const [ticketAmount, setTicketAmount] = useState<string>('');
   const [ticketColor, setTicketColor] = useState<string>('');
+  const [ticketStatus, setTicketStatus] = useState<number>(1);
   const [ticketType, setTicketType] = useState<TICKET_TYPE>();
   const [ticketPriceFixed, setTicketPriceFixed] = useState<TicketPriceTypeFixed[]>([]);
   const [ticketPriceList, setTicketPriceList] = useState<TicketRoutePrice[]>([]);
@@ -83,6 +84,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
     setTicketPriceList([]);
     setTicketChecked([]);
     setInitialTicketChecked([]);
+    setTicketStatus(1)
   };
 
   //Handle FixedPrice
@@ -173,6 +175,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
       setTicketColor(ticket.ticket_color);
       setTicketType(ticket.ticket_type);
       setTicketPriceList(ticket.ticket_price || []);
+      setTicketStatus(Number(ticket.ticket_status))
     };
 
     fetchTicket();
@@ -253,7 +256,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
       route_ticket_name_th: ticketNameTH,
       route_ticket_name_en: ticketNameEN,
       route_ticket_color: ticketColor,
-      route_ticket_status: 1,
+      route_ticket_status: ticketStatus,
       route_ticket_route_id: Number(routeId),
       route_ticket_amount: parseInt(ticketAmount),
       route_ticket_type: ticketType,
@@ -339,10 +342,16 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
                   ticket={item}
                   isActive={ticketActive === item.id}
                   onClick={() => {
-                    if (activeStep > 0) return;
+                    if (activeStep > 0) {
+                      toast.error("Please go back or finish editing before proceeding.");
+                      return
+                    };
                     setError("");
                     if (ticketActiveConfig && item.id) return setTicketActive(item.id);
-                    if (ticketActive === item.id) return setTicketActive(ticketActiveConfig);
+                    if (ticketActive === item.id) {
+                      setTicketActive(ticketActiveConfig)
+                      return
+                    };
                     if (item.id) setTicketActive(item.id);
                   }}
                 />

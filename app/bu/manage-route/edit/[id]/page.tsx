@@ -9,7 +9,7 @@ import { LocationItem } from '@/types/location';
 import { RouteData } from '@/types/types';
 
 //component 
-import FormRoute from '@/app/components/Form/FormRoute';
+import FormRoute from '@/app/components/Form/FormRoute/FormRoute';
 import TitleHeader from '@/app/components/Title/TitleHeader';
 
 //mui
@@ -53,11 +53,11 @@ function Page() {
         if (routeIndexData) {
             setRouteName(routeIndexData.route_name_en);
             setRouteNameTH(routeIndexData.route_name_th);
-            setRouteComId(parseInt(routeIndexData.route_com_id));
-            setRouteStatusId(parseInt(routeIndexData.route_status));
+            setRouteComId(Number(routeIndexData.route_com_id));
+            setRouteStatusId(Number(routeIndexData.route_status));
             setSchedule(routeIndexData.route_date_id)
-            setSelectedTime(parseInt(routeIndexData.route_time_id));
-            setSchedule(parseInt(routeIndexData.route_date_id).toString());
+            setSelectedTime(Number(routeIndexData.route_time_id));
+            setSchedule(Number(routeIndexData.route_date_id).toString());
             setRouteColor(routeIndexData.route_color)
             getLocations(1, 5, '');
         }
@@ -129,7 +129,6 @@ function Page() {
             route_array: routeArray
         };
 
-        console.log(payload)
         const result = await updateRoute(Number(params.id), payload);
 
         if (result.success) {

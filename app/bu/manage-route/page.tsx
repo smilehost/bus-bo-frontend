@@ -47,7 +47,7 @@ function Page() {
 
   //api
   // const { companyData } = useCompanyStore();
-  const { routeData, getRoutes, deleteRoute } = useRouteStore();
+  const { routeData, getRoutes, deleteRoute, updateRouteStatus } = useRouteStore();
   const { times, getTimes } = useTimeStore();
   const { dates, getDates } = useDateStore();
   const { getTicketByRouteId } = useTicketStore();
@@ -64,7 +64,7 @@ function Page() {
   //fetch routes from store
   const fetchRouteData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    await getRoutes(currentPage, rowsPerPage, debouncedSearch);
+    await getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
     cancelSkeleton();
   }
   //fetch dates, times from store
@@ -164,9 +164,9 @@ function Page() {
   };
 
   // Handle Change Status
-  const handleChangeStatus = async ({ idStatus }: { idStatus: string }) => {
+  const handleChangeStatus = async ({ idStatus, idRoute }: { idStatus: string, idRoute: number }) => {
     const currentStatus = Number(idStatus);
-    const nextStatus = currentStatus === 1 ? 2 : 1;
+    const nextStatus = currentStatus === 1 ? 0 : 1;
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
 
     const isStatusConfirmed = await Confirm({
@@ -177,7 +177,13 @@ function Page() {
     });
 
     if (isStatusConfirmed) {
-      console.log(`Status changed to ${statusText} (${nextStatus})`);
+      const result = await updateRouteStatus(idRoute, nextStatus);
+      if (result.success) {
+        toast.success("Change status sucessfuly!")
+        fetchRouteData();
+      } else {
+        toast.error(`Change status error: ${result.message}`)
+      }
     }
   };
 
@@ -206,14 +212,14 @@ function Page() {
     //     size: "w-[170px]"
     // },
   ]
-  
+
   //search
   useEffect(() => {
     if (!debouncedSearch) {
       fetchRouteData();
     };
-    getRoutes(currentPage, rowsPerPage, debouncedSearch);
-  }, [debouncedSearch])
+    getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
+  }, [debouncedSearch, searchStatus])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -240,7 +246,7 @@ function Page() {
         </div>
       ),
     },
-    { key: 'company', label: 'Company', width: '20%' },
+    // { key: 'company', label: 'Company', width: '20%' },
     { key: 'schedule', label: 'Schedule', width: '20%' },
     { key: 'time', label: 'Departure Times', width: '20%' },
     { key: 'ticket_amount', label: 'Tickets', width: '15%', align: 'center' },
@@ -248,9 +254,9 @@ function Page() {
       key: 'status',
       label: 'Status',
       width: '15%',
-      render: (idStatus) => (
-        <div onClick={() => handleChangeStatus({ idStatus })}>
-          <StatusText id={Number(idStatus)} />
+      render: (_, row) => (
+        <div className='cursor-pointer' onClick={() => handleChangeStatus({ idStatus: String(row.status), idRoute: Number(row.id) })}>
+          <StatusText id={Number(row.status)} />
         </div>
       ),
     },
