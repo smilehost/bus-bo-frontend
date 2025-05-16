@@ -46,12 +46,6 @@ export default function RootLayout({
             link: `manage-ticket`,
         },
         {
-            id: 11,
-            icon: "/icons/company.svg",
-            text: "Manage Ticket Type",
-            link: `manage-ticket-type`,
-        },
-        {
             id: 5,
             icon: "/icons/route.svg",
             text: "Manage Location",
@@ -74,6 +68,12 @@ export default function RootLayout({
             icon: "/icons/users.svg",
             text: "Manage Members",
             link: `manage-members`,
+        },
+        {
+            id: 11,
+            icon: "/icons/company.svg",
+            text: "Manage Price Type",
+            link: `manage-ticket-type`,
         },
         {
             id: 9,

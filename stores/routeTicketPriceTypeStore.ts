@@ -8,7 +8,7 @@ import { CreateRouteTicketPriceType, RouteTicketPriceType } from '@/payloads/rou
 type TicketPriceTypeProps = {
   ticketPriceTypeData: TicketPriceType[];
   setData: (newData: TicketPriceType[]) => void;
-  addTicketType: (newTicketType: CreateRouteTicketPriceType) => void;
+  addTicketType: (newTicketType: CreateRouteTicketPriceType) => Promise<{ success: boolean; message?: string }>;
   updateTicketPriceType: (id: number, updatedTicketType: RouteTicketPriceType) => Promise<{ success: boolean; message?: string }>
   deleteTicketType: (
     id: number,
