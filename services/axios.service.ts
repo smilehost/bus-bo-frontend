@@ -23,23 +23,32 @@ function getComId(): string | null {
   }
 }
 
-// ✅ Interceptor ก่อนส่ง request
+// Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token_bo");
-    const com_id = getComId();
+    const raw = localStorage.getItem("token_bo");
 
-    if (config.headers) {
-      config.headers.set("Authorization", token ? `Bearer ${token}` : "");
-      if (com_id) {
-        config.headers.set("com_id", com_id);
+    try {
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const token = parsed?.state?.token;
+        const com_id = parsed?.state?.com_id?.toString();
+
+        if (config.headers) {
+          config.headers.set("Authorization", token ? `Bearer ${token}` : "");
+          if (com_id) {
+            config.headers.set("com_id", com_id);
+          }
+        }
       }
+    } catch (error) {
+      console.error("Failed to parse token from token_bo:", error);
     }
   }
   return config;
 });
 
-// ✅ Interceptor หลังรับ response
+// Interceptor หลังรับ response
 instance.interceptors.response.use(
   (response) => {
     const code = response.data?.code;
@@ -62,7 +71,7 @@ instance.interceptors.response.use(
   }
 );
 
-// ✅ Service layer
+// Service layer
 interface Payload {
   path: string;
   params?: string | number;
