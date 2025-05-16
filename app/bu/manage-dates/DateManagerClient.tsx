@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useDateStore } from "@/stores/dateStore";
@@ -110,6 +110,9 @@ export default function DateManagerClient() {
       sun: data.days.sunday,
     };
 
+    setShowModal(false);
+    await new Promise((resolve) => setTimeout(resolve, 100)); 
+
     const isConfirmed = await Confirm({
       title: editingDate ? "Confirm Update" : "Confirm Create",
       text: editingDate
@@ -119,7 +122,11 @@ export default function DateManagerClient() {
       cancelText: "Cancel",
       type: "question",
     });
-    if (!isConfirmed) return;
+
+    if (!isConfirmed) {
+      setShowModal(true); 
+      return;
+    }
 
     try {
       if (editingDate) {
@@ -266,6 +273,7 @@ export default function DateManagerClient() {
 
       {showModal && (
         <DateModal
+          open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveDate}
           editingDate={

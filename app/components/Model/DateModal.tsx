@@ -1,6 +1,14 @@
+"use client";
 import React, { useEffect, useState } from "react";
+import { Dialog, DialogContent } from "@mui/material";
+import Image from "next/image";
+
+import TitleModel from "../Title/TitleModel";
+import ButtonBG from "../Form/ButtonBG";
+import ButtonDefault from "../Form/ButtonDefault";
 
 interface DateModalProps {
+  open: boolean;
   onClose: () => void;
   onSave: (data: {
     name: string;
@@ -33,7 +41,7 @@ interface DateModalProps {
   };
 }
 
-function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
+function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
   const [newDate, setNewDate] = useState({
     name: "",
     startDate: "",
@@ -53,7 +61,7 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
 
   // โหลดข้อมูลถ้ามีการแก้ไข
   useEffect(() => {
-    if (editingDate) {
+    if (isEditing && editingDate) {
       setNewDate({
         name: editingDate.name,
         startDate: editingDate.startDate || "",
@@ -66,15 +74,48 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
         (day) => day === true
       );
       setSelectedOption(isAllDays ? "All Days" : "Select");
+    } else {
+      // รีเซ็ตค่าเมื่อเปิด modal ใหม่
+      setNewDate({
+        name: "",
+        startDate: "",
+        endDate: "",
+        days: {
+          monday: false,
+          tuesday: false,
+          wednesday: false,
+          thursday: false,
+          friday: false,
+          saturday: false,
+          sunday: false,
+        },
+      });
+      setSelectedOption("Select");
     }
-  }, [editingDate]);
+  }, [editingDate, isEditing, open]);
 
-  const handleSaveDate = () => {
+  const validateForm = () => {
+    if (!newDate.name) {
+      return "Please enter date name";
+    }
+
     if (
       selectedOption === "Select" &&
       !Object.values(newDate.days).some((day) => day)
     ) {
-      alert("Please select at least one day");
+      return "Please select at least one day";
+    }
+
+    return null;
+  };
+
+  const handleSaveDate = () => {
+    const errorMessage = validateForm();
+    if (errorMessage) {
+      // ใช้ setTimeout เพื่อให้แน่ใจว่า Modal ปิดก่อน
+      setTimeout(() => {
+        alert(errorMessage);
+      }, 100);
       return;
     }
 
@@ -95,6 +136,7 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
     const endDate = new Date(newDate.endDate);
     const status = endDate < today ? "Inactive" : "Active";
 
+    // ส่งข้อมูลและปิด Modal
     onSave({
       name: newDate.name,
       startDate: newDate.startDate,
@@ -111,7 +153,8 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
       ...newDate,
       days: {
         ...newDate.days,
-        [day.toLowerCase() as keyof typeof newDate.days]: !newDate.days[day.toLowerCase() as keyof typeof newDate.days],
+        [day.toLowerCase() as keyof typeof newDate.days]:
+          !newDate.days[day.toLowerCase() as keyof typeof newDate.days],
       },
     });
   };
@@ -119,6 +162,19 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
   const handleSelectOption = (option: React.SetStateAction<string>) => {
     setSelectedOption(option);
     if (option === "All Days") {
+      setNewDate({
+        ...newDate,
+        days: {
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: true,
+          sunday: true,
+        },
+      });
+    } else if (option === "Select") {
       setNewDate({
         ...newDate,
         days: {
@@ -135,170 +191,155 @@ function DateModal({ onClose, onSave, editingDate }: DateModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg w-full max-w-3xl shadow-xl">
-        <h2 className="text-xl font-semibold mb-2 text-center">Add New Date</h2>
-        <p className="text-gray-500 text-sm text-center mb-6">
-          Fill in the dates details below
-        </p>
+    <Dialog open={open} onClose={onClose}>
+      <DialogContent>
+        <div className="w-[448px] py-2 relative">
+          <TitleModel
+            title={isEditing ? "Edit Date" : "Add New Date"}
+            description={
+              isEditing
+                ? "Update the date details below"
+                : "Fill in the date details below"
+            }
+          />
 
-        <div className="mb-8">
-          <div className="flex border rounded-md overflow-hidden mb-6">
-            <button
-              className={`flex-1 py-3 text-center font-medium ${
-                selectedOption === "Select"
-                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
-                  : "bg-white"
-              }`}
-              onClick={() => handleSelectOption("Select")}
-            >
-              Select
-            </button>
-            <button
-              className={`flex-1 py-3 text-center font-medium ${
-                selectedOption === "All Days"
-                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
-                  : "bg-white"
-              }`}
-              onClick={() => handleSelectOption("All Days")}
-            >
-              All Days
-            </button>
+          <div className="mt-7 flex flex-col gap-4">
+            <div className="flex border rounded-md overflow-hidden mb-2">
+              <button
+                className={`flex-1 py-2 text-center font-medium ${
+                  selectedOption === "Select"
+                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                    : "bg-white"
+                }`}
+                onClick={() => handleSelectOption("Select")}
+              >
+                Select
+              </button>
+              <button
+                className={`flex-1 py-2 text-center font-medium ${
+                  selectedOption === "All Days"
+                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                    : "bg-white"
+                }`}
+                onClick={() => handleSelectOption("All Days")}
+              >
+                All Days
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">
+                Date Name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter date name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
+                value={newDate.name}
+                onChange={(e) =>
+                  setNewDate({ ...newDate, name: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Start date
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
+                    value={newDate.startDate}
+                    onChange={(e) =>
+                      setNewDate({ ...newDate, startDate: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  End date
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
+                    value={newDate.endDate}
+                    onChange={(e) =>
+                      setNewDate({ ...newDate, endDate: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">
+                Select Days
+              </label>
+              <div className="grid grid-cols-7 gap-2">
+                {[
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ].map((day) => (
+                  <button
+                    key={day}
+                    onClick={() => handleDaySelect(day)}
+                    disabled={selectedOption === "All Days"}
+                    className={`
+                      py-2 px-1 rounded-md text-center text-xs font-medium transition-all duration-200
+                      ${
+                        newDate.days[
+                          day.toLowerCase() as keyof typeof newDate.days
+                        ]
+                          ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+                          : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
+                      }
+                      ${
+                        selectedOption === "All Days"
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }
+                    `}
+                  >
+                    {day.slice(0, 3)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="mb-6">
-            <label className="block mb-2 font-medium text-gray-700">
-              Date Name
-            </label>
-            <input
-              type="text"
-              placeholder="Enter time name"
-              className="w-full p-3 border rounded-md"
-              value={newDate.name}
-              onChange={(e) => setNewDate({ ...newDate, name: e.target.value })}
+          <div className="flex gap-3 justify-end mt-7">
+            <ButtonDefault size="" text="Cancel" onClick={onClose} />
+            <ButtonBG
+              size=""
+              text={isEditing ? "Update Date" : "Add Date"}
+              onClick={handleSaveDate}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                Start date
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  className="w-full p-3 border rounded-md pr-10"
-                  value={newDate.startDate}
-                  onChange={(e) =>
-                    setNewDate({ ...newDate, startDate: e.target.value })
-                  }
-                />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className="block mb-2 font-medium text-gray-700">
-                End date
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  className="w-full p-3 border rounded-md pr-10"
-                  value={newDate.endDate}
-                  onChange={(e) =>
-                    setNewDate({ ...newDate, endDate: e.target.value })
-                  }
-                />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block mb-3 font-medium text-gray-700">
-              Select Days
-            </label>
-            <div className="grid grid-cols-7 gap-2">
-              {[
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday",
-              ].map((day) => (
-                <button
-                  key={day}
-                  onClick={() => handleDaySelect(day)}
-                  disabled={selectedOption === "All Days"}
-                  className={`
-                    py-2 px-1 rounded-md text-center text-sm font-medium transition-all duration-200
-                    ${
-                      newDate.days[day.toLowerCase() as keyof typeof newDate.days]
-                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
-                        : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
-                    }
-                    ${
-                      selectedOption === "All Days"
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }
-                  `}
-                >
-                  {day.slice(0, 3)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-end space-x-4 mt-6">
-          <button
+          <div
+            className="absolute top-0 right-0 cursor-pointer"
             onClick={onClose}
-            className="px-6 py-2.5 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50"
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleSaveDate}
-            className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-md font-medium hover:from-yellow-600 hover:to-orange-600 shadow-md"
-          >
-            {isEditing ? "Update Date" : "Add Date"}
-          </button>
+            <Image
+              src={"/icons/close.svg"}
+              width={24}
+              height={24}
+              priority
+              alt="close-icon"
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
