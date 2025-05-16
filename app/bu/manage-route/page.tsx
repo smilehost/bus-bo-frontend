@@ -32,6 +32,9 @@ import { statusOptions } from '@/constants/options'
 import { STATUS, FILTER } from '@/constants/enum'
 import { Confirm } from '@/app/components/Dialog/Confirm';
 
+//icons
+import { Waypoints } from 'lucide-react';
+
 export interface RouteTableData {
   id: string,
   route: string,
@@ -241,7 +244,12 @@ function Page() {
       width: '25%',
       render: (_, row) => (
         <div className='flex gap-3 items-center'>
-          <div className='w-[8px] h-[32px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.routeColor }} />
+          {/* <div className='w-[8px] h-[32px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.routeColor }} /> */}
+          <Waypoints strokeWidth={1.5} 
+          style={{
+            color:  row.routeColor
+          }}
+          />
           <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
         </div>
       ),

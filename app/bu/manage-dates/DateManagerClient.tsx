@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useDateStore } from "@/stores/dateStore";
@@ -8,11 +8,10 @@ import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
 import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 import { Alert } from "@/app/components/Dialog/Alert";
-import TitlePage from "@/app/components/Title/TitlePage";
-import ButtonBG from "@/app/components/Form/ButtonBG";
 import { DateItem } from "@/types/date";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
+import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
 
 export default function DateManagerClient() {
   const { dates, getDates, createDate, updateDate, deleteDate } =
@@ -110,6 +109,9 @@ export default function DateManagerClient() {
       sun: data.days.sunday,
     };
 
+    setShowModal(false);
+    await new Promise((resolve) => setTimeout(resolve, 300)); 
+
     const isConfirmed = await Confirm({
       title: editingDate ? "Confirm Update" : "Confirm Create",
       text: editingDate
@@ -119,7 +121,11 @@ export default function DateManagerClient() {
       cancelText: "Cancel",
       type: "question",
     });
-    if (!isConfirmed) return;
+
+    if (!isConfirmed) {
+      setShowModal(true); 
+      return;
+    }
 
     try {
       if (editingDate) {
@@ -216,19 +222,8 @@ export default function DateManagerClient() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Date"
-            description="View and manage date information"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Date"
-            icon="/icons/plus.svg"
-            onClick={handleAddDate}
-          />
-        </div>
-        <div className="bg-white rounded-md shadow p-5">
+        <TitlePageAndButton title="Manage Date" description="View and manage date information" btnText='Add New Date' handleOpenModel={handleAddDate} />
+        <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
@@ -266,22 +261,23 @@ export default function DateManagerClient() {
 
       {showModal && (
         <DateModal
+          open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveDate}
           editingDate={
             editingDate
               ? {
-                  ...editingDate,
-                  days: {
-                    monday: editingDate.days.mon,
-                    tuesday: editingDate.days.tue,
-                    wednesday: editingDate.days.wed,
-                    thursday: editingDate.days.thu,
-                    friday: editingDate.days.fri,
-                    saturday: editingDate.days.sat,
-                    sunday: editingDate.days.sun,
-                  },
-                }
+                ...editingDate,
+                days: {
+                  monday: editingDate.days.mon,
+                  tuesday: editingDate.days.tue,
+                  wednesday: editingDate.days.wed,
+                  thursday: editingDate.days.thu,
+                  friday: editingDate.days.fri,
+                  saturday: editingDate.days.sat,
+                  sunday: editingDate.days.sun,
+                },
+              }
               : undefined
           }
         />

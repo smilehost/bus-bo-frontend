@@ -9,9 +9,8 @@ import { debounce } from "@/utils/debounce";
 import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
-import TitlePage from "@/app/components/Title/TitlePage";
-import ButtonBG from "@/app/components/Form/ButtonBG";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
+import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
 
 function Page() {
   const { times, getTimes, createTime, updateTime, deleteTime } =
@@ -102,6 +101,8 @@ function Page() {
     times: string[];
   }) => {
     const schedule = data.times.length > 0 ? data.times : [data.startTime];
+    setShowModal(false);
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
       title: editingTime ? "Confirm Update" : "Confirm Create",
@@ -191,20 +192,8 @@ function Page() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Time"
-            description="View and manage time information"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Time"
-            icon="/icons/plus.svg"
-            onClick={handleAddTime}
-          />
-        </div>
-
-        <div className="bg-white rounded-md shadow p-5">
+        <TitlePageAndButton title="Manage Time" description="View and manage time information" btnText='Add New Time' handleOpenModel={handleAddTime} />
+        <div className="bg-white rounded-md shadow p-5 mt-5 ">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={(value: string) =>
@@ -235,15 +224,16 @@ function Page() {
 
       {showModal && (
         <TimeModal
+          open={showModal}
           onClose={() => setShowModal(false)}
           onSave={handleSaveTime}
           editingTime={
             editingTime
               ? {
-                  ...editingTime,
-                  startTime: editingTime.startTime || "",
-                  times: editingTime.times || [],
-                }
+                ...editingTime,
+                startTime: editingTime.startTime || "",
+                times: editingTime.times || [],
+              }
               : undefined
           }
         />

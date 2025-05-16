@@ -21,7 +21,7 @@ export async function Alert({
         icon: type,
         confirmButtonText: confirmText,
         customClass: {
-            confirmButton: 'custom-btn-bg-main custom-border-gray'
+            confirmButton: 'custom-btn-bg-main custom-border-gray cursor-pointer',
         }
     }).then((result) => result.isConfirmed)
 }

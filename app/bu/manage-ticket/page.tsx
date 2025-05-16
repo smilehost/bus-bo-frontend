@@ -8,7 +8,6 @@ import Image from 'next/image'
 
 //companent 
 import FormFilter from '@/app/components/Filter/FormFilter'
-import TitlePageAndButton from '@/app/components/Title/TitlePageAndButton'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import StatusText from '@/app/components/StatusText'
 import { Confirm } from '@/app/components/Dialog/Confirm'
@@ -28,6 +27,10 @@ import { TicketProps } from '@/types/types'
 //const 
 import { FILTER } from '@/constants/enum'
 import { statusOptions } from '@/constants/options';
+import TitlePage from '@/app/components/Title/TitlePage';
+
+////icons
+import { Ticket } from "lucide-react";
 
 
 export interface TicketTableData {
@@ -165,10 +168,6 @@ function Page() {
     }
   };
 
-  const ExportTickets = () => {
-    console.log("ไปไหน")
-  }
-
   //filter
   // const listCompany = companyData.map((item) => {
   //   return {
@@ -217,10 +216,21 @@ function Page() {
       key: 'ticketNameEN', label: 'Ticket', width: '25%',
       render: (_, row) => (
         <div className='flex gap-3 items-center'>
-          <div className='w-[8px] h-[40px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.ticketColor }} />
-          <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
+          {/* <div className='w-[8px] h-[40px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.ticketColor }} /> */}
+          <div className='flex gap-3'>
+
+            <div>
+              <Ticket size={24} 
+                style={{
+                  color: row.ticketColor
+                }}
+              />
+            </div>
+
+            <div className='flex flex-col gap-1'>
+              <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
+              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
+            </div>
           </div>
         </div>
       ),
@@ -265,7 +275,8 @@ function Page() {
 
   return (
     <>
-      <TitlePageAndButton title='Manage Route Tickets' description='View and manage route ticket information.' btnText='Add New Route Ticket' handleOpenModel={ExportTickets} />
+      <TitlePage title='Manage Route Tickets' description='View and manage route ticket information.' />
+      {/* <TitlePageAndButton title='Manage Route Tickets' description='View and manage route ticket information.' btnText='Add New Route Ticket' handleOpenModel={RedirecAdd} /> */}
       <FormFilter
         setSearch={(value: string) =>
           handleSearchChange({

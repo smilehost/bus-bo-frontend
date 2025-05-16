@@ -7,16 +7,14 @@ import SearchFilter from "@/app/components/SearchFilter/CompanySearchFilter";
 import SkeletonCompanyTable from "@/app/components/Skeleton/SkeletonCompanyTable";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
-import TitlePage from "@/app/components/Title/TitlePage";
-import ButtonBG from "@/app/components/Form/ButtonBG";
 import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { useCompanyStore } from "@/stores/companyStore";
+import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
 
 export default function ManageCompaniesPage() {
   const {
     companies,
-    total,
     isLoading,
     getCompanies,
     createCompany,
@@ -166,20 +164,8 @@ export default function ManageCompaniesPage() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Companies"
-            description="View and manage bus companies"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Company"
-            icon="/icons/plus.svg"
-            onClick={handleAddCompany}
-          />
-        </div>
-
-        <div className="bg-white rounded-md shadow p-5">
+        <TitlePageAndButton title="Manage Companies" description="View and manage bus companies" btnText='Add New Company' handleOpenModel={handleAddCompany} />
+        <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={(value: string) =>
@@ -213,10 +199,10 @@ export default function ManageCompaniesPage() {
           editingCompany={
             editingCompany
               ? {
-                  name: editingCompany.name,
-                  prefix: editingCompany.prefix,
-                  status: editingCompany.status,
-                }
+                name: editingCompany.name,
+                prefix: editingCompany.prefix,
+                status: editingCompany.status,
+              }
               : undefined
           }
         />

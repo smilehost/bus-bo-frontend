@@ -271,7 +271,6 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
         route_ticket_price_route_id: Number(routeId)
       }))
     };
-    console.log("formattedPayload: ", formattedPayload)
 
     //fetch create, update to api
     try {

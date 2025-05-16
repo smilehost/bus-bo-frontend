@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import TitlePage from "@/app/components/Title/TitlePage";
-import ButtonBG from "@/app/components/Form/ButtonBG";
 import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 import MemberTable from "@/app/components/Table/MemberTable";
 import MemberModal from "@/app/components/Model/MemberModal";
@@ -17,6 +15,7 @@ import { useMemberStore } from "@/stores/memberStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { STATUS_LABELS, FILTER } from "@/constants/enum";
 import { MemberItem } from "@/types/member";
+import TitlePageAndButton from "@/app/components/Title/TitlePageAndButton";
 
 export default function ManageMembersPage() {
   const { members, getMembers, createMember, updateMember } = useMemberStore();
@@ -105,7 +104,7 @@ export default function ManageMembersPage() {
   }) => {
     try {
       setIsModalOpen(false);
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const isConfirmed = await Confirm({
         title: data.id ? "Confirm Update" : "Confirm Create",
@@ -232,26 +231,16 @@ export default function ManageMembersPage() {
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);
 
+  const handleAddMember = () => {
+    setEditingMember(null);
+    setIsModalOpen(true);
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <TitlePage
-            title="Manage Members"
-            description="View and manage customer information"
-          />
-          <ButtonBG
-            size="h-[38px]"
-            text="Add New Member"
-            icon="/icons/plus.svg"
-            onClick={() => {
-              setEditingMember(null);
-              setIsModalOpen(true);
-            }}
-          />
-        </div>
-
-        <div className="bg-white rounded-md shadow p-5">
+        <TitlePageAndButton title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
+        <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
@@ -309,10 +298,10 @@ export default function ManageMembersPage() {
           editingMember={
             editingMember
               ? {
-                  ...editingMember,
-                  id: editingMember.id.toString(),
-                  companyId: editingMember.companyId.toString(),
-                }
+                ...editingMember,
+                id: editingMember.id.toString(),
+                companyId: editingMember.companyId.toString(),
+              }
               : undefined
           }
         />

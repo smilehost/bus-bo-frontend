@@ -9,6 +9,20 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { usePathname } from "next/navigation";
 
+//icon
+import {
+    House,
+    Ticket,
+    Map,
+    Route,
+    Clock,
+    Calendar,
+    Users,
+    DollarSign,
+    FileBarChart,
+    Building,
+} from 'lucide-react'
+
 //component
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 
@@ -24,56 +38,60 @@ export default function RootLayout({
     const user_tier = userData.user_tier;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
     const allMenu = [
         {
             id: 1,
-            icon: "/icons/home.svg",
+            icon: House,
             text: "Dashboard",
             link: `dashboard`
         },
-        { id: 2, icon: "/icons/ticket.svg", text: "Sell Ticket", link: "sell-ticket" },
+        {
+            id: 2,
+            icon: Ticket,
+            text: "Sell Ticket",
+            link: "sell-ticket",
+        },
         {
             id: 3,
-            icon: "/icons/route.svg",
+            icon: Route,
             text: "Manage Routes",
-            link: `manage-route`,
+            link: "manage-route",
         },
         {
             id: 4,
-            icon: "/icons/ticket.svg",
+            icon: Ticket,
             text: "Manage Route Ticket",
-            link: `manage-ticket`,
-        },
-        {
-            id: 11,
-            icon: "/icons/company.svg",
-            text: "Manage Ticket Type",
-            link: `manage-ticket-type`,
+            link: "manage-ticket",
         },
         {
             id: 5,
-            icon: "/icons/route.svg",
+            icon: Map,
             text: "Manage Location",
-            link: `manage-location`,
+            link: "manage-location",
         },
         {
             id: 6,
-            icon: "/icons/time.svg",
+            icon: Clock,
             text: "Manage Times",
-            link: `manage-times`,
+            link: "manage-times",
         },
         {
             id: 7,
-            icon: "/icons/date.svg",
+            icon: Calendar,
             text: "Manage Date",
-            link: `manage-dates`,
+            link: "manage-dates",
         },
         {
             id: 8,
-            icon: "/icons/users.svg",
+            icon: Users,
             text: "Manage Members",
-            link: `manage-members`,
+            link: "manage-members",
+        },
+        {
+            id: 11,
+            icon: DollarSign,
+            text: "Manage Price Type",
+            link: "manage-price-type",
         },
         {
             id: 9, 
@@ -83,9 +101,9 @@ export default function RootLayout({
         },
         {
             id: 10,
-            icon: "/icons/company.svg",
+            icon: Building,
             text: "Manage Company",
-            link: `manage-company`,
+            link: "manage-company",
         },
 
     ];
