@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation';
 //component
-import RouteTicketForm from '@/app/components/Form/RouteTicketForm'
+import FromRouteTicketByStep from '@/app/components/Form/FormRouteTicketByStep'
 import TitlePage from '@/app/components/Title/TitlePage';
 
 //store
@@ -32,7 +32,7 @@ function Page() {
   return (
     <div>
       <TitlePage title={"Add New Route Ticket"} />
-      {ticketData && <RouteTicketForm ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
+      {ticketData && <FromRouteTicketByStep ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
     </div>
   )
 }

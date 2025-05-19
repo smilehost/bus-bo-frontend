@@ -37,6 +37,7 @@ export interface TicketTableData {
   id: number,
   ticketNameEN: string,
   ticketNameTH: string,
+  ticketType: string,
   status: number,
   amount: number,
   ticketColor: string
@@ -90,10 +91,11 @@ function Page() {
     ticketNameEN: string,
     ticketNameTH: string,
     status: number,
+    ticketType: string,
     amount: number,
     ticketColor: string
   ): TicketTableData => {
-    return { id, ticketNameEN, ticketNameTH, status, amount, ticketColor };
+    return { id, ticketType, ticketNameEN, ticketNameTH, status, amount, ticketColor };
   };
 
   // Generate rows for table
@@ -112,6 +114,7 @@ function Page() {
             item.ticketName_en,
             item.ticketName_th,
             Number(item.ticket_status),
+            item.ticket_type,
             Number(item.ticket_amount),
             item.ticket_color
           );
@@ -215,27 +218,23 @@ function Page() {
     {
       key: 'ticketNameEN', label: 'Ticket', width: '25%',
       render: (_, row) => (
-        <div className='flex gap-3 items-center'>
-          {/* <div className='w-[8px] h-[40px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.ticketColor }} /> */}
-          <div className='flex gap-3'>
-
-            <div>
-              <Ticket size={24} 
-                style={{
-                  color: row.ticketColor
-                }}
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
-              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
-            </div>
+        <div className='flex gap-3'>
+          <div>
+            <Ticket size={24}
+              style={{
+                color: row.ticketColor
+              }}
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
           </div>
         </div>
       ),
     },
     { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
+    { key: 'ticketType', label: 'Ticket Type', width: '20%', align: 'center' },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
       render: (_, row) => (

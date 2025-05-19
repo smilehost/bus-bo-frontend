@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 //component
-import FormRouteTicket from '@/app/components/Form/FormRouteTicket'
+import FormRouteTicketInformation from '@/app/components/Form/FormRouteTicketInformation'
 import TicketPriceFixed from '@/app/components/Form/TicketPriceFixed'
 import TierdPriceTable from '@/app/components/Table/TierdPriceTable'
 import ButtonBG from '@/app/components/Form/ButtonBG'
@@ -46,7 +46,7 @@ export interface RouteTicketFormProps {
   ticketActiveConfig: string
 }
 
-function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicketFormProps) {
+function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: RouteTicketFormProps) {
 
   const router = useRouter();
   //stores
@@ -400,7 +400,7 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
               >
               </StepLabel>
               <StepContent className='pt-5'>
-                <FormRouteTicket
+                <FormRouteTicketInformation
                   ticketNameTH={ticketNameTH}
                   setTicketNameTH={setTicketNameTH}
                   ticketNameEN={ticketNameEN}
@@ -507,4 +507,4 @@ function RouteTicketForm({ ticketData, routeId, ticketActiveConfig }: RouteTicke
   )
 }
 
-export default RouteTicketForm
+export default FromRouteTicketByStep
