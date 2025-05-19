@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation';
 //component
-import RouteTicketForm from '@/app/components/Form/RouteTicketForm'
+import FromRouteTicketByStep from '@/app/components/Form/FormRouteTicketByStep'
 import TitlePage from '@/app/components/Title/TitlePage';
 
 //store
@@ -36,7 +36,7 @@ function Page() {
     return (
         <div>
             <TitlePage title={"Edit Route Ticket"} />
-            {ticketData && <RouteTicketForm ticketData={ticketData} routeId={Number(ticketData[0]?.route_id)} ticketActiveConfig={idTicket.toString()} />}
+            {ticketData && <FromRouteTicketByStep ticketData={ticketData} routeId={Number(ticketData[0]?.route_id)} ticketActiveConfig={idTicket.toString()} />}
         </div>
     )
 }

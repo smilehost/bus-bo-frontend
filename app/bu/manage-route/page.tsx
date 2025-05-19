@@ -38,6 +38,7 @@ import TitlePage from '@/app/components/Title/TitlePage';
 export interface RouteTableData {
   id: string,
   route: string,
+  routeTH: string,
   company: string,
   schedule: string,
   time: string,
@@ -94,6 +95,7 @@ function Page() {
   const createData = (
     id: string,
     route: string,
+    routeTH: string,
     company: string,
     schedule: string,
     time: string,
@@ -101,7 +103,7 @@ function Page() {
     status: STATUS,
     routeColor: string
   ): RouteTableData => {
-    return { id, route, company, schedule, time, ticket_amount, status, routeColor };
+    return { id, route, routeTH,  company, schedule, time, ticket_amount, status, routeColor };
   };
 
   // Generate rows for table
@@ -124,6 +126,7 @@ function Page() {
           return createData(
             item.route_id,
             item.route_name_en,
+            item.route_name_th,
             item.route_com_id,
             dateName,
             timeName,
@@ -243,15 +246,19 @@ function Page() {
       label: 'Route',
       width: '25%',
       render: (_, row) => (
-        <div className='flex gap-3 items-center'>
-          {/* <div className='w-[8px] h-[32px] rounded-lg flex-shrink-0' style={{ backgroundColor: row.routeColor }} /> */}
-          <Waypoints strokeWidth={1.5} 
-          style={{
-            color:  row.routeColor
-          }}
-          />
-          <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
-        </div>
+          <div className='flex gap-3'>
+            <div>
+              <Waypoints strokeWidth={1.5}
+                style={{
+                  color: row.routeColor
+                }}
+              />
+            </div>
+            <div className='flex flex-col gap-1'>
+              <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
+              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.routeTH}</p>
+            </div>
+          </div>
       ),
     },
     // { key: 'company', label: 'Company', width: '20%' },

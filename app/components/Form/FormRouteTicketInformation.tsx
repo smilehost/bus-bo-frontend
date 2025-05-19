@@ -39,7 +39,7 @@ type FormRouteTicketProps = {
   error?: string;
 };
 
-function FormRouteTicket({
+function FormRouteTicketInformation({
   ticketNameTH,
   setTicketNameTH,
   ticketNameEN,
@@ -81,7 +81,7 @@ function FormRouteTicket({
         <div className='flex w-full gap-3'>
           <div className="flex-1">
             <InputLabel
-              label="Ticket Route Name (Thai)"
+              label="Ticket Name (Thai)"
               placeholder="e.g. Khon Kaen - Korat"
               size="max-w-[500px]"
               type="text"
@@ -192,4 +192,4 @@ function FormRouteTicket({
   )
 }
 
-export default FormRouteTicket
+export default FormRouteTicketInformation
