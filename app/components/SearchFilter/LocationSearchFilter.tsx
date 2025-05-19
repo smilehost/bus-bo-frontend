@@ -25,7 +25,7 @@ function LocationSearchFilter({
           <input
             type="text"
             placeholder="Search by location..."
-            className="pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-0"
+            className="pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
