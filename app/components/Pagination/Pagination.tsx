@@ -58,7 +58,7 @@ const Pagination: React.FC<PaginationProps> = ({
       buttons.push(
         <button
           key={i}
-          className={`w-9 h-9 flex items-center justify-center rounded-md mx-0.5 transition-all duration-200 ${
+          className={`w-9 h-9 flex items-center justify-center rounded-md mx-0.5 transition-all duration-200 cursor-pointer ${
             currentPage === i
               ? "bg-blue-600 text-white border border-blue-600 shadow-sm"
               : "border border-gray-300 text-gray-700 hover:bg-gray-50"
