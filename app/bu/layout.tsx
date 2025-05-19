@@ -94,10 +94,10 @@ export default function RootLayout({
             link: "manage-price-type",
         },
         {
-            id: 9, 
-            icon: "/icons/report.svg", 
-            text: "Reports", 
-            link: `reports`,
+            id: 9,
+            icon: FileBarChart,
+            text: "Reports",
+            link: "reports",
         },
         {
             id: 10,
@@ -119,6 +119,7 @@ export default function RootLayout({
     }, [user_tier]);
 
     const menu = allMenu.filter((item) => roleMenu?.includes(item.id));
+    // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
 
     return (
         <div className="flex h-screen bg-white ">

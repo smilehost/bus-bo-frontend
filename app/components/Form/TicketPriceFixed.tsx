@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { TicketPriceTypeFixed } from './RouteTicketForm';
 
 //type
-import { TicketPriceTypeFixed } from '@/app/bu/manage-route/routeTicket/[id]/page';
 
 type TicketPriceFixedProps = {
   listType: TicketPriceTypeFixed[];

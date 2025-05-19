@@ -107,7 +107,7 @@ function TableRoute({ rows, handleDeleteRoute }: TableRouteProps) {
               <StyledTableCell align="left">{row?.time}</StyledTableCell>
               <StyledTableCell align="center">{row?.ticket_amount}</StyledTableCell>
               <StyledTableCell align="left">
-                <StatusText type={row?.status} />
+                <StatusText id={Number(row?.status)} />
               </StyledTableCell>
               <StyledTableCell align="left">
                 <div className='flex gap-2 min-w-max'>

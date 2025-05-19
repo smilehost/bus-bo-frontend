@@ -11,7 +11,7 @@ import { TicketRoutePrice } from '@/types/types';
 
 //api
 import { useLocationStore } from '@/stores/locationStore';
-import { LocationItem } from '@/types/location.type';
+import { LocationItem } from '@/types/location';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];

@@ -152,7 +152,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
 
     getTicketById: async (id: number): Promise<TicketProps | undefined> => {
         try {
-            const res = await RouteTicketService.getTicketById(id);
+            const res = await RouteTicketService.getTicketById(id) as { route_ticket: any; route_ticket_price: any };
             const ticket = res.route_ticket;
             const price = res.route_ticket_price;
 

@@ -1,7 +1,7 @@
 export interface CreateTimePayload {
-    routeTimeName: string;
-    routeTimeArray: string[];
-    routeTimeComIdd: number;
+    route_time_name: string;
+    route_time_array: string[];
+    route_time_com_id: number;
   }
   
   export interface UpdateTimePayload {

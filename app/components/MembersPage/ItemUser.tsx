@@ -35,7 +35,7 @@ function ItemUser({ name, tel, status, company, tripsTotal, lastTransaction,inde
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-4">
         <p className="text-[16px]">{name}</p>
-        <StatusText type={status} />
+        <StatusText id={Number(status)} />
       </div>
       <div className="flex items-center gap-1">
         <Image

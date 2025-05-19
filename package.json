@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "analyze": "cross-env ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -29,14 +30,19 @@
     "recharts": "^2.15.3",
     "sortablejs": "^1.15.6",
     "sweetalert2": "^11.19.1",
+    "webpack": "^5.99.8",
+    "webpack-bundle-analyzer": "^4.10.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^15.3.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/webpack-bundle-analyzer": "^4.7.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "sass": "^1.88.0",
