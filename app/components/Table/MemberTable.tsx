@@ -1,6 +1,5 @@
 import React from "react";
 import Pagination from "../Pagination/Pagination";
-import { STATUS } from "@/constants/enum";
 
 type ActionType = "status" | "password" | "details";
 
@@ -183,33 +182,40 @@ function MemberTable({
                       {member.role === "1" ? "Admin" : "Salesman"}
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200">
-                      <div className="flex items-center justify-center">
+                      <button
+                        className="flex items-center justify-center w-full group cursor-pointer"
+                        onClick={() =>
+                          onEditStatus(member.id.toString(), member.status)
+                        }
+                        title="Click to edit status"
+                      >
                         {member.status === 1 ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 group-hover:ring-2 group-hover:ring-green-300 transition">
                             <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
                             <span>Active</span>
                           </span>
                         ) : member.status === 0 ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shadow-sm">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 group-hover:ring-2 group-hover:ring-yellow-300 transition">
                             <span className="mr-1.5 h-2 w-2 rounded-full bg-yellow-500"></span>
                             <span>Inactive</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 group-hover:ring-2 group-hover:ring-red-300 transition">
                             <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
                             <span>Cancelled</span>
                           </span>
                         )}
-                      </div>
+                      </button>
                     </td>
+
                     <td className="py-4 px-6 border-b border-gray-200 text-center">
                       <div className="flex justify-center space-x-2">
-                        <ActionButton
+                        {/* <ActionButton
                           type="status"
                           onClick={() =>
                             onEditStatus(member.id.toString(), member.status)
                           }
-                        />
+                        /> */}
                         <ActionButton
                           type="password"
                           onClick={() => onEditPassword(member.id.toString())}
