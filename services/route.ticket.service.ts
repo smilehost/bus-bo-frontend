@@ -6,48 +6,48 @@ export const RouteTicketService = {
     async fetchTickets(query: FetchTicketQuery,
     ) {
         return await api.get({
-            path: "/api/routeTicket/all",
+            path: "/routeTicket/all",
             query: query as unknown as Record<string, string | number>,
         });
     },
 
     async createTicket(payload: CreateRouteTicketPayload) {
         return await api.post({
-            path: "/api/routeTicket/create",
+            path: "/routeTicket/create",
             body: payload,
         });
     },
 
     async getTicketById(id: number) {
         return await api.get({
-            path: "/api/routeTicket/ticket",
+            path: "/routeTicket/ticket",
             params: id,
         });
     },
 
     async getTicketByRoute(id: number) {
         return await api.get({
-            path: "/api/routeTicket/route",
+            path: "/routeTicket/route",
             params: id,
         });
     },
 
     async getTicketByLocation(id: number) {
         return await api.get({
-            path: "/api/routeTicket",
+            path: "/routeTicket",
             params: id,
         });
     },
 
     async getTicketPriceType() {
         return await api.get({
-            path: "/api/routeTicket/priceType"
+            path: "/routeTicket/priceType"
         });
     },
 
     async updateTicket(id: number, payload: UpdateRouteTicketPayload) {
         return await api.put({
-            path: "/api/routeTicket",
+            path: "/routeTicket",
             params: id,
             body: payload,
         });
@@ -55,7 +55,7 @@ export const RouteTicketService = {
 
     async updateTicketStatus(id: number, payload: { route_ticket_status: number }) {
         return await api.put({
-            path: "/api/routeTicket",
+            path: "/routeTicket",
             params: `${id}/status`,
             body: payload,
         });
@@ -63,7 +63,7 @@ export const RouteTicketService = {
 
     async deleteTicket(id: number) {
         return await api.delete({
-            path: "/api/routeTicket",
+            path: "/routeTicket",
             params: id,
         });
     },

@@ -8,28 +8,28 @@ import {
 export const CompanyService = {
   async fetchCompanies(query: FetchCompanyQuery) {
     return await api.get({
-      path: "/api/company/all",
+      path: "/company/all",
       query: query as unknown as Record<string, string | number>,
     });
   },
 
   async fetchCompanyById(id: string) {
     return await api.get({
-      path: "/api/company",
+      path: "/company",
       params: id,
     });
   },
 
   async createCompany(payload: CreateCompanyPayload) {
     return await api.post({
-      path: "/api/company",
+      path: "/company",
       body: payload,
     });
   },
 
   async updateCompany(id: number, payload: UpdateCompanyPayload) {
     return await api.put({
-      path: "/api/company",
+      path: "/company",
       params: id,
       body: payload,
     });
@@ -37,7 +37,7 @@ export const CompanyService = {
 
   async deleteCompany(id: string) {
     return await api.delete({
-      path: "/api/company",
+      path: "/company",
       params: id,
     });
   },

@@ -9,28 +9,28 @@ export const RouteService = {
   async fetchRoutes(query: FetchRouteQuery,
   ) {
     return await api.get({
-      path: "/api/route",
+      path: "/route",
       query: query as unknown as Record<string, string | number>,
     });
   },
 
   async createRoute(payload: CreateRoutePayload) {
     return await api.post({
-      path: "/api/route",
+      path: "/route",
       body: payload,
     });
   },
 
   async getRouteById(id: number) {
     return await api.get({
-      path: "/api/route",
+      path: "/route",
       params: id,
     });
   },
 
   async updateRoute(id: number, payload: UpdateRoutePayload) {
     return await api.put({
-      path: "/api/route",
+      path: "/route",
       params: id,
       body: payload,
     });
@@ -38,7 +38,7 @@ export const RouteService = {
 
   async updateRouteStatus(id: number, status: { route_status: number }) {
     return await api.put({
-      path: "/api/route",
+      path: "/route",
       params: id,
       body: status,
     });
@@ -46,7 +46,7 @@ export const RouteService = {
 
   async deleteRoute(id: number) {
     return await api.delete({
-      path: "/api/route",
+      path: "/route",
       params: id,
     });
   },

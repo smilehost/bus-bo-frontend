@@ -8,28 +8,28 @@ import {
 export const MemberService = {
   async fetchMembers(query: FetchMemberQuery) {
     return await api.get({
-      path: "/api/accounts/all",
+      path: "/accounts/all",
       query: query as unknown as Record<string, string | number>,
     });
   },
 
   async fetchMemberById(id: string) {
     return await api.get({
-      path: "/api/accounts",
+      path: "/accounts",
       params: id,
     });
   },
 
   async createMember(payload: CreateMemberPayload) {
     return await api.post({
-      path: "api/auth/register",
+      path: "/auth/register",
       body: payload,
     });
   },
 
   async updateMember(id: string, payload: UpdateMemberPayload) {
     return await api.put({
-      path: `/api/accounts`,
+      path: `/accounts`,
       params: id,
       body: payload,
     });
@@ -37,7 +37,7 @@ export const MemberService = {
 
   async deleteMember(id: string) {
     return await api.delete({
-      path: "/api/accounts",
+      path: "/accounts",
       params: id,
     });
   },
@@ -54,7 +54,7 @@ export const MemberService = {
 
   async changeStatus(userId: string, newStatus: number) {
     return await api.post({
-      path: "/api/auth/changestatus",
+      path: "/auth/changestatus",
       body: {
         userId: Number(userId),
         newStatus,

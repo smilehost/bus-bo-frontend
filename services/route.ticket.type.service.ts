@@ -5,20 +5,20 @@ export const RouteTicketPriceTypeService = {
 
     async getTicketPriceType() {
         return await api.get({
-            path: "/api/ticketPriceType"
+            path: "/ticketPriceType"
         });
     },
 
     async createTicketType(payload: CreateRouteTicketPriceType) {
         return await api.post({
-            path: "/api/ticketPriceType",
+            path: "/ticketPriceType",
             body: payload,
         });
     },
 
     async updateTicketType(id: number, payload: RouteTicketPriceType) {
         return await api.put({
-            path: "/api/ticketPriceType",
+            path: "/ticketPriceType",
             params: id,
             body: payload,
         });
@@ -26,7 +26,7 @@ export const RouteTicketPriceTypeService = {
 
     async deleteTicketType(id: number) {
         return await api.delete({
-            path: "/api/ticketPriceType",
+            path: "/ticketPriceType",
             params: id,
         });
     },

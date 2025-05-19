@@ -8,28 +8,28 @@ import {
 export const DateService = {
   async fetchDates(query: FetchDatesQuery) {
     return await api.get({
-      path: "/api/routeDates/all",
+      path: "/routeDates/all",
       query: query as unknown as Record<string, string | number>,
     });
   },
 
   async fetchDateById(id: number) {
     return await api.get({
-      path: "/api/routeDates",
+      path: "/routeDates",
       params: id,
     });
   },
 
   async createDate(payload: CreateDatePayload) {
     return await api.post({
-      path: "/api/routeDates",
+      path: "/routeDates",
       body: payload,
     });
   },
 
   async updateDate(id: number, payload: UpdateDatePayload) {
     return await api.put({
-      path: "/api/routeDates",
+      path: "/routeDates",
       params: id,
       body: payload,
     });
@@ -37,7 +37,7 @@ export const DateService = {
 
   async deleteDate(id: number) {
     return await api.delete({
-      path: "/api/routeDates",
+      path: "/routeDates",
       params: id,
     });
   },
