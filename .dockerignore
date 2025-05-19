@@ -1,0 +1,27 @@
+# Node dependencies
+node_modules
+npm-debug.log
+yarn.lock
+.pnpm-store
+
+# Build output
+.next
+out
+
+# System files
+.DS_Store
+*.swp
+*.swo
+
+# Local dev config
+.env.local
+.env.development
+.env.test
+
+# IDE/editor configs
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
