@@ -91,32 +91,23 @@ function LocationModal({
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Latitude
+                Location (Latitude, Longitude)
               </label>
               <input
                 type="text"
-                placeholder="Enter latitude (e.g. 13.7563)"
+                placeholder="16.40110363857608, 102.85026064787496"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
-                value={location.latitude}
-                onChange={(e) =>
-                  setLocation({ ...location, latitude: e.target.value })
-                }
+                onChange={(e) => {
+                  const [lat, lng] = e.target.value.split(',').map(s => s.trim());
+                  setLocation(prev => ({
+                    ...prev,
+                    latitude: lat || "",
+                    longitude: lng || ""
+                  }));
+                }}
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                Longitude
-              </label>
-              <input
-                type="text"
-                placeholder="Enter longitude (e.g. 100.5018)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
-                value={location.longitude}
-                onChange={(e) =>
-                  setLocation({ ...location, longitude: e.target.value })
-                }
-              />
-            </div>
+
           </div>
           <div className="flex gap-3 justify-end mt-7">
             <ButtonDefault size="" text="Cancel" onClick={onClose} />
