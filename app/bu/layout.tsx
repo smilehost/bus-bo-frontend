@@ -25,6 +25,8 @@ import {
 
 //component
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
+import { Alert } from "../components/Dialog/Alert";
+import { Confirm } from "../components/Dialog/Confirm";
 
 export default function RootLayout({
     children,
@@ -109,6 +111,10 @@ export default function RootLayout({
     ];
 
     const [roleMenu, setRoleMenu] = useState<number[]>();
+    const logOut = () => {
+        localStorage.clear();
+        window.location.href = "/";
+    };
 
     useEffect(() => {
         if (user_tier === USER_TIER.ADMIN) {
@@ -154,14 +160,29 @@ export default function RootLayout({
                         ))}
                     </div>
                 </div>
-                <div className="absolute bottom-0 w-full border-t border-gray-200   ">
-                    <div className="flex items-end justify-between px-4 py-3">
-                        <button>
-                            <LogOutIcon size={18} className="mr-2" />
-                            Logout
+                <div className="absolute bottom-0 w-full border-t border-gray-200">
+                    <div className="flex items-end justify-end px-4 py-3">
+                    <button 
+                        onClick={async () => {
+                            const confirmed = await Confirm({
+                                title: "Are you sure?",
+                                text: "Do you want to log out?",
+                                confirmText: "Confirm",
+                                cancelText: "Cancel",
+                                type: "question",
+                            });
+
+                            if (confirmed) {
+                            logOut(); // เรียกฟังก์ชัน logout ได้เลย
+                            }
+                        }}
+                        className="flex items-center text-sm text-gray-700 hover:text-orange-600 cursor-pointer"
+                        >
+                        <LogOutIcon size={18} className="mr-2" />
+                        Logout
                         </button>
                     </div>
-                </div>
+                    </div>
             </aside>
             <div className="flex flex-col flex-1 overflow-hidden">
                 <header className="bg-white shadow-sm z-10">
