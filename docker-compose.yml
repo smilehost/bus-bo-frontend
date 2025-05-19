@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   frontend:
     build:
@@ -8,11 +10,10 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-    volumes:
-      - .:/app
-      - /app/node_modules
     restart: unless-stopped
-  
+    networks:
+      - bus-network
+
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -23,3 +24,9 @@ services:
     depends_on:
       - frontend
     restart: unless-stopped
+    networks:
+      - bus-network
+
+networks:
+  bus-network:
+    external: true

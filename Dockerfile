@@ -4,20 +4,17 @@ FROM node:20-alpine
 # set working directory
 WORKDIR /app
 
-# copy dependency files
+# copy dependencies
 COPY package*.json ./
-
-# install dependencies
 RUN npm install
 
-# copy the rest of the project
+# copy source code
 COPY . .
 
-# build the project
+# build Next.js
 RUN npm run build
 
-# expose the port (default for Next.js)
 EXPOSE 3000
 
-# run Next.js in production mode
+# run in production
 CMD ["npm", "run", "start"]
