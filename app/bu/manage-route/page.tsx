@@ -4,8 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
-import Link from 'next/link'
-import Image from 'next/image'
 
 //companent 
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
@@ -34,6 +32,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm';
 //icons
 import { Waypoints } from 'lucide-react';
 import TitlePage from '@/app/components/Title/TitlePage';
+import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 
 export interface RouteTableData {
   id: string,
@@ -103,7 +102,7 @@ function Page() {
     status: STATUS,
     routeColor: string
   ): RouteTableData => {
-    return { id, route, routeTH,  company, schedule, time, ticket_amount, status, routeColor };
+    return { id, route, routeTH, company, schedule, time, ticket_amount, status, routeColor };
   };
 
   // Generate rows for table
@@ -246,19 +245,19 @@ function Page() {
       label: 'Route',
       width: '25%',
       render: (_, row) => (
-          <div className='flex gap-3'>
-            <div>
-              <Waypoints strokeWidth={1.5}
-                style={{
-                  color: row.routeColor
-                }}
-              />
-            </div>
-            <div className='flex flex-col gap-1'>
-              <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
-              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.routeTH}</p>
-            </div>
+        <div className='flex gap-3'>
+          <div>
+            <Waypoints strokeWidth={1.5}
+              style={{
+                color: row.routeColor
+              }}
+            />
           </div>
+          <div className='flex flex-col gap-1'>
+            <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.routeTH}</p>
+          </div>
+        </div>
       ),
     },
     // { key: 'company', label: 'Company', width: '20%' },
@@ -281,36 +280,24 @@ function Page() {
       width: '25%',
       render: (_, row) => (
         <div className='flex gap-2 min-w-max'>
-          <Link href={`${pathname}/routeTicket/${row?.id}`} className='cursor-pointer'>
-            <Image
-              src={"/icons/money.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </Link>
-          <Link href={`${pathname}/edit/${row?.id}`} className='cursor-pointer'>
-            <Image
-              src={"/icons/edit.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </Link>
-          <div onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })} className='cursor-pointer'>
-            <Image
-              src={"/icons/garbage.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </div>
+          <TableActionButton
+            iconSrc="/icons/money.svg"
+            href={`${pathname}/routeTicket/${row?.id}`}
+            bgColor="bg-green-100"
+            hoverColor="hover:bg-green-200"
+          />
+          <TableActionButton
+            iconSrc="/icons/edit.svg"
+            href={`${pathname}/edit/${row?.id}`}
+            bgColor="bg-blue-50"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            iconSrc="/icons/garbage.svg"
+            onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
+            bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          />
         </div>
       ),
     },
@@ -319,29 +306,31 @@ function Page() {
   return (
     <>
       <TitlePage title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
-      <FormFilter
-        setSearch={(value: string) =>
-          handleSearchChange({
-            target: { value },
-          } as React.ChangeEvent<HTMLInputElement>)
-        }
-        placeholderSearch='Search routes...'
-        filter={filterSearch}
-        search={search}
-      />
-      {isLoadingskeleton ? <SkeletonRoute /> :
-        <TableTemplate
-          columns={columns}
-          data={rows}
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          totalPages={routeData?.totalPages}
-          totalResults={routeData?.total}
-          onPageChange={setCurrentPage}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          rowKey={(row) => row.id}
+      <div className='custom-frame-content p-5 mt-5'>
+        <FormFilter
+          setSearch={(value: string) =>
+            handleSearchChange({
+              target: { value },
+            } as React.ChangeEvent<HTMLInputElement>)
+          }
+          placeholderSearch='Search routes...'
+          filter={filterSearch}
+          search={search}
         />
-      }
+        {isLoadingskeleton ? <SkeletonRoute /> :
+          <TableTemplate
+            columns={columns}
+            data={rows}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            totalPages={routeData?.totalPages}
+            totalResults={routeData?.total}
+            onPageChange={setCurrentPage}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            rowKey={(row) => row.id}
+          />
+        }
+      </div>
 
     </>
   )

@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
-import Link from 'next/link'
-import Image from 'next/image'
 
 //companent 
 import FormFilter from '@/app/components/Filter/FormFilter'
@@ -31,6 +29,7 @@ import TitlePage from '@/app/components/Title/TitlePage';
 
 ////icons
 import { Ticket } from "lucide-react";
+import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 
 
 export interface TicketTableData {
@@ -247,26 +246,18 @@ function Page() {
       key: 'id', label: 'Action', width: '25%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
-          <Link href={`${pathname}/${row?.id}`} className='cursor-pointer'>
-            <Image
-              src={"/icons/money.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </Link>
-          <div onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })} className='cursor-pointer'>
-            <Image
-              src={"/icons/garbage.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </div>
+          <TableActionButton
+            iconSrc="/icons/money.svg"
+            href={`${pathname}/${row?.id}`}
+            bgColor="bg-green-100"
+            hoverColor="hover:bg-green-200"
+          />
+          <TableActionButton
+            iconSrc="/icons/garbage.svg"
+            onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
+            bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          />
         </div>
       ),
     },
@@ -275,29 +266,31 @@ function Page() {
   return (
     <>
       <TitlePage title='Manage Route Tickets' description='View and manage route ticket information.' />
-      <FormFilter
-        setSearch={(value: string) =>
-          handleSearchChange({
-            target: { value },
-          } as React.ChangeEvent<HTMLInputElement>)
-        }
-        placeholderSearch='Search route tickets...'
-        filter={filterSearch}
-        search={search}
-      />
-      {isLoadingskeleton ? <SkeletonRoute /> :
-        <TableTemplate
-          columns={columns}
-          data={rows}
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          totalPages={ticketDataList.totalPages}
-          totalResults={ticketDataList.total}
-          onPageChange={setCurrentPage}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          rowKey={(row) => row.id}
+      <div className='custom-frame-content p-5 mt-5'>
+        <FormFilter
+          setSearch={(value: string) =>
+            handleSearchChange({
+              target: { value },
+            } as React.ChangeEvent<HTMLInputElement>)
+          }
+          placeholderSearch='Search route tickets...'
+          filter={filterSearch}
+          search={search}
         />
-      }
+        {isLoadingskeleton ? <SkeletonRoute /> :
+          <TableTemplate
+            columns={columns}
+            data={rows}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            totalPages={ticketDataList.totalPages}
+            totalResults={ticketDataList.total}
+            onPageChange={setCurrentPage}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            rowKey={(row) => row.id}
+          />
+        }
+      </div>
 
     </>
   )

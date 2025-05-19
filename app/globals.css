@@ -26,7 +26,7 @@ body {
 }
 
 .custom-frame-content {
-  @apply bg-white rounded-lg shadow-xs mt-5;
+  @apply bg-white rounded-lg shadow-xs;
 }
 
 .custom-ellipsis-style {

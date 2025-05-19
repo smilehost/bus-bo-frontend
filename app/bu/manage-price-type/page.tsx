@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 
 //companent 
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
@@ -21,6 +20,7 @@ import { Alert } from '@/app/components/Dialog/Alert'
 //utils
 import { getComId } from '@/utils/getComId'
 import TitlePage from '@/app/components/Title/TitlePage'
+import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton'
 
 
 export interface TicketTypeTableData {
@@ -169,26 +169,18 @@ function Page() {
       key: 'company_id', label: 'Actions', width: '20%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
-          <div onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })} className='cursor-pointer'>
-            <Image
-              src={"/icons/edit.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </div>
-          <div onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })} className='cursor-pointer'>
-            <Image
-              src={"/icons/garbage.svg"}
-              width={1000}
-              height={1000}
-              alt='icon'
-              priority
-              className='w-[16px] h-[16px]'
-            />
-          </div>
+          <TableActionButton
+            iconSrc="/icons/edit.svg"
+            onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
+            bgColor="bg-blue-50"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            iconSrc="/icons/garbage.svg"
+            onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
+            bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          />
         </div>
       ),
     },

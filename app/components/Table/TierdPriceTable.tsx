@@ -12,6 +12,7 @@ import { TicketRoutePrice } from '@/types/types';
 //api
 import { useLocationStore } from '@/stores/locationStore';
 import { LocationItem } from '@/types/location';
+import { toast } from 'react-toastify';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
@@ -19,9 +20,11 @@ interface TierdPriceTableProps {
   ticketTypePriceName: string;
   ticketTypePriceId: string;
   handleSaveTable: (value: TicketRoutePrice[]) => void;
+  setSaveTable: React.Dispatch<React.SetStateAction<number>>;
+  saveTable: number
 }
 
-function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable }: TierdPriceTableProps) {
+function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable, setSaveTable, saveTable }: TierdPriceTableProps) {
   const { getLocationById } = useLocationStore();
 
   //set price เริ่มต้น
@@ -102,6 +105,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
       return;
     }
 
+    setSaveTable(Number(ticketTypePriceId))
     setShowSave(true)
     rowChecked.forEach((rowIdx) => {
       for (let j = rowIdx; j < stations.length - 1; j++) {
@@ -282,6 +286,10 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                           !isNaN(matrix[i][j]) ? matrix[i][j].toString() : ''
                         }
                         onChange={(e) => {
+                          if (saveTable && saveTable !== Number(ticketTypePriceId)) {
+                            toast.error("Please save the previous table first")
+                            return;
+                          }
                           const cleanedValue = e.target.value.replace(/^0+(?!$)/, ''); // ตัด 0 ข้างหน้า
                           const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue); // ป้องกัน NaN
                           const value = Number(numericValue);
@@ -289,7 +297,8 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                           newMatrix[i][j] = isNaN(value) ? NaN : value;
                           setMatrix(newMatrix);
                           const changed = checkMatrixChanged();
-                          setShowSave(changed)
+                          setSaveTable(Number(ticketTypePriceId))
+                          setShowSave(true)
                           setChangeMatrix(changed)
                           const newErrors = [...errorMatrix];
                           newErrors[i][j] = false;
