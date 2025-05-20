@@ -19,7 +19,6 @@ import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 import { useRouteStore } from '@/stores/routeStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
-import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
 import { toast } from 'react-toastify'
@@ -53,7 +52,6 @@ function Page() {
   const { routeData, getRoutes, deleteRoute, updateRouteStatus } = useRouteStore();
   const { times, getTimes } = useTimeStore();
   const { dates, getDates } = useDateStore();
-  const { getTicketByRouteId } = useTicketStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -119,9 +117,6 @@ function Page() {
           const dateName = dates.find(d => d.id === Number(item.route_date_id))?.name || '';
           const timeName = times.find(t => t.id === Number(item.route_time_id))?.schedule.join(', ') || '';
 
-          const tickets = await getTicketByRouteId(Number(item.route_id));
-          const ticketAmount = tickets?.length?.toString() || '0';
-
           return createData(
             item.route_id,
             item.route_name_en,
@@ -129,7 +124,7 @@ function Page() {
             item.route_com_id,
             dateName,
             timeName,
-            ticketAmount,
+            item.route_ticket_count.toString(),
             item.route_status,
             item.route_color
           );

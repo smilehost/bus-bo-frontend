@@ -16,6 +16,7 @@ export type RouteData = {
     route_date_id: string;
     route_time_id: string;
     route_array: string;
+    route_ticket_count: number
 };
 
 export type Route = {
