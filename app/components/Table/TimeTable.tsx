@@ -32,6 +32,7 @@ function TimeTable({
 }: TimeTableProps) {
   const totalPages = Math.ceil(totalResults / rowsPerPage);
 
+  
   return (
     <div className="flex flex-col space-y-6">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
@@ -117,7 +118,13 @@ function TimeTable({
                         <div>
                           {Array.isArray(time.schedule) &&
                           time.schedule.length > 0 ? (
-                            time.schedule.join(", ")
+                            time.schedule
+                              .sort((a, b) =>
+                                a.localeCompare(b, undefined, {
+                                  numeric: true,
+                                })
+                              )
+                              .join(", ")
                           ) : (
                             <span className="text-gray-400 italic">
                               No schedule

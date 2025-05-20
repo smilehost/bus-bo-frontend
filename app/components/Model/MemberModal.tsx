@@ -58,7 +58,7 @@ function MemberModal({
     const fetchCompanies = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/company/all`
+          `${process.env.NEXT_PUBLIC_API_URL}/company/all`
         );
         const raw = res.data.result || [];
         const mapped = raw.map((com: any) => ({

@@ -14,7 +14,7 @@ const ReportsPage = () => {
   const [reportType, setReportType] = useState<'overview' | 'company' | 'route' | 'payment'>('overview')
 
   return (
-    <div className="p-6">
+    <div className="">
       <ReportHeader />
       <ReportFilters
         dateRange={dateRange}
