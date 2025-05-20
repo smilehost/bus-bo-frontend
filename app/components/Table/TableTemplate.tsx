@@ -62,8 +62,11 @@ function TableTemplate<T>({
     onRowsPerPageChange,
 }: TableTemplateProps<T>) {
     return (
-        <div className=" bg-white rounded-lg shadow-xs mt-5 flex flex-col items-center overflow-hidden">
-            <TableContainer component={Paper} className='min-h-[700px] overflow-y-hidden'>
+        <div className=" rounded-md mt-5 flex flex-col items-center ">
+            <TableContainer sx={{
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+                borderRadius: "10px"
+                }} component={Paper} className=' min-h-[700px] overflow-y-hidden'>
                 <Table>
                     <TableHead>
                         <TableRow>

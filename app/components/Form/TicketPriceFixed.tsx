@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { TicketPriceTypeFixed } from './RouteTicketForm';
+import { TicketPriceTypeFixed } from './FormRouteTicketByStep';
 
 //type
 

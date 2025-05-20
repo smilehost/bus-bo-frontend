@@ -164,7 +164,7 @@ function FormRoute({
         <p className='text-[16px] font-bold'>Stations</p>
         <p className='text-[12px] text-[#6B7280]'>Add stations in order from start to end</p>
       </div>
-      <div className={`${disable ? "custom-disable-bg" : "bg-white"} border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-sm`}>
+      <div className={`${disable ? "custom-disable-bg" : "bg-white"} border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-lg`}>
         <div className={` ${styles.customSizeContainer} mx-auto`}>
           <DragDrop
             listA={listA}

@@ -60,29 +60,36 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
       )}
 
       {/* List B */}
-      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg":"w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
+      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg" : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
         <p className="text-center text-[12px] font-medium">Stations this Route</p>
-        <div className=' overflow-hidden mt-5 h-[350px] overflow-y-scroll'>
+        <div className={`mt-5 h-[350px]`}>
           <ReactSortable
             list={listB}
             setList={setListB}
             group={{ name: 'shared', pull: true, put: true }} // 👈 ใส่แบบนี้เหมือนกัน
             animation={200}
-            className="min-h-36"
-            disabled = {disable}
+            className={`${!disable && "h-full border rounded-lg border-gray-300 shadow p-3 overflow-y-scroll"} border"`}
+            disabled={disable}
           >
-            {listB.map((item, index) => (
-              <div key={index} className='flex gap-2'>
-                <div className={`${listB.length - 1 === index && "rounded-b-md"} ${0 === index && "rounded-t-md border-t"} w-[30px] h-[30px] flex justify-center items-center border-b border-r border-l ${disable ? "":"bg-white"} border-[#D1D5DB] text-[12px] cursor-pointer`}>
-                  {index + 1}
+            {listB.length > 0 ? (
+              listB.map((item, index) => (
+                <div key={index} className='flex gap-2'>
+                  <div className={`${listB.length - 1 === index && "rounded-b-md"} ${0 === index && "rounded-t-md border-t"} w-[30px] h-[30px] flex justify-center items-center border-b border-r border-l ${disable ? "" : "bg-white"} border-[#D1D5DB] text-[12px] cursor-pointer`}>
+                    {index + 1}
+                  </div>
+                  <div
+                    className={`${listB.length - 1 === index && "rounded-b-md "} ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "" : "bg-white"} text-[12px] cursor-pointer`}
+                  >
+                    {item.name}
+                  </div>
                 </div>
-                <div
-                  className={`${listB.length - 1 === index && "rounded-b-md "} ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "":"bg-white"} text-[12px] cursor-pointer`}
-                >
-                  {item.name}
-                </div>
+              ))
+
+            ) : (
+              <div className='flex justify-center items-center h-full text-gray-400 text-sm italic'>
+                Drag items here to add
               </div>
-            ))}
+            )}
           </ReactSortable>
         </div>
       </div>

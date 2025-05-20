@@ -50,9 +50,6 @@ function FormRouteTicketInformation({
   setTicketColor,
   ticketType,
   setTicketType,
-  newType,
-  setNewType,
-  handleAddType,
   handleValidateNext,
   ticketChecked,
   initialTicketChecked,
@@ -120,36 +117,28 @@ function FormRouteTicketInformation({
             {ticketType && (
               <div className='flex flex-col gap-2 mt-3'>
                 <LabelText text="Ticket Price Type" />
-                <div className='custom-border-gray rounded-md p-3'>
-                  <div className='flex flex-col gap-1'>
-                    {ticketTypeList?.map((item, index) => {
-                      const isMatch = ticketChecked?.some((c) => item.id === c)
-                      const isLocked = initialTicketChecked?.includes(item.id); 
-
-                      return (
-                        <div key={index} className='flex items-center gap-2'>
-                          <input
-                            type="checkbox"
-                            className='cursor-pointer'
-                            checked={isMatch}
-                            disabled={isLocked}
-                            onChange={() => handleChecked(item.id)}
-                          />
-                          <p className='text-[14px]'>{item.name}</p>
-                        </div>
-                      )
-                    })}
-                  </div>
-                  <div className='h-[25px] flex gap-2 mt-3'>
-                    <input
-                      type="text"
-                      className='h-full custom-border-gray rounded-md text-center text-[12px]'
-                      placeholder='Add new type...'
-                      value={newType}
-                      onChange={(e) => setNewType(e.target.value)}
-                    />
-                    <ButtonBG size='h-full' text='Add' onClick={handleAddType} />
-                  </div>
+                <div className='h-23 overflow-y-auto custom-border-gray rounded-md p-3 flex flex-col gap-1'
+                  style={{
+                    scrollbarWidth: 'none',       
+                    msOverflowStyle: 'none',
+                  }}
+                >
+                  {ticketTypeList?.map((item, index) => {
+                    const isMatch = ticketChecked?.some((c) => item.id === c)
+                    const isLocked = initialTicketChecked?.includes(item.id);
+                    return (
+                      <div key={index} className='flex items-center gap-2'>
+                        <input
+                          type="checkbox"
+                          className='cursor-pointer'
+                          checked={isMatch}
+                          disabled={isLocked}
+                          onChange={() => handleChecked(item.id)}
+                        />
+                        <p className='text-[14px]'>{item.name}</p>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

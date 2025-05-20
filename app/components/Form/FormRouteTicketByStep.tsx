@@ -73,6 +73,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
   const [activeStep, setActiveStep] = useState(0);
   const [checkConfirm, setCheckConfirm] = useState(true);
   const [initialTicketChecked, setInitialTicketChecked] = useState<string[]>([]);
+  const [isSaveTable, setSaveTable] = useState<number>(0)
 
   // ------------------- UTIL ----------------------
   const resetTicketForm = () => {
@@ -314,6 +315,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
       }
     });
 
+    setSaveTable(0)
     setTicketPriceList(updatedList);
   };
 
@@ -321,12 +323,16 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
   useEffect(() => {
     const isValidTicketPriceType = ValidTicketPriceType(ticketPriceList, ticketChecked)
     const isValidTicketPrice = ValidTicketPriceList(ticketPriceList)
+    if (isSaveTable) {
+      setCheckConfirm(true)
+      return;
+    }
     if (isValidTicketPriceType && isValidTicketPrice) {
       setCheckConfirm(false)
     } else {
       setCheckConfirm(true)
     }
-  }, [ticketPriceList, ticketChecked])
+  }, [ticketPriceList, ticketChecked, isSaveTable])
 
   return (
     <div>
@@ -372,7 +378,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
         </div>
       )}
 
-      <div className='p-5 custom-frame-content'>
+      <div className='p-5 custom-frame-content mt-5'>
         <Box sx={{}}>
           <Stepper activeStep={activeStep} orientation="vertical">
             <Step className=''>
@@ -464,6 +470,8 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                               ticketTypePriceName={ticketTypeList.find((item) => item.id === ticketTypeId)?.name || 'Ticket Price Type'}
                               ticketTypePriceId={ticketTypeId}
                               handleSaveTable={updateTicketPriceList}
+                              setSaveTable={setSaveTable}
+                              saveTable={isSaveTable}
                             />
                             <hr className='custom-border-gray ' />
                           </React.Fragment >
