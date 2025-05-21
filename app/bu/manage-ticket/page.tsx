@@ -13,7 +13,6 @@ import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //store
-// import { useCompanyStore } from '@/stores/companyStore'
 import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
@@ -45,13 +44,11 @@ export interface TicketTableData {
 function Page() {
 
   //stores
-  // const { companyData } = useCompanyStore();
   const { ticketDataList, getTickets, deleteTicket, updateTicketStatus } = useTicketStore();
 
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  // const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -170,13 +167,6 @@ function Page() {
     }
   };
 
-  //filter
-  // const listCompany = companyData.map((item) => {
-  //   return {
-  //     key: 1,
-  //     value: item.name
-  //   }
-  // })
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
@@ -184,12 +174,6 @@ function Page() {
       setSearchValue: setSearchStatus,
       size: "w-[130px]"
     },
-    // {
-    //   defaulteValue: FILTER.ALL_PAYMENT,
-    //   listValue: listCompany,
-    //   setSearchValue: setSearchCmpany,
-    //   size: "w-[170px]"
-    // },
   ]
 
   //Search

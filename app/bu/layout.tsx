@@ -25,7 +25,6 @@ import {
 
 //component
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import { Alert } from "../components/Dialog/Alert";
 import { Confirm } from "../components/Dialog/Confirm";
 
 export default function RootLayout({

@@ -66,7 +66,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     fetchStations();
 
-  }, [stations]);
+  }, [stations, getLocationById]);
 
   const [rowChecked, setRowChecked] = useState<number[]>([]);
   const [colChecked, setColChecked] = useState<number[]>([]);
