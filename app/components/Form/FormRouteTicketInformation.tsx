@@ -138,6 +138,8 @@ function FormRouteTicketInformation({
             </div>
           </div>
         </div>
+
+        {/* TicketType */}
         <div className="w-full md:w-[calc(50%-8px)] mt-3">
           {ticketType && (
             <div className={`flex flex-col  w-full max-w-96`}>
