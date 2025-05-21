@@ -249,15 +249,19 @@ function Page() {
             />
           </div>
           <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.routeTH}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
           </div>
         </div>
       ),
     },
     // { key: 'company', label: 'Company', width: '20%' },
-    { key: 'schedule', label: 'Schedule', width: '20%' },
-    { key: 'time', label: 'Departure Times', width: '20%' },
+    {
+      key: 'schedule', label: 'Schedule', width: '20%',
+    },
+    { key: 'time', label: 'Departure Times', width: '20%',  render: (row) => (
+        <p className='custom-ellipsis-style'>{row}</p>
+      )},
     { key: 'ticket_amount', label: 'Tickets', width: '15%', align: 'center' },
     {
       key: 'status',

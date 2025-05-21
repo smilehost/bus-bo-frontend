@@ -210,8 +210,8 @@ function Page() {
             />
           </div>
           <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
+            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
           </div>
         </div>
       ),
