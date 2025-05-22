@@ -21,14 +21,26 @@ export default function TableActionButton({
   const commonClass = `cursor-pointer ${bgColor} ${hoverColor} p-1 rounded-md transition-colors`;
 
   const icon = (
-    <Image
-      src={iconSrc}
-      width={1000}
-      height={1000}
-      alt={alt}
-      priority
-      className="w-[16px] h-[16px]"
-    />
+    // <Image
+    //   src={iconSrc}
+    //   width={1000}
+    //   height={1000}
+    //   alt={alt}
+    //   priority
+    //   className="w-[16px] h-[16px]"
+    // />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fillRule="evenodd"
+        d={iconSrc}
+        clipRule="evenodd"
+      />
+    </svg>
   );
 
   if (href) {

@@ -57,7 +57,7 @@ function Page() {
   //fetch tickets
   const fetchTicketData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    await getTickets(currentPage, rowsPerPage, '', '');;
+    await getTickets(currentPage, rowsPerPage, debouncedSearch, searchStatus);;
     cancelSkeleton();
   }
 
@@ -77,9 +77,9 @@ function Page() {
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-    fetchTicketData();
-  }, [currentPage, rowsPerPage]);
+  // useEffect(() => {
+  //   fetchTicketData();
+  // }, [currentPage, rowsPerPage]);
 
   // Function to create data for table
   const createData = (
@@ -178,11 +178,8 @@ function Page() {
 
   //Search
   useEffect(() => {
-    if (!debouncedSearch) {
-      fetchTicketData();
-    };
-    getTickets(currentPage, rowsPerPage, debouncedSearch, searchStatus);
-  }, [debouncedSearch, searchStatus])
+    fetchTicketData();
+  }, [debouncedSearch, searchStatus, currentPage, rowsPerPage])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -230,7 +227,7 @@ function Page() {
       key: 'id', label: 'Action', width: '25%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
-          <TableActionButton
+          {/* <TableActionButton
             iconSrc="/icons/money.svg"
             href={`${pathname}/${row?.id}`}
             bgColor="bg-green-100"
@@ -240,6 +237,18 @@ function Page() {
             iconSrc="/icons/garbage.svg"
             onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
             bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          /> */}
+          <TableActionButton
+            iconSrc="M1.5 6.375c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v3.026a.75.75 0 0 1-.375.65 2.249 2.249 0 0 0 0 3.898.75.75 0 0 1 .375.65v3.026c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 17.625v-3.026a.75.75 0 0 1 .374-.65 2.249 2.249 0 0 0 0-3.898.75.75 0 0 1-.374-.65V6.375Zm15-1.125a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0v.75a.75.75 0 0 0 1.5 0v-.75Zm-.75 3a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0v-.75a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0V18a.75.75 0 0 0 1.5 0v-.75ZM6 12a.75.75 0 0 1 .75-.75H12a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 12Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"
+            href={`${pathname}/${row?.id}`}
+            bgColor="text-green-600 bg-green-100"
+            hoverColor="hover:bg-green-200"
+          />
+          <TableActionButton
+            iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
+            bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
           />
         </div>

@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
 
+//mui
+import Tooltip from '@mui/material/Tooltip';
+
 //companent 
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
@@ -84,9 +87,6 @@ function Page() {
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-    fetchRouteData();
-  }, [currentPage, rowsPerPage]);
 
   // Function to create data for table
   const createData = (
@@ -215,11 +215,8 @@ function Page() {
 
   //search
   useEffect(() => {
-    if (!debouncedSearch) {
-      fetchRouteData();
-    };
-    getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
-  }, [debouncedSearch, searchStatus])
+    fetchRouteData();
+  }, [debouncedSearch, searchStatus, currentPage, rowsPerPage])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -248,10 +245,12 @@ function Page() {
               }}
             />
           </div>
-          <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
-          </div>
+          <Tooltip title={row.routeTH} arrow>
+            <div className='flex flex-col gap-1'>
+              <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
+              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
+            </div>
+          </Tooltip>
         </div>
       ),
     },
@@ -259,9 +258,13 @@ function Page() {
     {
       key: 'schedule', label: 'Schedule', width: '20%',
     },
-    { key: 'time', label: 'Departure Times', width: '20%',  render: (row) => (
-        <p className='custom-ellipsis-style'>{row}</p>
-      )},
+    {
+      key: 'time', label: 'Departure Times', width: '20%', render: (row) => (
+        <Tooltip title={row} arrow>
+          <p className='custom-ellipsis-style cursor-default'>{row}</p>
+        </Tooltip>
+      )
+    },
     { key: 'ticket_amount', label: 'Tickets', width: '15%', align: 'center' },
     {
       key: 'status',
@@ -279,7 +282,7 @@ function Page() {
       width: '25%',
       render: (_, row) => (
         <div className='flex gap-2 min-w-max'>
-          <TableActionButton
+          {/* <TableActionButton
             iconSrc="/icons/money.svg"
             href={`${pathname}/routeTicket/${row?.id}`}
             bgColor="bg-green-100"
@@ -295,6 +298,24 @@ function Page() {
             iconSrc="/icons/garbage.svg"
             onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
             bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          /> */}
+          <TableActionButton
+            iconSrc="M1.5 6.375c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v3.026a.75.75 0 0 1-.375.65 2.249 2.249 0 0 0 0 3.898.75.75 0 0 1 .375.65v3.026c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 17.625v-3.026a.75.75 0 0 1 .374-.65 2.249 2.249 0 0 0 0-3.898.75.75 0 0 1-.374-.65V6.375Zm15-1.125a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0v.75a.75.75 0 0 0 1.5 0v-.75Zm-.75 3a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0v-.75a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0V18a.75.75 0 0 0 1.5 0v-.75ZM6 12a.75.75 0 0 1 .75-.75H12a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 12Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"
+            href={`${pathname}/routeTicket/${row?.id}`}
+            bgColor="text-green-600 bg-green-100"
+            hoverColor="hover:bg-green-200"
+          />
+          <TableActionButton
+            iconSrc="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            href={`${pathname}/edit/${row?.id}`}
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
+            bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
           />
         </div>
