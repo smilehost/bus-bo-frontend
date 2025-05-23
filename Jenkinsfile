@@ -15,7 +15,18 @@ pipeline {
                     if (env.NEXT_PUBLIC_API_URL == 'https://suphasan.site/api') {
                         echo '✅'
       } else {
-                        echo '❌ NEXT_PUBLIC_API_URL is not set'
+                        echo '❌ '
+                    }
+                }
+            }
+        }
+        stage('Conditional Print2') {
+            steps {
+                script {
+                    if (env.NEXT_PUBLIC_API_URL == 'https://suphasan.site/ap') {
+                        echo '✅'
+      } else {
+                        echo '❌ '
                     }
                 }
             }
