@@ -3,6 +3,7 @@ import { TimeItem } from "@/types/time";
 import { TimeService } from "@/services/time.service";
 import { CreateTimePayload, UpdateTimePayload } from "@/payloads/time.payload";
 import { STATUS } from '@/constants/enum';
+import { getComId } from "@/utils/getComId";
 
 interface TimeState {
     times: TimeItem[];
@@ -14,6 +15,7 @@ interface TimeState {
     deleteTime: (id: number) => Promise<void>;
     getTimeById: (id: number) => Promise<TimeItem | undefined>;
 }
+const  com_id  = getComId();
 
 export const useTimeStore = create<TimeState>((set) => ({
     times: [],
@@ -52,7 +54,7 @@ export const useTimeStore = create<TimeState>((set) => ({
             const payload: CreateTimePayload = {
                 route_time_name: name,
                 route_time_array: schedule,
-                route_time_com_id: 1,
+                route_time_com_id: com_id!,
             };
             await TimeService.createTime(payload);
         } catch (error) {
@@ -66,7 +68,7 @@ export const useTimeStore = create<TimeState>((set) => ({
                 route_time_id: id,
                 route_time_name: name,
                 route_time_array: schedule.join(","),
-                route_time_com_id: 1,
+                route_time_com_id: com_id!,
             };
             await TimeService.updateTime(id, payload);
         } catch (error) {
