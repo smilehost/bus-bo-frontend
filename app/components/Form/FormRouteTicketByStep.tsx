@@ -144,7 +144,6 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
         getRouteById(tempRouteId),
         getTicketPriceType()
       ]);
-
       await fetchTicketByRouteID();
       setRouteActive(routeData);
       setTicketTypeList(priceTypeTemp || []);

@@ -106,7 +106,6 @@ function Page() {
     const [schedule, setSchedule] = useState<string>('');
     const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
         setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
-        console.log(event.target.value)
     };
 
 

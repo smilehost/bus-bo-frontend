@@ -4,10 +4,21 @@ import { Dialog, DialogContent } from "@mui/material";
 import Image from "next/image";
 import axios from "axios";
 
+//component
 import InputLabel from "../Form/InputLabel";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { EyeIcon } from "../Icons/EyeIcon";
+
+//utils
+import { createSecurePassword } from "@/utils/generatePassword";
+import LabelText from "../Form/LabelText";
+
+//store
+import { useUserStore } from "@/stores/userStore";
+import { useCompanyStore } from "@/stores/companyStore";
+import { CopyIcon } from "../Icons/CopyIcon";
 
 type CompanyOption = {
   value: string;
@@ -45,10 +56,27 @@ function MemberModal({
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [companyId, setCompanyId] = useState<string>("");
+  const [company, setCompany] = useState<any>();
   const [role, setRole] = useState<string>("2"); // Default to Salesman
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([
     { value: "", label: "Select a company" },
   ]);
+
+  //store
+  const { userData } = useUserStore();
+  const { getCompanyById } = useCompanyStore();
+
+  //get company by id
+  useEffect(() => {
+    const fetchCompany = async () => {
+      const data = await getCompanyById(userData.company_id);
+      setCompany(data);
+    };
+
+    if (userData?.company_id) {
+      fetchCompany();
+    }
+  }, [userData?.company_id]);
 
   const isEditing = !!editingMember;
 
@@ -111,21 +139,21 @@ function MemberModal({
 
     const payload = isEditing
       ? {
-          id: editingMember?.id,
-          name,
-          username: editingMember?.username || "", 
-          role: editingMember?.role || "2",
-          companyId: editingMember?.companyId || "",
-          status: 0,
-        }
+        id: editingMember?.id,
+        name,
+        username: editingMember?.username || "",
+        role: editingMember?.role || "2",
+        companyId: editingMember?.companyId || "",
+        status: 0,
+      }
       : {
-          name,
-          username,
-          password,
-          companyId,
-          role,
-          status: 1,
-        };
+        name,
+        username,
+        password,
+        companyId,
+        role,
+        status: 1,
+      };
 
     onHandle(payload);
 
@@ -135,6 +163,36 @@ function MemberModal({
     setRole("2");
     setCompanyId("");
   };
+
+  const genPassword = (length: number) => {
+    const newPassword = createSecurePassword(length)
+    setPassword(newPassword)
+  }
+
+  //handle  password
+  const [typePassword, setTypePassword] = useState<boolean>(true)
+  const [isCopy, setIsCopy] = useState<boolean>(false)
+
+  //change type input in password
+  const handleOpenPassword = () => {
+    setTypePassword(!typePassword)
+    setIsCopy(false)
+  }
+
+  //copy
+  const copyPassword = () => {
+    if (!password) return;
+    navigator.clipboard.writeText(password).then(() => {
+      setIsCopy(true)
+    }).catch((err) => {
+      console.error("Failed to copy password: ", err);
+    });
+  };
+
+  //check isCopy
+  useEffect(() => {
+    setIsCopy(false)
+  }, [password])
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -156,25 +214,61 @@ function MemberModal({
               value={name}
               setValue={setName}
             />
-
-            <InputLabel
-              label="Username"
-              placeholder="Enter username"
-              type="text"
-              value={username}
-              setValue={setUsername}
-              disabled={isEditing}
-            />
+            <div className='flex flex-col gap-2'>
+              <LabelText text={"Username"} />
+              <div className="flex gap-2">
+                <div
+                  className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] flex justify-center items-center`}
+                >
+                  {company?.prefix}
+                </div>
+                <input
+                  value={username}
+                  type={"text"}
+                  placeholder={"Enter username"}
+                  className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] w-full`}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+            </div>
 
             {!isEditing && (
-              <InputLabel
-                label="Password"
-                placeholder="Enter password"
-                type="password"
-                value={password}
-                setValue={setPassword}
-                autoComplete="new-password"
-              />
+              <div className="relative">
+                <InputLabel
+                  label={
+                    <div className="flex justify-between">
+                      <p>Password</p>
+                      <div className="" onClick={() => {
+                        genPassword(8)
+                      }}>
+                        <p className="" style={{ fontSize: "14px" }}>auto</p>
+                      </div>
+                    </div>
+                  }
+                  placeholder="Enter password"
+                  type={typePassword ? "password" : "text"}
+                  value={password}
+                  setValue={setPassword}
+                  autoComplete="new-password"
+                />
+                <div className="absolute bottom-2 right-4 flex gap-2 items-center">
+                  <button
+                    type="button"
+                    onClick={handleOpenPassword}
+                    className="text-gray-500 hover:text-blue-500 transition-colors"
+                  >
+                    <EyeIcon visible={typePassword} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={copyPassword}
+                    className={`${isCopy ? "text-green-600" : "text-gray-500"} hover:text-green-700 transition-colors`}
+                  >
+                    <CopyIcon copied={isCopy} />
+                  </button>
+                </div>
+              </div>
+
             )}
 
             <div className="flex flex-col gap-2">
