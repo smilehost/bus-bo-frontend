@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { LocationItem } from "@/types/location";
 import { LocationService } from "@/services/location.service";
 import { CreateLocationPayload, UpdateLocationPayload } from "@/payloads/location.payload";
+import { getComId } from "@/utils/getComId";
 
 interface LocationState {
   locations: LocationItem[];
@@ -14,11 +15,13 @@ interface LocationState {
   deleteLocation: (id: number) => Promise<void>;
   getLocationById: (id: number) => Promise<LocationItem | undefined>;
 }
+const  com_id  = getComId();
 
 export const useLocationStore = create<LocationState>((set) => ({
   locations: [],
   total: 0,
   isLoading: false,
+  
 
   getLocations: async (page, size, search) => {
     set({ isLoading: true });
@@ -48,7 +51,7 @@ export const useLocationStore = create<LocationState>((set) => ({
       route_location_name: location.name,
       route_location_lat: location.lat,
       route_location_long: location.long,
-      route_location_com_id: 1,
+      route_location_com_id: com_id!,
     };
     await LocationService.createLocation(payload);
   },
@@ -59,7 +62,7 @@ export const useLocationStore = create<LocationState>((set) => ({
       route_location_name: location.name,
       route_location_lat: location.lat,
       route_location_long: location.long,
-      route_location_com_id: 1,
+      route_location_com_id: com_id!,
     };
     await LocationService.updateLocation(id, payload);
   },

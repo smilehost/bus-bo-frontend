@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { DateItem } from "@/types/date";
 import { DateService } from "@/services/date.service";
 import { CreateDatePayload, UpdateDatePayload } from "@/payloads/date.payload";
+import { getComId } from "@/utils/getComId";
 
 interface DateState {
   dates: DateItem[];
@@ -19,6 +20,7 @@ interface DateState {
   deleteDate: (id: number) => Promise<void>;
   getDateById: (id: number) => Promise<DateItem | undefined>;
 }
+const  com_id  = getComId();
 
 export const useDateStore = create<DateState>((set) => ({
   dates: [],
@@ -74,7 +76,7 @@ export const useDateStore = create<DateState>((set) => ({
       route_date_fri: date.days.fri ? 1 : 0,
       route_date_sat: date.days.sat ? 1 : 0,
       route_date_sun: date.days.sun ? 1 : 0,
-      route_date_com_id: 1,
+      route_date_com_id: com_id!,
     };
     await DateService.createDate(payload);
   },
@@ -92,7 +94,7 @@ export const useDateStore = create<DateState>((set) => ({
       route_date_fri: date.days.fri ? 1 : 0,
       route_date_sat: date.days.sat ? 1 : 0,
       route_date_sun: date.days.sun ? 1 : 0,
-      route_date_com_id: 1,
+      route_date_com_id: com_id!,
     };
     await DateService.updateDate(id, payload);
   },
