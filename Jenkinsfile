@@ -1,5 +1,5 @@
 pipeline {
-    agent any 
+    agent any
 
     environment {
         DEBUG_ENV = 'true'
@@ -9,6 +9,12 @@ pipeline {
     }
 
     stages {
+        stage('Check nginx.conf') {
+            steps {
+                sh 'ls -l ./nginx.conf || echo "❌ nginx.conf NOT FOUND in workspace"'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker-compose up -d --build'
