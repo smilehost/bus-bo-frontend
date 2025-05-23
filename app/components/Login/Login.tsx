@@ -25,13 +25,6 @@ function Login() {
 
   //Redirect ถ้ามี token อยู่แล้ว
   useEffect(() => {
-    console.log("------------=--------");
-    console.log(process.env.NEXT_PUBLIC_API_URL);
-    console.log("------------=--------");
-    console.log(process.env.NEXT_PUBLIC_CONTEXT_PATH);
-    console.log("------------=--------");
-    console.log(process.env.JWT_SECRET);
-    console.log("------------=--------");
     const token = store.token.get();
     if (token) {
       try {
