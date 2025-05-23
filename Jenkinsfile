@@ -9,6 +9,17 @@ pipeline {
     }
 
     stages {
+        stage('Conditional Print') {
+            steps {
+                script {
+                    if (env.NEXT_PUBLIC_API_URL == 'https://suphasan.site/api') {
+                        echo '✅'
+      } else {
+                        echo '❌ NEXT_PUBLIC_API_URL is not set'
+                    }
+                }
+            }
+        }
         stage('Print ENV values (for debug only)') {
             steps {
                 sh '''
