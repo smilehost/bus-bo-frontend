@@ -9,12 +9,14 @@ pipeline {
     }
 
     stages {
-        stage('Print ENV values') {
+        stage('Print ENV values (for debug only)') {
             steps {
-                echo "DEBUG_ENV = $NEXT_PUBLIC_API_URL"
-                echo "NEXT_PUBLIC_API_URL = $NEXT_PUBLIC_API_URL"
-                echo "NEXT_PUBLIC_CONTEXT_PATH = $NEXT_PUBLIC_CONTEXT_PATH"
-                echo "JWT_SECRET = $JWT_SECRET"
+                sh '''
+                echo "DEBUG_ENV=$DEBUG_ENV"
+                echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
+                echo "NEXT_PUBLIC_CONTEXT_PATH=$NEXT_PUBLIC_CONTEXT_PATH"
+                echo "JWT_SECRET=$JWT_SECRET"
+                '''
             }
         }
 
