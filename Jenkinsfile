@@ -9,6 +9,14 @@ pipeline {
     }
 
     stages {
+        stage('Print ENV values') {
+            steps {
+                echo "DEBUG_ENV = ${env.DEBUG_ENV}"
+                echo "NEXT_PUBLIC_API_URL = ${env.NEXT_PUBLIC_API_URL}"
+                echo "NEXT_PUBLIC_CONTEXT_PATH = ${env.NEXT_PUBLIC_CONTEXT_PATH}"
+                echo "JWT_SECRET = ${env.JWT_SECRET}"
+            }
+        }
 
         stage('Check ls') {
             steps {
