@@ -41,7 +41,7 @@ export default function DashboardPage() {
     console.log("------------=--------");
     console.log(process.env.NEXT_PUBLIC_CONTEXT_PATH);
     console.log("------------=--------");
-    console.log(process.env.JWT_SECRET);
+    console.log(process.env.NEXT_PUBLIC_JWT_SECRET);
     console.log("------------=--------");
     // Simulate fetching data (fake delay)
     const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
