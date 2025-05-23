@@ -12,7 +12,7 @@ pipeline {
 
         stage('Check ls') {
             steps {
-                sh 'ls "'
+                sh 'ls '
             }
         }
         stage('Check nginx.conf') {
