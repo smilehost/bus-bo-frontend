@@ -20,6 +20,7 @@ import { useUserStore } from '@/stores/userStore';
 
 //toast
 import { toast } from 'react-toastify';
+import { getComId } from '@/utils/getComId';
 
 function Page() {
 
@@ -29,12 +30,12 @@ function Page() {
     //store
     const { addRoute } = useRouteStore();
     const { locations, getLocations } = useLocationStore();
-    const { userData } = useUserStore();
+    const  com_id  = getComId();
 
     //get locations
     useEffect(() => {
         setRouteStatusId(1)
-        setRouteComId(userData?.company_id);
+        setRouteComId(com_id!);
         getLocations(1, 5, '');
     }, [getLocations])
     
