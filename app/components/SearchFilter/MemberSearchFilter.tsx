@@ -5,6 +5,9 @@ import { useCompanyStore } from "@/stores/companyStore";
 import { STATUS, FILTER } from "@/constants/enum";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
 
+//store
+import { useUserStore } from "@/stores/userStore";
+
 interface Company {
   id: string;
   name: string;
@@ -29,6 +32,8 @@ export default function SearchFilter({
   setCompanyFilter,
 }: SearchFilterProps) {
   const { companies } = useCompanyStore();
+  const { userData } = useUserStore();
+
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
 
@@ -108,18 +113,16 @@ export default function SearchFilter({
           <div className="relative" ref={statusRef}>
             <button
               onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${
-                statusFilter !== FILTER.ALL_STATUS
+              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${statusFilter !== FILTER.ALL_STATUS
                   ? "border-orange-500 bg-orange-50 text-orange-700"
                   : "border-gray-300 bg-white"
-              } rounded-lg hover:bg-gray-50 transition-all`}
+                } rounded-lg hover:bg-gray-50 transition-all`}
             >
               <span className="mr-2">{statusFilter}</span>
               <ChevronDown
                 size={16}
-                className={`transform transition-transform ${
-                  statusDropdownOpen ? "rotate-180" : ""
-                }`}
+                className={`transform transition-transform ${statusDropdownOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -151,67 +154,67 @@ export default function SearchFilter({
           </div>
 
           {/* Company Filter */}
-          <div className="relative" ref={companyRef}>
-            <button
-              onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
-              className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${
-                companyFilter !== FILTER.ALL_COMPANIES
-                  ? "border-orange-500 bg-orange-50 text-orange-700"
-                  : "border-gray-300 bg-white"
-              } rounded-lg hover:bg-gray-50 transition-all`}
-            >
-              <span className="mr-2 truncate">
-                {companyFilter === FILTER.ALL_COMPANIES
-                  ? FILTER.ALL_COMPANIES
-                  : companies.find((c) => c.id.toString() === companyFilter)
+          {userData.account_role === 2 && (
+            <div className="relative" ref={companyRef}>
+              <button
+                onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
+                className={`flex items-center justify-between min-w-40 px-4 py-2.5 text-sm border cursor-pointer ${companyFilter !== FILTER.ALL_COMPANIES
+                    ? "border-orange-500 bg-orange-50 text-orange-700"
+                    : "border-gray-300 bg-white"
+                  } rounded-lg hover:bg-gray-50 transition-all`}
+              >
+                <span className="mr-2 truncate">
+                  {companyFilter === FILTER.ALL_COMPANIES
+                    ? FILTER.ALL_COMPANIES
+                    : companies.find((c) => c.id.toString() === companyFilter)
                       ?.name || "-"}
-              </span>
-              <ChevronDown
-                size={16}
-                className={`transform transition-transform ${
-                  companyDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+                </span>
+                <ChevronDown
+                  size={16}
+                  className={`transform transition-transform ${companyDropdownOpen ? "rotate-180" : ""
+                    }`}
+                />
+              </button>
 
-            {companyDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 py-1 max-h-60 overflow-auto">
-                <div
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                  onClick={() => {
-                    setCompanyFilter(FILTER.ALL_COMPANIES);
-                    setCompanyDropdownOpen(false);
-                  }}
-                >
-                  {FILTER.ALL_COMPANIES}
-                </div>
-                {companies.map((company) => (
+              {companyDropdownOpen && (
+                <div className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 py-1 max-h-60 overflow-auto">
                   <div
-                    key={company.id}
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm truncate"
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
                     onClick={() => {
-                      setCompanyFilter(company.id.toString()); // ✅ ใช้ id แทน name
+                      setCompanyFilter(FILTER.ALL_COMPANIES);
                       setCompanyDropdownOpen(false);
                     }}
                   >
-                    {company.name}
+                    {FILTER.ALL_COMPANIES}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  {companies.map((company) => (
+                    <div
+                      key={company.id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm truncate"
+                      onClick={() => {
+                        setCompanyFilter(company.id.toString()); // ✅ ใช้ id แทน name
+                        setCompanyDropdownOpen(false);
+                      }}
+                    >
+                      {company.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Reset Filters */}
           {(statusFilter !== FILTER.ALL_STATUS ||
             companyFilter !== FILTER.ALL_COMPANIES) && (
-            <button
-              onClick={resetFilters}
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center"
-            >
-              <X size={14} className="mr-1" />
-              Reset filters
-            </button>
-          )}
+              <button
+                onClick={resetFilters}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center"
+              >
+                <X size={14} className="mr-1" />
+                Reset filters
+              </button>
+            )}
         </div>
       </div>
     </div>

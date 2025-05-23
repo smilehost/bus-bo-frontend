@@ -170,7 +170,7 @@ function Page() {
   const handleChangeStatus = async ({ idStatus, idRoute }: { idStatus: string, idRoute: number }) => {
     const currentStatus = Number(idStatus);
     const nextStatus = currentStatus === 1 ? 0 : 1;
-    const statusText = nextStatus === 1 ? "Active" : "Inactive";
+    const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
 
     const isStatusConfirmed = await Confirm({
       title: "Change Status?",
