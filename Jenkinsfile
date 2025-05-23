@@ -9,6 +9,12 @@ pipeline {
     }
 
     stages {
+
+        stage('Check ls') {
+            steps {
+                sh 'ls "'
+            }
+        }
         stage('Check nginx.conf') {
             steps {
                 sh 'ls -l ./nginx.conf || echo "❌ nginx.conf NOT FOUND in workspace"'
