@@ -30,6 +30,7 @@ type TableTemplateProps<T> = {
     onPageChange?: (page: number) => void;
     onRowsPerPageChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     loading?: boolean;
+    height?: string
 };
 
 const StyledTableCell = styled(TableCell)(() => ({
@@ -60,13 +61,14 @@ function TableTemplate<T>({
     rowsPerPage,
     onPageChange,
     onRowsPerPageChange,
+    height="min-h-[700px]"
 }: TableTemplateProps<T>) {
     return (
         <div className=" rounded-md mt-5 flex flex-col items-center ">
             <TableContainer sx={{
                 boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
                 borderRadius: "10px"
-                }} component={Paper} className=' min-h-[700px] overflow-y-hidden'>
+                }} component={Paper} className={`${height} overflow-y-hidden`}>
                 <Table>
                     <TableHead>
                         <TableRow>

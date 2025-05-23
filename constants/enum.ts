@@ -10,6 +10,11 @@ export enum STATUS {
     CANCELLED = "Cancelled",
 }
 
+export enum DISCOUNT_TYPE {
+    BAHT = "บาท",
+    PERCENT = "%"
+}
+
 export enum FILTER {
     ALL_STATUS = "All Status",
     ALL_COMPANIES = "All Companies",

@@ -20,6 +20,7 @@ interface UnifiedSelectProps {
   withRenderValue?: boolean; // แสดงชื่อ + schedule
   withStartAdornment?: boolean; // ใส่ icon ด้านซ้าย
   onAddClick?: () => void;
+  tailwind?: string
 }
 
 const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
@@ -30,9 +31,10 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
   withRenderValue = false,
   withStartAdornment = false,
   onAddClick,
+  tailwind="min-w-[300px] xl:w-[400px] max-w-[400px]"
 }) => {
   return (
-    <div className="min-w-[300px] xl:w-[400px] max-w-[400px]">
+    <div className={`${tailwind}`}>
       <div className="flex flex-col gap-2 w-full">
         <LabelText text={label} />
         <div className="relative flex w-full">
