@@ -1,11 +1,16 @@
+// import type { NextConfig } from "next";
+
+// const nextConfig: NextConfig = {
+//   /* config options here */
+//   eslint: {ignoreDuringBuilds: true}, // Ignore ESLint errors during build
+// };
+
+// export default nextConfig;
+
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import type { Configuration } from "webpack";
-
-// ✅ โหลด .env สำหรับ Jenkins หรือ local dev
-import dotenv from "dotenv";
-dotenv.config();
 
 const withAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -17,14 +22,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-
-  // ✅ Inject ENV variables ไปยังฝั่ง client
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-    NEXT_PUBLIC_CONTEXT_PATH: process.env.NEXT_PUBLIC_CONTEXT_PATH,
-    JWT_SECRET: process.env.JWT_SECRET, // ใช้ได้เฉพาะฝั่ง server
-  },
-
   webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
     if (process.env.ANALYZE === "true") {
       config.plugins = config.plugins || [];
@@ -42,3 +39,8 @@ const nextConfig: NextConfig = {
 };
 
 export default withAnalyzer(nextConfig);
+
+
+
+
+
