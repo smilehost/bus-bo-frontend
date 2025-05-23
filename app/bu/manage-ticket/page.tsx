@@ -4,6 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
 
+//mui
+import Tooltip from '@mui/material/Tooltip';
+
 //companent 
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
@@ -14,6 +17,8 @@ import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //store
 import { useTicketStore } from '@/stores/routeTicketStore'
+import { useUserStore } from '@/stores/userStore';
+import { useCompanyStore } from '@/stores/companyStore';
 
 //toast
 import { toast } from 'react-toastify'
@@ -45,10 +50,13 @@ function Page() {
 
   //stores
   const { ticketDataList, getTickets, deleteTicket, updateTicketStatus } = useTicketStore();
+  const { companies, getCompanies } = useCompanyStore();
+  const { userData } = useUserStore();
 
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
+  const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -61,6 +69,10 @@ function Page() {
     cancelSkeleton();
   }
 
+  useEffect(() => {
+    getCompanies(1, 9999, '');
+  }, [])
+  
   useEffect(() => {
     if (ticketDataList) {
       setTickets(ticketDataList.data)
@@ -167,6 +179,14 @@ function Page() {
     }
   };
 
+
+  //filter
+  const listCompany = companies?.map((item) => {
+    return {
+      key: Number(item.id),
+      value: item.name
+    }
+  })
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
@@ -174,6 +194,16 @@ function Page() {
       setSearchValue: setSearchStatus,
       size: "w-[130px]"
     },
+    ...(userData?.account_role === 2
+      ? [
+        {
+          defaulteValue: FILTER.ALL_COMPANIES,
+          listValue: listCompany,
+          setSearchValue: setSearchCompany,
+          size: "w-[170px]",
+        },
+      ]
+      : []),
   ]
 
   //Search
@@ -206,10 +236,12 @@ function Page() {
               }}
             />
           </div>
-          <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
-          </div>
+          <Tooltip title={row.ticketNameTH} arrow>
+            <div className='flex flex-col gap-1 cursor-default'>
+              <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
+              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
+            </div>
+          </Tooltip>
         </div>
       ),
     },

@@ -2,7 +2,7 @@ import React from 'react'
 import LabelText from './LabelText'
 
 type InputLabelProps = {
-    label: string,
+    label: React.ReactNode,
     placeholder: string,
     setValue: (value: string) => void;
     value?: string | undefined;

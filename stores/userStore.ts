@@ -1,23 +1,26 @@
 import { create } from 'zustand';
-import { USER_TIER } from '@/constants/enum';
 
-type User = {
-    user_tier: USER_TIER;
+//utils
+import { getComId } from '@/utils/getComId';
+import { getAccountRoleId } from '@/utils/getAccountId';
+type UserProps = {
+    id: number
     name: string;
-    company_id: string;
+    company_id: number;
+    account_role: number
 };
 
 type UserStore = {
-    userData: User;
-    setUserData: (newData: User) => void;
+    userData: UserProps;
+    setUserData: (newData: UserProps) => void;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
     userData: {
-        id: '1',
+        id: 1,
         name: 'TEST USER',
-        user_tier: USER_TIER.ADMIN,
-        company_id: '1',
+        company_id: Number(getComId()),
+        account_role: Number(getAccountRoleId())
     },
     setUserData: (newData) => set({ userData: newData }),
 }));

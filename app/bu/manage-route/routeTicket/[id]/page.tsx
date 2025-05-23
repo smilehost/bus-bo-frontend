@@ -32,7 +32,7 @@ function Page() {
   return (
     <div>
       <TitlePage title={"Add New Route Ticket"} />
-      {ticketData && <FromRouteTicketByStep ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
+      {ticketData && routeId && <FromRouteTicketByStep ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
     </div>
   )
 }

@@ -17,11 +17,12 @@ import StatusText from '@/app/components/StatusText'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
-//api
-// import { useCompanyStore } from '@/stores/companyStore'
+//store
+import { useCompanyStore } from '@/stores/companyStore'
 import { useRouteStore } from '@/stores/routeStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
+import { useUserStore } from '@/stores/userStore';
 
 //toast
 import { toast } from 'react-toastify'
@@ -51,16 +52,17 @@ export interface RouteTableData {
 function Page() {
 
   //api
-  // const { companyData } = useCompanyStore();
+  const { companies, getCompanies } = useCompanyStore();
   const { routeData, getRoutes, deleteRoute, updateRouteStatus } = useRouteStore();
   const { times, getTimes } = useTimeStore();
   const { dates, getDates } = useDateStore();
+  const { userData } = useUserStore();
 
   const router = useRouter();
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  // const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
+  const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -75,6 +77,7 @@ function Page() {
   useEffect(() => {
     getDates(1, 9999, '');
     getTimes(1, 9999, '');
+    getCompanies(1, 9999, '');
   }, [])
 
   //pagination
@@ -192,26 +195,31 @@ function Page() {
   }
 
   //filter
-  // const listCompany = companyData.map((item) => {
-  //     return {
-  //         key: 1,
-  //         value: item.name
-  //     }
-  // })
+  const listCompany = companies?.map((item) => {
+    return {
+      key: Number(item.id),
+      value: item.name
+    }
+  })
+
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
       listValue: statusOptions,
       setSearchValue: setSearchStatus,
-      size: "w-[130px]"
+      size: "w-[130px]",
     },
-    // {
-    //     defaulteValue: FILTER.ALL_COMPANIES,
-    //     listValue: listCompany,
-    //     setSearchValue: setSearchCompany,
-    //     size: "w-[170px]"
-    // },
-  ]
+    ...(userData?.account_role === 2
+      ? [
+        {
+          defaulteValue: FILTER.ALL_COMPANIES,
+          listValue: listCompany,
+          setSearchValue: setSearchCompany,
+          size: "w-[170px]",
+        },
+      ]
+      : []),
+  ];
 
   //search
   useEffect(() => {
@@ -246,7 +254,7 @@ function Page() {
             />
           </div>
           <Tooltip title={row.routeTH} arrow>
-            <div className='flex flex-col gap-1'>
+            <div className='flex flex-col gap-1 cursor-default'>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
               <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
             </div>

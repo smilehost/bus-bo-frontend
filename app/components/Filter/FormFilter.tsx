@@ -33,7 +33,7 @@ function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilter
         }
     };
     return (
-        <div className='shadow-md rounded-lg p-3 flex items-center'>
+        <div className='shadow-md rounded-lg p-3 flex items-center flex-wrap gap-y-4'>
             <div className='flex-1'>
                 {setSearch && (
                     <div className="relative flex-grow">
