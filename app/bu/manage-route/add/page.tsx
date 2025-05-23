@@ -19,6 +19,7 @@ import { useLocationStore } from '@/stores/locationStore';
 
 //toast
 import { toast } from 'react-toastify';
+import { getComId } from '@/utils/getComId';
 
 function Page() {
 
@@ -28,11 +29,12 @@ function Page() {
     //api
     const { addRoute } = useRouteStore();
     const { locations, getLocations } = useLocationStore();
+    const  com_id  = getComId();
 
     //get locations
     useEffect(() => {
         setRouteStatusId(1)
-        setRouteComId(1);
+        setRouteComId(com_id!);
         getLocations(1, 5, '');
     }, [getLocations])
     useEffect(() => {
