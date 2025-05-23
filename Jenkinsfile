@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    // ok
 
     environment {
         DEBUG_ENV = 'true'
@@ -14,7 +15,7 @@ pipeline {
                 checkout scm
             }
         }
-        
+
         stage('Build and Run Docker') {
             steps {
                 script {
