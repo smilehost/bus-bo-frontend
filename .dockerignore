@@ -1,27 +1,35 @@
-# Node dependencies
+# node_modules: ไม่จำเป็นต้อง copy เข้า image เพราะ Docker จะติดตั้งใหม่
 node_modules
 npm-debug.log
-yarn.lock
-.pnpm-store
+yarn-debug.log
+yarn-error.log
+pnpm-lock.yaml
 
-# Build output
+# Output build
 .next
+dist
 out
 
-# System files
-.DS_Store
-*.swp
-*.swo
-
-# Local dev config
+# Local environment
+.env
 .env.local
 .env.development
 .env.test
+.env.production
 
-# IDE/editor configs
+# Editor/IDE
 .vscode
 .idea
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # Git
 .git
 .gitignore
+
+# Docker
+.dockerignore
+docker-compose.override.yml

@@ -8,6 +8,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_CONTEXT_PATH=${NEXT_PUBLIC_CONTEXT_PATH}
+      - JWT_SECRET=${JWT_SECRET}
     restart: unless-stopped
     networks:
       - bus-network
