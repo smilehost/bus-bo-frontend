@@ -300,15 +300,15 @@ function Page() {
   };
 
   const handleDeleteTicketDiscount = async ({ name, id }: { name: string, id: number }) => {
-    const inputName = await ConfirmWithInput({
-      title: `Delete "${name}"?`,
-      text: `Please type the route name below to confirm deletion.`,
-      confirmText: "Delete",
+
+    const isConfirmed = await Confirm({
+     title: `Delete "${name}"?`,
+     text: `Please type the route name below to confirm deletion.`,
+       confirmText: "Delete",
       cancelText: "Cancel",
-      placeholder: "Type route name here"
     });
 
-    if (inputName === name) {
+    if (isConfirmed) {
       const result = await deleteTicketDiscount(id);
       if (result.success) {
         fetchTicketDiscount();
@@ -316,7 +316,7 @@ function Page() {
       } else {
         toast.error(`Error: ${result.message}`);
       }
-    } else if (inputName !== null) {
+    } else if (isConfirmed) {
       await Alert({
         title: "Name mismatch!",
         text: "The typed name does not match the route name.",

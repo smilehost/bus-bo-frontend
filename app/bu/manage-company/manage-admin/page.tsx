@@ -4,7 +4,7 @@ import MemberPageComponent from '@/app/components/MembersPage/MemberPageComponen
 function page() {
   return (
     <div>
-      <MemberPageComponent />
+      <MemberPageComponent/>
     </div>
   )
 }

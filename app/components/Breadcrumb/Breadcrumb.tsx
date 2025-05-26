@@ -27,7 +27,7 @@ function Breadcrumb({ path }: BreadcrumbProps) {
 
                     return (
                         <React.Fragment key={index}>
-                            {index > 0 && <span className="mx-1">/</span>}
+                            {index > 0 && <span className="mx-1">{`>`}</span>}
                             <div
                                 // href={href}
                                 className={`text-gray-800 font-semibold cursor-pointer`}

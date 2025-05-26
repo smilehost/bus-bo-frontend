@@ -101,7 +101,7 @@ export default function RootLayout({
         {
             id: 11,
             icon: DollarSign,
-            text: "Manage Price Type",
+            text: "Manage Promotion",
             link: "manage-price-type",
         },
         {
@@ -116,7 +116,6 @@ export default function RootLayout({
             text: "Manage Company",
             link: "manage-company",
         },
-
     ];
 
     const [roleMenu, setRoleMenu] = useState<number[]>();
@@ -129,7 +128,7 @@ export default function RootLayout({
         if (account_role === 1) {
             setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
         } else if (account_role === 2) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+            setRoleMenu([1, 10, 8]);
         }
     }, [account_role]);
 
@@ -214,7 +213,7 @@ export default function RootLayout({
                                             {userData?.name}
                                         </div>
                                         <div className="text-xs text-gray-500  capitalize">
-                                            {userData.account_role === 2 ? USER_TIER.SUPER_ADMIN: USER_TIER.ADMIN}
+                                            {userData.account_role === 2 ? USER_TIER.SUPER_ADMIN : USER_TIER.ADMIN}
                                         </div>
                                     </div>
                                 </div>

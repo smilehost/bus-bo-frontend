@@ -153,7 +153,7 @@ export default function SearchFilter({
             )}
           </div>
 
-          {/* Company Filter */}
+          {/* Company Filter
           {userData.account_role === 2 && (
             <div className="relative" ref={companyRef}>
               <button
@@ -202,7 +202,7 @@ export default function SearchFilter({
                 </div>
               )}
             </div>
-          )}
+          )} */}
 
           {/* Reset Filters */}
           {(statusFilter !== FILTER.ALL_STATUS ||
