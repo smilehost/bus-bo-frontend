@@ -5,7 +5,6 @@ import { debounce } from "@/utils/debounce";
 
 //companent 
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
-import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import StatusText from '@/app/components/StatusText'
@@ -13,9 +12,6 @@ import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //store
-import { useRouteStore } from '@/stores/routeStore'
-import { useDateStore } from '@/stores/dateStore'
-import { useTimeStore } from '@/stores/timeStore'
 import { useDeviceStore } from '@/stores/deviceStore';
 
 //toast
@@ -30,7 +26,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm';
 import TitlePage from '@/app/components/Title/TitlePage';
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 
-export interface RouteTableData {
+export interface DeviceTable {
   id: number,
   no: number,
   com_id: number,
@@ -42,10 +38,7 @@ export interface RouteTableData {
 function Page() {
 
   //api
-  const { routeData, getRoutes, deleteRoute, updateRouteStatus } = useRouteStore();
-  const { devices } = useDeviceStore();
-  const { times, getTimes } = useTimeStore();
-  const { dates, getDates } = useDateStore();
+  const { devices, addDevice, getDevices, updateDeviceStatus, updateDevice, deleteDevice } = useDeviceStore();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
   const [search, setSearch] = useState<string>(''); // Search input
@@ -53,16 +46,11 @@ function Page() {
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
   //fetch routes from store
-  const fetchRouteData = async () => {
+  const fetchDeviceData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    await getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
+    await getDevices(currentPage, rowsPerPage, debouncedSearch, searchStatus);
     cancelSkeleton();
   }
-  //fetch dates, times from store
-  useEffect(() => {
-    getDates(1, 9999, '');
-    getTimes(1, 9999, '');
-  }, [])
 
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,66 +71,63 @@ function Page() {
     com_name: string,
     dv_serial: string,
     dv_status: number,
-  ): RouteTableData => {
+  ): DeviceTable => {
     return { no, id, com_id, com_name, dv_serial, dv_status };
   };
 
   // Generate rows for table
-  const [rows, setRows] = useState<RouteTableData[]>([]);
+  const [rows, setRows] = useState<DeviceTable[]>([]);
   useEffect(() => {
-    const isReady = routeData?.data?.length && dates.length && times.length;
+    const isReady = devices?.data?.length;
     if (!isReady) {
       setRows([])
       return
     };
+    const deviceCom = devices?.data[0]
     const fetchWithTicketCounts = async () => {
       const newRows = await Promise.all(
-        devices?.map(async (item, index) => {
+        deviceCom?.devices?.map(async (item, index) => {
           return createData(
             index + 1, // no
-            item.id, //id
-            item.com_id, // company id (example)
-            item.com_name, // company name (example)
-            item.serial, // serial number (example)
-            item.status // status
+            item.device_id, //id
+            item.device_com_id, // company id (example)
+            deviceCom.com_name, // company name (example)
+            item.device_serial_number, // serial number (example)
+            item.device_status // status
           );
         })
       );
       setRows(newRows);
     };
     fetchWithTicketCounts();
-  }, [routeData?.data, dates, times]);
+  }, [devices?.data]);
 
   // Handle delete route
-  const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
+
+  const handleDeleteDevice = async ({ name, id }: { name: string, id: number }) => {
     const inputName = await ConfirmWithInput({
-      title: `Delete "${route}"?`,
+      title: `Delete "${name}"?`,
       text: `Please type the route name below to confirm deletion.`,
       confirmText: "Delete",
       cancelText: "Cancel",
       placeholder: "Type route name here"
     });
 
-    if (inputName === route) {
-      const result = await deleteRoute(id);
-
+    if (inputName === name) {
+      const result = await deleteDevice(id);
       if (result.success) {
-        fetchRouteData();
-        toast.success("delete route successfully!");
+        fetchDeviceData();
+        toast.success("delete device successfully!");
       } else {
         toast.error(`Error: ${result.message}`);
       }
     } else if (inputName !== null) {
-      await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the route name.",
-        type: "error"
-      });
+      toast.error("ไมวะ.");
     }
   };
 
   // Handle Change Status
-  const handleChangeStatus = async ({ idStatus, idRoute }: { idStatus: string, idRoute: number }) => {
+  const handleChangeStatus = async ({ idStatus, id }: { idStatus: string, id: number }) => {
     const currentStatus = Number(idStatus);
     const nextStatus = currentStatus === 1 ? 0 : 1;
     const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
@@ -155,19 +140,63 @@ function Page() {
     });
 
     if (isStatusConfirmed) {
-      const result = await updateRouteStatus(idRoute, nextStatus);
+      const result = await updateDeviceStatus(id, nextStatus);
       if (result.success) {
         toast.success("Change status sucessfuly!")
-        fetchRouteData();
+        fetchDeviceData();
       } else {
         toast.error(`Change status error: ${result.message}`)
       }
     }
   };
 
-  const RedirectoAdd = () => {
-    console.log("add")
-  }
+  //model add or edit
+  const handleDevice = async ({ id, name }: { id?: number, name?: string }) => {
+    const isConfirmed = await ConfirmWithInput({
+      title: `${id ? "Edit Device" : "Add New Device"}`,
+      text: `Fill in the serial number below.`,
+      confirmText: "Confirm",
+      cancelText: "Cancel",
+      placeholder: "Serial Number",
+      defaultValue: name || ""  // ใส่ค่า name ถ้ามี, ไม่งั้นเป็น empty string
+    });
+
+    if (isConfirmed) {
+      const inputName = isConfirmed.trim();
+
+      if (!inputName) {
+        toast.error("Name cannot be empty");
+        return;
+      }
+
+      const formatPayload = {
+        device_serial_number: inputName,
+      };
+
+      if (id) {
+        const result = await updateDevice(id, formatPayload);
+        if (result.success) {
+          toast.success("Updated successfully!");
+        } else {
+          toast.error(`Update failed: ${result.message}`);
+        }
+      } else {
+        // เพิ่มใหม่ (ไม่ส่ง id)
+        const result = await addDevice(formatPayload);
+        if (result.success) {
+          toast.success("Created successfully!");
+        } else {
+          toast.error(`Creation failed: ${result.message}`);
+        }
+      }
+      fetchDeviceData();
+    }
+  };
+
+  //for add
+  const handleDeviceOpenModel = () => {
+    handleDevice({});
+  };
 
   //filter
   const filterSearch = [
@@ -182,7 +211,7 @@ function Page() {
 
   //search
   useEffect(() => {
-    fetchRouteData();
+    fetchDeviceData();
   }, [debouncedSearch, searchStatus, currentPage, rowsPerPage])
 
   const debouncedFetch = useCallback(
@@ -198,7 +227,7 @@ function Page() {
   };
 
   //table columns
-  const columns: ColumnConfig<RouteTableData>[] = [
+  const columns: ColumnConfig<DeviceTable>[] = [
     {
       key: 'no',
       label: 'No',
@@ -215,7 +244,9 @@ function Page() {
       label: 'Status',
       width: '15%',
       render: (_, row) => (
-        <div className='cursor-pointer'>
+        <div className='cursor-pointer'
+          onClick={() => handleChangeStatus({ idStatus: String(row.dv_status), id: Number(row.id) })}
+        >
           <StatusText id={Number(row.dv_status)} />
         </div>
       ),
@@ -228,11 +259,13 @@ function Page() {
       render: (_, row) => (
         <div className='flex gap-2 min-w-max justify-end'>
           <TableActionButton
+            onClick={() => handleDevice({ id: row.id, name: row.dv_serial })}
             iconSrc="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
+            onClick={() => handleDeleteDevice({ name: row.dv_serial, id: row.id })}
             iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
@@ -244,7 +277,7 @@ function Page() {
 
   return (
     <>
-      <TitlePage title='Manage Device' description='View and manage device' btnText='Add New Device' handleOpenModel={RedirectoAdd} />
+      <TitlePage title='Manage Device' description='View and manage device' btnText='Add New Device' handleOpenModel={handleDeviceOpenModel} />
       <div className='custom-frame-content p-5 mt-5'>
         <FormFilter
           setSearch={(value: string) =>
@@ -262,8 +295,8 @@ function Page() {
             data={rows}
             currentPage={currentPage}
             rowsPerPage={rowsPerPage}
-            totalPages={routeData?.totalPages}
-            totalResults={routeData?.total}
+            totalPages={devices?.totalPages}
+            totalResults={devices?.total}
             onPageChange={setCurrentPage}
             onRowsPerPageChange={handleRowsPerPageChange}
             rowKey={(row) => row.id}
