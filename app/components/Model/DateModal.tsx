@@ -106,6 +106,21 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
       return "Please select at least one day";
     }
 
+    if (!newDate.startDate) {
+      return "Please select a start date";
+    }
+
+    if (newDate.startDate && newDate.endDate) {
+      const start = new Date(newDate.startDate);
+      const end = new Date(newDate.endDate);
+      if (start > end) {
+        return "Start date cannot be after end date";
+      }
+      if (end < start) {
+        return "End date cannot be before start date";
+      }
+    }
+
     return null;
   };
 
