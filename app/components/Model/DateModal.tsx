@@ -6,6 +6,8 @@ import Image from "next/image";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface DateModalProps {
   open: boolean;
@@ -129,7 +131,7 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
     if (errorMessage) {
       // ใช้ setTimeout เพื่อให้แน่ใจว่า Modal ปิดก่อน
       setTimeout(() => {
-        alert(errorMessage);
+        toast.error(errorMessage);
       }, 100);
       return;
     }
