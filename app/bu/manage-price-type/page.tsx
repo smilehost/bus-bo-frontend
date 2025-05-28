@@ -9,6 +9,7 @@ import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //store
 import { useTicketPriceTypeStore } from '@/stores/routeTicketPriceTypeStore';
+import { useTicketDiscountPrice } from '@/stores/ticketDiscountPrice'
 
 //toast
 import { toast } from 'react-toastify'
@@ -21,6 +22,13 @@ import { Alert } from '@/app/components/Dialog/Alert'
 import { getComId } from '@/utils/getComId'
 import TitlePage from '@/app/components/Title/TitlePage'
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton'
+import StatusText from '@/app/components/StatusText'
+import { DISCOUNT_TYPE, STATUS } from '@/constants/enum'
+import { Confirm } from '@/app/components/Dialog/Confirm'
+
+import TicketDiscountModel from '@/app/components/Model/TicketDiscountModel'
+import { RouteTicketDiscount } from '@/payloads/route.ticket.discount.payload'
+
 
 
 export interface TicketTypeTableData {
@@ -30,23 +38,55 @@ export interface TicketTypeTableData {
   company_id: number
 }
 
+export interface DiscountPriceTableData {
+  no: number,
+  ticket_discount_id: number,
+  ticket_discount_name: string,
+  ticket_discount_type: number,
+  ticket_discount_value: string,
+  ticket_discount_status: number,
+  ticket_discount_comId: number
+}
+
+export interface InsertDiscount {
+  name: string,
+  type: number,
+  value: string
+}
 function Page() {
 
   //stores
   // const { companyData } = useCompanyStore();
+  const {
+    ticketDiscountPrice,
+    addTicketDiscount,
+    updateTicketDiscount,
+    deleteTicketDiscount,
+    updateTicketDiscountStatus,
+    fetchTicketDiscount
+  } = useTicketDiscountPrice();
+
   const { getTicketPriceType, ticketPriceTypeData, updateTicketPriceType, addTicketType, deleteTicketType } = useTicketPriceTypeStore();
 
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+  const [showModel, setShowModel] = useState(false)
+  const [editingDiscount, setEditingDiscount] = useState<RouteTicketDiscount>()
 
-  //fetch tickets
+  //fetch tickets and discount
   const fetchTicketTypeData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
     await getTicketPriceType();
     cancelSkeleton();
   };
+  const fetchTicketDiscountData = async () => {
+    const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
+    await fetchTicketDiscount();
+    cancelSkeleton();
+  };
 
   useEffect(() => {
     fetchTicketTypeData();
+    fetchTicketDiscountData();
   }, []);
 
   // Function to create data for table
@@ -59,7 +99,7 @@ function Page() {
     return { no, id, name, company_id };
   };
 
-  // Generate rows for table
+  // row route ticket price type
   const [rows, setRows] = useState<TicketTypeTableData[]>([]);
   useEffect(() => {
     const isReady = ticketPriceTypeData;
@@ -83,7 +123,35 @@ function Page() {
     fetchWithTicketCounts();
   }, [ticketPriceTypeData]);
 
+  //row ticket discount price
+  const [rowDiscount, setRowDiscount] = useState<DiscountPriceTableData[]>([]);
+  useEffect(() => {
+    const isReady = ticketDiscountPrice;
+    if (!isReady) {
+      setRowDiscount([])
+      return
+    };
+    const fetchWithCounts = async () => {
+      const newRows = await Promise.all(
+        ticketDiscountPrice?.map(async (item, index) => {
+          return {
+            no: index + 1,
+            ticket_discount_id: item.ticket_discount_id,
+            ticket_discount_name: item.ticket_discount_name,
+            ticket_discount_value: item.ticket_discount_value,
+            ticket_discount_type: item.ticket_discount_type,
+            ticket_discount_status: item.ticket_discount_status,
+            ticket_discount_comId: item.ticket_discount_com_id
+          };
+        })
+      );
+      setRowDiscount(newRows);
+    };
+    fetchWithCounts();
+  }, [ticketDiscountPrice]);
+
   //model
+  //ticket type models
   const handleTicketTypeModel = async ({ id, name }: { id?: number, name?: string }) => {
     const isConfirmed = await ConfirmWithInput({
       title: `${id ? "Edit Price Type" : "Add New Price Type"}`,
@@ -130,6 +198,80 @@ function Page() {
     }
   };
 
+  //ticket discount 
+
+  const handleAddDiscount = () => {
+    setEditingDiscount(undefined);
+    setShowModel(true);
+  };
+
+  const handleEditDiscount = (id: number) => {
+    const temp = ticketDiscountPrice.find((l) => l.ticket_discount_id === id);
+    if (temp) {
+      setEditingDiscount(temp);
+      setShowModel(true);
+    }
+  };
+  const handleSaveTicketDiscount = async (data: InsertDiscount) => {
+    const tempData = {
+      ticket_discount_name: data.name,
+      ticket_discount_type: data.type,
+      ticket_discount_value: data.value,
+    };
+
+    setShowModel(false);
+
+    const isConfirmed = await Confirm({
+      title: editingDiscount ? "Confirm Update" : "Confirm Create",
+      text: editingDiscount
+        ? "Do you want to update this discount?"
+        : "Do you want to create this discount?",
+      confirmText: editingDiscount ? "Update" : "Create",
+      cancelText: "Cancel",
+      type: "question",
+    });
+
+    if (!isConfirmed) return;
+    try {
+      if (editingDiscount) {
+        await updateTicketDiscount(editingDiscount.ticket_discount_id, tempData);
+        toast.success("Updated!")
+      } else {
+        await addTicketDiscount(tempData);
+        toast.success("Created!")
+
+      }
+      fetchTicketDiscount();
+    } catch (error) {
+      console.error("Save Discount error:", error);
+      toast.error("Save Discount error:");
+
+    }
+  }
+
+  // Handle Change Status
+  const handleChangeStatusDiscount = async ({ idStatus, idDiscount }: { idStatus: number, idDiscount: number }) => {
+    const currentStatus = Number(idStatus);
+    const nextStatus = currentStatus === 1 ? 0 : 1;
+    const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
+
+    const isStatusConfirmed = await Confirm({
+      title: "Change Status?",
+      text: `Do you want to change the status to "${statusText}"`,
+      confirmText: "Confirm",
+      cancelText: "Cancel",
+    });
+    if (isStatusConfirmed) {
+      const result = await updateTicketDiscountStatus(idDiscount, nextStatus);
+      if (result.success) {
+        toast.success("Change status sucessfuly!")
+        fetchTicketDiscount();
+      } else {
+        toast.error(`Change status error: ${result.message}`)
+      }
+    }
+  };
+
   //delete
   const handleDeleteTicketType = async ({ name, id }: { name: string, id: number }) => {
     const inputName = await ConfirmWithInput({
@@ -157,12 +299,38 @@ function Page() {
     }
   };
 
+  const handleDeleteTicketDiscount = async ({ name, id }: { name: string, id: number }) => {
+
+    const isConfirmed = await Confirm({
+     title: `Delete "${name}"?`,
+     text: `Please type the route name below to confirm deletion.`,
+       confirmText: "Delete",
+      cancelText: "Cancel",
+    });
+
+    if (isConfirmed) {
+      const result = await deleteTicketDiscount(id);
+      if (result.success) {
+        fetchTicketDiscount();
+        toast.success("delete discount price successfully!");
+      } else {
+        toast.error(`Error: ${result.message}`);
+      }
+    } else if (isConfirmed) {
+      await Alert({
+        title: "Name mismatch!",
+        text: "The typed name does not match the route name.",
+        type: "error"
+      });
+    }
+  };
+
   const handleOpenTicketTypeModal = () => {
     handleTicketTypeModel({});
   };
 
   //table columns
-  const columns: ColumnConfig<TicketTypeTableData>[] = [
+  const columnTicketType: ColumnConfig<TicketTypeTableData>[] = [
     { key: 'no', label: 'No.', width: '5%', align: 'left' },
     { key: 'name', label: 'Price Type', width: '20%', align: 'left' },
     {
@@ -186,7 +354,7 @@ function Page() {
             onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
-          /> 
+          />
           <TableActionButton
             iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
             onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
@@ -198,16 +366,89 @@ function Page() {
     },
   ];
 
+  const columnTicketDiscount: ColumnConfig<DiscountPriceTableData>[] = [
+    { key: 'no', label: 'No.', width: '5%', align: 'left' },
+    { key: 'ticket_discount_name', label: 'Name', width: '20%', align: 'left' },
+    {
+      key: 'ticket_discount_value', label: 'Value', width: '20%', align: 'left',
+    },
+    {
+      key: 'ticket_discount_type', label: 'Discount Type', width: '20%', align: 'center',
+      render: (_, row) => (
+        <p>{`${row.ticket_discount_type === 0 ? DISCOUNT_TYPE.BAHT : DISCOUNT_TYPE.PERCENT}`}</p>
+      )
+    },
+    {
+      key: 'ticket_discount_status',
+      label: 'Status',
+      width: '15%',
+      align: 'center',
+      render: (_, row) => (
+        <div className='cursor-pointer' onClick={() => handleChangeStatusDiscount({ idStatus: Number(row.ticket_discount_status), idDiscount: Number(row.ticket_discount_id) })}>
+          <StatusText id={Number(row.ticket_discount_status)} />
+        </div>
+      ),
+    },
+    {
+      key: 'ticket_discount_comId', label: 'Action', width: '20%', align: 'right', render: (_, row) => (
+        <div className='flex justify-end gap-2 min-w-max'>
+          <TableActionButton
+            onClick={() => handleEditDiscount(row.ticket_discount_id)}
+            iconSrc="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            onClick={() => handleDeleteTicketDiscount({ name: row.ticket_discount_name, id: row.ticket_discount_id })}
+            iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            bgColor="bg-red-50 text-red-600"
+            hoverColor="hover:bg-red-100"
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
-      <TitlePage title='Manage Ticket Types' description='View and manage ticket type information' btnText='Add New Type' handleOpenModel={handleOpenTicketTypeModal} />
-      {isLoadingskeleton ? <SkeletonRoute /> :
-        <TableTemplate
-          columns={columns}
-          data={rows}
-          rowKey={(row) => row.id}
-        />
-      }
+      <div>
+        <TitlePage title='Manage Ticket Types' description='View and manage ticket type information' btnText='Add New Type' handleOpenModel={handleOpenTicketTypeModal} />
+        {isLoadingskeleton ? <SkeletonRoute /> :
+          <TableTemplate
+            columns={columnTicketType}
+            data={rows}
+            rowKey={(row) => row.id}
+            height=''
+          />
+        }
+      </div>
+      <div className='mt-5'>
+        <TitlePage title='Manage Ticket Discount Price' description='View and manage discount price information' btnText='Add Discount Price' handleOpenModel={handleAddDiscount} />
+        {isLoadingskeleton ? <SkeletonRoute /> :
+          <TableTemplate
+            columns={columnTicketDiscount}
+            data={rowDiscount}
+            rowKey={(row) => row.ticket_discount_id}
+            height=''
+          />
+        }
+        {showModel && (
+          <TicketDiscountModel
+            open={showModel}
+            onClose={() => setShowModel(false)}
+            onSave={handleSaveTicketDiscount}
+            editingDiscount={
+              editingDiscount
+                ? {
+                  name: editingDiscount.ticket_discount_name,
+                  type: editingDiscount.ticket_discount_type,
+                  value: editingDiscount.ticket_discount_value,
+                }
+                : null
+            }
+          />
+        )}
+      </div>
     </>
   )
 }

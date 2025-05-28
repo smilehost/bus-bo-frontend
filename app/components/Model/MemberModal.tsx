@@ -19,6 +19,7 @@ import LabelText from "../Form/LabelText";
 import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { CopyIcon } from "../Icons/CopyIcon";
+import { CompanyItem } from "@/types/company";
 
 type CompanyOption = {
   value: string;
@@ -56,7 +57,7 @@ function MemberModal({
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [companyId, setCompanyId] = useState<string>("");
-  const [company, setCompany] = useState<any>();
+  const [company, setCompany] = useState<CompanyItem>();
   const [role, setRole] = useState<string>("2"); // Default to Salesman
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([
     { value: "", label: "Select a company" },
@@ -69,7 +70,7 @@ function MemberModal({
   //get company by id
   useEffect(() => {
     const fetchCompany = async () => {
-      const data = await getCompanyById(userData.company_id);
+      const data = await getCompanyById(userData.company_id.toString());
       setCompany(data);
     };
 
@@ -270,7 +271,6 @@ function MemberModal({
               </div>
 
             )}
-
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
                 Company

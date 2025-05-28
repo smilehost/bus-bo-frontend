@@ -21,7 +21,7 @@ type FilterProps = {
 type FormFilterProps = {
     setSearch?: (value: string) => void;
     placeholderSearch?: string
-    filter: FilterProps[];
+    filter?: FilterProps[];
     search: string
 }
 
@@ -59,23 +59,27 @@ function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilter
 
                 )}
             </div>
-            <div className='flex items-center mx-4 gap-2'>
-                <Funnel size={18}
-                    style={{ color: "#6B7280" }}
-                />
-                <p className='text-[12px] text-[#6B7280]'>Filters:</p>
-            </div>
-            <div className='flex gap-3'>
-                {filter.map((item, index) => (
-                    <SelectFilter
-                        key={index}
-                        width={item.size}
-                        defaultValue={item.defaulteValue}
-                        listValue={item.listValue}
-                        onChange={(e) => item.setSearchValue?.(e.target.value)}
-                    />
-                ))}
-            </div>
+            {filter && (
+                <>
+                    <div className='flex items-center mx-4 gap-2'>
+                        <Funnel size={18}
+                            style={{ color: "#6B7280" }}
+                        />
+                        <p className='text-[12px] text-[#6B7280]'>Filters:</p>
+                    </div>
+                    <div className='flex gap-3'>
+                        {filter.map((item, index) => (
+                            <SelectFilter
+                                key={index}
+                                width={item.size}
+                                defaultValue={item.defaulteValue}
+                                listValue={item.listValue}
+                                onChange={(e) => item.setSearchValue?.(e.target.value)}
+                            />
+                        ))}
+                    </div>
+                </>
+            )}
         </div>
     )
 }
