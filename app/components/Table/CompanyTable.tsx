@@ -1,13 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Pagination from "../Pagination/Pagination";
+import { Alert } from "../Dialog/Alert";
+import axios from "axios";
+import { store } from "@/stores/store";
+import { jwtDecode } from "jwt-decode";
+import { Router } from "lucide-react";
+import { useRouter } from "next/navigation"; // ✅ สำหรับ Next.js App Router
+import EnterPassModal from "../Model/EnterPassModal";
 
 type Company = {
   id: string;
   name: string;
   prefix: string;
   status: number; // 1 = Active, 0 = Inactive
+};
+type DecodedToken = {
+  account_id: number;
+  account_role: string;
+  com_id: number;
+  login_at: number;
+  iat: number;
+  exp: number;
 };
 
 type CompanyTableProps = {
@@ -34,6 +49,47 @@ export default function CompanyTable({
   onRowsPerPageChange,
 }: CompanyTableProps) {
   const totalPages = Math.ceil(totalResults / rowsPerPage);
+  const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [showPassModal, setShowPassModal] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
+    null
+  );
+
+  const onLoginAsCompany = async (com_id: number, password: string) => {
+    setError(null);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          username: "admin57",
+          // password : 'G1@ugO37ir',
+          // username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      const authHeader = response.headers["authorization"];
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1].trim();
+        store.token.set(token);
+
+        const decoded = jwtDecode<DecodedToken>(token);
+        store.com_id.set(com_id);
+        store.account_id.set(decoded.account_id);
+        store.account_role.set(decoded.account_role);
+        window.open("/bu/dashboard", "_blank");
+      } else {
+        setError("Login failed: No token received");
+      }
+    } catch (err) {
+      setError("Login failed: Invalid credentials");
+      console.error("Login error:", err);
+    }
+  };
 
   return (
     <div className="flex flex-col space-y-6">
@@ -140,6 +196,15 @@ export default function CompanyTable({
                             />
                           </svg>
                         </button>
+                        <button
+                          className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer"
+                          onClick={() => {
+                            setSelectedCompanyId(Number(company.id));
+                            setShowPassModal(true);
+                          }}
+                        >
+                          login as company
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -157,6 +222,16 @@ export default function CompanyTable({
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={onRowsPerPageChange}
         totalResults={totalResults}
+      />
+      <EnterPassModal
+        isOpen={showPassModal}
+        onClose={() => setShowPassModal(false)}
+        onSubmit={(password) => {
+          if (selectedCompanyId !== null) {
+            onLoginAsCompany(selectedCompanyId, password);
+            setShowPassModal(false);
+          }
+        }}
       />
     </div>
   );
