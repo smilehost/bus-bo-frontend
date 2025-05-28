@@ -29,7 +29,12 @@ export interface MemberTableData {
   username: string;
   id: string;
 }
-export default function MemberPageComponent() {
+
+export interface MemberPageComponentProps {
+  comId?: number
+}
+
+export default function MemberPageComponent({ comId }: MemberPageComponentProps) {
 
   const { members, getMembers, createMember, updateMember } = useMemberStore();
   const { companies, getCompanies } = useCompanyStore();
@@ -241,6 +246,7 @@ export default function MemberPageComponent() {
       role: m.role,
       status: m.status,
       company: getCompanyName(m.companyId.toString()),
+      com_id: m.companyId
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);
 
@@ -253,7 +259,7 @@ export default function MemberPageComponent() {
   const paginatedCompaniesWithNo = paginated.map((member, index) => ({
     ...member,
     no: (currentPage - 1) * rowsPerPage + index + 1,
-  }));
+  }))
 
   //action functions
   const onEditStatus = (

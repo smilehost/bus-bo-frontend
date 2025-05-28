@@ -423,7 +423,7 @@ function Page() {
         }
       </div>
       <div className='mt-5'>
-        <TitlePage title='Manage Ticket Discount Price' description='View and manage discount price information' btnText='Add Discount Price' handleOpenModel={handleAddDiscount} />
+        <TitlePage title='Manage Ticket Discount Price' description='View and manage discount price information' btnText='Add a Discount' handleOpenModel={handleAddDiscount} />
         {isLoadingskeleton ? <SkeletonRoute /> :
           <TableTemplate
             columns={columnTicketDiscount}

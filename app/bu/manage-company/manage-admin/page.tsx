@@ -1,13 +1,18 @@
+"use client"
+
 import React from 'react'
 
 import MemberPageComponent from '@/app/components/MembersPage/MemberPageComponent'
+import { useSearchParams } from 'next/navigation'
+function Page() {
+  const searchParams = useSearchParams();
+  const comId = searchParams.get("comId")
 
-function page() {
   return (
     <div>
-      <MemberPageComponent/>
+      <MemberPageComponent comId={Number(comId)} />
     </div>
   )
 }
 
-export default page
+export default Page
