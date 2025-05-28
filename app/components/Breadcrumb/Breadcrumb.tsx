@@ -1,42 +1,34 @@
 'use client';
 
 import React from 'react';
-// import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
-type BreadcrumbProps = {
-    path: string; 
-};
+function Breadcrumb() {
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
-function Breadcrumb({ path }: BreadcrumbProps) {
-    const segments = path
+    const segments = pathname
         .split('/')
         .filter(Boolean)
         .filter((segment) => segment !== 'bu');
 
-    // const getPath = (index: number) => {
-    //     const baseSegments = ['bu', ...segments.slice(0, index + 1)];
-    //     return '/' + baseSegments.join('/');
-    // };
+    const nameParam = searchParams.get('name');
+
+    if (nameParam) {
+        segments.push(decodeURIComponent(nameParam));
+    }
 
     return (
         <nav className="text-sm text-gray-600" aria-label="Breadcrumb">
             <ol className="flex items-center flex-wrap">
-                {segments.map((segment, index) => {
-                    // const href = getPath(index);
-                    // const isLast = index === segments.length - 1;
-
-                    return (
-                        <React.Fragment key={index}>
-                            {index > 0 && <span className="mx-1">{`>`}</span>}
-                            <div
-                                // href={href}
-                                className={`text-gray-800 font-semibold cursor-pointer`}
-                            >
-                                {decodeURIComponent(segment)}
-                            </div>
-                        </React.Fragment>
-                    );
-                })}
+                {segments.map((segment, index) => (
+                    <React.Fragment key={index}>
+                        {index > 0 && <span className="mx-1 text-gray-400">{'>'}</span>}
+                        <div className="text-gray-800 font-semibold cursor-default">
+                            {segment}
+                        </div>
+                    </React.Fragment>
+                ))}
             </ol>
         </nav>
     );

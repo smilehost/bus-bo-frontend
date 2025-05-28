@@ -10,8 +10,12 @@ import TitlePage from '@/app/components/Title/TitlePage';
 import { useTicketStore } from '@/stores/routeTicketStore'
 import { TicketProps } from '@/types/types';
 
+import { useSearchParams } from 'next/navigation';
+
 function Page() {
-  const { id } = useParams();
+  const searchParams = useSearchParams()
+  const id = searchParams.get("id")
+
   const { getTicketByRouteId } = useTicketStore();
 
   const routeId = Number(id)

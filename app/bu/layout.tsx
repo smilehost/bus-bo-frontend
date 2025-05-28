@@ -128,7 +128,8 @@ export default function RootLayout({
         if (account_role === 1) {
             setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
         } else if (account_role === 2) {
-            setRoleMenu([1, 10, 8]);
+            // setRoleMenu([1, 10, 8]);
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
         }
     }, [account_role]);
 
