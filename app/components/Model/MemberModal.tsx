@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import Image from "next/image";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 //component
 import InputLabel from "../Form/InputLabel";
@@ -134,27 +136,27 @@ function MemberModal({
 
   const handleSubmit = () => {
     if (!name || (!isEditing && (!username || !password || !companyId))) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     const payload = isEditing
       ? {
-        id: editingMember?.id,
-        name,
-        username: editingMember?.username || "",
-        role: editingMember?.role || "2",
-        companyId: editingMember?.companyId || "",
-        status: 0,
-      }
+          id: editingMember?.id,
+          name,
+          username: editingMember?.username || "",
+          role: editingMember?.role || "2",
+          companyId: editingMember?.companyId || "",
+          status: 0,
+        }
       : {
-        name,
-        username,
-        password,
-        companyId,
-        role,
-        status: 1,
-      };
+          name,
+          username,
+          password,
+          companyId,
+          role,
+          status: 1,
+        };
 
     onHandle(payload);
 
@@ -166,34 +168,37 @@ function MemberModal({
   };
 
   const genPassword = (length: number) => {
-    const newPassword = createSecurePassword(length)
-    setPassword(newPassword)
-  }
+    const newPassword = createSecurePassword(length);
+    setPassword(newPassword);
+  };
 
   //handle  password
-  const [typePassword, setTypePassword] = useState<boolean>(true)
-  const [isCopy, setIsCopy] = useState<boolean>(false)
+  const [typePassword, setTypePassword] = useState<boolean>(true);
+  const [isCopy, setIsCopy] = useState<boolean>(false);
 
   //change type input in password
   const handleOpenPassword = () => {
-    setTypePassword(!typePassword)
-    setIsCopy(false)
-  }
+    setTypePassword(!typePassword);
+    setIsCopy(false);
+  };
 
   //copy
   const copyPassword = () => {
     if (!password) return;
-    navigator.clipboard.writeText(password).then(() => {
-      setIsCopy(true)
-    }).catch((err) => {
-      console.error("Failed to copy password: ", err);
-    });
+    navigator.clipboard
+      .writeText(password)
+      .then(() => {
+        setIsCopy(true);
+      })
+      .catch((err) => {
+        console.error("Failed to copy password: ", err);
+      });
   };
 
   //check isCopy
   useEffect(() => {
-    setIsCopy(false)
-  }, [password])
+    setIsCopy(false);
+  }, [password]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -215,7 +220,7 @@ function MemberModal({
               value={name}
               setValue={setName}
             />
-            <div className='flex flex-col gap-2'>
+            <div className="flex flex-col gap-2">
               <LabelText text={"Username"} />
               <div className="flex gap-2">
                 <div
@@ -239,10 +244,15 @@ function MemberModal({
                   label={
                     <div className="flex justify-between">
                       <p>Password</p>
-                      <div className="" onClick={() => {
-                        genPassword(8)
-                      }}>
-                        <p className="" style={{ fontSize: "14px" }}>auto</p>
+                      <div
+                        className=""
+                        onClick={() => {
+                          genPassword(8);
+                        }}
+                      >
+                        <p className="" style={{ fontSize: "14px" }}>
+                          auto
+                        </p>
                       </div>
                     </div>
                   }
@@ -263,13 +273,14 @@ function MemberModal({
                   <button
                     type="button"
                     onClick={copyPassword}
-                    className={`${isCopy ? "text-green-600" : "text-gray-500"} hover:text-green-700 transition-colors`}
+                    className={`${
+                      isCopy ? "text-green-600" : "text-gray-500"
+                    } hover:text-green-700 transition-colors`}
                   >
                     <CopyIcon copied={isCopy} />
                   </button>
                 </div>
               </div>
-
             )}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
