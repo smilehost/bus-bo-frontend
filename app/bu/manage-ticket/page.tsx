@@ -25,7 +25,7 @@ import { toast } from 'react-toastify'
 import { TicketProps } from '@/types/types'
 
 //const 
-import { FILTER, STATUS } from '@/constants/enum'
+import { FILTER } from '@/constants/enum'
 import { statusOptions } from '@/constants/options';
 import TitlePage from '@/app/components/Title/TitlePage';
 
@@ -97,7 +97,7 @@ function Page() {
     ticketColor: string,
     routeNameTH: string,
     routeNameEN: string,
-    route_status: string,
+    route_status: number,
   ): TicketTableData => {
     return { id, ticketType, ticketNameEN, ticketNameTH, status, amount, ticketColor, routeNameTH, routeNameEN, route_status };
   };
@@ -123,7 +123,7 @@ function Page() {
             item.ticket_color,
             item.route.route_name_th,
             item.route.route_name_en,
-            item.route.route_status,
+            Number(item.route.route_status),
           );
         })
       );
@@ -234,7 +234,7 @@ function Page() {
       render: (_, row) => {
         const isActive = row.route_status === 1 ? true : false
         return (
-          <Tooltip title={isActive ? "": STATUS.INACTIVE} arrow>
+          <Tooltip title={isActive ? "": "This route status is inactive"} arrow>
             <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default w-fit`}>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeNameTH}</p>
               <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500": "text-gray-500"}`}>{row.routeNameEN}</p>
@@ -271,7 +271,7 @@ function Page() {
           /> */}
           <TableActionButton
             icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
-            href={`${pathname}/${row?.id}`}
+            href={`${pathname}/edit?id=${row?.id}&name=${row?.ticketNameTH}`}
             bgColor="text-green-600 bg-green-100"
             hoverColor="hover:bg-green-200"
           />

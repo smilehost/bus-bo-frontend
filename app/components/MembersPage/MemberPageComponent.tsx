@@ -19,8 +19,8 @@ import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import StatusText from "@/app/components/StatusText";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
-import { Lock, Pencil } from "lucide-react";
 import { ToastContainer } from "react-toastify";
+import { Eye, Lock, Pencil } from "lucide-react";
 
 export interface MemberTableData {
   no: number;
@@ -344,7 +344,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
           />
           <TableActionButton
             onClick={() => handleEditMember(row.id)}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<Eye className={`custom-size-tableAction-btn text-green-700`} />}
             bgColor="bg-green-100 text-green-500"
             hoverColor="hover:bg-green-100"
           />

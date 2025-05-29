@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation';
+
 //component
 import FromRouteTicketByStep from '@/app/components/Form/FormRouteTicketByStep'
 import TitlePage from '@/app/components/Title/TitlePage';
