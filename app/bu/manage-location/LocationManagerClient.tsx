@@ -210,6 +210,7 @@ function Page() {
           {isLoadingskeleton ? (
             <SkeletonLocationTable rows={5} />
           ) : (
+           <>
             <LocationTable
               locations={paginatedLocations.map((location) => ({
                 id: location.id,
@@ -226,6 +227,7 @@ function Page() {
               totalResults={totalResults}
               isLoading={isLoading}
             />
+            </>
           )}
         </div>
       </div>
