@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { USER_TIER } from "@/constants/enum";
 import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
-import { useUserStore } from "@/stores/userStore";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { usePathname } from "next/navigation";
@@ -25,19 +23,30 @@ import {
 
 //component
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
-import { Alert } from "../components/Dialog/Alert";
 import { Confirm } from "../components/Dialog/Confirm";
+
+//store
+import { useUserStore } from "@/stores/userStore";
+
+//enum
+import { USER_TIER } from "@/constants/enum";
+
 
 export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const [hasMounted, setHasMounted] = useState(false);
     const { userData } = useUserStore();
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     const pathName = usePathname();
 
-    const user_tier = userData.user_tier;
+    const account_role = userData.account_role;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const allMenu = [
@@ -92,7 +101,7 @@ export default function RootLayout({
         {
             id: 11,
             icon: DollarSign,
-            text: "Manage Price Type",
+            text: "Manage Promotion",
             link: "manage-price-type",
         },
         {
@@ -107,7 +116,6 @@ export default function RootLayout({
             text: "Manage Company",
             link: "manage-company",
         },
-
     ];
 
     const [roleMenu, setRoleMenu] = useState<number[]>();
@@ -117,16 +125,18 @@ export default function RootLayout({
     };
 
     useEffect(() => {
-        if (user_tier === USER_TIER.ADMIN) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
-        } else if (user_tier === USER_TIER.SUPER_ADMIN) {
-            setRoleMenu([1, 2, 3, 4, 7, 8, 10]);
+        if (account_role === 1) {
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+        } else if (account_role === 2) {
+            // setRoleMenu([1, 10, 8]);
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
         }
-    }, [user_tier]);
+    }, [account_role]);
 
     const menu = allMenu.filter((item) => roleMenu?.includes(item.id));
     // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
 
+    if (!hasMounted) return null;
     return (
         <div className="flex h-screen bg-white ">
             <ToastContainer />
@@ -162,27 +172,27 @@ export default function RootLayout({
                 </div>
                 <div className="absolute bottom-0 w-full border-t border-gray-200">
                     <div className="flex items-end justify-end px-4 py-3">
-                    <button 
-                        onClick={async () => {
-                            const confirmed = await Confirm({
-                                title: "Are you sure?",
-                                text: "Do you want to log out?",
-                                confirmText: "Confirm",
-                                cancelText: "Cancel",
-                                type: "question",
-                            });
+                        <button
+                            onClick={async () => {
+                                const confirmed = await Confirm({
+                                    title: "Are you sure?",
+                                    text: "Do you want to log out?",
+                                    confirmText: "Confirm",
+                                    cancelText: "Cancel",
+                                    type: "question",
+                                });
 
-                            if (confirmed) {
-                            logOut(); // เรียกฟังก์ชัน logout ได้เลย
-                            }
-                        }}
-                        className="flex items-center text-sm text-gray-700 hover:text-orange-600 cursor-pointer"
+                                if (confirmed) {
+                                    logOut(); // เรียกฟังก์ชัน logout ได้เลย
+                                }
+                            }}
+                            className="flex items-center text-sm text-gray-700 hover:text-orange-600 cursor-pointer"
                         >
-                        <LogOutIcon size={18} className="mr-2" />
-                        Logout
+                            <LogOutIcon size={18} className="mr-2" />
+                            Logout
                         </button>
                     </div>
-                    </div>
+                </div>
             </aside>
             <div className="flex flex-col flex-1 overflow-hidden">
                 <header className="bg-white shadow-sm z-10">
@@ -204,7 +214,7 @@ export default function RootLayout({
                                             {userData?.name}
                                         </div>
                                         <div className="text-xs text-gray-500  capitalize">
-                                            {userData?.user_tier}
+                                            {userData.account_role === 2 ? USER_TIER.SUPER_ADMIN : USER_TIER.ADMIN}
                                         </div>
                                     </div>
                                 </div>

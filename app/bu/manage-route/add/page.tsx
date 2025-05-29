@@ -13,9 +13,10 @@ import TitlePage from '@/app/components/Title/TitlePage';
 //mui
 import { SelectChangeEvent } from '@mui/material';
 
-//api
+//store
 import { useRouteStore } from '@/stores/routeStore';
 import { useLocationStore } from '@/stores/locationStore';
+import { useUserStore } from '@/stores/userStore';
 
 //toast
 import { toast } from 'react-toastify';
@@ -25,16 +26,18 @@ function Page() {
     //router
     const router = useRouter();
 
-    //api
+    //store
     const { addRoute } = useRouteStore();
     const { locations, getLocations } = useLocationStore();
+    const { userData } = useUserStore();
 
     //get locations
     useEffect(() => {
         setRouteStatusId(1)
-        setRouteComId(1);
+        setRouteComId(userData?.company_id);
         getLocations(1, 5, '');
     }, [getLocations])
+    
     useEffect(() => {
         // console.log("locations: ", locations)
         setListA(locations);

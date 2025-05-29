@@ -1,7 +1,7 @@
 import React from 'react'
 
 type LabelTextProps = {
-    text: string
+    text: React.ReactNode
 }
 
 function LabelText({ text }: LabelTextProps) {

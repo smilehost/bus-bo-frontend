@@ -4,6 +4,9 @@
   --main-gradient: linear-gradient(to right, #eab308, #f97316);
 }
 
+*{
+  font-size: 16px;
+}
 body {
   background-color: #f3f4f6;
 }
@@ -31,6 +34,10 @@ body {
 
 .custom-ellipsis-style {
   @apply whitespace-nowrap text-ellipsis overflow-hidden;
+}
+
+.custom-size-tableAction-btn {
+  @apply w-4 h-4;
 }
 
 .custom-disable-bg {
@@ -84,3 +91,4 @@ body {
 .swal2-cancel-btn:hover {
   background: #d1d5db;
 }
+

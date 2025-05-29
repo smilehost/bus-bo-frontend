@@ -11,7 +11,6 @@ import { TicketRoutePrice } from '@/types/types';
 
 //api
 import { useLocationStore } from '@/stores/locationStore';
-import { LocationItem } from '@/types/location';
 import { toast } from 'react-toastify';
 
 interface TierdPriceTableProps {
@@ -25,10 +24,15 @@ interface TierdPriceTableProps {
 }
 
 function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable, setSaveTable, saveTable }: TierdPriceTableProps) {
-  const { getLocationById } = useLocationStore();
+  const { locations, getLocations } = useLocationStore();
+  useEffect(() => {
+    getLocations(1, 1000);
+  }, [getLocations]);
 
   //set price เริ่มต้น
+  const [checkFetchData, setCheckFetchData] = useState<boolean>(false)
   useEffect(() => {
+    if (checkFetchData) return;
     // แปลง ticketPrice ที่ส่งเข้ามา ให้ map เข้า matrix
     const newMatrix = Array.from({ length: stations.length - 1 }, () =>
       Array(stations.length - 1).fill(NaN)
@@ -44,6 +48,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
       }
     });
 
+    setCheckFetchData(true)
     setMatrix(newMatrix);
   }, [stations, ticketPrice]);
 
@@ -54,11 +59,13 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
       if (!stations || stations.length === 0) return;
 
       try {
-        const stationNameTemp = (
-          await Promise.all(stations.map((id) => getLocationById(parseInt(id))))
-        ).filter((s): s is LocationItem => s !== undefined);
+        const stationNameTemp = stations.map((id) => locations.find((s) => Number(s.id) === Number(id)))
 
-        setStationName(stationNameTemp.map((s) => s?.name));
+        setStationName(
+          stationNameTemp
+            .map((s) => s?.name)
+            .filter((name): name is string => name !== undefined)
+        );
       } catch (error) {
         console.error('Error loading station names:', error);
       }
@@ -66,7 +73,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     fetchStations();
 
-  }, [stations]);
+  }, [stations, locations]);
 
   const [rowChecked, setRowChecked] = useState<number[]>([]);
   const [colChecked, setColChecked] = useState<number[]>([]);
@@ -202,6 +209,33 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
     return false;
   };
 
+  const handleChangeMatrixInput = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    i: number,
+    j: number,
+  ) => {
+    if (saveTable && saveTable !== Number(ticketTypePriceId)) {
+      toast.error("Please save the previous table first");
+      return;
+    }
+
+    const cleanedValue = e.target.value.replace(/^0+(?!$)/, '');
+    const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue);
+    const value = Number(numericValue);
+
+    const newMatrix = [...matrix];
+    newMatrix[i][j] = isNaN(value) ? NaN : value;
+    setMatrix(newMatrix);
+
+    const changed = checkMatrixChanged();
+    setSaveTable(Number(ticketTypePriceId));
+    setShowSave(true);
+    setChangeMatrix(changed);
+
+    const newErrors = [...errorMatrix];
+    newErrors[i][j] = false;
+    setErrorMatrix(newErrors);
+  };
   // console.log("ticketPrice: ", ticketPrice)
   return (
     <div >
@@ -257,7 +291,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
                     />
-                    <div>{stationName[j + 1]}</div>
+                    <div className='font-normal'>{stationName[j + 1]}</div>
                   </label>
                 </th>
               ))}
@@ -285,25 +319,11 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                         value={
                           !isNaN(matrix[i][j]) ? matrix[i][j].toString() : ''
                         }
-                        onChange={(e) => {
-                          if (saveTable && saveTable !== Number(ticketTypePriceId)) {
-                            toast.error("Please save the previous table first")
-                            return;
-                          }
-                          const cleanedValue = e.target.value.replace(/^0+(?!$)/, ''); // ตัด 0 ข้างหน้า
-                          const numericValue = cleanedValue === '' ? 0 : Number(cleanedValue); // ป้องกัน NaN
-                          const value = Number(numericValue);
-                          const newMatrix = [...matrix];
-                          newMatrix[i][j] = isNaN(value) ? NaN : value;
-                          setMatrix(newMatrix);
-                          const changed = checkMatrixChanged();
-                          setSaveTable(Number(ticketTypePriceId))
-                          setShowSave(true)
-                          setChangeMatrix(changed)
-                          const newErrors = [...errorMatrix];
-                          newErrors[i][j] = false;
-                          setErrorMatrix(newErrors);
-                        }}
+                        onWheel={(e) => {
+                          (e.target as HTMLInputElement).blur();
+                        }} // ปิดการเลื่อน number
+                        onChange={(e) => handleChangeMatrixInput(e, i, j)}
+
                       />
                     ) : null}
                   </td>

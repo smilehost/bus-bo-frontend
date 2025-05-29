@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
 
+//mui
+import Tooltip from '@mui/material/Tooltip';
+
 //companent 
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
 import { Alert } from '@/app/components/Dialog/Alert'
@@ -14,12 +17,10 @@ import StatusText from '@/app/components/StatusText'
 import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
-//api
-// import { useCompanyStore } from '@/stores/companyStore'
+//store
 import { useRouteStore } from '@/stores/routeStore'
 import { useDateStore } from '@/stores/dateStore'
 import { useTimeStore } from '@/stores/timeStore'
-import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
 import { toast } from 'react-toastify'
@@ -30,7 +31,7 @@ import { STATUS, FILTER } from '@/constants/enum'
 import { Confirm } from '@/app/components/Dialog/Confirm';
 
 //icons
-import { Waypoints } from 'lucide-react';
+import { SquarePen, Ticket, Trash2, Waypoints } from 'lucide-react';
 import TitlePage from '@/app/components/Title/TitlePage';
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 
@@ -43,23 +44,30 @@ export interface RouteTableData {
   time: string,
   ticket_amount: string,
   status: STATUS,
-  routeColor: string
+  routeColor: string,
+  route_date_name: string,
+  route_date_start: string,
+  route_date_end: string,
+  route_date_mon: number,
+  route_date_tue: number,
+  route_date_wen: number,
+  route_date_thu: number,
+  route_date_fri: number,
+  route_date_sat: number,
+  route_date_sun: number,
 }
 
 function Page() {
 
   //api
-  // const { companyData } = useCompanyStore();
   const { routeData, getRoutes, deleteRoute, updateRouteStatus } = useRouteStore();
   const { times, getTimes } = useTimeStore();
   const { dates, getDates } = useDateStore();
-  const { getTicketByRouteId } = useTicketStore();
 
   const router = useRouter();
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  // const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -86,9 +94,6 @@ function Page() {
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-    fetchRouteData();
-  }, [currentPage, rowsPerPage]);
 
   // Function to create data for table
   const createData = (
@@ -100,9 +105,19 @@ function Page() {
     time: string,
     ticket_amount: string,
     status: STATUS,
-    routeColor: string
+    routeColor: string,
+    route_date_name: string,
+    route_date_start: string,
+    route_date_end: string,
+    route_date_mon: number,
+    route_date_tue: number,
+    route_date_wen: number,
+    route_date_thu: number,
+    route_date_fri: number,
+    route_date_sat: number,
+    route_date_sun: number,
   ): RouteTableData => {
-    return { id, route, routeTH, company, schedule, time, ticket_amount, status, routeColor };
+    return { id, route, routeTH, company, schedule, time, ticket_amount, status, routeColor, route_date_name, route_date_start, route_date_end, route_date_mon, route_date_tue, route_date_wen, route_date_thu, route_date_fri, route_date_sat, route_date_sun };
   };
 
   // Generate rows for table
@@ -119,9 +134,6 @@ function Page() {
           const dateName = dates.find(d => d.id === Number(item.route_date_id))?.name || '';
           const timeName = times.find(t => t.id === Number(item.route_time_id))?.schedule.join(', ') || '';
 
-          const tickets = await getTicketByRouteId(Number(item.route_id));
-          const ticketAmount = tickets?.length?.toString() || '0';
-
           return createData(
             item.route_id,
             item.route_name_en,
@@ -129,9 +141,19 @@ function Page() {
             item.route_com_id,
             dateName,
             timeName,
-            ticketAmount,
+            item.route_ticket_count.toString(),
             item.route_status,
-            item.route_color
+            item.route_color,
+            item.route_date.route_date_name,
+            item.route_date.route_date_start,
+            item.route_date.route_date_end,
+            item.route_date.route_date_mon,
+            item.route_date.route_date_tue,
+            item.route_date.route_date_wen,
+            item.route_date.route_date_thu,
+            item.route_date.route_date_fri,
+            item.route_date.route_date_sat,
+            item.route_date.route_date_sun,
           );
         })
       );
@@ -139,6 +161,7 @@ function Page() {
     };
     fetchWithTicketCounts();
   }, [routeData?.data, dates, times]);
+
 
   // Handle delete route
   const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
@@ -172,7 +195,7 @@ function Page() {
   const handleChangeStatus = async ({ idStatus, idRoute }: { idStatus: string, idRoute: number }) => {
     const currentStatus = Number(idStatus);
     const nextStatus = currentStatus === 1 ? 0 : 1;
-    const statusText = nextStatus === 1 ? "Active" : "Inactive";
+    const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
 
     const isStatusConfirmed = await Confirm({
       title: "Change Status?",
@@ -197,34 +220,19 @@ function Page() {
   }
 
   //filter
-  // const listCompany = companyData.map((item) => {
-  //     return {
-  //         key: 1,
-  //         value: item.name
-  //     }
-  // })
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
       listValue: statusOptions,
       setSearchValue: setSearchStatus,
-      size: "w-[130px]"
+      size: "w-[130px]",
     },
-    // {
-    //     defaulteValue: FILTER.ALL_COMPANIES,
-    //     listValue: listCompany,
-    //     setSearchValue: setSearchCompany,
-    //     size: "w-[170px]"
-    // },
-  ]
+  ];
 
   //search
   useEffect(() => {
-    if (!debouncedSearch) {
-      fetchRouteData();
-    };
-    getRoutes(currentPage, rowsPerPage, debouncedSearch, searchStatus);
-  }, [debouncedSearch, searchStatus])
+    fetchRouteData();
+  }, [debouncedSearch, searchStatus, currentPage, rowsPerPage])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -243,7 +251,7 @@ function Page() {
     {
       key: 'route',
       label: 'Route',
-      width: '25%',
+      width: '20%',
       render: (_, row) => (
         <div className='flex gap-3'>
           <div>
@@ -253,17 +261,71 @@ function Page() {
               }}
             />
           </div>
-          <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style'>{row.route}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.routeTH}</p>
-          </div>
+          <Tooltip title={row.routeTH} arrow>
+            <div className='flex flex-col gap-1 cursor-default'>
+              <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
+              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
+            </div>
+          </Tooltip>
         </div>
       ),
     },
     // { key: 'company', label: 'Company', width: '20%' },
-    { key: 'schedule', label: 'Schedule', width: '20%' },
-    { key: 'time', label: 'Departure Times', width: '20%' },
-    { key: 'ticket_amount', label: 'Tickets', width: '15%', align: 'center' },
+    {
+      key: 'schedule',
+      label: 'Schedule',
+      width: '20%',
+      render: (_, row) => {
+        const getActiveDays = (row) => {
+          const dayMap = {
+            route_date_mon: 'Monday',
+            route_date_tue: 'Tuesday',
+            route_date_wen: 'Wednesday',
+            route_date_thu: 'Thursday',
+            route_date_fri: 'Friday',
+            route_date_sat: 'Saturday',
+            route_date_sun: 'Sunday',
+          };
+
+          return Object.entries(dayMap)
+            .filter(([key]) => row[key] === 1)
+            .map(([_, day]) => day)
+            .join(', ');
+        };
+
+        const activeDays = getActiveDays(row);
+
+        const today = new Date();
+        const endDate = new Date(row.route_date_end);
+        const isExpired = endDate < today;
+
+        return (
+          <div className='flex gap-3'>
+            <Tooltip title={activeDays} arrow>
+              <div className='flex flex-col gap-1 cursor-default'>
+                <p className={`whitespace-nowrap custom-ellipsis-style`}>
+                  {row.route_date_name}
+                </p>
+                <p
+                  className={`whitespace-nowrap custom-ellipsis-style ${isExpired ? 'text-red-500 font-semibold' : 'text-gray-500'
+                    }`}
+                >
+                  {isExpired ?  STATUS.INACTIVE: "Start"}: {row.route_date_start} - {row.route_date_end || "No End Date"}
+                </p>
+              </div>
+            </Tooltip>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'time', label: 'Departure Times', width: '20%', render: (row) => (
+        <Tooltip title={row} arrow>
+          <p className='custom-ellipsis-style cursor-default'>{row}</p>
+        </Tooltip>
+      )
+    },
+    { key: 'ticket_amount', label: 'Route Tickets', width: '15%', align: 'center' },
     {
       key: 'status',
       label: 'Status',
@@ -280,7 +342,7 @@ function Page() {
       width: '25%',
       render: (_, row) => (
         <div className='flex gap-2 min-w-max'>
-          <TableActionButton
+          {/* <TableActionButton
             iconSrc="/icons/money.svg"
             href={`${pathname}/routeTicket/${row?.id}`}
             bgColor="bg-green-100"
@@ -296,6 +358,24 @@ function Page() {
             iconSrc="/icons/garbage.svg"
             onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
             bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          /> */}
+          <TableActionButton
+            icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
+            href={`${pathname}/routeTicket?id=${row?.id}&name=${row?.routeTH}`}
+            bgColor="text-green-600 bg-green-100"
+            hoverColor="hover:bg-green-200"
+          />
+          <TableActionButton
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
+            href={`${pathname}/edit?id=${row?.id}&name=${row?.routeTH}`}
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
+            onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
+            bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
           />
         </div>

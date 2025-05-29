@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 //type
 import { LocationItem } from '@/types/location';
@@ -25,6 +26,10 @@ import { toast } from 'react-toastify';
 
 function Page() {
 
+    //search params
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id")
+
     //router
     const router = useRouter();
 
@@ -38,15 +43,15 @@ function Page() {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (params?.id) {
-                const route: RouteData | undefined = await getRouteById(Number(params.id)); // แปลง id เป็น number ถ้าจาก URL
+            if (id) {
+                const route: RouteData | undefined = await getRouteById(Number(id)); // แปลง id เป็น number ถ้าจาก URL
                 setRouteIndexData(route);
             }
         };
 
         fetchData();
 
-    }, [params?.id, getRouteById]);
+    }, [id, getRouteById]);
 
     //get location data
     useEffect(() => {
@@ -106,7 +111,6 @@ function Page() {
     const [schedule, setSchedule] = useState<string>('');
     const handleChangeSchedule = (event: SelectChangeEvent<string>) => {
         setSchedule(event.target.value); // อัปเดตค่าเมื่อเลือกเวลาใหม่
-        console.log(event.target.value)
     };
 
 
@@ -118,7 +122,7 @@ function Page() {
     const handleSubmit = async () => {
         const routeArray = listStations.map((id) => id).join(',');
         const payload = {
-            route_id: Number(params.id),
+            route_id: Number(id),
             route_name_th: routeNameTH,
             route_name_en: routeName,
             route_color: routeColor,
@@ -129,7 +133,7 @@ function Page() {
             route_array: routeArray
         };
 
-        const result = await updateRoute(Number(params.id), payload);
+        const result = await updateRoute(Number(id), payload);
 
         if (result.success) {
             toast.success("Update route successfully!");
@@ -161,7 +165,7 @@ function Page() {
                 schedule={schedule}
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
-                disable={!!params?.id}
+                disable={!!id}
 
             />
         </div>

@@ -114,15 +114,6 @@ function FormRoute({
     <div className='custom-frame-content px-5 py-7 mt-5 w-full'>
       <div className={` mx-auto flex flex-col gap-3 ${styles.customSizeContainer}`}>
         <div className='flex justify-between flex-wrap gap-3'>
-          {/* route name en*/}
-          <InputLabel
-            label="Route Name EN"
-            placeholder="Enter Route Name Eng"
-            type="text"
-            setValue={setRouteName}
-            value={routeName}
-            size={'min-w-[300px] xl:w-[400px] max-w-[400px]'}
-          />
           {/* route name th*/}
           <InputLabel
             label="Route Name TH"
@@ -131,6 +122,15 @@ function FormRoute({
             setValue={setRouteNameTH}
             value={routeNameTH}
             size='min-w-[300px] xl:w-[400px] max-w-[400px]'
+          />
+          {/* route name en*/}
+          <InputLabel
+            label="Route Name EN"
+            placeholder="Enter Route Name Eng"
+            type="text"
+            setValue={setRouteName}
+            value={routeName}
+            size={'min-w-[300px] xl:w-[400px] max-w-[400px]'}
           />
         </div>
         <div className='flex justify-between flex-wrap gap-3'>
@@ -142,7 +142,7 @@ function FormRoute({
             withStartAdornment
             onChange={handleChangeTime}
             data={times}
-            onAddClick={() => RedirecTo({path: 'manage-times'})}
+            onAddClick={() => RedirecTo({ path: 'manage-times' })}
           />
           {/* Schedule */}
 
@@ -151,7 +151,7 @@ function FormRoute({
             value={schedule}
             onChange={handleChangeSchedule}
             data={dates}
-            onAddClick={() => RedirecTo({path: 'manage-dates'})}
+            onAddClick={() => RedirecTo({ path: 'manage-dates' })}
           />
 
         </div>

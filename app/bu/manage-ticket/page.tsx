@@ -4,6 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { debounce } from "@/utils/debounce";
 
+//mui
+import Tooltip from '@mui/material/Tooltip';
+
 //companent 
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
@@ -13,7 +16,6 @@ import SkeletonRoute from '@/app/components/Skeleton/SkeletonRoute'
 import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //store
-// import { useCompanyStore } from '@/stores/companyStore'
 import { useTicketStore } from '@/stores/routeTicketStore'
 
 //toast
@@ -23,12 +25,12 @@ import { toast } from 'react-toastify'
 import { TicketProps } from '@/types/types'
 
 //const 
-import { FILTER } from '@/constants/enum'
+import { FILTER, STATUS } from '@/constants/enum'
 import { statusOptions } from '@/constants/options';
 import TitlePage from '@/app/components/Title/TitlePage';
 
 ////icons
-import { Ticket } from "lucide-react";
+import { Ticket, Trash2 } from "lucide-react";
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 
 
@@ -37,21 +39,21 @@ export interface TicketTableData {
   ticketNameEN: string,
   ticketNameTH: string,
   ticketType: string,
+  routeNameTH: string,
+  routeNameEN: string,
   status: number,
   amount: number,
-  ticketColor: string
+  ticketColor: string,
+  route_status: number
 }
 
 function Page() {
 
   //stores
-  // const { companyData } = useCompanyStore();
   const { ticketDataList, getTickets, deleteTicket, updateTicketStatus } = useTicketStore();
-
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  // const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -60,7 +62,7 @@ function Page() {
   //fetch tickets
   const fetchTicketData = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
-    await getTickets(currentPage, rowsPerPage, '', '');;
+    await getTickets(currentPage, rowsPerPage, debouncedSearch, searchStatus);;
     cancelSkeleton();
   }
 
@@ -80,9 +82,9 @@ function Page() {
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-    fetchTicketData();
-  }, [currentPage, rowsPerPage]);
+  // useEffect(() => {
+  //   fetchTicketData();
+  // }, [currentPage, rowsPerPage]);
 
   // Function to create data for table
   const createData = (
@@ -92,9 +94,12 @@ function Page() {
     status: number,
     ticketType: string,
     amount: number,
-    ticketColor: string
+    ticketColor: string,
+    routeNameTH: string,
+    routeNameEN: string,
+    route_status: string,
   ): TicketTableData => {
-    return { id, ticketType, ticketNameEN, ticketNameTH, status, amount, ticketColor };
+    return { id, ticketType, ticketNameEN, ticketNameTH, status, amount, ticketColor, routeNameTH, routeNameEN, route_status };
   };
 
   // Generate rows for table
@@ -115,7 +120,10 @@ function Page() {
             Number(item.ticket_status),
             item.ticket_type,
             Number(item.ticket_amount),
-            item.ticket_color
+            item.ticket_color,
+            item.route.route_name_th,
+            item.route.route_name_en,
+            item.route.route_status,
           );
         })
       );
@@ -170,13 +178,8 @@ function Page() {
     }
   };
 
+
   //filter
-  // const listCompany = companyData.map((item) => {
-  //   return {
-  //     key: 1,
-  //     value: item.name
-  //   }
-  // })
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
@@ -184,21 +187,13 @@ function Page() {
       setSearchValue: setSearchStatus,
       size: "w-[130px]"
     },
-    // {
-    //   defaulteValue: FILTER.ALL_PAYMENT,
-    //   listValue: listCompany,
-    //   setSearchValue: setSearchCmpany,
-    //   size: "w-[170px]"
-    // },
+
   ]
 
   //Search
   useEffect(() => {
-    if (!debouncedSearch) {
-      fetchTicketData();
-    };
-    getTickets(currentPage, rowsPerPage, debouncedSearch, searchStatus);
-  }, [debouncedSearch, searchStatus])
+    fetchTicketData();
+  }, [debouncedSearch, searchStatus, currentPage, rowsPerPage])
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -225,12 +220,28 @@ function Page() {
               }}
             />
           </div>
-          <div className='flex flex-col gap-1'>
-            <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameEN}</p>
-            <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameTH}</p>
-          </div>
+          <Tooltip title={row.ticketNameTH} arrow>
+            <div className='flex flex-col gap-1 cursor-default'>
+              <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
+              <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
+            </div>
+          </Tooltip>
         </div>
       ),
+    },
+    {
+      key: 'routeNameTH', label: 'Route', width: '20%', align: 'left',
+      render: (_, row) => {
+        const isActive = row.route_status === 1 ? true : false
+        return (
+          <Tooltip title={isActive ? "": STATUS.INACTIVE} arrow>
+            <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default w-fit`}>
+              <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeNameTH}</p>
+              <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500": "text-gray-500"}`}>{row.routeNameEN}</p>
+            </div>
+          </Tooltip>
+        )
+      },
     },
     { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     { key: 'ticketType', label: 'Ticket Type', width: '20%', align: 'center' },
@@ -246,7 +257,7 @@ function Page() {
       key: 'id', label: 'Action', width: '25%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
-          <TableActionButton
+          {/* <TableActionButton
             iconSrc="/icons/money.svg"
             href={`${pathname}/${row?.id}`}
             bgColor="bg-green-100"
@@ -256,6 +267,18 @@ function Page() {
             iconSrc="/icons/garbage.svg"
             onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
             bgColor="bg-red-50"
+            hoverColor="hover:bg-red-100"
+          /> */}
+          <TableActionButton
+            icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
+            href={`${pathname}/${row?.id}`}
+            bgColor="text-green-600 bg-green-100"
+            hoverColor="hover:bg-green-200"
+          />
+          <TableActionButton
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
+            onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
+            bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
           />
         </div>
