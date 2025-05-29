@@ -1,0 +1,35 @@
+# node_modules: ไม่จำเป็นต้อง copy เข้า image เพราะ Docker จะติดตั้งใหม่
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-lock.yaml
+
+# Output build
+.next
+dist
+out
+
+# Local environment
+# .env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Editor/IDE
+.vscode
+.idea
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose.override.yml
