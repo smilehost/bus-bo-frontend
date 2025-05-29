@@ -66,6 +66,8 @@ type TableActionButtonProps = {
   onClick?: () => void;
   bgColor?: string;
   hoverColor?: string;
+  newTab?: boolean; // 👈 เพิ่มตัวเลือกเปิดแท็บใหม่
+
 };
 
 export default function TableActionButton({
@@ -74,12 +76,18 @@ export default function TableActionButton({
   onClick,
   bgColor = "bg-gray-100",
   hoverColor = "hover:bg-gray-200",
+  newTab = false, // 👈 ค่า default คือ false
 }: TableActionButtonProps) {
   const commonClass = `cursor-pointer ${bgColor} ${hoverColor} p-1 rounded-md transition-colors`;
 
   if (href) {
     return (
-      <Link href={href} className={commonClass}>
+      <Link
+        href={href}
+        className={commonClass}
+        target={newTab ? "_blank" : undefined}
+        rel={newTab ? "noopener noreferrer" : undefined}
+      >
         {icon}
       </Link>
     );

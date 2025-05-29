@@ -221,7 +221,7 @@ function Page() {
             />
           </div>
           <Tooltip title={row.ticketNameTH} arrow>
-            <div className='flex flex-col gap-1 cursor-default'>
+            <div className='flex flex-col gap-1 cursor-default custom-ellipsis-style'>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
               <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
             </div>
@@ -235,8 +235,8 @@ function Page() {
         const isActive = row.route_status === 1 ? true : false
         return (
           <Tooltip title={isActive ? "": "This route status is inactive"} arrow>
-            <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default w-fit`}>
-              <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeNameTH}</p>
+            <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default custom-ellipsis-style`}>
+              <p className='whitespace-nowrap custom-ellipsis-style'>{row.routeNameTH}</p>
               <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500": "text-gray-500"}`}>{row.routeNameEN}</p>
             </div>
           </Tooltip>

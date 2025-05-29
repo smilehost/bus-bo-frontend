@@ -70,6 +70,7 @@ function TicketDiscountModel({
         });
     };
 
+    console.log("valueData: ", valueData)
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogContent>

@@ -16,7 +16,6 @@ import { SelectChangeEvent } from '@mui/material';
 //store
 import { useRouteStore } from '@/stores/routeStore';
 import { useLocationStore } from '@/stores/locationStore';
-import { useUserStore } from '@/stores/userStore';
 
 //toast
 import { toast } from 'react-toastify';

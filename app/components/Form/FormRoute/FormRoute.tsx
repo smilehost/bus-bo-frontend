@@ -153,14 +153,33 @@ function FormRoute({
             data={dates}
             onAddClick={() => RedirecTo({ path: 'manage-dates' })}
           />
-
         </div>
+
         <div className='flex justify-between flex-wrap gap-3'>
           {/* color */}
           <ColorRoute color={routeColor} setRouteColor={setRouteColor} label={"Route Color"} size_circle='w-[38px] h-[38px]' size_input='w-full' size='min-w-[300px] xl:w-[400px] max-w-[400px]' />
         </div>
+        <hr className='custom-border-gray my-5'/>
+        <div className='flex justify-between flex-wrap gap-3'>
+          <InputLabel
+            label="URL for slip details at the header"
+            placeholder="Enter URL for slip details at the header"
+            type="text"
+            setValue={setRouteNameTH}
+            value={routeNameTH}
+            size='min-w-[300px] xl:w-[400px] max-w-[400px]'
+          />
+          <InputLabel
+            label="URL for slip details at the footer"
+            placeholder="Enter URL for slip details at the footer"
+            type="text"
+            setValue={setRouteName}
+            value={routeName}
+            size={'min-w-[300px] xl:w-[400px] max-w-[400px]'}
+          />
+        </div>
       </div>
-      <div className='flex flex-col justify-center items-center mt-8'>
+      <div className='flex flex-col justify-center items-center mt-10'>
         <p className='text-[16px] font-bold'>Stations</p>
         <p className='text-[12px] text-[#6B7280]'>Add stations in order from start to end</p>
       </div>

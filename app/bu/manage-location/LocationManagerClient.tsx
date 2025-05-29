@@ -11,6 +11,9 @@ import { debounce } from "@/utils/debounce";
 import { useLocationStore } from "@/stores/locationStore";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import TitlePage from "@/app/components/Title/TitlePage";
+import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
+import { MapPin, SquarePen, Trash2 } from "lucide-react";
+import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
 
 // Define interfaces for location data
 interface Location {
@@ -26,6 +29,13 @@ interface LocationFormData {
   longitude: number;
 }
 
+interface LocationTableProps {
+  no: number,
+  name: string,
+  lat: string,
+  long: string,
+  id: number
+}
 function Page() {
   const {
     locations,
@@ -194,6 +204,49 @@ function Page() {
     currentPage * rowsPerPage
   );
 
+  const paginatedWithNo = paginatedLocations.map((lo, index) => ({
+    ...lo,
+    no: (currentPage - 1) * rowsPerPage + index + 1,
+  }));
+
+  //columns
+  const columns: ColumnConfig<LocationTableProps>[] = [
+    {
+      key: 'no', label: 'No.', width: '20%', align: 'left'
+    },
+    {
+      key: 'name', label: 'Location Name', width: '20%', align: 'left'
+    },
+    { key: 'lat', label: 'Latitude', width: '20%', align: 'center' },
+    { key: 'long', label: 'Longtitude', width: '20%', align: 'center' },
+    {
+      key: 'id', label: 'Action', width: '25%', align: 'right',
+      render: (_, row) => (
+        <div className='flex justify-end gap-2 min-w-max'>
+          <TableActionButton
+            href={`https://www.google.com/maps?q=${row.lat},${row.long}`}
+            newTab
+            icon={<MapPin className={`custom-size-tableAction-btn text-purple-600`} />}
+            bgColor="bg-purple-100"
+            hoverColor="hover:bg-purple-200"
+          />
+          <TableActionButton
+            onClick={() => handleEditLocation(row.id)}
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
+           bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            onClick={() => handleDeleteLocation(row.id)}
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
+            bgColor="bg-red-50 text-red-600"
+            hoverColor="hover:bg-red-100"
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
@@ -210,23 +263,34 @@ function Page() {
           {isLoadingskeleton ? (
             <SkeletonLocationTable rows={5} />
           ) : (
-           <>
-            <LocationTable
-              locations={paginatedLocations.map((location) => ({
-                id: location.id,
-                name: location.name,
-                latitude: parseFloat(location.lat),
-                longitude: parseFloat(location.long),
-              }))}
-              onEdit={handleEditLocation}
-              onDelete={handleDeleteLocation}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              totalResults={totalResults}
-              isLoading={isLoading}
-            />
+            <>
+              <TableTemplate
+                columns={columns}
+                data={paginatedWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalPages={Math.ceil(totalResults / rowsPerPage)}
+                totalResults={totalResults}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row) => row.id}
+              />
+              {/* <LocationTable
+                locations={paginatedLocations.map((location) => ({
+                  id: location.id,
+                  name: location.name,
+                  latitude: parseFloat(location.lat),
+                  longitude: parseFloat(location.long),
+                }))}
+                onEdit={handleEditLocation}
+                onDelete={handleDeleteLocation}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                totalResults={totalResults}
+                isLoading={isLoading}
+              /> */}
             </>
           )}
         </div>
@@ -240,10 +304,10 @@ function Page() {
           editingLocation={
             editingLocation
               ? {
-                  name: editingLocation.name,
-                  latitude: parseFloat(editingLocation.lat),
-                  longitude: parseFloat(editingLocation.long),
-                }
+                name: editingLocation.name,
+                latitude: parseFloat(editingLocation.lat),
+                longitude: parseFloat(editingLocation.long),
+              }
               : null
           }
         />

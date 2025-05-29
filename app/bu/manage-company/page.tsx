@@ -263,6 +263,7 @@ export default function ManageCompaniesPage() {
               data={paginatedCompaniesWithNo}
               currentPage={currentPage}
               rowsPerPage={rowsPerPage}
+              totalPages={Math.ceil(filtered.length / rowsPerPage)}
               totalResults={filtered.length}
               onPageChange={setCurrentPage}
               onRowsPerPageChange={handleRowsPerPageChange}

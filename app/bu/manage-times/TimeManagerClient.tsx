@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import TimeTable from "@/app/components/Table/TimeTable";
+// import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Model/TimeModal";
-import SearchFilter from "@/app/components/SearchFilter/TimeSearchFilter"; // ✅ Import SearchFilter
+import SearchFilter from "@/app/components/SearchFilter/TimeSearchFilter"; 
 import { useTimeStore } from "@/stores/timeStore";
 import { debounce } from "@/utils/debounce";
 import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
@@ -12,6 +12,9 @@ import { Alert } from "@/app/components/Dialog/Alert";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import TitlePage from "@/app/components/Title/TitlePage";
 import { ToastContainer } from "react-toastify";
+import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
+import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
+import { Clock, SquarePen, Trash2 } from "lucide-react";
 
 function Page() {
   const { times, getTimes, createTime, updateTime, deleteTime } =
@@ -32,6 +35,13 @@ function Page() {
     schedule: string[];
     times?: string[];
     startTime?: string;
+  }
+
+  interface TimeTableProps {
+    no: number,
+    name: string,
+    schedule: string[],
+    id: number
   }
 
   const [editingTime, setEditingTime] = useState<TimeItem | undefined>(
@@ -190,6 +200,52 @@ function Page() {
     currentPage * rowsPerPage
   );
 
+  const paginatedWithNo = paginatedTimes.map((time, index) => ({
+    ...time,
+    no: (currentPage - 1) * rowsPerPage + index + 1,
+  }));
+
+  //columns
+  const columns: ColumnConfig<TimeTableProps>[] = [
+    {
+      key: 'no', label: 'No.', width: '20%', align: 'left'
+    },
+    {
+      key: 'name', label: 'Name', width: '20%', align: 'left'
+    },
+    {
+      key: 'schedule', label: 'Schedule', width: '20%', align: 'left', render: (_, row) => (
+        <div className="flex gap-2">
+          <TableActionButton
+            icon={<Clock className={`custom-size-tableAction-btn text-blue-500`} />}
+            bgColor="bg-blue-50 text-blue-600 h-fit"
+            hoverColor="hover:bg-blue-100"
+          />
+          <p className="whitespace-nowrap"> {row.schedule.join(", ")}</p>
+        </div>
+      )
+    },
+    {
+      key: 'id', label: 'Actions', width: '25%', align: 'right',
+      render: (_, row) => (
+        <div className='flex justify-end gap-2 min-w-max'>
+          <TableActionButton
+            onClick={() => handleEditTime(row.id)}
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            onClick={() => handleDeleteTime(row.id)}
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
+            bgColor="bg-red-50 text-red-600"
+            hoverColor="hover:bg-red-100"
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="flex h-screen bg-gray-100">
       <ToastContainer />
@@ -212,19 +268,32 @@ function Page() {
           {isLoadingskeleton ? (
             <SkeletonManageTime rows={5} />
           ) : (
-            <TimeTable
-              times={paginatedTimes.map((time) => ({
-                ...time,
-              }))}
-              onEdit={handleEditTime}
-              onDelete={handleDeleteTime}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              totalResults={totalResults}
-              isLoading={isLoading}
-            />
+            <>
+              <TableTemplate
+                columns={columns}
+                data={paginatedWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalPages={Math.ceil(totalResults / rowsPerPage)}
+                totalResults={totalResults}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row) => row.id}
+              />
+              {/* <TimeTable
+                times={paginatedTimes.map((time) => ({
+                  ...time,
+                }))}
+                onEdit={handleEditTime}
+                onDelete={handleDeleteTime}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                totalResults={totalResults}
+                isLoading={isLoading}
+              /> */}
+            </>
           )}
         </div>
       </div>
@@ -237,10 +306,10 @@ function Page() {
           editingTime={
             editingTime
               ? {
-                  ...editingTime,
-                  startTime: editingTime.startTime || "",
-                  times: editingTime.times || [],
-                }
+                ...editingTime,
+                startTime: editingTime.startTime || "",
+                times: editingTime.times || [],
+              }
               : undefined
           }
         />

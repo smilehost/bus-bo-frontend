@@ -262,7 +262,7 @@ function Page() {
             />
           </div>
           <Tooltip title={row.routeTH} arrow>
-            <div className='flex flex-col gap-1 cursor-default'>
+            <div className='flex flex-col gap-1 cursor-default custom-ellipsis-style '>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
               <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
             </div>
@@ -353,7 +353,7 @@ function Page() {
       label: 'Action',
       width: '25%',
       render: (_, row) => (
-        <div className='flex gap-2 min-w-max'>
+        <div className='flex gap-2 min-w-max '>
           <TableActionButton
             icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
             href={`${pathname}/routeTicket?id=${row?.id}&name=${row?.routeTH}`}
