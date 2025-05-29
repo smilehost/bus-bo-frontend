@@ -17,7 +17,7 @@ import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplat
 import { usePathname } from "next/navigation";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import { CompanyItem } from "@/types/company";
-import { Pencil } from "lucide-react";
+import { KeyRound, Pencil, Smartphone, SquarePen, Users } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;
@@ -216,24 +216,24 @@ export default function ManageCompaniesPage() {
         <div className='flex gap-2 min-w-max justify-end'>
           <TableActionButton
             onClick={() => handleEditCompany(row.id)}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
             href={`${pathName}/manage-device?comId=${row.id}`}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<Smartphone className={`custom-size-tableAction-btn text-orange-400`} />}
             bgColor="bg-orange-100 text-orange-400"
             hoverColor="hover:bg-orange-100"
           />
           <TableActionButton
             href={`${pathName}/manage-admin?comId=${row.id}`}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<Users className={`custom-size-tableAction-btn text-blue-600`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<KeyRound className={`custom-size-tableAction-btn text-green-700`} />}
             bgColor="bg-green-100 text-green-600"
             hoverColor="hover:bg-green-100"
           />

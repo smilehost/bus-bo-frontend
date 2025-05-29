@@ -310,7 +310,7 @@ function Page() {
                   className={`whitespace-nowrap custom-ellipsis-style ${isExpired ? 'text-red-500 font-semibold' : 'text-gray-500'
                     }`}
                 >
-                  {isExpired ?  STATUS.INACTIVE: "Start"}: {row.route_date_start} - {row.route_date_end || "No End Date"}
+                  {isExpired &&  `${STATUS.EXPIRE}:`} {row.route_date_start} - {row.route_date_end || "No End Date"}
                 </p>
               </div>
             </Tooltip>
