@@ -75,6 +75,12 @@ export type TicketProps = {
     ticket_status?: number,
     ticket_price?: TicketRoutePrice[];
     route_id: string;
+    route?: {
+        route_name_th: string,
+        route_name_en: string,
+        route_status: number,
+    }
+    
 };
 
 export type Member = {

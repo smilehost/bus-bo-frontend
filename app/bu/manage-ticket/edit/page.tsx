@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 //component
 import FromRouteTicketByStep from '@/app/components/Form/FormRouteTicketByStep'
 import TitlePage from '@/app/components/Title/TitlePage';
@@ -11,7 +11,9 @@ import { useTicketStore } from '@/stores/routeTicketStore'
 import { TicketProps } from '@/types/types';
 
 function Page() {
-    const { id } = useParams();
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id")
+  
     const { getTicketById } = useTicketStore();
 
     const idTicket = Number(id)
@@ -33,7 +35,6 @@ function Page() {
 
     }, [id, getTicketById]);
 
-    console.log(ticketData)
     return (
         <div>
             <TitlePage title={"Edit Route Ticket"} />

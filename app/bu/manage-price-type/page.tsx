@@ -28,7 +28,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm'
 
 import TicketDiscountModel from '@/app/components/Model/TicketDiscountModel'
 import { RouteTicketDiscount } from '@/payloads/route.ticket.discount.payload'
-import { Pencil } from 'lucide-react'
+import { Pencil, SquarePen, Trash2 } from 'lucide-react'
 
 
 
@@ -351,13 +351,13 @@ function Page() {
             hoverColor="hover:bg-red-100"
           /> */}
           <TableActionButton
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
@@ -395,13 +395,13 @@ function Page() {
         <div className='flex justify-end gap-2 min-w-max'>
           <TableActionButton
             onClick={() => handleEditDiscount(row.ticket_discount_id)}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
             onClick={() => handleDeleteTicketDiscount({ name: row.ticket_discount_name, id: row.ticket_discount_id })}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
           />

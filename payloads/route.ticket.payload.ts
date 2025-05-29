@@ -18,6 +18,11 @@ export interface CreateRouteTicketPayload {
     route_ticket_amount: number,
     route_ticket_type: TICKET_TYPE,
     route_ticket_price?: RoutePriceTicket[]
+    route?: {
+        route_name_th: string,
+        route_name_en: string,
+        route_status: number,
+    }
 }
 
 export interface UpdateRouteTicketPayload extends CreateRouteTicketPayload {

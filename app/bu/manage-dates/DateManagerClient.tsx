@@ -12,6 +12,7 @@ import { DateItem } from "@/types/date";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import TitlePage from "@/app/components/Title/TitlePage";
+import { ToastContainer } from "react-toastify";
 
 export default function DateManagerClient() {
   const { dates, getDates, createDate, updateDate, deleteDate } =
@@ -110,7 +111,7 @@ export default function DateManagerClient() {
     };
 
     setShowModal(false);
-    await new Promise((resolve) => setTimeout(resolve, 300)); 
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
       title: editingDate ? "Confirm Update" : "Confirm Create",
@@ -123,7 +124,7 @@ export default function DateManagerClient() {
     });
 
     if (!isConfirmed) {
-      setShowModal(true); 
+      setShowModal(true);
       return;
     }
 
@@ -221,8 +222,14 @@ export default function DateManagerClient() {
 
   return (
     <div className="flex h-screen bg-gray-100">
+      <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Date" description="View and manage date information" btnText='Add New Date' handleOpenModel={handleAddDate} />
+        <TitlePage
+          title="Manage Date"
+          description="View and manage date information"
+          btnText="Add New Date"
+          handleOpenModel={handleAddDate}
+        />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
@@ -267,17 +274,17 @@ export default function DateManagerClient() {
           editingDate={
             editingDate
               ? {
-                ...editingDate,
-                days: {
-                  monday: editingDate.days.mon,
-                  tuesday: editingDate.days.tue,
-                  wednesday: editingDate.days.wed,
-                  thursday: editingDate.days.thu,
-                  friday: editingDate.days.fri,
-                  saturday: editingDate.days.sat,
-                  sunday: editingDate.days.sun,
-                },
-              }
+                  ...editingDate,
+                  days: {
+                    monday: editingDate.days.mon,
+                    tuesday: editingDate.days.tue,
+                    wednesday: editingDate.days.wed,
+                    thursday: editingDate.days.thu,
+                    friday: editingDate.days.fri,
+                    saturday: editingDate.days.sat,
+                    sunday: editingDate.days.sun,
+                  },
+                }
               : undefined
           }
         />

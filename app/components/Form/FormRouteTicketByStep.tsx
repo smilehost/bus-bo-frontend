@@ -270,6 +270,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
         price: item.price.toString(),
         route_ticket_price_route_id: Number(routeId)
       }))
+      
     };
 
     //fetch create, update to api
@@ -345,6 +346,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                   key={index}
                   ticket={item}
                   isActive={ticketActive === item.id}
+                  isTicketActive={item.ticket_status === 0 ? true : false}
                   onClick={() => {
                     if (activeStep > 0) {
                       toast.error("Please go back or finish editing before proceeding.");
@@ -368,8 +370,14 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                     ticketName_th: ticketData[0].ticketName_th,
                     ticket_type: ticketData[0].ticket_type ?? TICKET_TYPE.FIXED,
                     ticket_amount: '0',
-                    route_id: '0'
+                    route_id: '0',
+                    route: {
+                      route_name_th: "",
+                      route_name_en: "",
+                      route_status: 0,
+                    }
                   }}
+                  isTicketActive={ticketData[0].ticket_status === 0 ? true : false}
                   isActive={true}
                 />
               )}
@@ -385,7 +393,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                 optional={
                   <Typography variant="caption">
                     {ticketActive ? (
-                      <>{ticketActive} - Edit</>
+                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - Edit</>
                     ) : (
                       <>Ticket - Create</>
                     )}
@@ -435,7 +443,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                 optional={
                   <Typography variant="caption">
                     {ticketActive ? (
-                      <>{ticketActive} - Manage Price</>
+                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - Manage Price</>
                     ) : (
                       <>Ticket - Manage Price</>
                     )}
