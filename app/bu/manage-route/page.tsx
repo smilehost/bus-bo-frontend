@@ -276,7 +276,19 @@ function Page() {
       label: 'Schedule',
       width: '20%',
       render: (_, row) => {
-        const getActiveDays = (row) => {
+        type RouteDateRow = {
+          route_date_name: string;
+          route_date_start: string;
+          route_date_end?: string;
+          route_date_mon: number;
+          route_date_tue: number;
+          route_date_wen: number;
+          route_date_thu: number;
+          route_date_fri: number;
+          route_date_sat: number;
+          route_date_sun: number;
+        };
+        const getActiveDays = (row: RouteDateRow): string => {
           const dayMap = {
             route_date_mon: 'Monday',
             route_date_tue: 'Tuesday',
@@ -288,7 +300,7 @@ function Page() {
           };
 
           return Object.entries(dayMap)
-            .filter(([key]) => row[key] === 1)
+            .filter(([key]) => row[key as keyof RouteDateRow] === 1)
             .map(([_, day]) => day)
             .join(', ');
         };
@@ -310,7 +322,7 @@ function Page() {
                   className={`whitespace-nowrap custom-ellipsis-style ${isExpired ? 'text-red-500 font-semibold' : 'text-gray-500'
                     }`}
                 >
-                  {isExpired &&  `${STATUS.EXPIRE}:`} {row.route_date_start} - {row.route_date_end || "No End Date"}
+                  {isExpired && `${STATUS.EXPIRE}:`} {row.route_date_start} - {row.route_date_end || "No End Date"}
                 </p>
               </div>
             </Tooltip>
