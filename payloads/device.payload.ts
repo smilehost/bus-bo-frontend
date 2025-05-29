@@ -1,6 +1,7 @@
 import { UpdateCompanyPayload } from "./company.payload";
 
 export interface InsertDevice {
+    device_com_id?: number
     device_serial_number: string,
 
 }
@@ -21,7 +22,7 @@ export interface DevicePayload {
     size: number;
     total: number;
     totalPages: number;
-    data: DeviceCompanyPayload[];
+    data: DeviceCompanyPayload;
 }
 
 export interface FetchDeviceQuery {
@@ -29,4 +30,5 @@ export interface FetchDeviceQuery {
     size: number;
     search?: string;
     status?: string; // Added status property
+    com_id?: number; // Added status property
 }

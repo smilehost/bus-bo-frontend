@@ -10,16 +10,24 @@ interface DeviceStoreProps {
         id: number,
     ) => Promise<{ success: boolean; message?: string }>;
     getDeviceById: (id: number) => Promise<DevicePayload | undefined>;
-    getDevices: (page: number, size: number, search: string, status: string) => Promise<void>;
+    getDevices: (page: number, size: number, search: string, status: string, com_id: number) => Promise<void>;
     updateDeviceStatus: (
         id: number,
         status: number
     ) => Promise<{ success: boolean; message?: string }>;
+    clearDevices: () => void; // ← เพิ่มตรงนี้
+
 }
 
 export const useDeviceStore = create<DeviceStoreProps>((set) => ({
     devices: {
-        data: [],
+        data: {
+            com_id: 0,
+            com_name: "",
+            com_prefix: "",
+            com_status: 0,
+            devices: []
+        },
         page: 1,
         size: 10,
         total: 0,
@@ -65,7 +73,7 @@ export const useDeviceStore = create<DeviceStoreProps>((set) => ({
             };
         }
     },
-    
+
     deleteDevice: async (id): Promise<{ success: boolean; message?: string }> => {
         try {
             const res = await DeviceService.deleteDevice(id) as { message: string };
@@ -85,13 +93,14 @@ export const useDeviceStore = create<DeviceStoreProps>((set) => ({
             };
         }
     },
-    getDevices: async (page: number, size: number, search?: string, status?: string) => {
+    getDevices: async (page: number, size: number, search?: string, status?: string, com_id?: number) => {
         try {
             const res = await DeviceService.getDevices({
                 page,
                 size,
                 search,
-                status
+                status,
+                com_id
             }) as { result: DevicePayload };
 
             set({ devices: res.result }); // อัปเดต routeData โดยตรง
@@ -99,7 +108,13 @@ export const useDeviceStore = create<DeviceStoreProps>((set) => ({
             console.error(error);
             set({
                 devices: {
-                    data: [],
+                    data: {
+                        com_id: 0,
+                        com_name: "",
+                        com_prefix: "",
+                        com_status: 0,
+                        devices: []
+                    },
                     page: 1,
                     size: 10,
                     total: 0,
@@ -135,4 +150,23 @@ export const useDeviceStore = create<DeviceStoreProps>((set) => ({
             return { success: false, message };
         }
     },
+    clearDevices: () => {
+        set({
+            devices: {
+                data: {
+                    com_id: 0,
+                    com_name: "",
+                    com_prefix: "",
+                    com_status: 0,
+                    devices: [],
+                },
+                page: 1,
+                size: 10,
+                total: 0,
+                totalPages: 0,
+            },
+        });
+    },
+
+
 }));

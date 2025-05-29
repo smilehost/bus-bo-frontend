@@ -49,9 +49,11 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
                     const selectedItem = data.find((item) => item.id === parseInt(value));
                     const timeString = selectedItem?.schedule?.join(', ') || '';
                     return (
-                      <span className="text-[13px]">
+                      <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64"
+            
+                      >
                         {selectedItem?.name} {timeString}
-                      </span>
+                      </p>
                     );
                   }
                 : undefined

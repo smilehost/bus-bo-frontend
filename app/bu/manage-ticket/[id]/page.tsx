@@ -33,6 +33,7 @@ function Page() {
 
     }, [id, getTicketById]);
 
+    console.log(ticketData)
     return (
         <div>
             <TitlePage title={"Edit Route Ticket"} />

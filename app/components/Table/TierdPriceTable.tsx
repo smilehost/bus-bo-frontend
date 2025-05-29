@@ -291,7 +291,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
                     />
-                    <div>{stationName[j + 1]}</div>
+                    <div className='font-normal'>{stationName[j + 1]}</div>
                   </label>
                 </th>
               ))}

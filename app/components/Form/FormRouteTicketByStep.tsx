@@ -337,7 +337,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
     <div>
       {tickets && tickets.length > 0 && (
         <div className="mt-4">
-          <p className="font-medium">Tickets</p>
+          <p className="font-medium">Route Tickets</p>
           <div className="flex flex-wrap gap-4 mt-1">
             {!ticketActiveConfig
               ? tickets.map((item, index) => (
