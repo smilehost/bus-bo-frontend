@@ -52,7 +52,7 @@ export interface DiscountPriceTableData {
 export interface InsertDiscount {
   name: string,
   type: number,
-  value: string
+  value: number
 }
 function Page() {
 
@@ -240,13 +240,11 @@ function Page() {
       } else {
         await addTicketDiscount(tempData);
         toast.success("Created!")
-
       }
       fetchTicketDiscount();
     } catch (error) {
-      console.error("Save Discount error:", error);
       toast.error("Save Discount error:");
-
+      console.error("Save Discount error:", error);
     }
   }
 

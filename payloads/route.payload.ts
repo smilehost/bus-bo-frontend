@@ -6,7 +6,9 @@ export interface CreateRoutePayload {
     route_com_id: number,
     route_date_id: number,
     route_time_id: number,
-    route_array: string  
+    route_array: string  ,
+    route_ticket_url_header?: string,
+    route_ticket_url_footer?: string
 }
 
 export interface UpdateRoutePayload extends CreateRoutePayload {

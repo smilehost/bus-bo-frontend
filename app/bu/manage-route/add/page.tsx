@@ -29,7 +29,7 @@ function Page() {
     //store
     const { addRoute } = useRouteStore();
     const { locations, getLocations } = useLocationStore();
-    const  com_id  = getComId();
+    const com_id = getComId();
 
     //get locations
     useEffect(() => {
@@ -37,7 +37,7 @@ function Page() {
         setRouteComId(com_id!);
         getLocations(1, 5, '');
     }, [getLocations])
-    
+
     useEffect(() => {
         // console.log("locations: ", locations)
         setListA(locations);
@@ -53,6 +53,8 @@ function Page() {
     const [listA, setListA] = useState<LocationItem[]>([]);
     const [listB, setListB] = useState<LocationItem[]>([]);
     const [listStations, setListStations] = useState<number[]>([]);
+    const [headerUrl, setHeaderUrl] = useState<string>('')
+    const [footerUrl, setFooterUrl] = useState<string>('')
 
     //select time
     const [selectedTime, setSelectedTime] = useState<number>(); // ค่าที่จะเก็บเวลา
@@ -82,7 +84,9 @@ function Page() {
             route_com_id: Number(routeComId),
             route_date_id: Number(schedule),
             route_time_id: Number(selectedTime),
-            route_array: routeArray
+            route_array: routeArray,
+            route_ticket_url_header: headerUrl,
+            route_ticket_url_footer: footerUrl
         };
 
         const result = await addRoute(payload);
@@ -115,6 +119,10 @@ function Page() {
                 handleChangeSchedule={handleChangeSchedule}
                 handleSubmit={handleSubmit}
                 disable={false}
+                headerUrl={headerUrl}
+                setHeaderUrl={setHeaderUrl}
+                footerUrl={footerUrl}
+                setFooterUrl={setFooterUrl}
             />
         </div>
     )

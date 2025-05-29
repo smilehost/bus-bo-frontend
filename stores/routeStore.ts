@@ -51,7 +51,9 @@ export const useRouteStore = create<RouteStore>((set) => ({
         route_com_id: Number(newRoute.route_com_id),
         route_date_id: Number(newRoute.route_date_id),
         route_time_id: Number(newRoute.route_time_id),
-        route_array: newRoute.route_array
+        route_array: newRoute.route_array,
+        route_ticket_url_header: newRoute.route_ticket_url_header,
+        route_ticket_url_footer: newRoute.route_ticket_url_footer,
       };
       await RouteService.createRoute(payload);
       return { success: true };
@@ -79,7 +81,9 @@ export const useRouteStore = create<RouteStore>((set) => ({
         route_com_id: Number(updatedRoute.route_com_id),
         route_date_id: Number(updatedRoute.route_date_id),
         route_time_id: Number(updatedRoute.route_time_id),
-        route_array: updatedRoute.route_array
+        route_array: updatedRoute.route_array,
+        route_ticket_url_header: updatedRoute.route_ticket_url_header,
+        route_ticket_url_footer: updatedRoute.route_ticket_url_footer,
       };
       await RouteService.updateRoute(id, payload);
       return { success: true };

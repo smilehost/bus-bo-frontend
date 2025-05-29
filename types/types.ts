@@ -31,6 +31,8 @@ export type RouteData = {
           route_date_sun: number,
           route_date_com_id: number
         },
+    route_ticket_url_header?: string
+    route_ticket_url_footer?: string
 };
 
 export type Route = {

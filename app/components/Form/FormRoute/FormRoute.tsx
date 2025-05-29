@@ -27,6 +27,10 @@ import { Confirm } from '../../Dialog/Confirm';
 type FormRouteProps = {
   routeNameTH?: string | undefined;
   setRouteNameTH: React.Dispatch<React.SetStateAction<string>>;
+  headerUrl?: string | undefined;
+  setHeaderUrl: React.Dispatch<React.SetStateAction<string>>;
+  footerUrl?: string | undefined;
+  setFooterUrl: React.Dispatch<React.SetStateAction<string>>;
   routeName?: string | undefined;
   setRouteName: React.Dispatch<React.SetStateAction<string>>;
   routeColor: string;
@@ -59,6 +63,10 @@ function FormRoute({
   handleSubmit,
   setRouteNameTH,
   routeNameTH,
+  headerUrl,
+  setHeaderUrl,
+  footerUrl,
+  setFooterUrl,
   disable = false
 }: FormRouteProps) {
   const router = useRouter();
@@ -165,16 +173,16 @@ function FormRoute({
             label="URL for slip details at the header"
             placeholder="Enter URL for slip details at the header"
             type="text"
-            setValue={setRouteNameTH}
-            value={routeNameTH}
+            setValue={setHeaderUrl}
+            value={headerUrl}
             size='min-w-[300px] xl:w-[400px] max-w-[400px]'
           />
           <InputLabel
             label="URL for slip details at the footer"
             placeholder="Enter URL for slip details at the footer"
             type="text"
-            setValue={setRouteName}
-            value={routeName}
+            setValue={setFooterUrl}
+            value={footerUrl}
             size={'min-w-[300px] xl:w-[400px] max-w-[400px]'}
           />
         </div>
