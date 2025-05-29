@@ -16,6 +16,11 @@ import StatusText from "@/app/components/StatusText";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
 import { usePathname } from "next/navigation";
 import FormFilter from "@/app/components/Filter/FormFilter";
+import CompanyTable from "@/app/components/Table/CompanyTable";
+import axios from "axios";
+import { store } from "@/stores/store";
+import { jwtDecode } from "jwt-decode";
+import EnterPassModal from "@/app/components/Model/EnterPassModal";
 
 export interface CompanyTableData {
   no: number;
@@ -24,15 +29,23 @@ export interface CompanyTableData {
   prefix: string;
   status: number;
 }
+type DecodedToken = {
+  account_id: number;
+  account_role: string;
+  com_id: number;
+  login_at: number;
+  iat: number;
+  exp: number;
+};
 
 export default function ManageCompaniesPage() {
   const {
     companies,
-    // isLoading,
+    isLoading,
     getCompanies,
     createCompany,
     updateCompany,
-    // deleteCompany,
+    deleteCompany,
   } = useCompanyStore();
 
   //pathName
@@ -66,6 +79,34 @@ export default function ManageCompaniesPage() {
   const handleAddCompany = () => {
     setEditingCompany(null);
     setIsModalOpen(true);
+  };
+  const handleDeleteCompany = async (id: string) => {
+    const isConfirmed = await Confirm({
+      title: "Confirm Delete",
+      text: "Are you sure you want to delete this company?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "warning",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await deleteCompany(id);
+      await Alert({
+        title: "Deleted!",
+        text: "Company deleted.",
+        type: "success",
+      });
+      fetchCompanies();
+    } catch (error) {
+      console.error("Delete error:", error);
+      await Alert({
+        title: "Error!",
+        text: "Failed to delete.",
+        type: "error",
+      });
+    }
   };
 
   const handleEditCompany = (id: string) => {
@@ -181,6 +222,48 @@ export default function ManageCompaniesPage() {
     ...company,
     no: (currentPage - 1) * rowsPerPage + index + 1,
   }));
+  const [error, setError] = useState<string | null>(null);
+  const [showPassModal, setShowPassModal] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
+    null
+  );
+
+  const onLoginAsCompany = async (com_id: number, password: string) => {
+    setError(null);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          username: "admin57",
+          // password : 'G1@ugO37ir',
+          // username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      const authHeader = response.headers["authorization"];
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.split(" ")[1].trim();
+        store.token.set(token);
+
+        const decoded = jwtDecode<DecodedToken>(token);
+        store.com_id.set(com_id);
+        store.account_id.set(decoded.account_id);
+        store.account_role.set(decoded.account_role);
+        window.open("/bu/dashboard", "_blank");
+        // shell.openExternal('localhost:3000/bu/dashboard');
+
+      } else {
+        setError("Login failed: No token received");
+      }
+    } catch (err) {
+      setError("Login failed: Invalid credentials");
+      console.error("Login error:", err);
+    }
+  };
 
 
   //table columns
@@ -235,6 +318,15 @@ export default function ManageCompaniesPage() {
             bgColor="bg-green-100 text-green-600"
             hoverColor="hover:bg-green-100"
           />
+          <TableActionButton
+          onClick={() => {
+            setSelectedCompanyId(Number(row.id));
+            setShowPassModal(true);
+          }}
+            iconSrc="M15.75 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-1.5 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"
+            bgColor="bg-red-50 text-red-600"
+            hoverColor="hover:bg-red-100"
+          />
         </div>
       ),
     },
@@ -256,6 +348,17 @@ export default function ManageCompaniesPage() {
           {isLoadingSkeleton ? (
             <SkeletonCompanyTable rows={5} />
           ) : (
+            // <CompanyTable
+            //   companies={paginatedCompanies}
+            //   onEdit={handleEditCompany}
+            //   onDelete={handleDeleteCompany}
+            //   currentPage={currentPage}
+            //   onPageChange={setCurrentPage}
+            //   rowsPerPage={rowsPerPage}
+            //   onRowsPerPageChange={handleRowsPerPageChange}
+            //   totalResults={filtered.length}
+            //   isLoading={isLoading}
+            // />
             <TableTemplate
               columns={columns}
               data={paginatedCompaniesWithNo}
@@ -266,6 +369,7 @@ export default function ManageCompaniesPage() {
               onRowsPerPageChange={handleRowsPerPageChange}
               rowKey={(row) => row.id}
             />
+            
           )}
         </div>
 
@@ -286,6 +390,16 @@ export default function ManageCompaniesPage() {
           }
         />
       )}
+      <EnterPassModal
+              isOpen={showPassModal}
+              onClose={() => setShowPassModal(false)}
+              onSubmit={(password) => {
+                if (selectedCompanyId !== null) {
+                  onLoginAsCompany(selectedCompanyId, password);
+                  setShowPassModal(false);
+                }
+              }}
+            />
     </div>
   );
 }

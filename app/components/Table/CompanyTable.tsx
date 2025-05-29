@@ -9,6 +9,7 @@ import { jwtDecode } from "jwt-decode";
 import { Router } from "lucide-react";
 import { useRouter } from "next/navigation"; // ✅ สำหรับ Next.js App Router
 import EnterPassModal from "../Model/EnterPassModal";
+// import { shell } from 'electron';
 
 type Company = {
   id: string;
@@ -81,7 +82,9 @@ export default function CompanyTable({
         store.com_id.set(com_id);
         store.account_id.set(decoded.account_id);
         store.account_role.set(decoded.account_role);
-        window.open("/bu/dashboard", "_blank");
+        // window.open("/bu/dashboard", "_blank");
+        // shell.openExternal('localhost:3000/bu/dashboard');
+
       } else {
         setError("Login failed: No token received");
       }
