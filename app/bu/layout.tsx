@@ -123,7 +123,8 @@ export default function RootLayout({
 
     useEffect(() => {
         if (account_role === 2) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+            // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
         } else if (account_role === 1) {
             // setRoleMenu([1, 10, 8]);
             setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);

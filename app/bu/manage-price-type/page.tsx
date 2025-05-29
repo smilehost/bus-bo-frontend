@@ -28,7 +28,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm'
 
 import TicketDiscountModel from '@/app/components/Model/TicketDiscountModel'
 import { RouteTicketDiscount } from '@/payloads/route.ticket.discount.payload'
-import { Pencil, SquarePen, Trash2 } from 'lucide-react'
+import { SquarePen, Trash2 } from 'lucide-react'
 
 
 
@@ -44,7 +44,7 @@ export interface DiscountPriceTableData {
   ticket_discount_id: number,
   ticket_discount_name: string,
   ticket_discount_type: number,
-  ticket_discount_value: string,
+  ticket_discount_value: number,
   ticket_discount_status: number,
   ticket_discount_comId: number
 }
