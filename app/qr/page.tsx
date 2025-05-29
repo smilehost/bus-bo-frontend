@@ -5,7 +5,7 @@ function page() {
     return (
         <div>
             <Image
-                src={"/qr/qr.jpg"}
+                src={"/qr.jpg"}
                 width={1000}
                 height={1000}
                 alt="qr"

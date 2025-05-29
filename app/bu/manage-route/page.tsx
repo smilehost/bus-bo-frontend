@@ -354,24 +354,6 @@ function Page() {
       width: '25%',
       render: (_, row) => (
         <div className='flex gap-2 min-w-max'>
-          {/* <TableActionButton
-            iconSrc="/icons/money.svg"
-            href={`${pathname}/routeTicket/${row?.id}`}
-            bgColor="bg-green-100"
-            hoverColor="hover:bg-green-200"
-          />
-          <TableActionButton
-            iconSrc="/icons/edit.svg"
-            href={`${pathname}/edit/${row?.id}`}
-            bgColor="bg-blue-50"
-            hoverColor="hover:bg-blue-100"
-          />
-          <TableActionButton
-            iconSrc="/icons/garbage.svg"
-            onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
-            bgColor="bg-red-50"
-            hoverColor="hover:bg-red-100"
-          /> */}
           <TableActionButton
             icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
             href={`${pathname}/routeTicket?id=${row?.id}&name=${row?.routeTH}`}
