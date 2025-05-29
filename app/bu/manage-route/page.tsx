@@ -301,7 +301,7 @@ function Page() {
 
           return Object.entries(dayMap)
             .filter(([key]) => row[key as keyof RouteDateRow] === 1)
-            .map(([_, day]) => day)
+            .map(([, day]) => day)
             .join(', ');
         };
 

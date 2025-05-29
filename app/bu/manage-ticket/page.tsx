@@ -121,9 +121,9 @@ function Page() {
             item.ticket_type,
             Number(item.ticket_amount),
             item.ticket_color,
-            item.route.route_name_th,
-            item.route.route_name_en,
-            Number(item.route.route_status),
+            item?.route?.route_name_th || "-",
+            item?.route?.route_name_en || "-",
+            Number(item?.route?.route_status),
           );
         })
       );

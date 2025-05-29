@@ -270,6 +270,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
         price: item.price.toString(),
         route_ticket_price_route_id: Number(routeId)
       }))
+      
     };
 
     //fetch create, update to api
