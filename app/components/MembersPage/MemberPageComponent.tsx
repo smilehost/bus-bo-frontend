@@ -19,6 +19,7 @@ import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import StatusText from "@/app/components/StatusText";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
+import { ToastContainer } from "react-toastify";
 import { Eye, Lock, Pencil } from "lucide-react";
 
 export interface MemberTableData {
@@ -355,6 +356,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
   // console.log("paginatedCompaniesWithNo: ", paginatedCompaniesWithNo)
   return (
     <div className="flex h-screen bg-gray-100">
+      <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
         <div className="bg-white rounded-md shadow p-5 mt-5">

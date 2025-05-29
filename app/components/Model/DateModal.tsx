@@ -6,6 +6,8 @@ import Image from "next/image";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface DateModalProps {
   open: boolean;
@@ -106,6 +108,21 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
       return "Please select at least one day";
     }
 
+    if (!newDate.startDate) {
+      return "Please select a start date";
+    }
+
+    if (newDate.startDate && newDate.endDate) {
+      const start = new Date(newDate.startDate);
+      const end = new Date(newDate.endDate);
+      if (start > end) {
+        return "Start date cannot be after end date";
+      }
+      if (end < start) {
+        return "End date cannot be before start date";
+      }
+    }
+
     return null;
   };
 
@@ -114,7 +131,7 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
     if (errorMessage) {
       // ใช้ setTimeout เพื่อให้แน่ใจว่า Modal ปิดก่อน
       setTimeout(() => {
-        alert(errorMessage);
+        toast.error(errorMessage);
       }, 100);
       return;
     }

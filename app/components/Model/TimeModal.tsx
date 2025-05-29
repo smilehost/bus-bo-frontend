@@ -7,6 +7,8 @@ import { Clock } from "lucide-react";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface NewTime {
   name: string;
@@ -148,15 +150,15 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
 
   const handleSaveTime = () => {
     if (!newTime.name.trim()) {
-      setTimeout(() => alert("Please enter a time name"), 100);
+      setTimeout(() => toast.error("Please enter a time name"), 100);
       return;
     }
     if (!newTime.startTime.trim()) {
-      setTimeout(() => alert("Please select a start time"), 100);
+      setTimeout(() => toast.error("Please select a start time"), 100);
       return;
     }
     if (newTime.times.length === 0) {
-      setTimeout(() => alert("Please add at least one time slot"), 100);
+      setTimeout(() => toast.error("Please add at least one time slot"), 100);
       return;
     }
     onSave(newTime);

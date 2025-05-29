@@ -4,6 +4,8 @@ import Image from "next/image";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface LocationModalProps {
   open: boolean;
@@ -52,7 +54,10 @@ function LocationModal({
       isNaN(parseFloat(location.latitude)) ||
       isNaN(parseFloat(location.longitude))
     ) {
-      setTimeout(() => alert("Please fill in all fields correctly."), 100);
+      setTimeout(
+        () => toast.error("Please fill in all fields correctly."),
+        100
+      );
       return;
     }
     onSave({
@@ -98,16 +103,17 @@ function LocationModal({
                 placeholder="16.40110363857608, 102.85026064787496"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
                 onChange={(e) => {
-                  const [lat, lng] = e.target.value.split(',').map(s => s.trim());
-                  setLocation(prev => ({
+                  const [lat, lng] = e.target.value
+                    .split(",")
+                    .map((s) => s.trim());
+                  setLocation((prev) => ({
                     ...prev,
                     latitude: lat || "",
-                    longitude: lng || ""
+                    longitude: lng || "",
                   }));
                 }}
               />
             </div>
-
           </div>
           <div className="flex gap-3 justify-end mt-7">
             <ButtonDefault size="" text="Cancel" onClick={onClose} />
