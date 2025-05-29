@@ -6,7 +6,7 @@ import { create } from 'zustand';
 type TicketDiscountPriceProps = {
     ticketDiscountPrice: RouteTicketDiscount[],
     addTicketDiscount: (newDiscount: InsertTicketDiscount) => Promise<{ success: boolean; message?: string }>,
-    updateTicketDiscount:  (id: number, updateDiscount: InsertTicketDiscount) => Promise<{ success: boolean; message?: string }>,
+    updateTicketDiscount: (id: number, updateDiscount: InsertTicketDiscount) => Promise<{ success: boolean; message?: string }>,
     updateTicketDiscountStatus: (id: number, status: number) => Promise<{ success: boolean; message?: string }>,
     deleteTicketDiscount: (
         id: number,
@@ -54,11 +54,14 @@ export const useTicketDiscountPrice = create<TicketDiscountPriceProps>((set) => 
                 ),
             }));
             return { success: true };
-        } catch (error) {
-            console.error("updateTicketDiscountStatus error:", error);
+        } catch (error: unknown) {
+            let message = "Unknown error during update";
+            if (error instanceof Error) {
+                message = error.message;
+            }
             return {
                 success: false,
-                message: (error as any)?.message || "Unknown error during update",
+                message,
             };
         }
     },

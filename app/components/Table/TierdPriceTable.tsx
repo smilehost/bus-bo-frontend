@@ -11,7 +11,6 @@ import { TicketRoutePrice } from '@/types/types';
 
 //api
 import { useLocationStore } from '@/stores/locationStore';
-import { LocationItem } from '@/types/location';
 import { toast } from 'react-toastify';
 
 interface TierdPriceTableProps {
@@ -25,7 +24,10 @@ interface TierdPriceTableProps {
 }
 
 function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable, setSaveTable, saveTable }: TierdPriceTableProps) {
-  const { getLocationById } = useLocationStore();
+  const { locations, getLocations } = useLocationStore();
+  useEffect(() => {
+    getLocations(1, 1000);
+  }, [getLocations]);
 
   //set price เริ่มต้น
   const [checkFetchData, setCheckFetchData] = useState<boolean>(false)
@@ -57,11 +59,13 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
       if (!stations || stations.length === 0) return;
 
       try {
-        const stationNameTemp = (
-          await Promise.all(stations.map((id) => getLocationById(parseInt(id))))
-        ).filter((s): s is LocationItem => s !== undefined);
+        const stationNameTemp = stations.map((id) => locations.find((s) => Number(s.id) === Number(id)))
 
-        setStationName(stationNameTemp.map((s) => s?.name));
+        setStationName(
+          stationNameTemp
+            .map((s) => s?.name)
+            .filter((name): name is string => name !== undefined)
+        );
       } catch (error) {
         console.error('Error loading station names:', error);
       }
@@ -69,7 +73,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     fetchStations();
 
-  }, [stations, getLocationById]);
+  }, [stations, locations]);
 
   const [rowChecked, setRowChecked] = useState<number[]>([]);
   const [colChecked, setColChecked] = useState<number[]>([]);
@@ -287,7 +291,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
                     />
-                    <div>{stationName[j + 1]}</div>
+                    <div className='font-normal'>{stationName[j + 1]}</div>
                   </label>
                 </th>
               ))}

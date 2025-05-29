@@ -228,7 +228,11 @@ function MemberModal({
                   type={"text"}
                   placeholder={"Enter username"}
                   className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] w-full`}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    const input = e.target.value;
+                    const englishOnly = input.replace(/[^a-zA-Z0-9]/g, ''); // กรองให้เหลือแค่ a-z, A-Z, 0-9
+                    setUsername(englishOnly);
+                  }}
                 />
               </div>
             </div>

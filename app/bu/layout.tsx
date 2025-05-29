@@ -5,7 +5,6 @@ import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { usePathname } from "next/navigation";
 
 //icon
 import {
@@ -43,8 +42,6 @@ export default function RootLayout({
     useEffect(() => {
         setHasMounted(true);
     }, []);
-
-    const pathName = usePathname();
 
     const account_role = userData.account_role;
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -101,7 +98,7 @@ export default function RootLayout({
         {
             id: 11,
             icon: DollarSign,
-            text: "Manage Price Type",
+            text: "Manage Promotion",
             link: "manage-price-type",
         },
         {
@@ -116,7 +113,6 @@ export default function RootLayout({
             text: "Manage Company",
             link: "manage-company",
         },
-
     ];
 
     const [roleMenu, setRoleMenu] = useState<number[]>();
@@ -129,7 +125,8 @@ export default function RootLayout({
         if (account_role === 1) {
             setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
         } else if (account_role === 2) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+            // setRoleMenu([1, 10, 8]);
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
         }
     }, [account_role]);
 
@@ -141,24 +138,27 @@ export default function RootLayout({
         <div className="flex h-screen bg-white ">
             <ToastContainer />
             <aside
-                className={`fixed inset-y-0 left-0 z-10 w-64 transform bg-white  shadow-lg transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-                    }`}
+                className={`fixed inset-y-0 left-0 z-10 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out 
+    flex flex-col
+    lg:translate-x-0 lg:static lg:inset-0 
+    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
             >
-                <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-white">
+                {/* Header */}
+                <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-white shrink-0">
                     <div className="flex items-center">
                         <div className="h-8 w-8 rounded-md custom-bg-main"></div>
-                        <span className="ml-2 text-lg font-semibold text-gray-800">
-                            BusTicket
-                        </span>
+                        <span className="ml-2 text-lg font-semibold text-gray-800">BusTicket</span>
                     </div>
                     <button
                         className="p-1 rounded-md lg:hidden focus:outline-none focus:ring-2 focus:ring-orange-500"
                         onClick={() => setSidebarOpen(false)}
                     >
-                        <XIcon size={24} className="text-gray-500 " />
+                        <XIcon size={24} className="text-gray-500" />
                     </button>
                 </div>
-                <div className="px-3 py-4">
+
+                {/* Menu with scroll */}
+                <div className="flex-1 overflow-y-auto px-3 py-4">
                     <div className="space-y-1">
                         {menu.map((item, index) => (
                             <MenuItemLink
@@ -170,7 +170,9 @@ export default function RootLayout({
                         ))}
                     </div>
                 </div>
-                <div className="absolute bottom-0 w-full border-t border-gray-200">
+
+                {/* Footer */}
+                <div className="border-t border-gray-200 shrink-0">
                     <div className="flex items-end justify-end px-4 py-3">
                         <button
                             onClick={async () => {
@@ -183,7 +185,7 @@ export default function RootLayout({
                                 });
 
                                 if (confirmed) {
-                                    logOut(); // เรียกฟังก์ชัน logout ได้เลย
+                                    logOut();
                                 }
                             }}
                             className="flex items-center text-sm text-gray-700 hover:text-orange-600 cursor-pointer"
@@ -214,7 +216,7 @@ export default function RootLayout({
                                             {userData?.name}
                                         </div>
                                         <div className="text-xs text-gray-500  capitalize">
-                                            {userData.account_role === 2 ? USER_TIER.SUPER_ADMIN: USER_TIER.ADMIN}
+                                            {userData.account_role === 2 ? USER_TIER.SUPER_ADMIN : USER_TIER.ADMIN}
                                         </div>
                                     </div>
                                 </div>
@@ -225,7 +227,7 @@ export default function RootLayout({
                 <main className="flex-1 overflow-auto bg-gray-100 ">
                     <div className="container mx-auto px-4 sm:px-6 ">
                         <div className="mt-3">
-                            <Breadcrumb path={pathName} />
+                            <Breadcrumb />
                         </div>
                         <div className="py-4 md:py-6">
                             {children}

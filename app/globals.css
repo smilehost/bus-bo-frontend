@@ -36,6 +36,10 @@ body {
   @apply whitespace-nowrap text-ellipsis overflow-hidden;
 }
 
+.custom-size-tableAction-btn {
+  @apply w-4 h-4;
+}
+
 .custom-disable-bg {
   @apply bg-gray-100
 }

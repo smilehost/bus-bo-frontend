@@ -113,4 +113,11 @@ export const api = {
     const res = await instance.delete(url);
     return res.data;
   },
+
+  async patch<T>(payload: Payload): Promise<T> {
+    const { path, params, body } = payload;
+    const url = `${path}${params !== undefined ? `/${params}` : ""}`;
+    const res = await instance.patch(url, body);
+    return res.data;
+  },
 };

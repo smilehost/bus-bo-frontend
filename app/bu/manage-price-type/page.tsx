@@ -28,6 +28,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm'
 
 import TicketDiscountModel from '@/app/components/Model/TicketDiscountModel'
 import { RouteTicketDiscount } from '@/payloads/route.ticket.discount.payload'
+import { Pencil, SquarePen, Trash2 } from 'lucide-react'
 
 
 
@@ -300,15 +301,15 @@ function Page() {
   };
 
   const handleDeleteTicketDiscount = async ({ name, id }: { name: string, id: number }) => {
-    const inputName = await ConfirmWithInput({
-      title: `Delete "${name}"?`,
-      text: `Please type the route name below to confirm deletion.`,
-      confirmText: "Delete",
+
+    const isConfirmed = await Confirm({
+     title: `Delete "${name}"?`,
+     text: `Please type the route name below to confirm deletion.`,
+       confirmText: "Delete",
       cancelText: "Cancel",
-      placeholder: "Type route name here"
     });
 
-    if (inputName === name) {
+    if (isConfirmed) {
       const result = await deleteTicketDiscount(id);
       if (result.success) {
         fetchTicketDiscount();
@@ -316,7 +317,7 @@ function Page() {
       } else {
         toast.error(`Error: ${result.message}`);
       }
-    } else if (inputName !== null) {
+    } else if (isConfirmed) {
       await Alert({
         title: "Name mismatch!",
         text: "The typed name does not match the route name.",
@@ -350,13 +351,13 @@ function Page() {
             hoverColor="hover:bg-red-100"
           /> */}
           <TableActionButton
-            iconSrc="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
-            iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
@@ -394,13 +395,13 @@ function Page() {
         <div className='flex justify-end gap-2 min-w-max'>
           <TableActionButton
             onClick={() => handleEditDiscount(row.ticket_discount_id)}
-            iconSrc="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
           />
           <TableActionButton
             onClick={() => handleDeleteTicketDiscount({ name: row.ticket_discount_name, id: row.ticket_discount_id })}
-            iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
           />
@@ -423,7 +424,7 @@ function Page() {
         }
       </div>
       <div className='mt-5'>
-        <TitlePage title='Manage Ticket Discount Price' description='View and manage discount price information' btnText='Add Discount Price' handleOpenModel={handleAddDiscount} />
+        <TitlePage title='Manage Ticket Discount Price' description='View and manage discount price information' btnText='Add a Discount' handleOpenModel={handleAddDiscount} />
         {isLoadingskeleton ? <SkeletonRoute /> :
           <TableTemplate
             columns={columnTicketDiscount}

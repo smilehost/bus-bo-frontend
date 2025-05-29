@@ -77,10 +77,11 @@ export default function CompanyModal({
             </label>
             <input
               type="text"
+              disabled={editingCompany ? true : false}
               value={prefix}
               onChange={(e) => setPrefix(e.target.value)}
               placeholder="Enter Company prefix (e.g. BST)"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className={`${editingCompany && "bg-gray-200"} w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400`}
             />
           </div>
 

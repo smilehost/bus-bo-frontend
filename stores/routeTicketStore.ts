@@ -54,6 +54,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
                 ticket_color: item.route_ticket_color,
                 ticket_status: item.route_ticket_status,
                 route_id: String(item.route_ticket_route_id),
+                route: item.route
             }));
 
             set({

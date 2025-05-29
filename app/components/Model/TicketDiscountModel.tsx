@@ -8,6 +8,7 @@ import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
 import SelectInputUnified from "../Form/SelectInputUnified";
 import { DISCOUNT_TYPE } from "@/constants/enum";
+import TextError from "../TextError";
 
 interface TicketDiscountProps {
     open: boolean;
@@ -92,11 +93,12 @@ function TicketDiscountModel({
                             }
                         />
                         <SelectInputUnified
-                            label="Times"
+                            label="Types"
                             value={valueData.type.toString()}
                             tailwind="w-full"
-                            onChange={(e) =>
-                                setValueData({ ...valueData, type: Number(e.target.value) })}
+                            onChange={(e) => {
+                                setValueData({ ...valueData, type: Number(e.target.value), value: "0" })
+                            }}
                             data={[
                                 {
                                     id: 0,
@@ -113,10 +115,19 @@ function TicketDiscountModel({
                             placeholder="Enter ticket amount"
                             type="number"
                             value={valueData.value}
-                            setValue={(e) =>
-                                setValueData({ ...valueData, value: e })
-                            }
+                            setValue={(e) => {
+                                const newValue = Number(e);
+                                if (valueData.type === 1) {
+                                    if (newValue > 100 || newValue < 0) {
+                                        return;
+                                    }
+                                }
+                                setValueData({ ...valueData, value: newValue.toString() });
+                            }}
                         />
+                       {valueData.type === 1 && (
+                         <TextError text={"รองรับสูงสุดไม่เกิน 100%"}/>
+                       )}
 
                     </div>
                     <div className="flex gap-3 justify-end mt-7">
