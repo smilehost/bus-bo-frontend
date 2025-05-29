@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type CompanyFormData = {
   name: string;
@@ -37,7 +39,7 @@ export default function CompanyModal({
 
   const handleSave = () => {
     if (!name.trim()) {
-      alert("Please enter a valid company name.");
+      toast.error("Please enter a valid company name.");
       return;
     }
     onSave({ name, prefix, status });
@@ -81,7 +83,9 @@ export default function CompanyModal({
               value={prefix}
               onChange={(e) => setPrefix(e.target.value)}
               placeholder="Enter Company prefix (e.g. BST)"
-              className={`${editingCompany && "bg-gray-200"} w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400`}
+              className={`${
+                editingCompany && "bg-gray-200"
+              } w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400`}
             />
           </div>
 
