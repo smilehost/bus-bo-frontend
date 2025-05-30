@@ -6,12 +6,12 @@ import { LocationItem } from '@/types/location';
 type DragDropProps = {
   listA: LocationItem[],
   listB: LocationItem[],
-  setListA: Dispatch<SetStateAction<LocationItem[]>>,
+  setListA?: Dispatch<SetStateAction<LocationItem[]>>,
   setListB: Dispatch<SetStateAction<LocationItem[]>>,
   disable: boolean
 }
 
-function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDropProps) {
+function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
 
   const [search, setSearch] = useState<string>("");
 
