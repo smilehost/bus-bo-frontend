@@ -92,7 +92,7 @@ export default function RootLayout({
         {
             id: 8,
             icon: Users,
-            text: "Manage Members",
+            text: "Manage Employees",
             link: "manage-members",
         },
         {

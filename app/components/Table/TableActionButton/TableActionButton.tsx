@@ -78,7 +78,7 @@ export default function TableActionButton({
   hoverColor = "hover:bg-gray-200",
   newTab = false, // 👈 ค่า default คือ false
 }: TableActionButtonProps) {
-  const commonClass = `cursor-pointer ${bgColor} ${hoverColor} p-1 rounded-md transition-colors`;
+  const commonClass = `cursor-pointer ${bgColor} ${hoverColor} p-1 rounded-md transition-colors h-fit`;
 
   if (href) {
     return (

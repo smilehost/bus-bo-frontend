@@ -17,7 +17,7 @@ import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplat
 import { usePathname } from "next/navigation";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import { CompanyItem } from "@/types/company";
-import { KeyRound, Pencil, Smartphone, SquarePen, Users } from "lucide-react";
+import { KeyRound, Smartphone, SquarePen, Users } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;

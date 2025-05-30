@@ -2,6 +2,8 @@
 
 import React from "react";
 import Pagination from "../Pagination/Pagination";
+import TableActionButton from "./TableActionButton/TableActionButton";
+import { SquarePen, Trash2 } from "lucide-react";
 
 type DateTableProps = {
   dates: {
@@ -73,9 +75,8 @@ function DateTable({
                 {englishDays.map((day, index) => (
                   <th
                     key={day}
-                    className={`sticky top-0 py-4 px-4 bg-gray-50 border-b-2 border-gray-200 font-semibold text-center ${
-                      index >= 5 ? "text-red-600" : "text-gray-600"
-                    }`}
+                    className={`sticky top-0 py-4 px-4 bg-gray-50 border-b-2 border-gray-200 font-semibold text-center ${index >= 5 ? "text-red-600" : "text-gray-600"
+                      }`}
                   >
                     <span className="block">{day}</span>
                   </th>
@@ -99,9 +100,8 @@ function DateTable({
                 dates.map((date, index) => (
                   <tr
                     key={date.id}
-                    className={`transition-all duration-300 ease-out hover:bg-blue-50/70 ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                    } animate-fade-in`}
+                    className={`transition-all duration-300 ease-out hover:bg-blue-50/70 ${index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                      } animate-fade-in`}
                     style={{
                       animationDelay: `${index * 80}ms`,
                       animationDuration: "600ms",
@@ -117,9 +117,8 @@ function DateTable({
                     {englishDays.map((day, dayIndex) => (
                       <td
                         key={day}
-                        className={`py-4 px-4 border-b border-gray-200 text-center ${
-                          dayIndex >= 5 ? "bg-red-50/30" : ""
-                        }`}
+                        className={`py-4 px-4 border-b border-gray-200 text-center ${dayIndex >= 5 ? "bg-red-50/30" : ""
+                          }`}
                       >
                         {!!date.days[
                           day.toLowerCase() as keyof typeof date.days
@@ -151,7 +150,20 @@ function DateTable({
                     </td>
                     <td className="py-4 px-6 border-b border-gray-200">
                       <div className="flex justify-center space-x-2">
-                        <button
+
+                        <TableActionButton
+                          icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
+                          onClick={() => onEdit(date.id)}
+                          bgColor="bg-blue-50 text-blue-600"
+                          hoverColor="hover:bg-blue-100"
+                        />
+                        <TableActionButton
+                          icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
+                          onClick={() => onDelete(date.id)}
+                          bgColor="bg-red-50 text-red-600"
+                          hoverColor="hover:bg-red-100"
+                        />
+                        {/* <button
                           onClick={() => onEdit(date.id)}
                           className="p-1.5 bg-blue-50 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors hover:shadow-sm cursor-pointer"
                           title="Edit"
@@ -182,7 +194,7 @@ function DateTable({
                               clipRule="evenodd"
                             />
                           </svg>
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>

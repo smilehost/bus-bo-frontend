@@ -9,6 +9,7 @@ import ButtonDefault from "../Form/ButtonDefault";
 import SelectInputUnified from "../Form/SelectInputUnified";
 import { DISCOUNT_TYPE } from "@/constants/enum";
 import TextError from "../TextError";
+import { toast } from "react-toastify";
 
 interface TicketDiscountProps {
     open: boolean;
@@ -59,7 +60,7 @@ function TicketDiscountModel({
             !valueData.name ||
             !valueData.value
         ) {
-            setTimeout(() => alert("Please fill in all fields correctly."), 100);
+            setTimeout(() => toast.error("Please fill in all fields correctly."), 100);
             return;
         }
         onSave({
