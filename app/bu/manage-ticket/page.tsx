@@ -124,6 +124,7 @@ function Page() {
             item?.route?.route_name_th || "-",
             item?.route?.route_name_en || "-",
             Number(item?.route?.route_status),
+
           );
         })
       );
@@ -245,6 +246,7 @@ function Page() {
     },
     { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     { key: 'ticketType', label: 'Ticket Type', width: '20%', align: 'center' },
+    // { key: 'ticketPrice', label: 'Ticket Price', width: '20%', align: 'center' },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
       render: (_, row) => (
@@ -262,12 +264,14 @@ function Page() {
             href={`${pathname}/edit?id=${row?.id}&name=${row?.ticketNameTH}`}
             bgColor="text-green-600 bg-green-100"
             hoverColor="hover:bg-green-200"
+            title='Edit'
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title='Delete'
           />
         </div>
       ),

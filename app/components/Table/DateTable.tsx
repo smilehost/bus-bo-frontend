@@ -156,12 +156,14 @@ function DateTable({
                           onClick={() => onEdit(date.id)}
                           bgColor="bg-blue-50 text-blue-600"
                           hoverColor="hover:bg-blue-100"
+                          title="Edit"
                         />
                         <TableActionButton
                           icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
                           onClick={() => onDelete(date.id)}
                           bgColor="bg-red-50 text-red-600"
                           hoverColor="hover:bg-red-100"
+                          title="Delete"
                         />
                         {/* <button
                           onClick={() => onEdit(date.id)}

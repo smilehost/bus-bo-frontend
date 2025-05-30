@@ -351,12 +351,14 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
             icon={<Lock className={`custom-size-tableAction-btn text-yellow-700`} />}
             bgColor="bg-yellow-100 text-yellow-400"
             hoverColor="hover:bg-yellow-100"
+            title="Change Password"
           />
           <TableActionButton
             onClick={() => handleEditMember(row.id)}
             icon={<Eye className={`custom-size-tableAction-btn text-green-700`} />}
             bgColor="bg-green-100 text-green-500"
             hoverColor="hover:bg-green-100"
+            title="View"
           />
         </div>
       ),

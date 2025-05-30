@@ -17,7 +17,7 @@ const ReportTable = () => {
         <table className="min-w-full divide-y divide-gray-200 ">
           <thead className="bg-gray-50 ">
             <tr>
-              {['Date', 'Passengers', 'Revenue', 'Avg. Ticket Price', 'Routes'].map((header) => (
+              {['ticket Number', 'Passengers', 'Ticket Price', 'Routes'].map((header) => (
                 <th
                   key={header}
                   scope="col"
@@ -32,13 +32,10 @@ const ReportTable = () => {
             {dailyData.map((day, index) => (
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 ">
-                  {new Date(day.date).toLocaleDateString()}
+                  {day.tickets}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                   {day.passengers}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
-                  ${day.revenue.toLocaleString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                   ${(day.revenue / day.passengers).toFixed(2)}

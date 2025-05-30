@@ -1,215 +1,176 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-
-import { FilterIcon, UsersIcon, CreditCardIcon, TruckIcon } from "lucide-react";
-import { JSX } from "@emotion/react/jsx-runtime";
+import React, { useEffect, useState, useRef } from "react";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import SkeletonDashboard from "@/app/components/Skeleton/SkeletonDashboard";
+import { useTransactionStore } from "@/stores/transaction";
+import DashboardHeader from "@/app/components/dash/DashboardHeader";
+import DashboardFilters from "@/app/components/dash/DashboardFilters";
+import DashboardStats from "@/app/components/dash/DashboardStats";
+import DashboardCharts from "@/app/components/dash/DashboardCharts";
 
-const transactionData = [
-  { name: "Cash", value: 4000, color: "#10B981" },
-  { name: "QR Code", value: 3000, color: "#6366F1" },
-];
-
-const routeData = [
-  { name: "Route A", passengers: 120, amount: 3600 },
-  { name: "Route B", passengers: 85, amount: 2550 },
-  { name: "Route C", passengers: 150, amount: 4500 },
-  { name: "Route D", passengers: 65, amount: 1950 },
-];
+interface RouteData {
+  lat: number;
+  lng: number;
+  name: number;
+  amount: number;
+  payment: number;
+  Date: string;
+}
 
 export default function DashboardPage() {
-  const [selectedCompany, setSelectedCompany] = useState("all");
-  const [selectedProvince, setSelectedProvince] = useState("all");
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+  });
+
+  const getTransactionMap = useTransactionStore((state) => state.getTransactionMap);
+  const [routeData, setRouteData] = useState<RouteData[]>([]);
+  const [selectDate, setSelectDate] = useState("all");
+  const [customDate, setCustomDate] = useState(""); // <-- เพิ่มแยก
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerClusterRef = useRef<MarkerClusterer | null>(null);
+
+  const totalAmount = routeData.reduce((sum, route) => sum + route.amount, 0);
+  const totalPassengers = routeData.length;
+
+  const center = routeData.length
+    ? {
+        lat: routeData.reduce((sum, { lat }) => sum + lat, 0) / routeData.length,
+        lng: routeData.reduce((sum, { lng }) => sum + lng, 0) / routeData.length,
+      }
+    : { lat: 16.44, lng: 102.83 };
+
+  const containerStyle = {
+    width: "100%",
+    height: "600px",
+  };
+
+  // ฟังก์ชันวาง Marker ใหม่ทุกครั้งที่ข้อมูลเปลี่ยน
+  const loadMarkers = (map: google.maps.Map, data: RouteData[]) => {
+    // ล้าง marker เดิม
+    if (markerClusterRef.current) {
+      markerClusterRef.current.clearMarkers();
+    }
+
+    const markers = data.map((route) => {
+      return new google.maps.Marker({
+        position: { lat: route.lat, lng: route.lng },
+      });
+    });
+
+    const clusterer = new MarkerClusterer({ markers, map });
+    markerClusterRef.current = clusterer;
+  };
+
+  const onLoad = (map: google.maps.Map) => {
+    mapRef.current = map;
+    if (routeData.length > 0) {
+      loadMarkers(map, routeData);
+    }
+  };
+
+  // เมื่อข้อมูลเปลี่ยน ให้ update marker บนแผนที่
   useEffect(() => {
-    // Simulate fetching data (fake delay)
+    if (mapRef.current && isLoaded && routeData.length > 0) {
+      loadMarkers(mapRef.current, routeData);
+    }
+  }, [routeData, isLoaded]);
+
+  // โหลดข้อมูลเมื่อเลือกวันที่
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getTransactionMap();
+      if (!data) return;
+
+      const now = new Date();
+
+      const filtered = data.filter((tx) => {
+        const txDate = new Date(tx.transaction_date_time);
+
+        if (selectDate === "day") {
+          return (
+            txDate.getFullYear() === now.getFullYear() &&
+            txDate.getMonth() === now.getMonth() &&
+            txDate.getDate() === now.getDate()
+          );
+        } else if (selectDate === "month") {
+          return (
+            txDate.getFullYear() === now.getFullYear() &&
+            txDate.getMonth() === now.getMonth()
+          );
+        } else if (selectDate === "year") {
+          return txDate.getFullYear() === now.getFullYear();
+        } else if (/\d{4}-\d{2}-\d{2}/.test(selectDate)) {
+          const customDate = new Date(selectDate);
+          return (
+            txDate.getFullYear() === customDate.getFullYear() &&
+            txDate.getMonth() === customDate.getMonth() &&
+            txDate.getDate() === customDate.getDate()
+          );
+        }
+
+        return true;
+      });
+
+      const mapped = filtered.map((tx) => ({
+        lat: parseFloat(tx.transaction_lat),
+        lng: parseFloat(tx.transaction_long),
+        name: tx.transaction_route_id,
+        amount: parseFloat(tx.transaction_amount),
+        payment: tx.transaction_payment_method_id,
+        Date: tx.transaction_date_time,
+      }));
+
+      setRouteData(mapped);
+    };
+
+    fetchData();
+  }, [selectDate, getTransactionMap]);
+
+  useEffect(() => {
     const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  const totalPassengers = routeData.reduce(
-    (sum, route) => sum + route.passengers,
-    0
-  );
-  const totalAmount = routeData.reduce((sum, route) => sum + route.amount, 0);
 
   return (
     <>
       {isLoadingskeleton ? (
         <SkeletonDashboard />
       ) : (
-        <div className="">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 ">Dashboard</h1>
-            <p className="text-gray-600 ">
-              Today&apos;s overview of transactions and statistics
-            </p>
-          </div>
-
-          {/* Filters */}
-          <div className="bg-white  rounded-lg shadow-sm p-4 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
-              <div className="flex items-center text-gray-500 0">
-                <FilterIcon size={18} className="mr-2" />
-                <span className="text-sm font-medium">Filters:</span>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <select
-                  value={selectedCompany}
-                  onChange={(e) => setSelectedCompany(e.target.value)}
-                  className="px-3 py-2 bg-gray-50  border border-gray-300  rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="all">All Companies</option>
-                  <option value="company1">Northern Bus Co.</option>
-                  <option value="company2">Southern Express</option>
-                  <option value="company3">Eastern Transport</option>
-                </select>
-                <select
-                  value={selectedProvince}
-                  onChange={(e) => setSelectedProvince(e.target.value)}
-                  className="px-3 py-2 bg-gray-50  border border-gray-300  rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="all">All Provinces</option>
-                  <option value="province1">North Province</option>
-                  <option value="province2">South Province</option>
-                  <option value="province3">East Province</option>
-                  <option value="province4">West Province</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <StatsCard
-              title="Total Passengers"
-              value={totalPassengers}
-              icon={<UsersIcon size={24} className="text-green-600 " />}
-              change="+8.1% from yesterday"
-              iconBg="bg-green-100 "
-            />
-            <StatsCard
-              title="Total Revenue"
-              value={`$${totalAmount.toLocaleString()}`}
-              icon={<CreditCardIcon size={24} className="text-blue-600 " />}
-              change="+12.3% from yesterday"
-              iconBg="bg-blue-100 "
-            />
-            <StatsCard
-              title="Active Routes"
-              value={routeData.length}
-              icon={<TruckIcon size={24} className="text-purple-600 " />}
-              change="Today"
-              iconBg="bg-purple-100 "
-            />
-          </div>
-
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white  rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium text-gray-900  mb-4">
-                Transactions by Payment Method
-              </h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={transactionData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {transactionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="bg-white  rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium text-gray-900  mb-4">
-                Revenue by Route
-              </h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={routeData}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="amount" name="Amount ($)" fill="#F59E0B" />
-                    <Bar
-                      dataKey="passengers"
-                      name="Passengers"
-                      fill="#3B82F6"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+        <div>
+          <DashboardHeader />
+          <DashboardFilters
+            selectDate={selectDate}
+            setDate={setSelectDate}
+            customDate={customDate}
+            setCustomDate={setCustomDate}
+          />
+          <DashboardStats
+            totalPassengers={totalPassengers}
+            totalAmount={totalAmount}
+            totalRoutes={routeData.length}
+          />
+          <DashboardCharts routeData={routeData} />
+          <div className="flex gap-4 h-[600px]">
+            <div className="flex-1 rounded overflow-hidden">
+              {isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={containerStyle}
+                  center={center}
+                  zoom={10}
+                  onLoad={onLoad}
+                />
+              ) : (
+                <div>Loading map...</div>
+              )}
             </div>
           </div>
         </div>
       )}
     </>
-  );
-}
-function StatsCard({
-  title,
-  value,
-  icon,
-  change,
-  iconBg,
-}: {
-  title: string;
-  value: string | number;
-  icon: JSX.Element;
-  change: string;
-  iconBg: string;
-}) {
-  return (
-    <div className="bg-white  rounded-lg shadow-sm p-6">
-      <div className="flex items-center">
-        <div
-          className={`flex items-center justify-center h-12 w-12 rounded-md ${iconBg}`}
-        >
-          {icon}
-        </div>
-        <div className="ml-5">
-          <h2 className="text-sm font-medium text-gray-500 ">{title}</h2>
-          <div className="mt-1 flex items-baseline">
-            <p className="text-2xl font-semibold text-gray-900 ">{value}</p>
-            <p className="ml-2 text-sm text-green-600 ">{change}</p>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }

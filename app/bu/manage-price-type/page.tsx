@@ -353,12 +353,14 @@ function Page() {
             onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title='Edit'
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title='Delete'
           />
         </div>
       ),
@@ -396,12 +398,14 @@ function Page() {
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title='Edit'
           />
           <TableActionButton
             onClick={() => handleDeleteTicketDiscount({ name: row.ticket_discount_name, id: row.ticket_discount_id })}
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title='Delete'
           />
         </div>
       ),

@@ -234,12 +234,14 @@ function Page() {
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title="Edit"
           />
           <TableActionButton
             onClick={() => handleDeleteTime(row.id)}
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title="Delete"
           />
         </div>
       ),

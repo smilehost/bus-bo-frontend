@@ -2,16 +2,16 @@
 
 import { FilterIcon } from "lucide-react";
 
-export default function ReportFilters({
-  dateRange,
-  setDateRange,
-  customReDate,
-  setCustomReDate,
+export default function DashboardFilters({
+  selectDate,
+  setDate,
+  customDate,
+  setCustomDate,
 }: {
-  dateRange: string;
-  setDateRange: (date: string) => void;
-  customReDate: string;
-  setCustomReDate: (date: string) => void;
+  selectDate: string;
+  setDate: (date: string) => void;
+  customDate: string;
+  setCustomDate: (date: string) => void;
 }) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -25,8 +25,8 @@ export default function ReportFilters({
           {/* Select Date Type */}
           <select
             value={
-              ["all", "day", "month", "year"].includes(dateRange)
-                ? dateRange
+              ["all", "day", "month", "year"].includes(selectDate)
+                ? selectDate
                 : "custom"
             }
             onChange={(e) => {
@@ -35,8 +35,8 @@ export default function ReportFilters({
                 // กด custom จาก select => ไม่เปลี่ยนค่าทันที
                 return;
               }
-              setDateRange(val);
-              setCustomReDate(""); // reset custom date
+              setDate(val);
+              setCustomDate(""); // reset custom date
             }}
             className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
@@ -50,11 +50,11 @@ export default function ReportFilters({
           {/* Custom Date Picker */}
           <input
             type="date"
-            value={customReDate}
+            value={customDate}
             onChange={(e) => {
               const val = e.target.value;
-              setCustomReDate(val);
-              setDateRange(val); // ใช้เป็น selectDate เช่นกัน
+              setCustomDate(val);
+              setDate(val); // ใช้เป็น selectDate เช่นกัน
             }}
             className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm"
           />
