@@ -1,15 +1,17 @@
+"use client";
+
 import { FilterIcon } from "lucide-react";
 
 export default function DashboardFilters({
-  selectedCompany,
-  selectedProvince,
-  setSelectedCompany,
-  setSelectedProvince,
+  selectDate,
+  setDate,
+  customDate,
+  setCustomDate,
 }: {
-  selectedCompany: string;
-  selectedProvince: string;
-  setSelectedCompany: (val: string) => void;
-  setSelectedProvince: (val: string) => void;
+  selectDate: string;
+  setDate: (date: string) => void;
+  customDate: string;
+  setCustomDate: (date: string) => void;
 }) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -18,28 +20,44 @@ export default function DashboardFilters({
           <FilterIcon size={18} className="mr-2" />
           <span className="text-sm font-medium">Filters:</span>
         </div>
-        <div className="flex flex-wrap gap-3">
+
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Select Date Type */}
           <select
-            value={selectedCompany}
-            onChange={(e) => setSelectedCompany(e.target.value)}
+            value={
+              ["all", "day", "month", "year"].includes(selectDate)
+                ? selectDate
+                : "custom"
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "custom") {
+                // กด custom จาก select => ไม่เปลี่ยนค่าทันที
+                return;
+              }
+              setDate(val);
+              setCustomDate(""); // reset custom date
+            }}
             className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
-            <option value="all">All Companies</option>
-            <option value="company1">Northern Bus Co.</option>
-            <option value="company2">Southern Express</option>
-            <option value="company3">Eastern Transport</option>
+            <option value="all">All</option>
+            <option value="day">Today</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom Date</option>
           </select>
-          <select
-            value={selectedProvince}
-            onChange={(e) => setSelectedProvince(e.target.value)}
-            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-          >
-            <option value="all">All Provinces</option>
-            <option value="province1">North Province</option>
-            <option value="province2">South Province</option>
-            <option value="province3">East Province</option>
-            <option value="province4">West Province</option>
-          </select>
+
+          {/* Custom Date Picker */}
+          <input
+            type="date"
+            value={customDate}
+            onChange={(e) => {
+              const val = e.target.value;
+              setCustomDate(val);
+              setDate(val); // ใช้เป็น selectDate เช่นกัน
+            }}
+            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm"
+          />
         </div>
       </div>
     </div>

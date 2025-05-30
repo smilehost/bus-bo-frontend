@@ -7,6 +7,7 @@ interface TransactionMap {
   transaction_route_id: number;
   transaction_amount: string;
   transaction_payment_method_id: number;
+  transaction_date_time: string;
 }
 
 interface TransactionStore {
@@ -15,6 +16,7 @@ interface TransactionStore {
   transaction_route_id: number;
   transaction_amount: string;
   transaction_payment_method_id: number;
+  transaction_date_time: string;
 
   getTransactionMap: () => Promise<TransactionMap[] | undefined>;
 }
@@ -25,6 +27,7 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
   transaction_route_id: 0,
   transaction_amount: "",
   transaction_payment_method_id: 0,
+  transaction_date_time: "",
 
   getTransactionMap: async () => {
     try {
@@ -39,6 +42,7 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
           transaction_route_id: first.transaction_route_id,
           transaction_amount: first.transaction_amount,
           transaction_payment_method_id: first.transaction_payment_method_id,
+          transaction_date_time: first.transaction_date_time,
         });
       }
       console.log("res.result", res.result);

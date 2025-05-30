@@ -19,7 +19,7 @@ function MenuItemLink({ text, icon: Icon, link }: MenuItemProps) {
     <Link
       href={`/bu/${link}`}
       className={`flex items-center px-4 py-3 rounded-md text-[14px] font-medium transition-all ${
-        isActive ? 'custom-bg-main text-white' : 'text-gray-700 hover:bg-gray-100'
+        isActive ? 'custom-bg-main text-white' : 'text-gray-600 hover:bg-gray-100'
       }`}
     >
       <Icon size={20} />

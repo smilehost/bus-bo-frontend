@@ -9,9 +9,12 @@ import React, { useState } from 'react'
 
 
 const ReportsPage = () => {
-  const [dateRange, setDateRange] = useState({ start: '2023-05-10', end: '2023-05-16' })
+  const [dateRange, setDateRange] = useState("all");
+  const [customReDate, setCustomReDate] = useState(""); // <-- เพิ่มแยก
+
   const [groupBy, setGroupBy] = useState('day')
   const [reportType, setReportType] = useState<'overview' | 'company' | 'route' | 'payment'>('overview')
+
 
   return (
     <div className="">
@@ -19,13 +22,11 @@ const ReportsPage = () => {
       <ReportFilters
         dateRange={dateRange}
         setDateRange={setDateRange}
-        groupBy={groupBy}
-        setGroupBy={setGroupBy}
-        reportType={reportType}
-        setReportType={(value: string) => setReportType(value as "overview" | "company" | "route" | "payment")}
+        customReDate={customReDate}
+        setCustomReDate={setCustomReDate}
       />
-      <ReportStats reportType={reportType} />
-      <ReportChart reportType={reportType} />
+      {/* <ReportStats reportType={reportType} />
+      <ReportChart reportType={reportType} /> */}
       <ReportTable />
     </div>
   )

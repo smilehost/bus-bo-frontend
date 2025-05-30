@@ -15,49 +15,56 @@ import {
 } from 'recharts'
 
 export const dailyData = [
-    {
-      date: '2023-05-10',
-      passengers: 320,
-      revenue: 9600,
-      routes: 4,
-    },
-    {
-      date: '2023-05-11',
-      passengers: 350,
-      revenue: 10500,
-      routes: 4,
-    },
-    {
-      date: '2023-05-12',
-      passengers: 380,
-      revenue: 11400,
-      routes: 4,
-    },
-    {
-      date: '2023-05-13',
-      passengers: 450,
-      revenue: 13500,
-      routes: 5,
-    },
-    {
-      date: '2023-05-14',
-      passengers: 480,
-      revenue: 14400,
-      routes: 5,
-    },
-    {
-      date: '2023-05-15',
-      passengers: 410,
-      revenue: 12300,
-      routes: 4,
-    },
-    {
-      date: '2023-05-16',
-      passengers: 390,
-      revenue: 11700,
-      routes: 4,
-    },
-  ]
+  {
+    date: '2023-05-10',
+    passengers: 320,
+    revenue: 9600,
+    routes: 4,
+    tickets: 400,
+  },
+  {
+    date: '2023-05-11',
+    passengers: 350,
+    revenue: 10500,
+    routes: 4,
+    tickets: 450,
+  },
+  {
+    date: '2023-05-12',
+    passengers: 380,
+    revenue: 11400,
+    routes: 4,
+    tickets: 480,
+  },
+  {
+    date: '2023-05-13',
+    passengers: 450,
+    revenue: 13500,
+    routes: 5,
+    tickets: 560,
+  },
+  {
+    date: '2023-05-14',
+    passengers: 480,
+    revenue: 14400,
+    routes: 5,
+    tickets: 600,
+  },
+  {
+    date: '2023-05-15',
+    passengers: 410,
+    revenue: 12300,
+    routes: 4,
+    tickets: 510,
+  },
+  {
+    date: '2023-05-16',
+    passengers: 390,
+    revenue: 11700,
+    routes: 4,
+    tickets: 490,
+  },
+]
   const companyData = [
     {
       name: 'Northern Bus Co.',

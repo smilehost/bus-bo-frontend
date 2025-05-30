@@ -79,7 +79,8 @@ export type TicketProps = {
         route_name_th: string,
         route_name_en: string,
         route_status: number,
-    }
+    };
+    
     
 };
 

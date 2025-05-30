@@ -124,6 +124,7 @@ function Page() {
             item?.route?.route_name_th || "-",
             item?.route?.route_name_en || "-",
             Number(item?.route?.route_status),
+            
           );
         })
       );
@@ -245,6 +246,7 @@ function Page() {
     },
     { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
     { key: 'ticketType', label: 'Ticket Type', width: '20%', align: 'center' },
+    // { key: 'ticketPrice', label: 'Ticket Price', width: '20%', align: 'center' },
     {
       key: 'status', label: 'Status', width: '20%', align: 'center',
       render: (_, row) => (
