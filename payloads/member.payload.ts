@@ -1,9 +1,9 @@
 export interface FetchMemberQuery {
-  page: number;
-  size: number;
+  page?: number;
+  size?: number;
   search?: string;
   status?: string;
-  companyId?: string;
+  com_id?: number;
 }
 
 export interface CreateMemberPayload {

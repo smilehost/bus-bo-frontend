@@ -8,6 +8,13 @@ import {
 export const MemberService = {
   async fetchMembers(query: FetchMemberQuery) {
     return await api.get({
+      path: "/accounts",
+      query: query as unknown as Record<string, string | number>,
+    });
+  },
+
+  async fetchMemberByComId(query: FetchMemberQuery) {
+    return await api.get({
       path: "/accounts/all",
       query: query as unknown as Record<string, string | number>,
     });

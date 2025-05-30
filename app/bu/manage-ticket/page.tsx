@@ -222,7 +222,7 @@ function Page() {
             />
           </div>
           <Tooltip title={row.ticketNameTH} arrow>
-            <div className='flex flex-col gap-1 cursor-default'>
+            <div className='flex flex-col gap-1 cursor-default custom-ellipsis-style'>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
               <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
             </div>
@@ -235,9 +235,9 @@ function Page() {
       render: (_, row) => {
         const isActive = row.route_status === 1 ? true : false
         return (
-          <Tooltip title={isActive ? "": "This route status is inactive"} arrow>
-            <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default w-fit`}>
-              <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeNameTH}</p>
+          <Tooltip title={isActive ? row.routeNameTH: "This route status is inactive"} arrow>
+            <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default custom-ellipsis-style w-fit`}>
+              <p className='whitespace-nowrap custom-ellipsis-style'>{row.routeNameTH}</p>
               <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500": "text-gray-500"}`}>{row.routeNameEN}</p>
             </div>
           </Tooltip>
@@ -259,18 +259,6 @@ function Page() {
       key: 'id', label: 'Action', width: '25%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
-          {/* <TableActionButton
-            iconSrc="/icons/money.svg"
-            href={`${pathname}/${row?.id}`}
-            bgColor="bg-green-100"
-            hoverColor="hover:bg-green-200"
-          />
-          <TableActionButton
-            iconSrc="/icons/garbage.svg"
-            onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
-            bgColor="bg-red-50"
-            hoverColor="hover:bg-red-100"
-          /> */}
           <TableActionButton
             icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
             href={`${pathname}/edit?id=${row?.id}&name=${row?.ticketNameTH}`}

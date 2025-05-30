@@ -262,7 +262,7 @@ function Page() {
             />
           </div>
           <Tooltip title={row.routeTH} arrow>
-            <div className='flex flex-col gap-1 cursor-default'>
+            <div className='flex flex-col gap-1 cursor-default custom-ellipsis-style '>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.routeTH}</p>
               <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.route}</p>
             </div>
@@ -353,25 +353,7 @@ function Page() {
       label: 'Action',
       width: '25%',
       render: (_, row) => (
-        <div className='flex gap-2 min-w-max'>
-          {/* <TableActionButton
-            iconSrc="/icons/money.svg"
-            href={`${pathname}/routeTicket/${row?.id}`}
-            bgColor="bg-green-100"
-            hoverColor="hover:bg-green-200"
-          />
-          <TableActionButton
-            iconSrc="/icons/edit.svg"
-            href={`${pathname}/edit/${row?.id}`}
-            bgColor="bg-blue-50"
-            hoverColor="hover:bg-blue-100"
-          />
-          <TableActionButton
-            iconSrc="/icons/garbage.svg"
-            onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
-            bgColor="bg-red-50"
-            hoverColor="hover:bg-red-100"
-          /> */}
+        <div className='flex gap-2 min-w-max '>
           <TableActionButton
             icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
             href={`${pathname}/routeTicket?id=${row?.id}&name=${row?.routeTH}`}

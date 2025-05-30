@@ -27,6 +27,10 @@ import { Confirm } from '../../Dialog/Confirm';
 type FormRouteProps = {
   routeNameTH?: string | undefined;
   setRouteNameTH: React.Dispatch<React.SetStateAction<string>>;
+  headerUrl?: string | undefined;
+  setHeaderUrl: React.Dispatch<React.SetStateAction<string>>;
+  footerUrl?: string | undefined;
+  setFooterUrl: React.Dispatch<React.SetStateAction<string>>;
   routeName?: string | undefined;
   setRouteName: React.Dispatch<React.SetStateAction<string>>;
   routeColor: string;
@@ -59,6 +63,10 @@ function FormRoute({
   handleSubmit,
   setRouteNameTH,
   routeNameTH,
+  headerUrl,
+  setHeaderUrl,
+  footerUrl,
+  setFooterUrl,
   disable = false
 }: FormRouteProps) {
   const router = useRouter();
@@ -153,14 +161,33 @@ function FormRoute({
             data={dates}
             onAddClick={() => RedirecTo({ path: 'manage-dates' })}
           />
-
         </div>
+
         <div className='flex justify-between flex-wrap gap-3'>
           {/* color */}
           <ColorRoute color={routeColor} setRouteColor={setRouteColor} label={"Route Color"} size_circle='w-[38px] h-[38px]' size_input='w-full' size='min-w-[300px] xl:w-[400px] max-w-[400px]' />
         </div>
+        <hr className='custom-border-gray my-5'/>
+        <div className='flex justify-between flex-wrap gap-3'>
+          <InputLabel
+            label="URL for slip details at the header"
+            placeholder="Enter URL for slip details at the header"
+            type="text"
+            setValue={setHeaderUrl}
+            value={headerUrl}
+            size='min-w-[300px] xl:w-[400px] max-w-[400px]'
+          />
+          <InputLabel
+            label="URL for slip details at the footer"
+            placeholder="Enter URL for slip details at the footer"
+            type="text"
+            setValue={setFooterUrl}
+            value={footerUrl}
+            size={'min-w-[300px] xl:w-[400px] max-w-[400px]'}
+          />
+        </div>
       </div>
-      <div className='flex flex-col justify-center items-center mt-8'>
+      <div className='flex flex-col justify-center items-center mt-10'>
         <p className='text-[16px] font-bold'>Stations</p>
         <p className='text-[12px] text-[#6B7280]'>Add stations in order from start to end</p>
       </div>

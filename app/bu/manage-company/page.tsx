@@ -22,7 +22,7 @@ import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
 import EnterPassModal from "@/app/components/Model/EnterPassModal";
 import { CompanyItem } from "@/types/company";
-import { KeyRound, Pencil, Smartphone, SquarePen, Users } from "lucide-react";
+import { KeyRound, Smartphone, SquarePen, Users } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;
@@ -366,6 +366,7 @@ export default function ManageCompaniesPage() {
               data={paginatedCompaniesWithNo}
               currentPage={currentPage}
               rowsPerPage={rowsPerPage}
+              totalPages={Math.ceil(filtered.length / rowsPerPage)}
               totalResults={filtered.length}
               onPageChange={setCurrentPage}
               onRowsPerPageChange={handleRowsPerPageChange}

@@ -274,17 +274,17 @@ export default function DateManagerClient() {
           editingDate={
             editingDate
               ? {
-                  ...editingDate,
-                  days: {
-                    monday: editingDate.days.mon,
-                    tuesday: editingDate.days.tue,
-                    wednesday: editingDate.days.wed,
-                    thursday: editingDate.days.thu,
-                    friday: editingDate.days.fri,
-                    saturday: editingDate.days.sat,
-                    sunday: editingDate.days.sun,
-                  },
-                }
+                ...editingDate,
+                days: {
+                  monday: editingDate.days.mon,
+                  tuesday: editingDate.days.tue,
+                  wednesday: editingDate.days.wed,
+                  thursday: editingDate.days.thu,
+                  friday: editingDate.days.fri,
+                  saturday: editingDate.days.sat,
+                  sunday: editingDate.days.sun,
+                },
+              }
               : undefined
           }
         />

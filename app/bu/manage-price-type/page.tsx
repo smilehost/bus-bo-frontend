@@ -28,7 +28,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm'
 
 import TicketDiscountModel from '@/app/components/Model/TicketDiscountModel'
 import { RouteTicketDiscount } from '@/payloads/route.ticket.discount.payload'
-import { Pencil, SquarePen, Trash2 } from 'lucide-react'
+import { SquarePen, Trash2 } from 'lucide-react'
 
 
 
@@ -44,7 +44,7 @@ export interface DiscountPriceTableData {
   ticket_discount_id: number,
   ticket_discount_name: string,
   ticket_discount_type: number,
-  ticket_discount_value: string,
+  ticket_discount_value: number,
   ticket_discount_status: number,
   ticket_discount_comId: number
 }
@@ -52,7 +52,7 @@ export interface DiscountPriceTableData {
 export interface InsertDiscount {
   name: string,
   type: number,
-  value: string
+  value: number
 }
 function Page() {
 
@@ -240,13 +240,11 @@ function Page() {
       } else {
         await addTicketDiscount(tempData);
         toast.success("Created!")
-
       }
       fetchTicketDiscount();
     } catch (error) {
-      console.error("Save Discount error:", error);
       toast.error("Save Discount error:");
-
+      console.error("Save Discount error:", error);
     }
   }
 

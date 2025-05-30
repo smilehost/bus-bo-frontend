@@ -1,7 +1,11 @@
+"use client"
+
 import React from 'react'
 
 import MemberPageComponent from '@/app/components/MembersPage/MemberPageComponent'
-function page() {
+
+function Page() {
+
   return (
     <div>
       <MemberPageComponent />
@@ -9,4 +13,4 @@ function page() {
   )
 }
 
-export default page
+export default Page

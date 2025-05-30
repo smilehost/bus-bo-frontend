@@ -61,14 +61,14 @@ function TableTemplate<T>({
     rowsPerPage,
     onPageChange,
     onRowsPerPageChange,
-    height="min-h-[700px]"
+    height = "min-h-[600px]"
 }: TableTemplateProps<T>) {
     return (
         <div className=" rounded-md mt-5 flex flex-col items-center ">
             <TableContainer sx={{
                 boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
                 borderRadius: "10px"
-                }} component={Paper} className={`${height} overflow-y-hidden`}>
+            }} component={Paper} className={`${height} overflow-y-hidden`}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -76,9 +76,10 @@ function TableTemplate<T>({
                                 <StyledTableCell
                                     key={index}
                                     align={col.align || 'left'}
-                                    sx={{ width: col.width,
+                                    sx={{
+                                        width: col.width,
                                         fontSize: '16px !important'
-                                     }}
+                                    }}
                                 >
                                     {col.label}
                                 </StyledTableCell>
@@ -96,10 +97,18 @@ function TableTemplate<T>({
                                     animationDuration: '600ms',
                                     animationFillMode: 'both',
                                 }}
+
                             >
                                 {columns.map((col, colIndex) => (
                                     <StyledTableCell key={colIndex} align={col.align || 'left'}
-                                    sx={{ fontSize: '16px !important' }}
+                                        sx={{
+                                            fontSize: '16px !important',
+                                            whiteSpace: 'nowrap',
+                                            textOverflow: 'ellipsis',
+                                            overflow: 'hidden',
+                                            maxWidth: '270px',
+                                        }}
+
                                     >
                                         {col.render
                                             ? col.render(row[col.key], row)

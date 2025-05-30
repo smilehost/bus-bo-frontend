@@ -9,6 +9,7 @@ import ButtonDefault from "../Form/ButtonDefault";
 import SelectInputUnified from "../Form/SelectInputUnified";
 import { DISCOUNT_TYPE } from "@/constants/enum";
 import TextError from "../TextError";
+import { toast } from "react-toastify";
 
 interface TicketDiscountProps {
     open: boolean;
@@ -16,15 +17,14 @@ interface TicketDiscountProps {
     onSave: (data: {
         name: string;
         type: number;
-        value: string;
+        value: number;
     }) => void;
     editingDiscount?: {
         name: string;
         type: number;
-        value: string;
+        value: number;
     } | null;
 }
-
 function TicketDiscountModel({
     open,
     onClose,
@@ -36,7 +36,7 @@ function TicketDiscountModel({
     const [valueData, setValueData] = useState({
         name: "",
         type: 0,
-        value: "",
+        value: 0,
     });
 
     useEffect(() => {
@@ -50,7 +50,7 @@ function TicketDiscountModel({
             setValueData({
                 name: "",
                 type: 0,
-                value: "",
+                value: 0,
             });
         }
     }, [editingDiscount, open]);
@@ -60,7 +60,7 @@ function TicketDiscountModel({
             !valueData.name ||
             !valueData.value
         ) {
-            setTimeout(() => alert("Please fill in all fields correctly."), 100);
+            setTimeout(() => toast.error("Please fill in all fields correctly."), 100);
             return;
         }
         onSave({
@@ -97,7 +97,7 @@ function TicketDiscountModel({
                             value={valueData.type.toString()}
                             tailwind="w-full"
                             onChange={(e) => {
-                                setValueData({ ...valueData, type: Number(e.target.value), value: "0" })
+                                setValueData({ ...valueData, type: Number(e.target.value), value: 0 })
                             }}
                             data={[
                                 {
@@ -114,7 +114,7 @@ function TicketDiscountModel({
                             label="Value"
                             placeholder="Enter ticket amount"
                             type="number"
-                            value={valueData.value}
+                            value={valueData.value.toString()}
                             setValue={(e) => {
                                 const newValue = Number(e);
                                 if (valueData.type === 1) {
@@ -122,7 +122,7 @@ function TicketDiscountModel({
                                         return;
                                     }
                                 }
-                                setValueData({ ...valueData, value: newValue.toString() });
+                                setValueData({ ...valueData, value: newValue });
                             }}
                         />
                        {valueData.type === 1 && (

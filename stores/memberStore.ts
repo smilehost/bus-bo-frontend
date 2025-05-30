@@ -20,12 +20,17 @@ interface MemberStore {
     companyId?: string
   ) => Promise<void>;
 
+  getMemberByComId: (
+    com_id?: number
+  ) => Promise<void>;
+
   createMember: (member: CreateMemberPayload) => Promise<void>;
   updateMember: (id: string, member: Partial<MemberItem>) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
   getMemberById: (id: string) => Promise<MemberItem | undefined>;
   changePassword: (userId: string, newPassword: string) => Promise<void>;
   changeStatus: (userId: string, newStatus: number) => Promise<void>; // ✅ เพิ่มเมธอด
+  clearMember: () => void;
 }
 
 export const useMemberStore = create<MemberStore>((set) => ({
@@ -33,19 +38,45 @@ export const useMemberStore = create<MemberStore>((set) => ({
   total: 0,
   isLoading: false,
 
-  getMembers: async (page, size, search, status, companyId) => {
+  getMembers: async (page, size, search, status) => {
     set({ isLoading: true });
     try {
       const query: FetchMemberQuery = {
         page,
         size,
-        search: search || "",
-        status: status || "",
-        companyId: companyId || "",
+        search: search,
+        status: status,
       };
       const res = await MemberService.fetchMembers(query);
-      const rawData = (res as { result: any[] }).result || [];
-      const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData.length;
+      const rawData = (res as { result: { data: any[] } })?.result?.data || [];
+      const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData?.length;
+
+      const mapped: MemberItem[] = rawData.map((item: any) => ({
+        id: item.account_id.toString(),
+        username: item.account_username,
+        name: item.account_name,
+        role: item.account_role,
+        status: item.account_status,
+        companyId: item.account_com_id,
+      }));
+
+      set({ members: mapped, total: totalCount });
+    } catch (error) {
+      console.error("getMembers error:", error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  getMemberByComId: async (com_id) => {
+    set({ isLoading: true });
+    try {
+      const query: FetchMemberQuery = {
+        com_id
+      };
+      const res = await MemberService.fetchMemberByComId(query);
+      const rawData = (res as { result: any[] })?.result || [];
+      const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData?.length;
 
       const mapped: MemberItem[] = rawData.map((item: any) => ({
         id: item.account_id.toString(),
@@ -114,5 +145,12 @@ export const useMemberStore = create<MemberStore>((set) => ({
       console.error("Change status error:", error);
       throw error;
     }
+  },
+
+  clearMember: () => {
+    set({
+      members: [],
+      total: 0,
+    });
   },
 }));
