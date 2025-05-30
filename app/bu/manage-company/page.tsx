@@ -22,7 +22,7 @@ import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
 import EnterPassModal from "@/app/components/Model/EnterPassModal";
 import { CompanyItem } from "@/types/company";
-import { KeyRound, Smartphone, SquarePen, Users } from "lucide-react";
+import { KeyRound, Pencil, Smartphone, SquarePen, Users } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;
@@ -302,32 +302,33 @@ export default function ManageCompaniesPage() {
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title="Edit"
           />
           <TableActionButton
             href={`${pathName}/manage-device?comId=${row.id}`}
             icon={<Smartphone className={`custom-size-tableAction-btn text-orange-400`} />}
             bgColor="bg-orange-100 text-orange-400"
             hoverColor="hover:bg-orange-100"
+            title="Device"
           />
           <TableActionButton
             href={`${pathName}/manage-admin?comId=${row.id}`}
             icon={<Users className={`custom-size-tableAction-btn text-blue-600`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title="Add User"
           />
-          <TableActionButton
-            icon={<KeyRound className={`custom-size-tableAction-btn text-green-700`} />}
-            bgColor="bg-green-100 text-green-600"
-            hoverColor="hover:bg-green-100"
-          />
+         
           <TableActionButton
           onClick={() => {
             setSelectedCompanyId(Number(row.id));
             setShowPassModal(true);
           }}
-            icon={<Pencil className={`custom-size-tableAction-btn text-gray-700`} />}
+            icon={<KeyRound className={`custom-size-tableAction-btn text-gray-700`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title="Login as Company"
+
           />
         </div>
       ),

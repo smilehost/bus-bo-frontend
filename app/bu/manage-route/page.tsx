@@ -359,18 +359,21 @@ function Page() {
             href={`${pathname}/routeTicket?id=${row?.id}&name=${row?.routeTH}`}
             bgColor="text-green-600 bg-green-100"
             hoverColor="hover:bg-green-200"
+            title="Add Bus Ticket"
           />
           <TableActionButton
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             href={`${pathname}/edit?id=${row?.id}&name=${row?.routeTH}`}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title="Edit"
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title="Delete"
           />
         </div>
       ),

@@ -229,18 +229,21 @@ function Page() {
             icon={<MapPin className={`custom-size-tableAction-btn text-purple-600`} />}
             bgColor="bg-purple-100"
             hoverColor="hover:bg-purple-200"
+            title="Open in Google Maps"
           />
           <TableActionButton
             onClick={() => handleEditLocation(row.id)}
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
            bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title="Edit"
           />
           <TableActionButton
             onClick={() => handleDeleteLocation(row.id)}
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title="Delete"
           />
         </div>
       ),
