@@ -123,12 +123,11 @@ export default function RootLayout({
 
     useEffect(() => {
         if (account_role === 2) {
-            // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
         } else if (account_role === 1) {
-            // setRoleMenu([1, 10, 8]);
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
+            setRoleMenu([1, 10, 8]);
         }
+        // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
     }, [account_role]);
 
     const menu = allMenu.filter((item) => roleMenu?.includes(item.id));
@@ -217,7 +216,7 @@ export default function RootLayout({
                                             {userData?.name}
                                         </div>
                                         <div className="text-xs text-gray-500  capitalize">
-                                            {userData.account_role === 2 ? USER_TIER.SUPER_ADMIN : USER_TIER.ADMIN}
+                                            {userData.account_role === 1 ? USER_TIER.SUPER_ADMIN : USER_TIER.ADMIN}
                                         </div>
                                     </div>
                                 </div>
