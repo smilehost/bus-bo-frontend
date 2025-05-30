@@ -20,7 +20,7 @@ import TableActionButton from "@/app/components/Table/TableActionButton/TableAct
 import StatusText from "@/app/components/StatusText";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
 import { ToastContainer } from "react-toastify";
-import { Eye, Lock, Pencil } from "lucide-react";
+import { Eye, Lock } from "lucide-react";
 
 export interface MemberTableData {
   no: number;
@@ -38,7 +38,7 @@ export interface MemberPageComponentProps {
 
 export default function MemberPageComponent({ comId }: MemberPageComponentProps) {
 
-  const { members, getMembers, createMember, updateMember } = useMemberStore();
+  const { members, getMembers, createMember, updateMember, getMemberByComId, clearMember } = useMemberStore();
   const { companies, getCompanies } = useCompanyStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -66,15 +66,25 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     []
   );
 
+
   const fetchMembers = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingSkeleton);
-    await getMembers(1, 9999); // โหลดทั้งหมดครั้งเดียว
+    if (comId) {
+      await getMemberByComId(comId)
+    } else {
+      await getMembers(1, 50, "", ""); // โหลดทั้งหมดครั้งเดียว
+    }
     cancelSkeleton();
+
   };
 
   useEffect(() => {
     fetchMembers();
     getCompanies(1, 10);
+
+    return () => {
+      clearMember()
+    }
   }, []);
 
   useEffect(() => {

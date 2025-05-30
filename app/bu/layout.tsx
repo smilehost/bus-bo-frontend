@@ -51,7 +51,7 @@ export default function RootLayout({
             id: 1,
             icon: House,
             text: "Dashboard",
-            link: `dashboard`
+            link: `dashboard`,
         },
         {
             id: 2,
