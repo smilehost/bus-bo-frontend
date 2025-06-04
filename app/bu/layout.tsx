@@ -5,6 +5,7 @@ import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usePathname } from "next/navigation";
 
 //icon
 import {
@@ -25,24 +26,27 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import { Confirm } from "../components/Dialog/Confirm";
 
 //store
-import { useUserStore } from "@/stores/userStore";
+import { store } from "@/stores/store";
 
-//enum
-import { USER_TIER } from "@/constants/enum";
+//hooks
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [hasMounted, setHasMounted] = useState(false);
-  const { userData } = useUserStore();
+  const [roleMenu, setRoleMenu] = useState<number[]>([]);
+  const account_name = store.account_name.get();
+  const account_username = store.account_username.get();
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  const account_role = userData.account_role;
+  const account_role = Number(store.account_role.get());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const toggleGroup = (groupName: string) => {
@@ -65,24 +69,14 @@ export default function RootLayout({
       group: "SETUP ROUTE & TICKET",
       items: [
         { id: 3, icon: Route, text: "Manage Routes", link: "manage-route" },
-        {
-          id: 4,
-          icon: Ticket,
-          text: "Manage Bus Tickets",
-          link: "manage-ticket",
-        },
+        { id: 4, icon: Ticket, text: "Manage Bus Tickets", link: "manage-ticket" },
       ],
     },
     {
       group: "TEMPLATE",
       items: [
         { id: 5, icon: Map, text: "Manage Location", link: "manage-location" },
-        {
-          id: 11,
-          icon: DollarSign,
-          text: "Manage Promotion",
-          link: "manage-price-type",
-        },
+        { id: 11, icon: DollarSign, text: "Manage Promotion", link: "manage-price-type" },
         { id: 7, icon: Calendar, text: "Manage Date", link: "manage-dates" },
         { id: 6, icon: Clock, text: "Manage Times", link: "manage-times" },
       ],
@@ -91,30 +85,27 @@ export default function RootLayout({
       group: "USERS",
       items: [
         { id: 8, icon: Users, text: "Manage Employee", link: "manage-members" },
-        {
-          id: 10,
-          icon: Building,
-          text: "Manage Company",
-          link: "manage-company",
-        },
+        { id: 10, icon: Building, text: "Manage Company", link: "manage-company" },
       ],
     },
   ];
 
-  const [roleMenu, setRoleMenu] = useState<number[]>();
+
   const logOut = () => {
     localStorage.clear();
     window.location.href = "/";
   };
 
-    useEffect(() => {
-        if (account_role === 2) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
-        } else if (account_role === 1) {
-            setRoleMenu([1, 10, 8]);
-        }
-        // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
-    }, [account_role]);
+  useEffect(() => {
+    if (account_role === 2) {
+      setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+    } else if (account_role === 1) {
+      setRoleMenu([1, 10, 8]);
+    }
+  }, [account_role]);
+
+  //auth redirect
+  useAuthGuard({ account_role, roleMenu, pathname, allMenu });
 
   const filteredMenu = allMenu
     .map((group) => ({
@@ -123,7 +114,6 @@ export default function RootLayout({
     }))
     .filter((group) => group.items.length > 0);
 
-  // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
 
   if (!hasMounted) return null;
   return (
@@ -167,9 +157,8 @@ export default function RootLayout({
                       {group.group}
                     </span>
                     <svg
-                      className={`w-4 h-4 transform transition-transform duration-200 ${
-                        isOpen ? "rotate-90" : "rotate-0"
-                      }`}
+                      className={`w-4 h-4 transform transition-transform duration-200 ${isOpen ? "rotate-90" : "rotate-0"
+                        }`}
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -236,16 +225,18 @@ export default function RootLayout({
               <div className="relative">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 rounded-full custom-bg-main flex items-center justify-center text-white font-medium">
-                    {userData?.name.substring(0, 1).toUpperCase()}
+                    {account_username.substring(0, 1).toUpperCase()}
                   </div>
                   <div className="hidden md:block">
                     <div className="text-sm font-medium text-black ">
-                      {userData?.name}
+                      {/* {userData?.name} */}
+                      {account_username}
                     </div>
                     <div className="text-xs text-gray-500  capitalize">
-                      {userData.account_role === 1
+                      {/* {userData.account_role === 1
                         ? USER_TIER.SUPER_ADMIN
-                        : USER_TIER.ADMIN}
+                        : USER_TIER.ADMIN} */}
+                      {account_name}
                     </div>
                   </div>
                 </div>

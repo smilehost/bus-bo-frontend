@@ -7,12 +7,16 @@ const defaultState: {
   com_id: number;
   account_id: number;
   account_role: string;
+  account_name: string;
+  account_username: string;
   token: string;
 } = {
   com_id: 0,
   account_id: 1,
   account_role: "",
   token: "",
+  account_name: "",
+  account_username: "",
 };
 
 type StoreState = typeof defaultState;

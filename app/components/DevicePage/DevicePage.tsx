@@ -38,18 +38,19 @@ export interface DeviceTable {
 }
 
 export interface DevicePageProps {
-    comId: number
+    comId: number,
 }
 
 function DevicePage({ comId }: DevicePageProps) {
 
-    //api
+    //store
     const { devices, addDevice, getDevices, updateDeviceStatus, updateDevice, deleteDevice, clearDevices } = useDeviceStore();
-
     const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
     const [search, setSearch] = useState<string>(''); // Search input
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [editDevice, setEditingDevice] = useState<any>(null);
 
     //clear
     useEffect(() => {
@@ -282,12 +283,14 @@ function DevicePage({ comId }: DevicePageProps) {
                         icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
                         bgColor="bg-blue-50 text-blue-600"
                         hoverColor="hover:bg-blue-100"
+                         title='Edit Device'
                     />
                     <TableActionButton
                         onClick={() => handleDeleteDevice({ name: row.dv_serial, id: row.id })}
                         icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
                         bgColor="bg-red-50 text-red-600"
                         hoverColor="hover:bg-red-100"
+                        title='Delete Device'
                     />
                 </div>
             ),
@@ -296,7 +299,7 @@ function DevicePage({ comId }: DevicePageProps) {
 
     return (
         <>
-            <TitlePage title='Manage Device' description='View and manage device' btnText='Add New Device' handleOpenModel={handleDeviceOpenModel} />
+            <TitlePage title={`Device Management`} description='View and manage device' btnText='Add New Device' handleOpenModel={handleDeviceOpenModel} />
             <div className='custom-frame-content p-5 mt-5'>
                 <FormFilter
                     setSearch={(value: string) =>

@@ -16,13 +16,12 @@ import StatusText from "@/app/components/StatusText";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
 import { usePathname } from "next/navigation";
 import FormFilter from "@/app/components/Filter/FormFilter";
-import CompanyTable from "@/app/components/Table/CompanyTable";
 import axios from "axios";
 import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
 import EnterPassModal from "@/app/components/Model/EnterPassModal";
 import { CompanyItem } from "@/types/company";
-import { KeyRound, Pencil, Smartphone, SquarePen, Users } from "lucide-react";
+import { KeyRound, Smartphone, SquarePen, Users } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;
@@ -82,6 +81,7 @@ export default function ManageCompaniesPage() {
     setEditingCompany(null);
     setIsModalOpen(true);
   };
+
   const handleDeleteCompany = async (id: string) => {
     const isConfirmed = await Confirm({
       title: "Confirm Delete",
@@ -305,25 +305,25 @@ export default function ManageCompaniesPage() {
             title="Edit"
           />
           <TableActionButton
-            href={`${pathName}/manage-device?comId=${row.id}`}
+            href={`${pathName}/manage-device?comId=${row.id}&name=${row.name}`}
             icon={<Smartphone className={`custom-size-tableAction-btn text-orange-400`} />}
             bgColor="bg-orange-100 text-orange-400"
             hoverColor="hover:bg-orange-100"
             title="Device"
           />
           <TableActionButton
-            href={`${pathName}/manage-admin?comId=${row.id}`}
+            href={`${pathName}/manage-admin?comId=${row.id}&name=${row.name}`}
             icon={<Users className={`custom-size-tableAction-btn text-blue-600`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
             title="Add User"
           />
-         
+
           <TableActionButton
-          onClick={() => {
-            setSelectedCompanyId(Number(row.id));
-            setShowPassModal(true);
-          }}
+            onClick={() => {
+              setSelectedCompanyId(Number(row.id));
+              setShowPassModal(true);
+            }}
             icon={<KeyRound className={`custom-size-tableAction-btn text-gray-700`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
@@ -373,7 +373,7 @@ export default function ManageCompaniesPage() {
               onRowsPerPageChange={handleRowsPerPageChange}
               rowKey={(row) => row.id}
             />
-            
+
           )}
         </div>
 
@@ -395,15 +395,15 @@ export default function ManageCompaniesPage() {
         />
       )}
       <EnterPassModal
-              isOpen={showPassModal}
-              onClose={() => setShowPassModal(false)}
-              onSubmit={(password) => {
-                if (selectedCompanyId !== null) {
-                  onLoginAsCompany(selectedCompanyId, password);
-                  setShowPassModal(false);
-                }
-              }}
-            />
+        isOpen={showPassModal}
+        onClose={() => setShowPassModal(false)}
+        onSubmit={(password) => {
+          if (selectedCompanyId !== null) {
+            onLoginAsCompany(selectedCompanyId, password);
+            setShowPassModal(false);
+          }
+        }}
+      />
     </div>
   );
 }

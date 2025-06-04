@@ -72,7 +72,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     if (comId) {
       await getMemberByComId(comId)
     } else {
-      await getMembers(1, 50, "", ""); // โหลดทั้งหมดครั้งเดียว
+      await getMembers(1, 50, "", ""); 
     }
     cancelSkeleton();
 
@@ -370,7 +370,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     <div className="flex h-screen bg-gray-100">
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
+        <TitlePage title={`${comId ? `Admin Management `:"Manage Members"}`} description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
