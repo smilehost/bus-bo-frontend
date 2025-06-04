@@ -29,6 +29,7 @@ import { useUserStore } from "@/stores/userStore";
 
 //enum
 import { USER_TIER } from "@/constants/enum";
+import { store } from "@/stores/store";
 
 export default function RootLayout({
   children,
@@ -37,6 +38,13 @@ export default function RootLayout({
 }) {
   const [hasMounted, setHasMounted] = useState(false);
   const { userData } = useUserStore();
+  const lang = store.Translation.use(); // ✅ re-render เมื่อเปลี่ยนภาษา
+
+  const setLang = (value: 'TH' | 'EN') => {
+    if (value !== lang) {
+      store.Translation.set(value);
+    }
+  };
 
   useEffect(() => {
     setHasMounted(true);
@@ -51,6 +59,8 @@ export default function RootLayout({
       [groupName]: !prev[groupName],
     }));
   };
+  const role = store.account_role.use();
+
 
   const allMenu = [
     {
@@ -68,7 +78,7 @@ export default function RootLayout({
         {
           id: 4,
           icon: Ticket,
-          text: "Manage Bus Tickets",
+          text: "Manage Tickets",
           link: "manage-ticket",
         },
       ],
@@ -90,7 +100,13 @@ export default function RootLayout({
     {
       group: "USERS",
       items: [
-        { id: 8, icon: Users, text: "Manage Employee", link: "manage-members" },
+        {
+          id: 8,
+          icon: Users,
+          text: role === '1' ? 'Manage Admin' : 'Manage Employee',
+          href: 'manage-members',
+          as: role === '1' ? 'manage-admin' : 'manage-employee',
+        },
         {
           id: 10,
           icon: Building,
@@ -100,6 +116,8 @@ export default function RootLayout({
       ],
     },
   ];
+
+
 
   const [roleMenu, setRoleMenu] = useState<number[]>();
   const logOut = () => {
@@ -182,15 +200,17 @@ export default function RootLayout({
                   {/* Group Items (toggle visibility) */}
                   {isOpen && (
                     <div className="space-y-1 mt-1">
-                      {group.items.map((item) => (
-                        <MenuItemLink
-                          key={item.id}
-                          link={item.link}
-                          text={item.text}
-                          icon={item.icon}
-                        />
-                      ))}
-                    </div>
+                    {group.items.map((item) => (
+                      <MenuItemLink
+                        key={item.id}
+                        text={item.text}
+                        icon={item.icon}
+                        href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
+                        as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
+                      />
+                    ))}
+                  </div>
+
                   )}
                 </div>
               );
@@ -232,23 +252,36 @@ export default function RootLayout({
             >
               <MenuIcon size={24} className="text-gray-500 " />
             </button>
-            <div className="flex items-center">
-              <div className="relative">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full custom-bg-main flex items-center justify-center text-white font-medium">
-                    {userData?.name.substring(0, 1).toUpperCase()}
+            <div className="flex items-center space-x-4 w-full">
+              <div className="relative flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full custom-bg-main flex items-center justify-center text-white font-medium">
+                  {userData?.name.substring(0, 1).toUpperCase()}
+                </div>
+                <div className="hidden md:block">
+                  <div className="text-sm font-medium text-black">
+                    {userData?.name}
                   </div>
-                  <div className="hidden md:block">
-                    <div className="text-sm font-medium text-black ">
-                      {userData?.name}
-                    </div>
-                    <div className="text-xs text-gray-500  capitalize">
-                      {userData.account_role === 2
-                        ? USER_TIER.SUPER_ADMIN
-                        : USER_TIER.ADMIN}
-                    </div>
+                  <div className="text-xs text-gray-500 capitalize">
+                    {userData.account_role === 2
+                      ? USER_TIER.SUPER_ADMIN
+                      : USER_TIER.ADMIN}
                   </div>
                 </div>
+              </div>
+
+              {/* ปุ่มเปลี่ยนภาษา */}
+              <div className="flex gap-2 ml-auto">
+                {['TH', 'EN'].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setLang(item as 'TH' | 'EN')}
+                    className={`px-3 py-1.5 text-sm rounded-md border cursor-pointer
+                      ${lang === item ? 'bg-orange-500 text-white ring-2 ring-orange-500' : 'text-gray-600 bg-white'} 
+                      transition focus:outline-none`}
+                  >
+                    {item}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
