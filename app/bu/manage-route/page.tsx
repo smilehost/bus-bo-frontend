@@ -34,6 +34,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm';
 import { SquarePen, Ticket, Trash2, Waypoints } from 'lucide-react';
 import TitlePage from '@/app/components/Title/TitlePage';
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
+import { getTextRoute, useLanguageContext } from '@/app/i18n/translations';
 
 export interface RouteTableData {
   id: string,
@@ -87,6 +88,8 @@ function Page() {
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const { isTH } = useLanguageContext();
+  const text = getTextRoute({isTH});
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSize = Number(e.target.value);
@@ -250,7 +253,7 @@ function Page() {
   const columns: ColumnConfig<RouteTableData>[] = [
     {
       key: 'route',
-      label: 'Route',
+      label:text.tableTitle,
       width: '20%',
       render: (_, row) => (
         <div className='flex gap-3'>
@@ -273,7 +276,7 @@ function Page() {
     // { key: 'company', label: 'Company', width: '20%' },
     {
       key: 'schedule',
-      label: 'Schedule',
+      label: text.schedule,
       width: '20%',
       render: (_, row) => {
         type RouteDateRow = {
@@ -331,16 +334,16 @@ function Page() {
       },
     },
     {
-      key: 'time', label: 'Departure Times', width: '20%', render: (row) => (
+      key: 'time', label: text.times, width: '20%', render: (row) => (
         <Tooltip title={row} arrow>
           <p className='custom-ellipsis-style cursor-default'>{row}</p>
         </Tooltip>
       )
     },
-    { key: 'ticket_amount', label: 'Route Tickets', width: '15%', align: 'center' },
+    { key: 'ticket_amount', label: text.amount, width: '15%', align: 'center' },
     {
       key: 'status',
-      label: 'Status',
+      label: text.status,
       width: '15%',
       render: (_, row) => (
         <div className='cursor-pointer' onClick={() => handleChangeStatus({ idStatus: String(row.status), idRoute: Number(row.id) })}>
@@ -350,7 +353,7 @@ function Page() {
     },
     {
       key: 'id',
-      label: 'Action',
+      label: text.action,
       width: '25%',
       render: (_, row) => (
         <div className='flex gap-2 min-w-max '>
@@ -359,21 +362,21 @@ function Page() {
             href={`${pathname}/routeTicket?id=${row?.id}&name=${row?.routeTH}`}
             bgColor="text-green-600 bg-green-100"
             hoverColor="hover:bg-green-200"
-            title="Add Bus Ticket"
+            title={text.addTicket}
           />
           <TableActionButton
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             href={`${pathname}/edit?id=${row?.id}&name=${row?.routeTH}`}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
-            title="Edit"
+            title={text.edit}
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteRoute({ route: row?.route, id: Number(row?.id) })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
-            title="Delete"
+            title={text.delete}
           />
         </div>
       ),
@@ -382,7 +385,7 @@ function Page() {
 
   return (
     <>
-      <TitlePage title='Manage Routes' description='View and manage bus routes' btnText='Add New Route' handleOpenModel={RedirectoAdd} />
+      <TitlePage title={text.title} description={text.des} btnText={text.btnText} handleOpenModel={RedirectoAdd} />
       <div className='custom-frame-content p-5 mt-5'>
         <FormFilter
           setSearch={(value: string) =>
@@ -390,7 +393,7 @@ function Page() {
               target: { value },
             } as React.ChangeEvent<HTMLInputElement>)
           }
-          placeholderSearch='Search routes...'
+          placeholderSearch={text.search}
           filter={filterSearch}
           search={search}
         />

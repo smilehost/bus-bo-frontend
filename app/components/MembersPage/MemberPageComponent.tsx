@@ -21,6 +21,7 @@ import StatusText from "@/app/components/StatusText";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
 import { ToastContainer } from "react-toastify";
 import { Eye, Lock } from "lucide-react";
+import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
 
 export interface MemberTableData {
   no: number;
@@ -58,6 +59,8 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
   const [isEditStatusOpen, setEditStatusOpen] = useState(false);
   const [isEditPasswordOpen, setEditPasswordOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<MemberItem | null>(null);
+  const { isTH, isSuperAdmin } = useLanguageContext();
+  const text = getTextManageUserPage({ isTH, isSuperAdmin });
 
   const debouncedFetch = useCallback(
     debounce((value: string) => {
@@ -304,31 +307,32 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     }
   };
 
+
   //table columns
   const columns: ColumnConfig<MemberTableData>[] = [
     {
       key: 'no',
-      label: 'No.',
+      label: text.number,
       width: '5%',
     },
     {
-      key: 'name', label: 'Name', width: '20%',
+      key: 'name', label: text.name, width: '20%',
     },
     {
-      key: 'username', label: 'Username', width: '20%',
+      key: 'username', label: text.userName, width: '20%',
     },
     {
-      key: 'company', label: 'Company', width: '20%',
+      key: 'company', label: text.com, width: '20%',
     },
     {
-      key: 'role', label: 'Role', width: '20%',
+      key: 'role', label: text.role, width: '20%',
       render: (_, row) => (
         <p>{Number(row.role) === 1 ? USER_TIER.ADMIN : USER_TIER.SUPER_ADMIN}</p>
       ),
     },
     {
       key: 'status',
-      label: 'Status',
+      label: text.status,
       width: '15%',
       render: (_, row) => (
         <div
@@ -341,7 +345,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     },
     {
       key: 'id',
-      label: 'Action',
+      label: text.action,
       width: '25%',
       align: 'right',
       render: (_, row) => (
@@ -351,14 +355,14 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
             icon={<Lock className={`custom-size-tableAction-btn text-yellow-700`} />}
             bgColor="bg-yellow-100 text-yellow-400"
             hoverColor="hover:bg-yellow-100"
-            title="Change Password"
+            title={text.ChangePassword}
           />
           <TableActionButton
             onClick={() => handleEditMember(row.id)}
             icon={<Eye className={`custom-size-tableAction-btn text-green-700`} />}
             bgColor="bg-green-100 text-green-500"
             hoverColor="hover:bg-green-100"
-            title="View"
+            title={text.view}
           />
         </div>
       ),
@@ -370,7 +374,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     <div className="flex h-screen bg-gray-100">
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
+        <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddMember} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}

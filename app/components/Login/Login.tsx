@@ -63,6 +63,7 @@ function Login() {
         store.com_id.set(decoded.com_id);
         store.account_id.set(decoded.account_id);
         store.account_role.set(decoded.account_role);
+        store.Translation.set("TH");
   
         // ✅ ถ้าเป็น SuperAdmin → ดึง com_id ทั้งหมด
         if (decoded.account_role === "2") {

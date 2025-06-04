@@ -30,6 +30,7 @@ import { useUserStore } from "@/stores/userStore";
 //enum
 import { USER_TIER } from "@/constants/enum";
 import { store } from "@/stores/store";
+import { getTextMenu, useLanguageContext } from "../i18n/translations";
 
 export default function RootLayout({
   children,
@@ -60,59 +61,40 @@ export default function RootLayout({
     }));
   };
   const role = store.account_role.use();
+  const { isTH, isSuperAdmin } = useLanguageContext();
+  const menuText = getTextMenu({ isTH, isSuperAdmin });
 
 
   const allMenu = [
     {
-      group: "OVER VIEW",
+      group: menuText.overview,
       items: [
-        { id: 1, icon: House, text: "Dashboard", link: "dashboard" },
-        { id: 9, icon: FileBarChart, text: "Reports", link: "reports" },
-        { id: 2, icon: Ticket, text: "Sell Ticket", link: "sell-ticket" },
+        { id: 1, icon: House, text: menuText.dashboard, link: "dashboard" },
+        { id: 9, icon: FileBarChart, text: menuText.reports, link: "reports" },
+        { id: 2, icon: Ticket, text: menuText.sellTicket, link: "sell-ticket" },
       ],
     },
     {
-      group: "SETUP ROUTE & TICKET",
+      group: menuText.setup,
       items: [
-        { id: 3, icon: Route, text: "Manage Routes", link: "manage-route" },
-        {
-          id: 4,
-          icon: Ticket,
-          text: "Manage Tickets",
-          link: "manage-ticket",
-        },
+        { id: 3, icon: Route, text: menuText.manageRoute, link: "manage-route" },
+        { id: 4, icon: Ticket, text: menuText.manageTicket, link: "manage-ticket" },
       ],
     },
     {
-      group: "TEMPLATE",
+      group: menuText.template,
       items: [
-        { id: 5, icon: Map, text: "Manage Location", link: "manage-location" },
-        {
-          id: 11,
-          icon: DollarSign,
-          text: "Manage Promotion",
-          link: "manage-price-type",
-        },
-        { id: 7, icon: Calendar, text: "Manage Date", link: "manage-dates" },
-        { id: 6, icon: Clock, text: "Manage Times", link: "manage-times" },
+        { id: 5, icon: Map, text: menuText.manageLocation, link: "manage-location" },
+        { id: 11, icon: DollarSign, text: menuText.managePromo, link: "manage-price-type" },
+        { id: 7, icon: Calendar, text: menuText.manageDate, link: "manage-dates" },
+        { id: 6, icon: Clock, text: menuText.manageTime, link: "manage-times" },
       ],
     },
     {
-      group: "USERS",
+      group: menuText.users,
       items: [
-        {
-          id: 8,
-          icon: Users,
-          text: role === '1' ? 'Manage Admin' : 'Manage Employee',
-          href: 'manage-members',
-          as: role === '1' ? 'manage-admin' : 'manage-employee',
-        },
-        {
-          id: 10,
-          icon: Building,
-          text: "Manage Company",
-          link: "manage-company",
-        },
+        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", },
+        { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
   ];

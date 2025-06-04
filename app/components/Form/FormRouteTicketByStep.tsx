@@ -33,6 +33,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import Typography from '@mui/material/Typography';
+import {getTextRouteTicketBystep, useLanguageContext} from '@/app/i18n/translations'
 
 export type TicketPriceTypeFixed = {
   id_type: string,
@@ -74,6 +75,8 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
   const [checkConfirm, setCheckConfirm] = useState(true);
   const [initialTicketChecked, setInitialTicketChecked] = useState<string[]>([]);
   const [isSaveTable, setSaveTable] = useState<number>(0)
+  const { isTH  } = useLanguageContext();
+  const text = getTextRouteTicketBystep({ isTH });
 
   // ------------------- UTIL ----------------------
   const resetTicketForm = () => {
@@ -338,7 +341,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
     <div>
       {tickets && tickets.length > 0 && (
         <div className="mt-4">
-          <p className="font-medium">Route Tickets</p>
+          <p className="font-medium">{text.title}</p>
           <div className="flex flex-wrap gap-4 mt-1">
             {!ticketActiveConfig
               ? tickets.map((item, index) => (
@@ -391,11 +394,11 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
             <Step className=''>
               <StepLabel
                 optional={
-                  <Typography variant="caption">
+                  <Typography variant="h6" color="textPrimary">
                     {ticketActive ? (
-                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - Edit</>
+                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - {text.Edit}</>
                     ) : (
-                      <>Ticket - Create</>
+                      <>{text.New}</>
                     )}
                   </Typography>
                 }
@@ -441,11 +444,11 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
             <Step className=''>
               <StepLabel
                 optional={
-                  <Typography variant="caption">
+                  <Typography variant="h6" color="textPrimary">
                     {ticketActive ? (
-                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - Manage Price</>
+                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - {text.manPrice}</>
                     ) : (
-                      <>Ticket - Manage Price</>
+                      <>{text.manTicketPrice}</>
                     )}
                   </Typography>
                 }

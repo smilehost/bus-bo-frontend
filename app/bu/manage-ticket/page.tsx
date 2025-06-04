@@ -32,6 +32,7 @@ import TitlePage from '@/app/components/Title/TitlePage';
 ////icons
 import { Ticket, Trash2 } from "lucide-react";
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
+import {getTextTicketPage, useLanguageContext} from '@/app/i18n/translations'
 
 
 export interface TicketTableData {
@@ -75,6 +76,8 @@ function Page() {
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const {isTH} = useLanguageContext();
+  const text = getTextTicketPage({isTH});
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSize = Number(e.target.value);
@@ -211,7 +214,7 @@ function Page() {
   //table columns
   const columns: ColumnConfig<TicketTableData>[] = [
     {
-      key: 'ticketNameEN', label: 'Ticket', width: '25%',
+      key: 'ticketNameEN', label: text.tableTitle, width: '25%',
       render: (_, row) => (
         <div className='flex gap-3'>
           <div>
@@ -231,7 +234,7 @@ function Page() {
       ),
     },
     {
-      key: 'routeNameTH', label: 'Route', width: '20%', align: 'left',
+      key: 'routeNameTH', label: text.route, width: '20%', align: 'left',
       render: (_, row) => {
         const isActive = row.route_status === 1 ? true : false
         return (
@@ -244,11 +247,11 @@ function Page() {
         )
       },
     },
-    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
-    { key: 'ticketType', label: 'Ticket Type', width: '20%', align: 'center' },
+    { key: 'amount', label: text.amount, width: '20%', align: 'center' },
+    { key: 'ticketType', label: text.type, width: '20%', align: 'center' },
     // { key: 'ticketPrice', label: 'Ticket Price', width: '20%', align: 'center' },
     {
-      key: 'status', label: 'Status', width: '20%', align: 'center',
+      key: 'status', label: text.status, width: '20%', align: 'center',
       render: (_, row) => (
         <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus: row.status, idTicket: row.id })}>
           <StatusText id={Number(row.status)} />
@@ -256,7 +259,7 @@ function Page() {
       ),
     },
     {
-      key: 'id', label: 'Action', width: '25%', align: 'right',
+      key: 'id', label: text.action, width: '25%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
           <TableActionButton
@@ -280,7 +283,7 @@ function Page() {
 
   return (
     <>
-      <TitlePage title='Manage Route Tickets' description='View and manage route ticket information.' />
+      <TitlePage title={text.title} description={text.description} />
       <div className='custom-frame-content p-5 mt-5'>
         <FormFilter
           setSearch={(value: string) =>
@@ -288,7 +291,7 @@ function Page() {
               target: { value },
             } as React.ChangeEvent<HTMLInputElement>)
           }
-          placeholderSearch='Search route tickets...'
+          placeholderSearch={text.search}
           filter={filterSearch}
           search={search}
         />
