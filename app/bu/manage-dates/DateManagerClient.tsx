@@ -344,7 +344,7 @@ export default function DateManagerClient() {
   }));
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage
@@ -353,7 +353,7 @@ export default function DateManagerClient() {
           btnText="Add New Date"
           handleOpenModel={handleAddDate}
         />
-        <div className="bg-white rounded-md shadow p-5 mt-5">
+        <div className="custom-frame-content p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
@@ -363,18 +363,20 @@ export default function DateManagerClient() {
           {isLoadingskeleton ? (
             <SkeletonDateTable count={5} />
           ) : (
-            <TableTemplate
-              columns={columns}
-              data={paginatedWithNo}
-              currentPage={currentPage}
-              rowsPerPage={rowsPerPage}
-              totalPages={Math.ceil(totalResults / rowsPerPage)}
-              totalResults={totalResults}
-              onPageChange={setCurrentPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              rowKey={(row: DateTableProps) => row.id}
-              loading={isLoading}
-            />
+            <div className="overflow-x-auto">
+              <TableTemplate
+                columns={columns}
+                data={paginatedWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalPages={Math.ceil(totalResults / rowsPerPage)}
+                totalResults={totalResults}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row: DateTableProps) => row.id}
+                loading={isLoading}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -387,17 +389,17 @@ export default function DateManagerClient() {
           editingDate={
             editingDate
               ? {
-                ...editingDate,
-                days: {
-                  monday: editingDate.days.mon,
-                  tuesday: editingDate.days.tue,
-                  wednesday: editingDate.days.wed,
-                  thursday: editingDate.days.thu,
-                  friday: editingDate.days.fri,
-                  saturday: editingDate.days.sat,
-                  sunday: editingDate.days.sun,
-                },
-              }
+                  ...editingDate,
+                  days: {
+                    monday: editingDate.days.mon,
+                    tuesday: editingDate.days.tue,
+                    wednesday: editingDate.days.wed,
+                    thursday: editingDate.days.thu,
+                    friday: editingDate.days.fri,
+                    saturday: editingDate.days.sat,
+                    sunday: editingDate.days.sun,
+                  },
+                }
               : undefined
           }
         />

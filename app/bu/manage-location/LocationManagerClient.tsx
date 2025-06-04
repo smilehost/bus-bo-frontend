@@ -13,7 +13,9 @@ import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { MapPin, SquarePen, Trash2 } from "lucide-react";
-import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
+import TableTemplate, {
+  ColumnConfig,
+} from "@/app/components/Table/TableTemplate";
 
 // Define interfaces for location data
 interface Location {
@@ -30,11 +32,11 @@ interface LocationFormData {
 }
 
 interface LocationTableProps {
-  no: number,
-  name: string,
-  lat: string,
-  long: string,
-  id: number
+  no: number;
+  name: string;
+  lat: string;
+  long: string;
+  id: number;
 }
 function Page() {
   const {
@@ -212,35 +214,54 @@ function Page() {
   //columns
   const columns: ColumnConfig<LocationTableProps>[] = [
     {
-      key: 'no', label: 'No.', width: '20%', align: 'left'
+      key: "no",
+      label: "No.",
+      width: "20%",
+      align: "left",
     },
     {
-      key: 'name', label: 'Location Name', width: '20%', align: 'left'
+      key: "name",
+      label: "Location Name",
+      width: "20%",
+      align: "left",
     },
-    { key: 'lat', label: 'Latitude', width: '20%', align: 'center' },
-    { key: 'long', label: 'Longtitude', width: '20%', align: 'center' },
+    { key: "lat", label: "Latitude", width: "20%", align: "center" },
+    { key: "long", label: "Longtitude", width: "20%", align: "center" },
     {
-      key: 'id', label: 'Action', width: '25%', align: 'right',
+      key: "id",
+      label: "Action",
+      width: "25%",
+      align: "right",
       render: (_, row) => (
-        <div className='flex justify-end gap-2 min-w-max'>
+        <div className="flex justify-end gap-2 min-w-max">
           <TableActionButton
             href={`https://www.google.com/maps?q=${row.lat},${row.long}`}
             newTab
-            icon={<MapPin className={`custom-size-tableAction-btn text-purple-600`} />}
+            icon={
+              <MapPin
+                className={`custom-size-tableAction-btn text-purple-600`}
+              />
+            }
             bgColor="bg-purple-100"
             hoverColor="hover:bg-purple-200"
             title="Open in Google Maps"
           />
           <TableActionButton
             onClick={() => handleEditLocation(row.id)}
-            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
-           bgColor="bg-blue-50 text-blue-600"
+            icon={
+              <SquarePen
+                className={`custom-size-tableAction-btn text-blue-500`}
+              />
+            }
+            bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
             title="Edit"
           />
           <TableActionButton
             onClick={() => handleDeleteLocation(row.id)}
-            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
+            icon={
+              <Trash2 className={`custom-size-tableAction-btn text-red-600`} />
+            }
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
             title="Delete"
@@ -251,10 +272,16 @@ function Page() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Location" description="View and manage location information" btnText='Add New Location' handleOpenModel={handleAddLocation} />
-        <div className="bg-white rounded-md shadow p-5 mt-5">
+        <TitlePage
+          title="Manage Location"
+          description="View and manage location information"
+          btnText="Add New Location"
+          handleOpenModel={handleAddLocation}
+        />
+
+        <div className="custom-frame-content p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={(value: string) =>
@@ -266,7 +293,7 @@ function Page() {
           {isLoadingskeleton ? (
             <SkeletonLocationTable rows={5} />
           ) : (
-            <>
+            <div className="w-full overflow-x-auto">
               <TableTemplate
                 columns={columns}
                 data={paginatedWithNo}
@@ -278,23 +305,7 @@ function Page() {
                 onRowsPerPageChange={handleRowsPerPageChange}
                 rowKey={(row) => row.id}
               />
-              {/* <LocationTable
-                locations={paginatedLocations.map((location) => ({
-                  id: location.id,
-                  name: location.name,
-                  latitude: parseFloat(location.lat),
-                  longitude: parseFloat(location.long),
-                }))}
-                onEdit={handleEditLocation}
-                onDelete={handleDeleteLocation}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                totalResults={totalResults}
-                isLoading={isLoading}
-              /> */}
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -307,10 +318,10 @@ function Page() {
           editingLocation={
             editingLocation
               ? {
-                name: editingLocation.name,
-                latitude: parseFloat(editingLocation.lat),
-                longitude: parseFloat(editingLocation.long),
-              }
+                  name: editingLocation.name,
+                  latitude: parseFloat(editingLocation.lat),
+                  longitude: parseFloat(editingLocation.long),
+                }
               : null
           }
         />

@@ -18,7 +18,9 @@ import { MemberItem } from "@/types/member";
 import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import StatusText from "@/app/components/StatusText";
-import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
+import TableTemplate, {
+  ColumnConfig,
+} from "@/app/components/Table/TableTemplate";
 import { ToastContainer } from "react-toastify";
 import { Eye, Lock } from "lucide-react";
 
@@ -33,12 +35,20 @@ export interface MemberTableData {
 }
 
 export interface MemberPageComponentProps {
-  comId?: number
+  comId?: number;
 }
 
-export default function MemberPageComponent({ comId }: MemberPageComponentProps) {
-
-  const { members, getMembers, createMember, updateMember, getMemberByComId, clearMember } = useMemberStore();
+export default function MemberPageComponent({
+  comId,
+}: MemberPageComponentProps) {
+  const {
+    members,
+    getMembers,
+    createMember,
+    updateMember,
+    getMemberByComId,
+    clearMember,
+  } = useMemberStore();
   const { companies, getCompanies } = useCompanyStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -66,16 +76,14 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     []
   );
 
-
   const fetchMembers = async () => {
     const cancelSkeleton = withSkeletonDelay(setIsLoadingSkeleton);
     if (comId) {
-      await getMemberByComId(comId)
+      await getMemberByComId(comId);
     } else {
       await getMembers(1, 50, "", ""); // โหลดทั้งหมดครั้งเดียว
     }
     cancelSkeleton();
-
   };
 
   useEffect(() => {
@@ -83,8 +91,8 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     getCompanies(1, 10);
 
     return () => {
-      clearMember()
-    }
+      clearMember();
+    };
   }, []);
 
   useEffect(() => {
@@ -98,7 +106,9 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
       );
     }
     if (searchStatus !== FILTER.ALL_STATUS) {
-      temp = temp.filter((m) => STATUS_LABELS[m.status] === searchStatus.toString());
+      temp = temp.filter(
+        (m) => STATUS_LABELS[m.status] === searchStatus.toString()
+      );
     }
     if (searchCompany !== FILTER.ALL_COMPANIES) {
       temp = temp.filter(
@@ -258,25 +268,23 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
       role: m.role,
       status: m.status,
       company: getCompanyName(m.companyId.toString()),
-      com_id: m.companyId
+      com_id: m.companyId,
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);
 
   const handleAddMember = () => {
     setEditingMember(null);
     setIsModalOpen(true);
-  }
+  };
 
   //add no index
   const paginatedCompaniesWithNo = paginated.map((member, index) => ({
     ...member,
     no: (currentPage - 1) * rowsPerPage + index + 1,
-  }))
+  }));
 
   //action functions
-  const onEditStatus = (
-    id: string | number,
-  ) => {
+  const onEditStatus = (id: string | number) => {
     const found = members.find((m) => m.id === id);
     if (found) {
       setSelectedMember(found);
@@ -284,9 +292,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     }
   };
 
-  const onEditPassword = (
-    id: string | number
-  ) => {
+  const onEditPassword = (id: string | number) => {
     const found = members.find((m) => m.id === id);
     if (found) {
       setSelectedMember(found);
@@ -294,9 +300,7 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
     }
   };
 
-  const handleEditMember = (
-    id: string | number,
-  ) => {
+  const handleEditMember = (id: string | number) => {
     const found = members.find((m) => m.id === id);
     if (found) {
       setEditingMember(found);
@@ -307,55 +311,66 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
   //table columns
   const columns: ColumnConfig<MemberTableData>[] = [
     {
-      key: 'no',
-      label: 'No.',
-      width: '5%',
+      key: "no",
+      label: "No.",
+      width: "5%",
     },
     {
-      key: 'name', label: 'Name', width: '20%',
+      key: "name",
+      label: "Name",
+      width: "20%",
     },
     {
-      key: 'username', label: 'Username', width: '20%',
+      key: "username",
+      label: "Username",
+      width: "20%",
     },
     {
-      key: 'company', label: 'Company', width: '20%',
+      key: "company",
+      label: "Company",
+      width: "20%",
     },
     {
-      key: 'role', label: 'Role', width: '20%',
+      key: "role",
+      label: "Role",
+      width: "20%",
       render: (_, row) => (
-        <p>{Number(row.role) === 1 ? USER_TIER.ADMIN : USER_TIER.SUPER_ADMIN}</p>
+        <p>
+          {Number(row.role) === 1 ? USER_TIER.ADMIN : USER_TIER.SUPER_ADMIN}
+        </p>
       ),
     },
     {
-      key: 'status',
-      label: 'Status',
-      width: '15%',
+      key: "status",
+      label: "Status",
+      width: "15%",
       render: (_, row) => (
-        <div
-          className="cursor-pointer"
-          onClick={() => onEditStatus(row.id)}
-        >
+        <div className="cursor-pointer" onClick={() => onEditStatus(row.id)}>
           <StatusText id={Number(row.status)} />
         </div>
       ),
     },
     {
-      key: 'id',
-      label: 'Action',
-      width: '25%',
-      align: 'right',
+      key: "id",
+      label: "Action",
+      width: "25%",
+      align: "right",
       render: (_, row) => (
-        <div className='flex gap-2 min-w-max justify-end'>
+        <div className="flex gap-2 min-w-max justify-end">
           <TableActionButton
             onClick={() => onEditPassword(row.id)}
-            icon={<Lock className={`custom-size-tableAction-btn text-yellow-700`} />}
+            icon={
+              <Lock className={`custom-size-tableAction-btn text-yellow-700`} />
+            }
             bgColor="bg-yellow-100 text-yellow-400"
             hoverColor="hover:bg-yellow-100"
             title="Change Password"
           />
           <TableActionButton
             onClick={() => handleEditMember(row.id)}
-            icon={<Eye className={`custom-size-tableAction-btn text-green-700`} />}
+            icon={
+              <Eye className={`custom-size-tableAction-btn text-green-700`} />
+            }
             bgColor="bg-green-100 text-green-500"
             hoverColor="hover:bg-green-100"
             title="View"
@@ -363,15 +378,21 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
         </div>
       ),
     },
-  ]
+  ];
 
   // console.log("paginatedCompaniesWithNo: ", paginatedCompaniesWithNo)
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Members" description="View and manage customer information" btnText='Add New Member' handleOpenModel={handleAddMember} />
-        <div className="bg-white rounded-md shadow p-5 mt-5">
+        <TitlePage
+          title="Manage Members"
+          description="View and manage customer information"
+          btnText="Add New Member"
+          handleOpenModel={handleAddMember}
+        />
+
+        <div className="custom-frame-content p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
@@ -389,49 +410,22 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
           {isLoadingSkeleton ? (
             <SkeletonMemberPage rows={5} />
           ) : (
-            <TableTemplate
-              columns={columns}
-              data={paginatedCompaniesWithNo}
-              currentPage={currentPage}
-              rowsPerPage={rowsPerPage}
-              totalResults={totalResults}
-              onPageChange={setCurrentPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              rowKey={(row) => row.id}
-            />
-            // <MemberTable
-            //   members={paginated}
-            //   currentPage={currentPage}
-            //   totalPages={Math.ceil(totalResults / rowsPerPage)}
-            //   onPageChange={setCurrentPage}
-            //   rowsPerPage={rowsPerPage}
-            //   onRowsPerPageChange={handleRowsPerPageChange}
-            //   totalResults={totalResults}
-            //   onEditStatus={(id, status) => {
-            //     const found = members.find((m) => m.id === id);
-            //     if (found) {
-            //       setSelectedMember(found);
-            //       setEditStatusOpen(true);
-            //     }
-            //   }}
-            //   onEditPassword={(id) => {
-            //     const found = members.find((m) => m.id === id);
-            //     if (found) {
-            //       setSelectedMember(found);
-            //       setEditPasswordOpen(true);
-            //     }
-            //   }}
-            //   onEditMember={(id) => {
-            //     const found = members.find((m) => m.id === id);
-            //     if (found) {
-            //       setEditingMember(found);
-            //       setIsModalOpen(true);
-            //     }
-            //   }}
-            // />
+            <div className="w-full overflow-x-auto">
+              <TableTemplate
+                columns={columns}
+                data={paginatedCompaniesWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalResults={totalResults}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row) => row.id}
+              />
+            </div>
           )}
         </div>
 
+        {/* ✅ Responsive modal ส่วนล่างยังคงใช้ได้ */}
         <MemberModal
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -439,10 +433,10 @@ export default function MemberPageComponent({ comId }: MemberPageComponentProps)
           editingMember={
             editingMember
               ? {
-                ...editingMember,
-                id: editingMember.id.toString(),
-                companyId: editingMember.companyId.toString(),
-              }
+                  ...editingMember,
+                  id: editingMember.id.toString(),
+                  companyId: editingMember.companyId.toString(),
+                }
               : undefined
           }
         />
