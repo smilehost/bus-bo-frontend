@@ -10,7 +10,7 @@ function Page() {
   
   return (
     <div>
-      <DevicePage comId={Number(comId)} />
+      <DevicePage comId={Number(comId)}/>
     </div>
   )
 }

@@ -17,6 +17,7 @@ import TableTemplate, {
 } from "@/app/components/Table/TableTemplate";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { Clock, SquarePen, Trash2 } from "lucide-react";
+import { Tooltip } from "@mui/material";
 
 function Page() {
   const { times, getTimes, createTime, updateTime, deleteTime } =
@@ -222,22 +223,16 @@ function Page() {
       align: "left",
     },
     {
-      key: "schedule",
-      label: "Schedule",
-      width: "20%",
-      align: "left",
-      render: (_, row) => (
-        <div className="flex gap-2">
-          <TableActionButton
-            icon={
-              <Clock className={`custom-size-tableAction-btn text-blue-500`} />
-            }
-            bgColor="bg-blue-50 text-blue-600 h-fit"
-            hoverColor="hover:bg-blue-100"
-          />
-          <p className="whitespace-nowrap"> {row.schedule.join(", ")}</p>
-        </div>
-      ),
+      key: 'schedule', label: 'Schedule', width: '20%', align: 'left', render: (_, row) => (
+        <Tooltip title={row.schedule.join(", ")}>
+          <div className="flex items-center gap-2 custom-ellipsis-style">
+            <div className="shrink-0">
+              <Clock className={`custom-size-tableAction-btn text-blue-500 `}/>
+            </div>
+            <p className="whitespace-nowrap custom-ellipsis-style"> {row.schedule.join(", ")}</p>
+          </div>
+        </Tooltip>
+      )
     },
     {
       key: "id",

@@ -289,14 +289,17 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
             <tr>
               <th className="border border-gray-200 px-2 py-1 text-center h-14">location</th>
               {stations.slice(1).map((station, j) => (
-                <th key={j} className="border border-gray-200 px-2 py-1 text-center">
+                <th key={j} className="border border-gray-200 px-2 py-2 text-center align-top">
                   <label className="flex flex-col items-center space-y-1">
                     <input
                       type="checkbox"
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
+                      className='cursor-pointer'
                     />
-                    <div className='font-normal'>{stationName[j + 1]}</div>
+                    <div className='font-normal'>
+                      {stationName[j + 1]}
+                    </div>
                   </label>
                 </th>
               ))}
@@ -310,6 +313,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                     type="checkbox"
                     checked={rowChecked.includes(i)}
                     onChange={() => toggleCheck(i, 'row')}
+                    className='cursor-pointer'
                   />
                   <span className=' max-w-40 xl:max-w-96 custom-ellipsis-style'>{stationName[i]}</span>
                 </td>

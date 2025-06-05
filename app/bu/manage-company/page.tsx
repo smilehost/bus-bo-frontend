@@ -18,13 +18,12 @@ import TableTemplate, {
 } from "@/app/components/Table/TableTemplate";
 import { usePathname } from "next/navigation";
 import FormFilter from "@/app/components/Filter/FormFilter";
-import CompanyTable from "@/app/components/Table/CompanyTable";
 import axios from "axios";
 import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
 import EnterPassModal from "@/app/components/Model/EnterPassModal";
 import { CompanyItem } from "@/types/company";
-import { KeyRound, Pencil, Smartphone, SquarePen, Users } from "lucide-react";
+import { KeyRound, Smartphone, SquarePen, Users } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;
@@ -86,6 +85,7 @@ export default function ManageCompaniesPage() {
     setEditingCompany(null);
     setIsModalOpen(true);
   };
+
   const handleDeleteCompany = async (id: string) => {
     const isConfirmed = await Confirm({
       title: "Confirm Delete",
@@ -313,21 +313,15 @@ export default function ManageCompaniesPage() {
             title="Edit"
           />
           <TableActionButton
-            href={`${pathName}/manage-device?comId=${row.id}`}
-            icon={
-              <Smartphone
-                className={`custom-size-tableAction-btn text-orange-400`}
-              />
-            }
+            href={`${pathName}/manage-device?comId=${row.id}&name=${row.name}`}
+            icon={<Smartphone className={`custom-size-tableAction-btn text-orange-400`} />}
             bgColor="bg-orange-100 text-orange-400"
             hoverColor="hover:bg-orange-100"
             title="Device"
           />
           <TableActionButton
-            href={`${pathName}/manage-admin?comId=${row.id}`}
-            icon={
-              <Users className={`custom-size-tableAction-btn text-blue-600`} />
-            }
+            href={`${pathName}/manage-admin?comId=${row.id}&name=${row.name}`}
+            icon={<Users className={`custom-size-tableAction-btn text-blue-600`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
             title="Add User"
@@ -338,11 +332,7 @@ export default function ManageCompaniesPage() {
               setSelectedCompanyId(Number(row.id));
               setShowPassModal(true);
             }}
-            icon={
-              <KeyRound
-                className={`custom-size-tableAction-btn text-gray-700`}
-              />
-            }
+            icon={<KeyRound className={`custom-size-tableAction-btn text-gray-700`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
             title="Login as Company"
@@ -373,19 +363,29 @@ export default function ManageCompaniesPage() {
           {isLoadingSkeleton ? (
             <SkeletonCompanyTable rows={5} />
           ) : (
-            <div className="w-full overflow-x-auto">
-              <TableTemplate
-                columns={columns}
-                data={paginatedCompaniesWithNo}
-                currentPage={currentPage}
-                rowsPerPage={rowsPerPage}
-                totalPages={Math.ceil(filtered.length / rowsPerPage)}
-                totalResults={filtered.length}
-                onPageChange={setCurrentPage}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                rowKey={(row) => row.id}
-              />
-            </div>
+            // <CompanyTable
+            //   companies={paginatedCompanies}
+            //   onEdit={handleEditCompany}
+            //   onDelete={handleDeleteCompany}
+            //   currentPage={currentPage}
+            //   onPageChange={setCurrentPage}
+            //   rowsPerPage={rowsPerPage}
+            //   onRowsPerPageChange={handleRowsPerPageChange}
+            //   totalResults={filtered.length}
+            //   isLoading={isLoading}
+            // />
+            <TableTemplate
+              columns={columns}
+              data={paginatedCompaniesWithNo}
+              currentPage={currentPage}
+              rowsPerPage={rowsPerPage}
+              totalPages={Math.ceil(filtered.length / rowsPerPage)}
+              totalResults={filtered.length}
+              onPageChange={setCurrentPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              rowKey={(row) => row.id}
+            />
+
           )}
         </div>
       </div>

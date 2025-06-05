@@ -84,7 +84,7 @@ export default function MemberPageComponent({
     if (comId) {
       await getMemberByComId(comId);
     } else {
-      await getMembers(1, 50, "", ""); // โหลดทั้งหมดครั้งเดียว
+      await getMembers(1, 50, "", ""); 
     }
     cancelSkeleton();
   };

@@ -3,12 +3,21 @@ import { persist } from "zustand/middleware";
 
 const STORAGE_KEY = "token_bo";
 
-// ✅ Default state
-const defaultState = {
+const defaultState: {
+  com_id: number;
+  account_id: number;
+  account_role: string;
+  account_name: string;
+  account_username: string;
+  token: string;
+  Translation: string;
+} = {
   com_id: 0,
   account_id: 1,
   account_role: "",
   token: "",
+  account_name: "",
+  account_username: "",
   Translation: "", // TH or EN
 };
 
