@@ -55,7 +55,7 @@ export default function MemberPageComponent({
   const { companies, getCompanies } = useCompanyStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [searchStatus, setSearchStatus] = useState<FILTER>(FILTER.ALL_STATUS);
+  const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
   const [searchCompany, setSearchCompany] = useState<FILTER>(
     FILTER.ALL_COMPANIES
   );
