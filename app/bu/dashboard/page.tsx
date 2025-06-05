@@ -9,6 +9,7 @@ import DashboardHeader from "@/app/components/dash/DashboardHeader";
 import DashboardFilters from "@/app/components/dash/DashboardFilters";
 import DashboardStats from "@/app/components/dash/DashboardStats";
 import DashboardCharts from "@/app/components/dash/DashboardCharts";
+import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 
 interface RouteData {
   lat: number;
@@ -29,7 +30,7 @@ export default function DashboardPage() {
   const [routeData, setRouteData] = useState<RouteData[]>([]);
   const [selectDate, setSelectDate] = useState("all");
   const [customDate, setCustomDate] = useState(""); // <-- เพิ่มแยก
-  const [isLoadingskeleton, setIsLoadingskeleton] = useState(true);
+  const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerClusterRef = useRef<MarkerClusterer | null>(null);
@@ -83,6 +84,7 @@ export default function DashboardPage() {
   // โหลดข้อมูลเมื่อเลือกวันที่
   useEffect(() => {
     const fetchData = async () => {
+      const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
       const data = await getTransactionMap();
       if (!data) return;
 
@@ -126,15 +128,11 @@ export default function DashboardPage() {
       }));
 
       setRouteData(mapped);
+      cancelSkeleton();
     };
 
     fetchData();
   }, [selectDate, getTransactionMap]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoadingskeleton(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <>

@@ -31,6 +31,9 @@ import { store } from "@/stores/store";
 //hooks
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 
+//enum
+import { getTextMenu, useLanguageContext } from "../i18n/translations";
+
 export default function RootLayout({
   children,
 }: {
@@ -41,6 +44,13 @@ export default function RootLayout({
   const [roleMenu, setRoleMenu] = useState<number[]>([]);
   const account_name = store.account_name.get();
   const account_username = store.account_username.get();
+  const lang = store.Translation.use(); // ✅ re-render เมื่อเปลี่ยนภาษา
+
+  const setLang = (value: 'TH' | 'EN') => {
+    if (value !== lang) {
+      store.Translation.set(value);
+    }
+  };
 
   useEffect(() => {
     setHasMounted(true);
@@ -55,37 +65,41 @@ export default function RootLayout({
       [groupName]: !prev[groupName],
     }));
   };
+  const role = store.account_role.use();
+  const { isTH, isSuperAdmin } = useLanguageContext();
+  const menuText = getTextMenu({ isTH, isSuperAdmin });
+
 
   const allMenu = [
     {
-      group: "OVER VIEW",
+      group: menuText.overview,
       items: [
-        { id: 1, icon: House, text: "Dashboard", link: "dashboard" },
-        { id: 9, icon: FileBarChart, text: "Reports", link: "reports" },
-        { id: 2, icon: Ticket, text: "Sell Ticket", link: "sell-ticket" },
+        { id: 1, icon: House, text: menuText.dashboard, link: "dashboard" },
+        { id: 9, icon: FileBarChart, text: menuText.reports, link: "reports" },
+        { id: 2, icon: Ticket, text: menuText.sellTicket, link: "sell-ticket" },
       ],
     },
     {
-      group: "SETUP ROUTE & TICKET",
+      group: menuText.setup,
       items: [
-        { id: 3, icon: Route, text: "Manage Routes", link: "manage-route" },
-        { id: 4, icon: Ticket, text: "Manage Bus Tickets", link: "manage-ticket" },
+        { id: 3, icon: Route, text: menuText.manageRoute, link: "manage-route" },
+        { id: 4, icon: Ticket, text: menuText.manageTicket, link: "manage-ticket" },
       ],
     },
     {
-      group: "TEMPLATE",
+      group: menuText.template,
       items: [
-        { id: 5, icon: Map, text: "Manage Location", link: "manage-location" },
-        { id: 11, icon: DollarSign, text: "Manage Promotion", link: "manage-price-type" },
-        { id: 7, icon: Calendar, text: "Manage Date", link: "manage-dates" },
-        { id: 6, icon: Clock, text: "Manage Times", link: "manage-times" },
+        { id: 5, icon: Map, text: menuText.manageLocation, link: "manage-location" },
+        { id: 11, icon: DollarSign, text: menuText.managePromo, link: "manage-price-type" },
+        { id: 7, icon: Calendar, text: menuText.manageDate, link: "manage-dates" },
+        { id: 6, icon: Clock, text: menuText.manageTime, link: "manage-times" },
       ],
     },
     {
-      group: "USERS",
+      group: menuText.users,
       items: [
-        { id: 8, icon: Users, text: "Manage Employee", link: "manage-members" },
-        { id: 10, icon: Building, text: "Manage Company", link: "manage-company" },
+        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", },
+        { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
   ];
@@ -171,15 +185,17 @@ export default function RootLayout({
                   {/* Group Items (toggle visibility) */}
                   {isOpen && (
                     <div className="space-y-1 mt-1">
-                      {group.items.map((item) => (
-                        <MenuItemLink
-                          key={item.id}
-                          link={item.link}
-                          text={item.text}
-                          icon={item.icon}
-                        />
-                      ))}
-                    </div>
+                    {group.items.map((item) => (
+                      <MenuItemLink
+                        key={item.id}
+                        text={item.text}
+                        icon={item.icon}
+                        href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
+                        as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
+                      />
+                    ))}
+                  </div>
+
                   )}
                 </div>
               );
@@ -240,6 +256,21 @@ export default function RootLayout({
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* ปุ่มเปลี่ยนภาษา */}
+              <div className="flex gap-2 ml-auto">
+                {['TH', 'EN'].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setLang(item as 'TH' | 'EN')}
+                    className={`px-3 py-1.5 text-sm rounded-md border cursor-pointer
+                      ${lang === item ? 'bg-orange-500 text-white ring-2 ring-orange-500' : 'text-gray-600 bg-white'} 
+                      transition focus:outline-none`}
+                  >
+                    {item}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

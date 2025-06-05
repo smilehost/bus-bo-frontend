@@ -12,6 +12,7 @@ import { TicketRoutePrice } from '@/types/types';
 //api
 import { useLocationStore } from '@/stores/locationStore';
 import { toast } from 'react-toastify';
+import { getTextTableMatrix, useLanguageContext } from '@/app/i18n/translations';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
@@ -236,47 +237,51 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
     newErrors[i][j] = false;
     setErrorMatrix(newErrors);
   };
+  const { isTH } = useLanguageContext();
+  const text = getTextTableMatrix({isTH});
   // console.log("ticketPrice: ", ticketPrice)
   return (
-    <div >
-      <p className='mb-2 text-xl font-bold'>{ticketTypePriceName}</p>
-      <div className="mb-4 flex flex-wrap gap-4 items-center">
-        <label>
-          Row Value:{' '}
-          <input
-            type="number"
-            className="custom-border-gray rounded-md p-1 w-20"
-            value={rowValue}
-            onChange={(e) => setRowValue(e.target.value)}
-          />
-        </label>
-        <label>
-          Column Value:{' '}
-          <input
-            type="number"
-            className="custom-border-gray rounded-md p-1 w-20"
-            value={colValue}
-            onChange={(e) => setColValue(e.target.value)}
-          />
-        </label>
-        <ButtonDefault text='Apply' size='' onClick={applyValues} />
-        {showSave && (
-          <ButtonBG text='Save Table' size='' onClick={handleSave} />
-        )}
-      </div>
+    <div>
+    <p className="mb-2 text-xl font-bold">{ticketTypePriceName}</p>
+    <div className="mb-4 flex flex-wrap gap-4 items-center">
+      <label>
+        {text.rowLabel}:{' '}
+        <input
+          type="number"
+          className="custom-border-gray rounded-md p-1 w-20"
+          value={rowValue}
+          onChange={(e) => setRowValue(e.target.value)}
+        />
+      </label>
 
-      {/* Display selection summary */}
-      <div className="mb-4 text-sm text-gray-700">
-        <p>
-          Selected Rows:{' '}
-          {rowChecked.map((i) => `${stationName[i]}`).join(', ') || 'None'}
-        </p>
-        <p>
-          Selected Columns:{' '}
-          {colChecked.map((i) => `${stationName[i + 1]}`).join(', ') ||
-            'None'}
-        </p>
-      </div>
+      <label>
+        {text.colLabel}:{' '}
+        <input
+          type="number"
+          className="custom-border-gray rounded-md p-1 w-20"
+          value={colValue}
+          onChange={(e) => setColValue(e.target.value)}
+        />
+      </label>
+
+      <ButtonDefault text={text.applyText} size="" onClick={applyValues} />
+
+      {showSave && (
+        <ButtonBG text={text.saveText} size="" onClick={handleSave} />
+      )}
+    </div>
+
+    {/* Display selection summary */}
+    <div className="mb-4 text-sm text-gray-700">
+      <p>
+        {text.selectedRowsLabel}{' '}
+        {rowChecked.map((i) => `${stationName[i]}`).join(', ') || text.noneText}
+      </p>
+      <p>
+        {text.selectedColsLabel}{' '}
+        {colChecked.map((i) => `${stationName[i + 1]}`).join(', ') || text.noneText}
+      </p>
+    </div>
 
       <div className=' overflow-auto'>
         <table className="table-auto w-full text-sm">

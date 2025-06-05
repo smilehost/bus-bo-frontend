@@ -11,6 +11,7 @@ import { useTicketStore } from '@/stores/routeTicketStore'
 import { TicketProps } from '@/types/types';
 
 import { useSearchParams } from 'next/navigation';
+import { store } from '@/stores/store';
 
 function Page() {
   const searchParams = useSearchParams()
@@ -21,6 +22,8 @@ function Page() {
   const routeId = Number(id)
 
   const [ticketData, setTicketData] = useState<TicketProps[]>();
+  const lang = store.Translation.use();
+  const title = lang === 'EN' ? 'Manage Bus Ticket' : 'จัดการตั๋วรถ';
 
   useEffect(() => {
     if (!id) return;
@@ -35,7 +38,7 @@ function Page() {
 
   return (
     <div>
-      <TitlePage title={"Add New Route Ticket"} />
+      <TitlePage title={title} />
       {ticketData && routeId && <FromRouteTicketByStep ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
     </div>
   )
