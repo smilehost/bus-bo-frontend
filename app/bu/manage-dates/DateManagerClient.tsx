@@ -20,6 +20,7 @@ import { SquarePen, Trash2 } from "lucide-react";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import { FILTER } from "@/constants/enum";
 import { statusOptions } from "@/constants/options";
+import { Tooltip } from "@mui/material";
 
 type DateTableProps = {
   no: number;
@@ -34,6 +35,7 @@ type DateTableProps = {
     saturday: boolean;
     sunday: boolean;
   };
+  endDate: string;
   status: string;
 };
 
@@ -298,10 +300,12 @@ export default function DateManagerClient() {
             <span>Active</span>
           </span>
         ) : (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
+        <Tooltip title={`Expires on ${row.endDate}`}>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
             <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
             <span>Inactive</span>
           </span>
+        </Tooltip>
         ),
     },
     {
@@ -331,7 +335,6 @@ export default function DateManagerClient() {
       ),
     },
   ];
-
 
   const paginatedWithNo = paginatedDates.map((date, idx) => ({
     ...date,
