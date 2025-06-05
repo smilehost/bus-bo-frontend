@@ -33,6 +33,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import Typography from '@mui/material/Typography';
+import {getTextRouteTicketBystep, useLanguageContext} from '@/app/i18n/translations'
 
 export type TicketPriceTypeFixed = {
   id_type: string,
@@ -74,6 +75,8 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
   const [checkConfirm, setCheckConfirm] = useState(true);
   const [initialTicketChecked, setInitialTicketChecked] = useState<string[]>([]);
   const [isSaveTable, setSaveTable] = useState<number>(0)
+  const { isTH  } = useLanguageContext();
+  const text = getTextRouteTicketBystep({ isTH });
 
   // ------------------- UTIL ----------------------
   const resetTicketForm = () => {
@@ -270,6 +273,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
         price: item.price.toString(),
         route_ticket_price_route_id: Number(routeId)
       }))
+      
     };
 
     //fetch create, update to api
@@ -337,7 +341,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
     <div>
       {tickets && tickets.length > 0 && (
         <div className="mt-4">
-          <p className="font-medium">Tickets</p>
+          <p className="font-medium">{text.title}</p>
           <div className="flex flex-wrap gap-4 mt-1">
             {!ticketActiveConfig
               ? tickets.map((item, index) => (
@@ -345,6 +349,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                   key={index}
                   ticket={item}
                   isActive={ticketActive === item.id}
+                  isTicketActive={item.ticket_status === 0 ? true : false}
                   onClick={() => {
                     if (activeStep > 0) {
                       toast.error("Please go back or finish editing before proceeding.");
@@ -368,8 +373,14 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
                     ticketName_th: ticketData[0].ticketName_th,
                     ticket_type: ticketData[0].ticket_type ?? TICKET_TYPE.FIXED,
                     ticket_amount: '0',
-                    route_id: '0'
+                    route_id: '0',
+                    route: {
+                      route_name_th: "",
+                      route_name_en: "",
+                      route_status: 0,
+                    }
                   }}
+                  isTicketActive={ticketData[0].ticket_status === 0 ? true : false}
                   isActive={true}
                 />
               )}
@@ -383,11 +394,11 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
             <Step className=''>
               <StepLabel
                 optional={
-                  <Typography variant="caption">
+                  <Typography variant="h6" color="textPrimary">
                     {ticketActive ? (
-                      <>{ticketActive} - Edit</>
+                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - {text.Edit}</>
                     ) : (
-                      <>Ticket - Create</>
+                      <>{text.New}</>
                     )}
                   </Typography>
                 }
@@ -433,11 +444,11 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
             <Step className=''>
               <StepLabel
                 optional={
-                  <Typography variant="caption">
+                  <Typography variant="h6" color="textPrimary">
                     {ticketActive ? (
-                      <>{ticketActive} - Manage Price</>
+                      <>{ticketData.find((item) => item.id === ticketActive)?.ticketName_th} - {text.manPrice}</>
                     ) : (
-                      <>Ticket - Manage Price</>
+                      <>{text.manTicketPrice}</>
                     )}
                   </Typography>
                 }

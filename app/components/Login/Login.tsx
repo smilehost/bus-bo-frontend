@@ -53,29 +53,43 @@ function Login() {
           withCredentials: true,
         }
       );
-
+  
       const authHeader = response.headers["authorization"];
       if (authHeader?.startsWith("Bearer ")) {
         const token = authHeader.split(" ")[1].trim();
         store.token.set(token);
-
+  
         const decoded = jwtDecode<DecodedToken>(token);
         store.com_id.set(decoded.com_id);
         store.account_id.set(decoded.account_id);
         store.account_role.set(decoded.account_role);
-
-        console.log("com_id :", store.com_id.get());
-        console.log("account_id :", store.account_id.get());
-        console.log("account_role :", store.account_role.get());
-        console.log("token :", store.token.get() + ":");
-
-        // เพิ่ม alert เมื่อ login สำเร็จ
+        store.account_name.set(response.data.result.account_name);
+        store.account_username.set(response.data.result.account_username);
+        store.Translation.set("TH");
+  
+        // ✅ ถ้าเป็น SuperAdmin → ดึง com_id ทั้งหมด
+        if (decoded.account_role === "2") {
+          try {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/company/all`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              withCredentials: true,
+            });
+  
+            const comIds = res.data.result.map((company: any) => company.com_id);
+            localStorage.setItem("comidSuper", JSON.stringify(comIds));
+          } catch (err) {
+            console.error("Failed to fetch companies for SuperAdmin:", err);
+          }
+        }
+  
         await Alert({
           title: "Login Success!",
           text: "The system will take you to the website.",
           type: "success",
         });
-
+  
         router.replace("/bu/dashboard");
       } else {
         setError("Login failed: No token received");
@@ -85,6 +99,7 @@ function Login() {
       console.error("Login error:", err);
     }
   };
+  
 
   return (
     <div className="shadow-xl rounded-lg overflow-hidden">

@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type EditPasswordModelProps = {
   open: boolean;
@@ -21,7 +23,7 @@ function EditPasswordModel({
 
   const handleSave = () => {
     if (!password.trim()) {
-      alert("Please enter a new password.");
+      toast.error("Please enter a new password.");
       return;
     }
     onSave(userId, password.trim());

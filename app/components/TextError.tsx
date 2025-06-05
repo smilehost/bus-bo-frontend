@@ -1,11 +1,16 @@
 import React from 'react'
 
 interface TextErrorProps {
-    text: string;
+  text: string;
+  fontSize?: string;
 }
-function TextError({text}: TextErrorProps) {
+function TextError({ text, fontSize = "13px" }: TextErrorProps) {
   return (
-    <p className='text-red-500 text-xs'>* {text}</p>
+    <p className={`text-red-500`}
+      style={{
+        fontSize: fontSize
+      }}
+    >* {text}</p>
   )
 }
 

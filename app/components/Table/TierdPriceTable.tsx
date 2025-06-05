@@ -11,8 +11,8 @@ import { TicketRoutePrice } from '@/types/types';
 
 //api
 import { useLocationStore } from '@/stores/locationStore';
-import { LocationItem } from '@/types/location';
 import { toast } from 'react-toastify';
+import { getTextTableMatrix, useLanguageContext } from '@/app/i18n/translations';
 
 interface TierdPriceTableProps {
   ticketPrice: TicketRoutePrice[];
@@ -25,7 +25,10 @@ interface TierdPriceTableProps {
 }
 
 function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTypePriceId, handleSaveTable, setSaveTable, saveTable }: TierdPriceTableProps) {
-  const { getLocationById } = useLocationStore();
+  const { locations, getLocations } = useLocationStore();
+  useEffect(() => {
+    getLocations(1, 1000);
+  }, [getLocations]);
 
   //set price เริ่มต้น
   const [checkFetchData, setCheckFetchData] = useState<boolean>(false)
@@ -57,11 +60,13 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
       if (!stations || stations.length === 0) return;
 
       try {
-        const stationNameTemp = (
-          await Promise.all(stations.map((id) => getLocationById(parseInt(id))))
-        ).filter((s): s is LocationItem => s !== undefined);
+        const stationNameTemp = stations.map((id) => locations.find((s) => Number(s.id) === Number(id)))
 
-        setStationName(stationNameTemp.map((s) => s?.name));
+        setStationName(
+          stationNameTemp
+            .map((s) => s?.name)
+            .filter((name): name is string => name !== undefined)
+        );
       } catch (error) {
         console.error('Error loading station names:', error);
       }
@@ -69,7 +74,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
 
     fetchStations();
 
-  }, [stations, getLocationById]);
+  }, [stations, locations]);
 
   const [rowChecked, setRowChecked] = useState<number[]>([]);
   const [colChecked, setColChecked] = useState<number[]>([]);
@@ -232,47 +237,51 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
     newErrors[i][j] = false;
     setErrorMatrix(newErrors);
   };
+  const { isTH } = useLanguageContext();
+  const text = getTextTableMatrix({isTH});
   // console.log("ticketPrice: ", ticketPrice)
   return (
-    <div >
-      <p className='mb-2 text-xl font-bold'>{ticketTypePriceName}</p>
-      <div className="mb-4 flex flex-wrap gap-4 items-center">
-        <label>
-          Row Value:{' '}
-          <input
-            type="number"
-            className="custom-border-gray rounded-md p-1 w-20"
-            value={rowValue}
-            onChange={(e) => setRowValue(e.target.value)}
-          />
-        </label>
-        <label>
-          Column Value:{' '}
-          <input
-            type="number"
-            className="custom-border-gray rounded-md p-1 w-20"
-            value={colValue}
-            onChange={(e) => setColValue(e.target.value)}
-          />
-        </label>
-        <ButtonDefault text='Apply' size='' onClick={applyValues} />
-        {showSave && (
-          <ButtonBG text='Save Table' size='' onClick={handleSave} />
-        )}
-      </div>
+    <div>
+    <p className="mb-2 text-xl font-bold">{ticketTypePriceName}</p>
+    <div className="mb-4 flex flex-wrap gap-4 items-center">
+      <label>
+        {text.rowLabel}:{' '}
+        <input
+          type="number"
+          className="custom-border-gray rounded-md p-1 w-20"
+          value={rowValue}
+          onChange={(e) => setRowValue(e.target.value)}
+        />
+      </label>
 
-      {/* Display selection summary */}
-      <div className="mb-4 text-sm text-gray-700">
-        <p>
-          Selected Rows:{' '}
-          {rowChecked.map((i) => `${stationName[i]}`).join(', ') || 'None'}
-        </p>
-        <p>
-          Selected Columns:{' '}
-          {colChecked.map((i) => `${stationName[i + 1]}`).join(', ') ||
-            'None'}
-        </p>
-      </div>
+      <label>
+        {text.colLabel}:{' '}
+        <input
+          type="number"
+          className="custom-border-gray rounded-md p-1 w-20"
+          value={colValue}
+          onChange={(e) => setColValue(e.target.value)}
+        />
+      </label>
+
+      <ButtonDefault text={text.applyText} size="" onClick={applyValues} />
+
+      {showSave && (
+        <ButtonBG text={text.saveText} size="" onClick={handleSave} />
+      )}
+    </div>
+
+    {/* Display selection summary */}
+    <div className="mb-4 text-sm text-gray-700">
+      <p>
+        {text.selectedRowsLabel}{' '}
+        {rowChecked.map((i) => `${stationName[i]}`).join(', ') || text.noneText}
+      </p>
+      <p>
+        {text.selectedColsLabel}{' '}
+        {colChecked.map((i) => `${stationName[i + 1]}`).join(', ') || text.noneText}
+      </p>
+    </div>
 
       <div className=' overflow-auto'>
         <table className="table-auto w-full text-sm">
@@ -280,14 +289,17 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
             <tr>
               <th className="border border-gray-200 px-2 py-1 text-center h-14">location</th>
               {stations.slice(1).map((station, j) => (
-                <th key={j} className="border border-gray-200 px-2 py-1 text-center">
+                <th key={j} className="border border-gray-200 px-2 py-2 text-center align-top">
                   <label className="flex flex-col items-center space-y-1">
                     <input
                       type="checkbox"
                       checked={colChecked.includes(j)}
                       onChange={() => toggleCheck(j, 'col')}
+                      className='cursor-pointer'
                     />
-                    <div>{stationName[j + 1]}</div>
+                    <div className='font-normal'>
+                      {stationName[j + 1]}
+                    </div>
                   </label>
                 </th>
               ))}
@@ -301,6 +313,7 @@ function TierdPriceTable({ ticketPrice, stations, ticketTypePriceName, ticketTyp
                     type="checkbox"
                     checked={rowChecked.includes(i)}
                     onChange={() => toggleCheck(i, 'row')}
+                    className='cursor-pointer'
                   />
                   <span className=' max-w-40 xl:max-w-96 custom-ellipsis-style'>{stationName[i]}</span>
                 </td>

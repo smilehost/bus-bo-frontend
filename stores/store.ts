@@ -7,21 +7,29 @@ const defaultState: {
   com_id: number;
   account_id: number;
   account_role: string;
+  account_name: string;
+  account_username: string;
   token: string;
+  Translation: string;
 } = {
   com_id: 0,
   account_id: 1,
   account_role: "",
   token: "",
+  account_name: "",
+  account_username: "",
+  Translation: "", // TH or EN
 };
 
 type StoreState = typeof defaultState;
 
+// ✅ Actions
 type StoreActions = {
   setField: <K extends keyof StoreState>(key: K, value: StoreState[K]) => void;
 };
 
-const useZustandStore = create<StoreState & StoreActions>()(
+// ✅ Zustand store
+export const useZustandStore = create<StoreState & StoreActions>()(
   persist(
     (set) => ({
       ...defaultState,
@@ -31,6 +39,7 @@ const useZustandStore = create<StoreState & StoreActions>()(
   )
 );
 
+// ✅ Proxy Wrapper class
 class AppStore {
   private readonly store = useZustandStore;
   private readonly fields = Object.keys(defaultState) as (keyof StoreState)[];
@@ -56,6 +65,7 @@ class AppStore {
             get: () => this.store.getState()[key],
             set: (value: StoreState[typeof key]) =>
               this.store.getState().setField(key, value),
+            use: () => this.store((state) => state[key]),
           };
         },
       }
@@ -63,13 +73,16 @@ class AppStore {
       [K in keyof StoreState]: {
         get: () => StoreState[K];
         set: (value: StoreState[K]) => void;
+        use: () => StoreState[K];
       };
     } & {
       clear: () => void;
     };
   }
 
+  // ✅ ดึงทั้ง state ถ้าต้องการ
   use = () => this.store();
 }
 
+// ✅ export
 export const store = new AppStore().proxy;

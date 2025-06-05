@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation';
+
 //component
 import FromRouteTicketByStep from '@/app/components/Form/FormRouteTicketByStep'
 import TitlePage from '@/app/components/Title/TitlePage';
@@ -10,13 +10,20 @@ import TitlePage from '@/app/components/Title/TitlePage';
 import { useTicketStore } from '@/stores/routeTicketStore'
 import { TicketProps } from '@/types/types';
 
+import { useSearchParams } from 'next/navigation';
+import { store } from '@/stores/store';
+
 function Page() {
-  const { id } = useParams();
+  const searchParams = useSearchParams()
+  const id = searchParams.get("id")
+
   const { getTicketByRouteId } = useTicketStore();
 
   const routeId = Number(id)
 
   const [ticketData, setTicketData] = useState<TicketProps[]>();
+  const lang = store.Translation.use();
+  const title = lang === 'EN' ? 'Manage Bus Ticket' : 'จัดการตั๋วรถ';
 
   useEffect(() => {
     if (!id) return;
@@ -31,7 +38,7 @@ function Page() {
 
   return (
     <div>
-      <TitlePage title={"Add New Route Ticket"} />
+      <TitlePage title={title} />
       {ticketData && routeId && <FromRouteTicketByStep ticketData={ticketData} routeId={routeId} ticketActiveConfig=''/>}
     </div>
   )

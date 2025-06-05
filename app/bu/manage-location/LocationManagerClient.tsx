@@ -11,6 +11,10 @@ import { debounce } from "@/utils/debounce";
 import { useLocationStore } from "@/stores/locationStore";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import TitlePage from "@/app/components/Title/TitlePage";
+import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
+import { MapPin, SquarePen, Trash2 } from "lucide-react";
+import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
+import {getTextLocation, useLanguageContext} from "@/app/i18n/translations";
 
 // Define interfaces for location data
 interface Location {
@@ -26,6 +30,13 @@ interface LocationFormData {
   longitude: number;
 }
 
+interface LocationTableProps {
+  no: number;
+  name: string;
+  lat: string;
+  long: string;
+  id: number;
+}
 function Page() {
   const {
     locations,
@@ -47,6 +58,8 @@ function Page() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+  const { isTH } = useLanguageContext();
+  const text = getTextLocation({isTH});
 
   const fetchLocations = async () => {
     setIsLoading(true);
@@ -194,10 +207,66 @@ function Page() {
     currentPage * rowsPerPage
   );
 
+  const paginatedWithNo = paginatedLocations.map((lo, index) => ({
+    ...lo,
+    no: (currentPage - 1) * rowsPerPage + index + 1,
+  }));
+
+  //columns
+  const columns: ColumnConfig<LocationTableProps>[] = [
+    {
+      key: 'no', label: text.number, width: '20%', align: 'left'
+    },
+    {
+      key: 'name', label: text.name, width: '20%', align: 'left'
+    },
+    { key: 'lat', label: text.lat, width: '20%', align: 'center' },
+    { key: 'long', label: text.long , width: '20%', align: 'center' },
+    {
+      key: 'id', label: text.action, width: '25%', align: 'right',
+      render: (_, row) => (
+        <div className="flex justify-end gap-2 min-w-max">
+          <TableActionButton
+            href={`https://www.google.com/maps?q=${row.lat},${row.long}`}
+            newTab
+            icon={
+              <MapPin
+                className={`custom-size-tableAction-btn text-purple-600`}
+              />
+            }
+            bgColor="bg-purple-100"
+            hoverColor="hover:bg-purple-200"
+            title={isTH ? "เปิดใน Google Maps" : "Open in Google Maps"}
+          />
+          <TableActionButton
+            onClick={() => handleEditLocation(row.id)}
+            icon={
+              <SquarePen
+                className={`custom-size-tableAction-btn text-blue-500`}
+              />
+            }
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+            title={isTH ? "แก้ไข" : "Edit"}
+          />
+          <TableActionButton
+            onClick={() => handleDeleteLocation(row.id)}
+            icon={
+              <Trash2 className={`custom-size-tableAction-btn text-red-600`} />
+            }
+            bgColor="bg-red-50 text-red-600"
+            hoverColor="hover:bg-red-100"
+            title={isTH ? "ลบ" : "Delete"}
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Location" description="View and manage location information" btnText='Add New Location' handleOpenModel={handleAddLocation} />
+        <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddLocation} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
@@ -210,22 +279,19 @@ function Page() {
           {isLoadingskeleton ? (
             <SkeletonLocationTable rows={5} />
           ) : (
-            <LocationTable
-              locations={paginatedLocations.map((location) => ({
-                id: location.id,
-                name: location.name,
-                latitude: parseFloat(location.lat),
-                longitude: parseFloat(location.long),
-              }))}
-              onEdit={handleEditLocation}
-              onDelete={handleDeleteLocation}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              totalResults={totalResults}
-              isLoading={isLoading}
-            />
+            <div className="w-full overflow-x-auto">
+              <TableTemplate
+                columns={columns}
+                data={paginatedWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalPages={Math.ceil(totalResults / rowsPerPage)}
+                totalResults={totalResults}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row) => row.id}
+              />
+            </div>
           )}
         </div>
       </div>

@@ -17,8 +17,6 @@ import { withSkeletonDelay } from '@/app/components/Skeleton/withSkeletonDelay'
 
 //store
 import { useTicketStore } from '@/stores/routeTicketStore'
-import { useUserStore } from '@/stores/userStore';
-import { useCompanyStore } from '@/stores/companyStore';
 
 //toast
 import { toast } from 'react-toastify'
@@ -32,8 +30,11 @@ import { statusOptions } from '@/constants/options';
 import TitlePage from '@/app/components/Title/TitlePage';
 
 ////icons
-import { Ticket } from "lucide-react";
+import { Ticket, Trash2 } from "lucide-react";
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
+import {getTextTicketPage, useLanguageContext} from '@/app/i18n/translations'
+import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput';
+import { Alert } from '@/app/components/Dialog/Alert';
 
 
 export interface TicketTableData {
@@ -41,22 +42,21 @@ export interface TicketTableData {
   ticketNameEN: string,
   ticketNameTH: string,
   ticketType: string,
+  routeNameTH: string,
+  routeNameEN: string,
   status: number,
   amount: number,
-  ticketColor: string
+  ticketColor: string,
+  route_status: number
 }
 
 function Page() {
 
   //stores
   const { ticketDataList, getTickets, deleteTicket, updateTicketStatus } = useTicketStore();
-  const { companies, getCompanies } = useCompanyStore();
-  const { userData } = useUserStore();
-
   const pathname = usePathname();
 
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  const [searchCompany, setSearchCompany] = useState<string>(''); // Filter by company
   const [search, setSearch] = useState<string>(''); // Search input
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
@@ -70,10 +70,6 @@ function Page() {
   }
 
   useEffect(() => {
-    getCompanies(1, 9999, '');
-  }, [])
-  
-  useEffect(() => {
     if (ticketDataList) {
       setTickets(ticketDataList.data)
     }
@@ -82,6 +78,8 @@ function Page() {
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const {isTH} = useLanguageContext();
+  const text = getTextTicketPage({isTH});
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSize = Number(e.target.value);
@@ -101,9 +99,12 @@ function Page() {
     status: number,
     ticketType: string,
     amount: number,
-    ticketColor: string
+    ticketColor: string,
+    routeNameTH: string,
+    routeNameEN: string,
+    route_status: number,
   ): TicketTableData => {
-    return { id, ticketType, ticketNameEN, ticketNameTH, status, amount, ticketColor };
+    return { id, ticketType, ticketNameEN, ticketNameTH, status, amount, ticketColor, routeNameTH, routeNameEN, route_status };
   };
 
   // Generate rows for table
@@ -124,7 +125,11 @@ function Page() {
             Number(item.ticket_status),
             item.ticket_type,
             Number(item.ticket_amount),
-            item.ticket_color
+            item.ticket_color,
+            item?.route?.route_name_th || "-",
+            item?.route?.route_name_en || "-",
+            Number(item?.route?.route_status),
+
           );
         })
       );
@@ -134,21 +139,48 @@ function Page() {
   }, [tickets]);
 
   // Handle delete route
+  // const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
+  //   const isConfirmed = await Confirm({
+  //     title: `Delete "${ticketName}"?`,
+  //     text: `Are you sure you want to delete it.`,
+  //     confirmText: "Delete",
+  //     cancelText: "Cancel",
+  //   });
+  //   if (isConfirmed) {
+  //     const result = await deleteTicket(id);
+  //     if (result.success) {
+  //       fetchTicketData();
+  //       toast.success("delete ticket successfully!");
+  //     } else {
+  //       toast.error(`Error: ${result.message}`);
+  //     }
+  //   }
+  // };
+
   const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
-    const isConfirmed = await Confirm({
+    const inputName = await ConfirmWithInput({
       title: `Delete "${ticketName}"?`,
       text: `Are you sure you want to delete it.`,
       confirmText: "Delete",
       cancelText: "Cancel",
+      placeholder: "Type route name here"
     });
-    if (isConfirmed) {
+
+    if (inputName === ticketName) {
       const result = await deleteTicket(id);
+
       if (result.success) {
         fetchTicketData();
         toast.success("delete ticket successfully!");
       } else {
         toast.error(`Error: ${result.message}`);
       }
+    } else if (inputName !== null) {
+      await Alert({
+        title: "Name mismatch!",
+        text: "The typed name does not match the ticket name.",
+        type: "error"
+      });
     }
   };
 
@@ -181,12 +213,6 @@ function Page() {
 
 
   //filter
-  const listCompany = companies?.map((item) => {
-    return {
-      key: Number(item.id),
-      value: item.name
-    }
-  })
   const filterSearch = [
     {
       defaulteValue: FILTER.ALL_STATUS,
@@ -194,16 +220,7 @@ function Page() {
       setSearchValue: setSearchStatus,
       size: "w-[130px]"
     },
-    ...(userData?.account_role === 2
-      ? [
-        {
-          defaulteValue: FILTER.ALL_COMPANIES,
-          listValue: listCompany,
-          setSearchValue: setSearchCompany,
-          size: "w-[170px]",
-        },
-      ]
-      : []),
+
   ]
 
   //Search
@@ -226,7 +243,7 @@ function Page() {
   //table columns
   const columns: ColumnConfig<TicketTableData>[] = [
     {
-      key: 'ticketNameEN', label: 'Ticket', width: '25%',
+      key: 'ticketNameEN', label: text.tableTitle, width: '25%',
       render: (_, row) => (
         <div className='flex gap-3'>
           <div>
@@ -237,7 +254,7 @@ function Page() {
             />
           </div>
           <Tooltip title={row.ticketNameTH} arrow>
-            <div className='flex flex-col gap-1 cursor-default'>
+            <div className='flex flex-col gap-1 cursor-default custom-ellipsis-style'>
               <p className='whitespace-nowrap custom-ellipsis-style '>{row.ticketNameTH}</p>
               <p className='whitespace-nowrap custom-ellipsis-style text-gray-500'>{row.ticketNameEN}</p>
             </div>
@@ -245,10 +262,25 @@ function Page() {
         </div>
       ),
     },
-    { key: 'amount', label: 'Amount', width: '20%', align: 'center' },
-    { key: 'ticketType', label: 'Ticket Type', width: '20%', align: 'center' },
     {
-      key: 'status', label: 'Status', width: '20%', align: 'center',
+      key: 'routeNameTH', label: text.route, width: '20%', align: 'left',
+      render: (_, row) => {
+        const isActive = row.route_status === 1 ? true : false
+        return (
+          <Tooltip title={isActive ? row.routeNameTH : "This route status is inactive"} arrow>
+            <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default custom-ellipsis-style w-fit`}>
+              <p className='whitespace-nowrap custom-ellipsis-style'>{row.routeNameTH}</p>
+              <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500" : "text-gray-500"}`}>{row.routeNameEN}</p>
+            </div>
+          </Tooltip>
+        )
+      },
+    },
+    { key: 'amount', label: text.amount, width: '20%', align: 'center' },
+    { key: 'ticketType', label: text.type, width: '20%', align: 'center' },
+    // { key: 'ticketPrice', label: 'Ticket Price', width: '20%', align: 'center' },
+    {
+      key: 'status', label: text.status, width: '20%', align: 'center',
       render: (_, row) => (
         <div className='flex justify-center cursor-pointer' onClick={() => handleChangeStatus({ idStatus: row.status, idTicket: row.id })}>
           <StatusText id={Number(row.status)} />
@@ -256,32 +288,22 @@ function Page() {
       ),
     },
     {
-      key: 'id', label: 'Action', width: '25%', align: 'right',
+      key: 'id', label: text.action, width: '25%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
-          {/* <TableActionButton
-            iconSrc="/icons/money.svg"
-            href={`${pathname}/${row?.id}`}
-            bgColor="bg-green-100"
-            hoverColor="hover:bg-green-200"
-          />
           <TableActionButton
-            iconSrc="/icons/garbage.svg"
-            onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
-            bgColor="bg-red-50"
-            hoverColor="hover:bg-red-100"
-          /> */}
-          <TableActionButton
-            iconSrc="M1.5 6.375c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v3.026a.75.75 0 0 1-.375.65 2.249 2.249 0 0 0 0 3.898.75.75 0 0 1 .375.65v3.026c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 17.625v-3.026a.75.75 0 0 1 .374-.65 2.249 2.249 0 0 0 0-3.898.75.75 0 0 1-.374-.65V6.375Zm15-1.125a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0v.75a.75.75 0 0 0 1.5 0v-.75Zm-.75 3a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0v-.75a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0V18a.75.75 0 0 0 1.5 0v-.75ZM6 12a.75.75 0 0 1 .75-.75H12a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 12Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"
-            href={`${pathname}/${row?.id}`}
+            icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
+            href={`${pathname}/edit?id=${row?.id}&name=${row?.ticketNameTH}`}
             bgColor="text-green-600 bg-green-100"
             hoverColor="hover:bg-green-200"
+            title='Edit'
           />
           <TableActionButton
-            iconSrc="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title='Delete'
           />
         </div>
       ),
@@ -290,7 +312,7 @@ function Page() {
 
   return (
     <>
-      <TitlePage title='Manage Route Tickets' description='View and manage route ticket information.' />
+      <TitlePage title={text.title} description={text.description} />
       <div className='custom-frame-content p-5 mt-5'>
         <FormFilter
           setSearch={(value: string) =>
@@ -298,7 +320,7 @@ function Page() {
               target: { value },
             } as React.ChangeEvent<HTMLInputElement>)
           }
-          placeholderSearch='Search route tickets...'
+          placeholderSearch={text.search}
           filter={filterSearch}
           search={search}
         />

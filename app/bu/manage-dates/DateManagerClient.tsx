@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useDateStore } from "@/stores/dateStore";
-import DateTable from "@/app/components/Table/DateTable";
 import DateModal from "@/app/components/Model/DateModal";
 import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
@@ -12,6 +11,28 @@ import { DateItem } from "@/types/date";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import TitlePage from "@/app/components/Title/TitlePage";
+import { ToastContainer } from "react-toastify";
+import TableTemplate, {
+  ColumnConfig,
+} from "@/app/components/Table/TableTemplate";
+import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
+import { SquarePen, Trash2 } from "lucide-react";
+
+type DateTableProps = {
+  no: number;
+  id: number;
+  name: string;
+  days: {
+    monday: boolean;
+    tuesday: boolean;
+    wednesday: boolean;
+    thursday: boolean;
+    friday: boolean;
+    saturday: boolean;
+    sunday: boolean;
+  };
+  status: string;
+};
 
 export default function DateManagerClient() {
   const { dates, getDates, createDate, updateDate, deleteDate } =
@@ -110,7 +131,7 @@ export default function DateManagerClient() {
     };
 
     setShowModal(false);
-    await new Promise((resolve) => setTimeout(resolve, 300)); 
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
       title: editingDate ? "Confirm Update" : "Confirm Create",
@@ -123,7 +144,7 @@ export default function DateManagerClient() {
     });
 
     if (!isConfirmed) {
-      setShowModal(true); 
+      setShowModal(true);
       return;
     }
 
@@ -219,11 +240,120 @@ export default function DateManagerClient() {
     currentPage * rowsPerPage
   );
 
+  const englishDays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const columns: ColumnConfig<DateTableProps>[] = [
+    {
+      key: "no",
+      label: "No.",
+      width: "6%",
+      align: "center",
+      render: (_: unknown, row: DateTableProps) => <span>{row.no}</span>,
+    },
+    {
+      key: "name",
+      label: "Name",
+      width: "16%",
+      align: "left",
+      render: (_: unknown, row: DateTableProps) => <span>{row.name}</span>,
+    },
+    ...englishDays.map((day, idx) => ({
+      key: `days.${day.toLowerCase()}` as keyof DateTableProps,
+      label: day,
+      width: "8%",
+      align: "center" as const,
+      render: (_: unknown, row: DateTableProps) => {
+        const value = row.days[day.toLowerCase() as keyof typeof row.days];
+        return value ? (
+          <span className="inline-flex items-center justify-center w-7 h-7 bg-green-100 text-green-600 rounded-full shadow-sm transition-transform hover:scale-110">
+            ✓
+          </span>
+        ) : (
+          <span className="inline-flex items-center justify-center w-7 h-7 bg-red-100 text-red-600 rounded-full shadow-sm transition-transform hover:scale-110">
+            ✕
+          </span>
+        );
+      },
+    })),
+    {
+      key: "status",
+      label: "Status",
+      width: "10%",
+      align: "center",
+      render: (_: unknown, row: DateTableProps) =>
+        row.status === "Active" ? (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
+            <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
+            <span>Active</span>
+          </span>
+        ) : (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
+            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+            <span>Inactive</span>
+          </span>
+        ),
+    },
+    {
+      key: "id",
+      label: "Actions",
+      width: "12%",
+      align: "center",
+      render: (_: unknown, row: DateTableProps) => (
+        <div className="flex justify-center space-x-2">
+          <TableActionButton
+            onClick={() => handleEditDate(row.id)}
+            icon={
+              <SquarePen className="custom-size-tableAction-btn text-blue-500" />
+            }
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+          />
+          <TableActionButton
+            onClick={() => handleDeleteDate(row.id)}
+            icon={
+              <Trash2 className="custom-size-tableAction-btn text-red-600" />
+            }
+            bgColor="bg-red-50 text-red-600"
+            hoverColor="hover:bg-red-100"
+          />
+        </div>
+      ),
+    },
+  ];
+
+  const paginatedWithNo = paginatedDates.map((date, idx) => ({
+    ...date,
+    no: (currentPage - 1) * rowsPerPage + idx + 1,
+    days: {
+      monday: date.days.mon,
+      tuesday: date.days.tue,
+      wednesday: date.days.wed,
+      thursday: date.days.thu,
+      friday: date.days.fri,
+      saturday: date.days.sat,
+      sunday: date.days.sun,
+    },
+  }));
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Date" description="View and manage date information" btnText='Add New Date' handleOpenModel={handleAddDate} />
-        <div className="bg-white rounded-md shadow p-5 mt-5">
+        <TitlePage
+          title="Manage Date"
+          description="View and manage date information"
+          btnText="Add New Date"
+          handleOpenModel={handleAddDate}
+        />
+        <div className="custom-frame-content p-5 mt-5">
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
@@ -233,28 +363,20 @@ export default function DateManagerClient() {
           {isLoadingskeleton ? (
             <SkeletonDateTable count={5} />
           ) : (
-            <DateTable
-              dates={paginatedDates.map((date) => ({
-                ...date,
-                days: {
-                  monday: date.days.mon,
-                  tuesday: date.days.tue,
-                  wednesday: date.days.wed,
-                  thursday: date.days.thu,
-                  friday: date.days.fri,
-                  saturday: date.days.sat,
-                  sunday: date.days.sun,
-                },
-              }))}
-              onEdit={handleEditDate}
-              onDelete={handleDeleteDate}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              totalResults={totalResults}
-              isLoading={isLoading}
-            />
+            <div className="overflow-x-auto">
+              <TableTemplate
+                columns={columns}
+                data={paginatedWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalPages={Math.ceil(totalResults / rowsPerPage)}
+                totalResults={totalResults}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row: DateTableProps) => row.id}
+                loading={isLoading}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -267,17 +389,17 @@ export default function DateManagerClient() {
           editingDate={
             editingDate
               ? {
-                ...editingDate,
-                days: {
-                  monday: editingDate.days.mon,
-                  tuesday: editingDate.days.tue,
-                  wednesday: editingDate.days.wed,
-                  thursday: editingDate.days.thu,
-                  friday: editingDate.days.fri,
-                  saturday: editingDate.days.sat,
-                  sunday: editingDate.days.sun,
-                },
-              }
+                  ...editingDate,
+                  days: {
+                    monday: editingDate.days.mon,
+                    tuesday: editingDate.days.tue,
+                    wednesday: editingDate.days.wed,
+                    thursday: editingDate.days.thu,
+                    friday: editingDate.days.fri,
+                    saturday: editingDate.days.sat,
+                    sunday: editingDate.days.sun,
+                  },
+                }
               : undefined
           }
         />

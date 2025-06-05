@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
 
 const instance = axios.create({
@@ -111,6 +111,13 @@ export const api = {
     const { path, params } = payload;
     const url = `${path}/${params}`;
     const res = await instance.delete(url);
+    return res.data;
+  },
+
+  async patch<T>(payload: Payload): Promise<T> {
+    const { path, params, body } = payload;
+    const url = `${path}${params !== undefined ? `/${params}` : ""}`;
+    const res = await instance.patch(url, body);
     return res.data;
   },
 };

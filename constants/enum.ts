@@ -7,7 +7,13 @@ export enum USER_TIER {
 export enum STATUS {
     ACTIVE = "Active",
     INACTIVE = "Inactive",
+    EXPIRE = "Expire",
     CANCELLED = "Cancelled",
+}
+
+export enum DISCOUNT_TYPE {
+    BAHT = "บาท",
+    PERCENT = "%"
 }
 
 export enum FILTER {
