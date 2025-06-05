@@ -129,7 +129,6 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
   const handleSaveDate = () => {
     const errorMessage = validateForm();
     if (errorMessage) {
-      // ใช้ setTimeout เพื่อให้แน่ใจว่า Modal ปิดก่อน
       setTimeout(() => {
         toast.error(errorMessage);
       }, 100);
@@ -149,11 +148,15 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
           }
         : newDate.days;
 
+    // ✅ แก้ตรงนี้: เคลียร์เวลาของทั้งวันนี้และ endDate
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // เคลียร์เวลา
+
     const endDate = new Date(newDate.endDate);
+    endDate.setHours(0, 0, 0, 0); // เคลียร์เวลา
+
     const status = endDate < today ? "Inactive" : "Active";
 
-    // ส่งข้อมูลและปิด Modal
     onSave({
       name: newDate.name,
       startDate: newDate.startDate,

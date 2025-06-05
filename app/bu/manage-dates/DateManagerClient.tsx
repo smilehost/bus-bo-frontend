@@ -71,15 +71,39 @@ export default function DateManagerClient() {
   };
 
   const filterDates = useCallback(() => {
-    let tempDates = [...dates];
+    const today = new Date();
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ); // ตัดเวลาออก
+
+    let tempDates = [...dates].map((date) => {
+      const endDate = new Date(date.endDate);
+      const endDateStart = new Date(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate()
+      );
+
+      const isExpired = endDateStart < todayStart;
+
+      return {
+        ...date,
+        status: isExpired ? "Inactive" : date.status,
+      };
+    });
+
     if (debouncedSearch) {
       tempDates = tempDates.filter((date) =>
         date.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
+
     if (statusFilter !== "All Status") {
       tempDates = tempDates.filter((date) => date.status === statusFilter);
     }
+
     setFilteredDates(tempDates);
     setTotalResults(tempDates.length);
     setCurrentPage(1);
@@ -300,12 +324,12 @@ export default function DateManagerClient() {
             <span>Active</span>
           </span>
         ) : (
-        <Tooltip title={`Expires on ${row.endDate}`}>
+          <Tooltip title={`Expires on ${row.endDate}`}>
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
-            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-            <span>Inactive</span>
-          </span>
-        </Tooltip>
+              <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+              <span>Inactive</span>
+            </span>
+          </Tooltip>
         ),
     },
     {
@@ -415,17 +439,17 @@ export default function DateManagerClient() {
           editingDate={
             editingDate
               ? {
-                ...editingDate,
-                days: {
-                  monday: editingDate.days.mon,
-                  tuesday: editingDate.days.tue,
-                  wednesday: editingDate.days.wed,
-                  thursday: editingDate.days.thu,
-                  friday: editingDate.days.fri,
-                  saturday: editingDate.days.sat,
-                  sunday: editingDate.days.sun,
-                },
-              }
+                  ...editingDate,
+                  days: {
+                    monday: editingDate.days.mon,
+                    tuesday: editingDate.days.tue,
+                    wednesday: editingDate.days.wed,
+                    thursday: editingDate.days.thu,
+                    friday: editingDate.days.fri,
+                    saturday: editingDate.days.sat,
+                    sunday: editingDate.days.sun,
+                  },
+                }
               : undefined
           }
         />

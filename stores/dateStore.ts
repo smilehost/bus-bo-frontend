@@ -20,7 +20,7 @@ interface DateState {
   deleteDate: (id: number) => Promise<void>;
   getDateById: (id: number) => Promise<DateItem | undefined>;
 }
-const  com_id  = getComId();
+const com_id = getComId();
 
 export const useDateStore = create<DateState>((set) => ({
   dates: [],
@@ -37,25 +37,38 @@ export const useDateStore = create<DateState>((set) => ({
         status,
       })) as { result: any[] };
       const rawData = res.result || [];
+      const today = new Date();
+      const todayStart = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
 
-      const mapped: DateItem[] = rawData.map((item: any) => ({
-        id: item.route_date_id,
-        name: item.route_date_name,
-        startDate: item.route_date_start,
-        endDate: item.route_date_end,
-        days: {
-          mon: item.route_date_mon === 1,
-          tue: item.route_date_tue === 1,
-          wed: item.route_date_wen === 1,
-          thu: item.route_date_thu === 1,
-          fri: item.route_date_fri === 1,
-          sat: item.route_date_sat === 1,
-          sun: item.route_date_sun === 1,
-        },
-        status:
-          new Date(item.route_date_end) < new Date() ? "Inactive" : "Active",
-      }));
+      const mapped: DateItem[] = rawData.map((item: any) => {
+        const endDate = new Date(item.route_date_end);
+        const endDateStart = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate()
+        );
 
+        return {
+          id: item.route_date_id,
+          name: item.route_date_name,
+          startDate: item.route_date_start,
+          endDate: item.route_date_end,
+          days: {
+            mon: item.route_date_mon === 1,
+            tue: item.route_date_tue === 1,
+            wed: item.route_date_wen === 1,
+            thu: item.route_date_thu === 1,
+            fri: item.route_date_fri === 1,
+            sat: item.route_date_sat === 1,
+            sun: item.route_date_sun === 1,
+          },
+          status: endDateStart < todayStart ? "Inactive" : "Active",
+        };
+      });
       set({ dates: mapped, total: mapped.length });
     } catch (error) {
       console.error("fetchDates error:", error);
@@ -101,7 +114,7 @@ export const useDateStore = create<DateState>((set) => ({
 
   getDateById: async (id: number): Promise<DateItem | undefined> => {
     try {
-      const res = await DateService.fetchDateById(id) as { result: DateItem };
+      const res = (await DateService.fetchDateById(id)) as { result: DateItem };
       return res.result;
     } catch (error) {
       console.error("getRouteById error:", error);
