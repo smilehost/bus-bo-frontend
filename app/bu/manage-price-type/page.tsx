@@ -153,50 +153,83 @@ function Page() {
 
   //model
   //ticket type models
-  const handleTicketTypeModel = async ({ id, name }: { id?: number, name?: string }) => {
-    const isConfirmed = await ConfirmWithInput({
-      title: `${id ? "Edit Price Type" : "Add New Price Type"}`,
-      text: `Fill in the price type details below.`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
-      placeholder: "Type route name here",
-      defaultValue: name || ""  // ใส่ค่า name ถ้ามี, ไม่งั้นเป็น empty string
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [confirmDialogData, setConfirmDialogData] = useState<{
+    id?: number;
+    name?: string;
+    mode: 'add' | 'edit';
+  } | null>(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteDialogData, setDeleteDialogData] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const openTicketTypeDialog = (data?: { id?: number; name?: string }) => {
+    setConfirmDialogData({
+      id: data?.id,
+      name: data?.name || '',
+      mode: data?.id ? 'edit' : 'add'
     });
-
-    if (isConfirmed) {
-      const inputName = isConfirmed.trim();
-
-      if (!inputName) {
-        toast.error("Name cannot be empty");
-        return;
-      }
-
-      const formatPayload = {
-        route_ticket_price_type_name: inputName,
-        route_ticket_price_type_com_id: Number(getComId())
-      };
-
-      if (id) {
-        const result = await updateTicketPriceType(id, {
-          ...formatPayload,
-          route_ticket_price_type_id: id,
-        });
-        if (result.success) {
-          toast.success("Updated successfully!");
-        } else {
-          toast.error(`Update failed: ${result.message}`);
-        }
-      } else {
-        // เพิ่มใหม่ (ไม่ส่ง id)
-        const result = await addTicketType(formatPayload);
-        if (result.success) {
-          toast.success("Created successfully!");
-        } else {
-          toast.error(`Creation failed: ${result.message}`);
-        }
-      }
-      fetchTicketTypeData(); // รีเฟรชข้อมูล
+    setConfirmDialogOpen(true);
+  };
+  const openDeleteDialog = (data: { id: number; name: string }) => {
+    setDeleteDialogData(data);
+    setDeleteDialogOpen(true);
+  };
+  const handleTicketTypeConfirm = async (input: string) => {
+    const name = input.trim();
+    if (!name) {
+      toast.error("Name cannot be empty");
+      return;
     }
+
+    const formatPayload = {
+      route_ticket_price_type_name: name,
+      route_ticket_price_type_com_id: Number(getComId()),
+    };
+
+    if (confirmDialogData?.mode === 'edit' && confirmDialogData?.id) {
+      const result = await updateTicketPriceType(confirmDialogData.id, {
+        ...formatPayload,
+        route_ticket_price_type_id: confirmDialogData.id,
+      });
+      if (result.success) {
+        toast.success("Updated successfully!");
+      } else {
+        toast.error(`Update failed: ${result.message}`);
+      }
+    } else {
+      const result = await addTicketType(formatPayload);
+      if (result.success) {
+        toast.success("Created successfully!");
+      } else {
+        toast.error(`Creation failed: ${result.message}`);
+      }
+    }
+
+    fetchTicketTypeData();
+    setConfirmDialogOpen(false);
+  };
+  const handleDeleteConfirm = async (input: string) => {
+    if (input !== deleteDialogData?.name) {
+      await Alert({
+        title: "Name mismatch!",
+        text: "The typed name does not match the route name.",
+        type: "error"
+      });
+      return;
+    }
+
+    const result = await deleteTicketType(deleteDialogData.id);
+    if (result.success) {
+      fetchTicketTypeData();
+      toast.success("Deleted successfully!");
+    } else {
+      toast.error(`Error: ${result.message}`);
+    }
+
+    setDeleteDialogOpen(false);
   };
 
   //ticket discount 
@@ -271,39 +304,12 @@ function Page() {
     }
   };
 
-  //delete
-  const handleDeleteTicketType = async ({ name, id }: { name: string, id: number }) => {
-    const inputName = await ConfirmWithInput({
-      title: `Delete "${name}"?`,
-      text: `Please type the route name below to confirm deletion.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      placeholder: "Type route name here"
-    });
-
-    if (inputName === name) {
-      const result = await deleteTicketType(id);
-      if (result.success) {
-        fetchTicketTypeData();
-        toast.success("delete price type successfully!");
-      } else {
-        toast.error(`Error: ${result.message}`);
-      }
-    } else if (inputName !== null) {
-      await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the route name.",
-        type: "error"
-      });
-    }
-  };
-
   const handleDeleteTicketDiscount = async ({ name, id }: { name: string, id: number }) => {
 
     const isConfirmed = await Confirm({
-     title: `Delete "${name}"?`,
-     text: `Please type the route name below to confirm deletion.`,
-       confirmText: "Delete",
+      title: `Delete "${name}"?`,
+      text: `Please type the route name below to confirm deletion.`,
+      confirmText: "Delete",
       cancelText: "Cancel",
     });
 
@@ -325,7 +331,7 @@ function Page() {
   };
 
   const handleOpenTicketTypeModal = () => {
-    handleTicketTypeModel({});
+    openTicketTypeDialog({});
   };
 
   //table columns
@@ -350,14 +356,15 @@ function Page() {
           /> */}
           <TableActionButton
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
-            onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
+            onClick={() => openTicketTypeDialog({ id: row.id, name: row.name })}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
             title='Edit'
           />
+
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
-            onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
+            onClick={() => openDeleteDialog({ id: row.id, name: row.name })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
             title='Delete'
@@ -451,6 +458,31 @@ function Page() {
             }
           />
         )}
+        <ConfirmWithInput
+          open={confirmDialogOpen}
+          onClose={() => setConfirmDialogOpen(false)}
+          title={confirmDialogData?.mode === 'edit' ? 'Edit Price Type' : 'Add New Price Type'}
+          text="Fill in the price type details below."
+          confirmText="Confirm"
+          cancelText="Cancel"
+          placeholder="Type route name here"
+          defaultValue={confirmDialogData?.name || ''}
+          label="Route Name"
+          onConfirm={handleTicketTypeConfirm}
+        />
+
+        <ConfirmWithInput
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          title={`Delete "${deleteDialogData?.name}"?`}
+          text="Please type the route name below to confirm deletion."
+          confirmText="Delete"
+          cancelText="Cancel"
+          placeholder="Type route name here"
+          defaultValue=""
+          label="Route Name"
+          onConfirm={handleDeleteConfirm}
+        />
       </div>
     </>
   )

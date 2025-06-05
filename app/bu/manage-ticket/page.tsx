@@ -32,10 +32,8 @@ import TitlePage from '@/app/components/Title/TitlePage';
 ////icons
 import { Ticket, Trash2 } from "lucide-react";
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
-import {getTextTicketPage, useLanguageContext} from '@/app/i18n/translations'
+import { getTextTicketPage, useLanguageContext } from '@/app/i18n/translations'
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput';
-import { Alert } from '@/app/components/Dialog/Alert';
-
 
 export interface TicketTableData {
   id: number,
@@ -78,8 +76,8 @@ function Page() {
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const {isTH} = useLanguageContext();
-  const text = getTextTicketPage({isTH});
+  const { isTH } = useLanguageContext();
+  const text = getTextTicketPage({ isTH });
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSize = Number(e.target.value);
@@ -157,31 +155,31 @@ function Page() {
   //   }
   // };
 
-  const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
-    const inputName = await ConfirmWithInput({
-      title: `Delete "${ticketName}"?`,
-      text: `Are you sure you want to delete it.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      placeholder: "Type route name here"
-    });
+  // Handle delete route ticket
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState<{ ticket: string; id: number } | null>(null);
+  const handleDeleteTicket = ({ ticket, id }: { ticket: string; id: number }) => {
+    setTicketToDelete({ ticket, id });
+    setConfirmOpen(true);
+  };
+  const onConfirmDelete = async (inputName: string) => {
+    if (!ticketToDelete) return;
 
-    if (inputName === ticketName) {
-      const result = await deleteTicket(id);
+    if (inputName === ticketToDelete.ticket) {
+      const result = await deleteTicket(ticketToDelete.id);
 
       if (result.success) {
         fetchTicketData();
-        toast.success("delete ticket successfully!");
+        toast.success("Delete ticket successfully!");
       } else {
         toast.error(`Error: ${result.message}`);
       }
-    } else if (inputName !== null) {
-      await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the ticket name.",
-        type: "error"
-      });
+    } else {
+      toast.error("The typed name does not match the ticket name.");
     }
+
+    setConfirmOpen(false);
+    setTicketToDelete(null);
   };
 
   // Handle Change Status
@@ -300,7 +298,7 @@ function Page() {
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
-            onClick={() => handleDeleteRoute({ ticketName: row.ticketNameEN, id: Number(row?.id) })}
+            onClick={() => handleDeleteTicket({ ticket: row?.ticketNameEN, id: Number(row?.id) })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
             title='Delete'
@@ -338,7 +336,22 @@ function Page() {
           />
         }
       </div>
-
+      {ticketToDelete && (
+        <ConfirmWithInput
+          open={confirmOpen}
+          onClose={() => {
+            setConfirmOpen(false);
+            setTicketToDelete(null);
+          }}
+          title={`Delete "${ticketToDelete.ticket}"?`}
+          text={`Please type the ticket name below to confirm deletion.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          placeholder="Type ticket name here"
+          onConfirm={onConfirmDelete}
+          label="Ticket Name"
+        />
+      )}
     </>
   )
 }

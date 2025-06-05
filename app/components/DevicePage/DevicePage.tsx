@@ -119,26 +119,35 @@ function DevicePage({ comId }: DevicePageProps) {
     }, [devices]);
 
     // Handle delete route
-    const handleDeleteDevice = async ({ name, id }: { name: string, id: number }) => {
-        const inputName = await ConfirmWithInput({
-            title: `Delete "${name}"?`,
-            text: `Please type the route name below to confirm deletion.`,
-            confirmText: "Delete",
-            cancelText: "Cancel",
-            placeholder: "Type route name here"
-        });
+    // State
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deviceToDelete, setDeviceToDelete] = useState<{ name: string; id: number } | null>(null);
 
-        if (inputName === name) {
-            const result = await deleteDevice(id);
+    // ฟังก์ชันเปิด confirm dialog
+    const handleDeleteDevice = ({ name, id }: { name: string; id: number }) => {
+        setDeviceToDelete({ name, id });
+        setConfirmOpen(true);
+    };
+
+    // ฟังก์ชันกด confirm ลบ device
+    const onConfirmDelete = async (inputName: string) => {
+        if (!deviceToDelete) return;
+
+        if (inputName === deviceToDelete.name) {
+            const result = await deleteDevice(deviceToDelete.id);
+
             if (result.success) {
                 fetchDeviceData();
-                toast.success("delete device successfully!");
+                toast.success("Delete device successfully!");
             } else {
                 toast.error(`Error: ${result.message}`);
             }
-        } else if (inputName !== null) {
-            toast.error("ไมวะ.");
+        } else {
+            toast.error("The typed name does not match the device name.");
         }
+
+        setConfirmOpen(false);
+        setDeviceToDelete(null);
     };
 
     // Handle Change Status
@@ -166,51 +175,51 @@ function DevicePage({ comId }: DevicePageProps) {
     };
 
     //model add or edit
-    const handleDevice = async ({ id, name }: { id?: number, name?: string }) => {
-        const isConfirmed = await ConfirmWithInput({
-            title: `${id ? "Edit Device" : "Add New Device"}`,
-            text: `Fill in the serial number below.`,
-            confirmText: "Confirm",
-            cancelText: "Cancel",
-            placeholder: "Serial Number",
-            defaultValue: name || ""  // ใส่ค่า name ถ้ามี, ไม่งั้นเป็น empty string
-        });
+    // State เก็บข้อมูล device สำหรับ dialog
+    const [confirmDeviceOpen, setConfirmDeviceOpen] = useState(false);
+    const [deviceToEdit, setDeviceToEdit] = useState<{ id?: number; name?: string } | null>(null);
 
-        if (isConfirmed) {
-            const inputName = isConfirmed.trim();
+    // ฟังก์ชันเปิด dialog เพิ่ม/แก้ไข device
+    const handleDevice = ({ id, name }: { id?: number; name?: string }) => {
+        setDeviceToEdit({ id, name });
+        setConfirmDeviceOpen(true);
+    };
 
-            if (!inputName) {
-                toast.error("Name cannot be empty");
-                return;
-            }
-
-            const formatPayload: InsertDevice = {
-                device_serial_number: inputName,
-            };
-
-            if (id) {
-
-                const result = await updateDevice(id, formatPayload);
-                if (result.success) {
-                    toast.success("Updated successfully!");
-                } else {
-                    toast.error(`Update failed: ${result.message}`);
-                }
-            } else {
-                if (comId) {
-                    formatPayload.device_com_id = comId;
-                }
-
-                // เพิ่มใหม่ (ไม่ส่ง id)
-                const result = await addDevice(formatPayload);
-                if (result.success) {
-                    toast.success("Created successfully!");
-                } else {
-                    toast.error(`Creation failed: ${result.message}`);
-                }
-            }
-            fetchDeviceData();
+    // ฟังก์ชันรับ callback เมื่อ user กด confirm ใน dialog
+    const onConfirmDevice = async (inputName: string) => {
+        if (!inputName.trim()) {
+            toast.error("Name cannot be empty");
+            return;
         }
+
+        const formatPayload: InsertDevice = {
+            device_serial_number: inputName.trim(),
+        };
+
+        if (deviceToEdit?.id) {
+            // แก้ไข
+            const result = await updateDevice(deviceToEdit.id, formatPayload);
+            if (result.success) {
+                toast.success("Updated successfully!");
+            } else {
+                toast.error(`Update failed: ${result.message}`);
+            }
+        } else {
+            // เพิ่มใหม่
+            if (comId) {
+                formatPayload.device_com_id = comId;
+            }
+            const result = await addDevice(formatPayload);
+            if (result.success) {
+                toast.success("Created successfully!");
+            } else {
+                toast.error(`Creation failed: ${result.message}`);
+            }
+        }
+
+        fetchDeviceData();
+        setConfirmOpen(false);
+        setDeviceToEdit(null);
     };
 
     //for add
@@ -283,7 +292,7 @@ function DevicePage({ comId }: DevicePageProps) {
                         icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
                         bgColor="bg-blue-50 text-blue-600"
                         hoverColor="hover:bg-blue-100"
-                         title='Edit Device'
+                        title='Edit Device'
                     />
                     <TableActionButton
                         onClick={() => handleDeleteDevice({ name: row.dv_serial, id: row.id })}
@@ -325,7 +334,39 @@ function DevicePage({ comId }: DevicePageProps) {
                     />
                 }
             </div>
-
+            {deviceToDelete && (
+                <ConfirmWithInput
+                    open={confirmOpen}
+                    onClose={() => {
+                        setConfirmOpen(false);
+                        setDeviceToDelete(null);
+                    }}
+                    title={`Delete "${deviceToDelete.name}"?`}
+                    text={`Please type the Serial Number below to confirm deletion.`}
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                    placeholder="Type Serial Number here"
+                    onConfirm={onConfirmDelete}
+                    label="Serial Number"
+                />
+            )}
+            {deviceToEdit && (
+                <ConfirmWithInput
+                    open={confirmDeviceOpen}
+                    onClose={() => {
+                        setConfirmOpen(false);
+                        setDeviceToEdit(null);
+                    }}
+                    title={`${deviceToEdit.id ? "Edit Device" : "Add New Device"}`}
+                    text={`Fill in the serial number below.`}
+                    confirmText="Confirm"
+                    cancelText="Cancel"
+                    placeholder="Serial Number"
+                    defaultValue={deviceToEdit.name || ""}
+                    onConfirm={onConfirmDevice}
+                    label="Serial Number"
+                />
+            )}
         </>
     )
 }

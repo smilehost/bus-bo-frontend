@@ -24,6 +24,8 @@ import TableTemplate, {
 import { ToastContainer } from "react-toastify";
 import { Eye, Lock } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
+import FormFilter from "../Filter/FormFilter";
+import { statusOptions } from "@/constants/options";
 
 export interface MemberTableData {
   no: number;
@@ -84,7 +86,7 @@ export default function MemberPageComponent({
     if (comId) {
       await getMemberByComId(comId);
     } else {
-      await getMembers(1, 50, "", ""); 
+      await getMembers(1, 50, "", "");
     }
     cancelSkeleton();
   };
@@ -376,6 +378,16 @@ export default function MemberPageComponent({
     },
   ];
 
+  //filter
+  const filterSearch = [
+    {
+      defaulteValue: FILTER.ALL_STATUS,
+      listValue: statusOptions,
+      setSearchValue: setSearchStatus,
+      size: "w-[130px]",
+    },
+  ];
+
   // console.log("paginatedCompaniesWithNo: ", paginatedCompaniesWithNo)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -383,7 +395,17 @@ export default function MemberPageComponent({
       <div className="flex-1 flex flex-col p-0">
         <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddMember} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
-          <SearchFilter
+          <FormFilter
+            setSearch={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+            placeholderSearch={"Search by name or phone..."}
+            filter={filterSearch}
+            search={searchTerm}
+          />
+          {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
             statusFilter={searchStatus}
@@ -395,7 +417,7 @@ export default function MemberPageComponent({
               setSearchCompany(value as FILTER)
             }
             companies={companies}
-          />
+          /> */}
 
           {isLoadingSkeleton ? (
             <SkeletonMemberPage rows={5} />
@@ -423,10 +445,10 @@ export default function MemberPageComponent({
           editingMember={
             editingMember
               ? {
-                  ...editingMember,
-                  id: editingMember.id.toString(),
-                  companyId: editingMember.companyId.toString(),
-                }
+                ...editingMember,
+                id: editingMember.id.toString(),
+                companyId: editingMember.companyId.toString(),
+              }
               : undefined
           }
         />

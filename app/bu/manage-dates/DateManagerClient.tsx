@@ -17,6 +17,9 @@ import TableTemplate, {
 } from "@/app/components/Table/TableTemplate";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { SquarePen, Trash2 } from "lucide-react";
+import FormFilter from "@/app/components/Filter/FormFilter";
+import { FILTER } from "@/constants/enum";
+import { statusOptions } from "@/constants/options";
 
 type DateTableProps = {
   no: number;
@@ -329,6 +332,7 @@ export default function DateManagerClient() {
     },
   ];
 
+
   const paginatedWithNo = paginatedDates.map((date, idx) => ({
     ...date,
     no: (currentPage - 1) * rowsPerPage + idx + 1,
@@ -343,6 +347,15 @@ export default function DateManagerClient() {
     },
   }));
 
+  //filter
+  const filterSearch = [
+    {
+      defaulteValue: FILTER.ALL_STATUS,
+      listValue: statusOptions,
+      setSearchValue: setStatusFilter,
+      size: "w-[130px]",
+    },
+  ];
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <ToastContainer />
@@ -354,11 +367,21 @@ export default function DateManagerClient() {
           handleOpenModel={handleAddDate}
         />
         <div className="custom-frame-content p-5 mt-5">
-          <SearchFilter
+          {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
             statusFilter={statusFilter}
             setStatusFilter={handleStatusFilterChange}
+          /> */}
+          <FormFilter
+            setSearch={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+            placeholderSearch={"Search by name..."}
+            filter={filterSearch}
+            search={searchTerm}
           />
           {isLoadingskeleton ? (
             <SkeletonDateTable count={5} />
@@ -389,17 +412,17 @@ export default function DateManagerClient() {
           editingDate={
             editingDate
               ? {
-                  ...editingDate,
-                  days: {
-                    monday: editingDate.days.mon,
-                    tuesday: editingDate.days.tue,
-                    wednesday: editingDate.days.wed,
-                    thursday: editingDate.days.thu,
-                    friday: editingDate.days.fri,
-                    saturday: editingDate.days.sat,
-                    sunday: editingDate.days.sun,
-                  },
-                }
+                ...editingDate,
+                days: {
+                  monday: editingDate.days.mon,
+                  tuesday: editingDate.days.tue,
+                  wednesday: editingDate.days.wed,
+                  thursday: editingDate.days.thu,
+                  friday: editingDate.days.fri,
+                  saturday: editingDate.days.sat,
+                  sunday: editingDate.days.sun,
+                },
+              }
               : undefined
           }
         />

@@ -1,39 +1,79 @@
-// src/app/components/Dialog/ConfirmWithInput.ts
-import Swal from 'sweetalert2';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent } from '@mui/material'; // หรือ component dialog ที่ใช้อยู่จริง
+import TitleModel from '../Title/TitleModel';
+import InputLabel from '../Form/InputLabel';
+import ButtonDefault from '../Form/ButtonDefault';
+import ButtonBG from '../Form/ButtonBG';
+import Image from 'next/image';
 
-export const ConfirmWithInput = async ({
-    title,
-    text,
-    confirmText = 'Confirm',
-    cancelText = 'Cancel',
-    placeholder = '',
-    defaultValue = ''
-}: {
+export type ConfirmWithInputProps = {
+    open: boolean;
+    onClose: () => void;
     title: string;
     text: string;
     confirmText?: string;
     cancelText?: string;
     placeholder?: string;
     defaultValue?: string;
-}): Promise<string | null> => {
-    const result = await Swal.fire({
-        title,
-        text,
-        input: 'text',
-        inputPlaceholder: placeholder,
-        inputValue: defaultValue, // ✅ ใส่ default value ที่นี่
-        showCancelButton: true,
-        confirmButtonText: confirmText,
-        cancelButtonText: cancelText,
-        customClass: {
-            confirmButton: 'custom-btn-bg-main custom-border-gray',
-            cancelButton: 'bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded ml-4',
-        },
-        inputValidator: (value) => {
-            if (!value) return 'Please enter a value';
-            return null;
-        }
-    });
+    label?: string;
+    onConfirm: (value: string) => void;
+};
 
-    return result.isConfirmed ? result.value : null;
+export const ConfirmWithInput: React.FC<ConfirmWithInputProps> = ({
+    open,
+    onClose,
+    title,
+    text,
+    confirmText = "Confirm",
+    cancelText = "Cancel",
+    placeholder = "",
+    defaultValue = "",
+    label = "",
+    onConfirm
+}) => {
+    const [value, setValue] = useState(defaultValue);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleConfirm = () => {
+        if (!value.trim()) {
+            setError("Please enter a value");
+            return;
+        }
+        setError(null);
+        onConfirm(value.trim());
+        onClose();
+    };
+
+    useEffect(() => {
+        setValue(defaultValue);
+    }, [defaultValue]);
+    return (
+        <Dialog open={open} onClose={onClose}>
+            <DialogContent>
+                <div className="w-[448px] py-2 relative">
+                    <TitleModel title={title} description={text} />
+                    <div className="mt-7 flex flex-col gap-4">
+                        <InputLabel
+                            label={label}
+                            placeholder={placeholder}
+                            type="text"
+                            value={value}
+                            setValue={(e) => setValue(e)}
+                        />
+                        {error && <p className="text-red-500 text-sm">{error}</p>}
+                    </div>
+                    <div className="flex gap-3 justify-end mt-7">
+                        <ButtonDefault size="" text={cancelText} onClick={onClose} />
+                        <ButtonBG size="" text={confirmText} onClick={handleConfirm} />
+                    </div>
+                    <div
+                        className="absolute top-0 right-0 cursor-pointer"
+                        onClick={onClose}
+                    >
+                        <Image src={"/icons/close.svg"} width={24} height={24} alt="close-icon" />
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
 };

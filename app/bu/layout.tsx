@@ -32,11 +32,18 @@ import { USER_TIER } from "@/constants/enum";
 import { store } from "@/stores/store";
 import { getTextMenu, useLanguageContext } from "../i18n/translations";
 
+//hooks
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { usePathname } from "next/navigation";
+
+
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [hasMounted, setHasMounted] = useState(false);
   const { userData } = useUserStore();
   const lang = store.Translation.use(); // ✅ re-render เมื่อเปลี่ยนภาษา
@@ -60,7 +67,7 @@ export default function RootLayout({
       [groupName]: !prev[groupName],
     }));
   };
-  const role = store.account_role.use();
+
   const { isTH, isSuperAdmin } = useLanguageContext();
   const menuText = getTextMenu({ isTH, isSuperAdmin });
 
@@ -93,7 +100,7 @@ export default function RootLayout({
     {
       group: menuText.users,
       items: [
-        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", },
+        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee",  link: isSuperAdmin ? "manage-admin" : "manage-employee" },
         { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
@@ -101,20 +108,20 @@ export default function RootLayout({
 
 
 
-  const [roleMenu, setRoleMenu] = useState<number[]>();
+  const [roleMenu, setRoleMenu] = useState<number[]>([]);
   const logOut = () => {
     localStorage.clear();
     window.location.href = "/";
   };
 
-    useEffect(() => {
-        if (account_role === 2) {
-            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
-        } else if (account_role === 1) {
-            setRoleMenu([1, 10, 8]);
-        }
-        // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
-    }, [account_role]);
+  useEffect(() => {
+    if (account_role === 2) {
+      setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+    } else if (account_role === 1) {
+      setRoleMenu([1, 10, 8]);
+    }
+    // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
+  }, [account_role]);
 
   const filteredMenu = allMenu
     .map((group) => ({
@@ -124,6 +131,9 @@ export default function RootLayout({
     .filter((group) => group.items.length > 0);
 
   // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
+
+  //auth redirectAdd commentMore actions
+  useAuthGuard({ account_role, roleMenu, pathname, allMenu });
 
   if (!hasMounted) return null;
   return (
@@ -167,9 +177,8 @@ export default function RootLayout({
                       {group.group}
                     </span>
                     <svg
-                      className={`w-4 h-4 transform transition-transform duration-200 ${
-                        isOpen ? "rotate-90" : "rotate-0"
-                      }`}
+                      className={`w-4 h-4 transform transition-transform duration-200 ${isOpen ? "rotate-90" : "rotate-0"
+                        }`}
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -182,16 +191,16 @@ export default function RootLayout({
                   {/* Group Items (toggle visibility) */}
                   {isOpen && (
                     <div className="space-y-1 mt-1">
-                    {group.items.map((item) => (
-                      <MenuItemLink
-                        key={item.id}
-                        text={item.text}
-                        icon={item.icon}
-                        href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
-                        as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
-                      />
-                    ))}
-                  </div>
+                      {group.items.map((item) => (
+                        <MenuItemLink
+                          key={item.id}
+                          text={item.text}
+                          icon={item.icon}
+                          href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
+                          as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
+                        />
+                      ))}
+                    </div>
 
                   )}
                 </div>

@@ -19,7 +19,7 @@ function InputLabel({ label, placeholder, setValue, type, size, value, disabled 
                 value={value}
                 type={type}
                 placeholder={placeholder}
-                className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] ${size}`}
+                className={` h-[38px] px-5 rounded-md custom-border-gray text-[14px] ${size} custom-focus-input`}
                 onChange={(e) => setValue(e.target.value)}
                 disabled={disabled}
             />
