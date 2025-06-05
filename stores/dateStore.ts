@@ -53,7 +53,7 @@ export const useDateStore = create<DateState>((set) => ({
           sun: item.route_date_sun === 1,
         },
         status:
-          new Date(item.route_date_end) < new Date() ? "Inactive" : "Active",
+          new Date(item.route_date_end) < new Date() ? 0 : 1,
       }));
 
       set({ dates: mapped, total: mapped.length });

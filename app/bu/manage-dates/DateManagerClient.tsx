@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDateStore } from "@/stores/dateStore";
 import DateModal from "@/app/components/Model/DateModal";
-import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
 import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 import { Alert } from "@/app/components/Dialog/Alert";
@@ -21,6 +20,7 @@ import FormFilter from "@/app/components/Filter/FormFilter";
 import { FILTER } from "@/constants/enum";
 import { statusOptions } from "@/constants/options";
 import { Tooltip } from "@mui/material";
+import StatusText from "@/app/components/StatusText";
 
 type DateTableProps = {
   no: number;
@@ -49,7 +49,7 @@ export default function DateManagerClient() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [statusFilter, setStatusFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingDate, setEditingDate] = useState<DateItem | undefined>(
     undefined
@@ -77,7 +77,8 @@ export default function DateManagerClient() {
         date.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
-    if (statusFilter !== "All Status") {
+
+    if (statusFilter !== "" && statusFilter !== FILTER.ALL_STATUS) {
       tempDates = tempDates.filter((date) => date.status === statusFilter);
     }
     setFilteredDates(tempDates);
@@ -236,9 +237,9 @@ export default function DateManagerClient() {
     debouncedFetch(e.target.value);
   };
 
-  const handleStatusFilterChange = (value: string) => {
-    setStatusFilter(value);
-  };
+  // const handleStatusFilterChange = (value: string) => {
+  //   setStatusFilter(value);
+  // };
 
   const paginatedDates = filteredDates.slice(
     (currentPage - 1) * rowsPerPage,
@@ -294,19 +295,9 @@ export default function DateManagerClient() {
       width: "10%",
       align: "center",
       render: (_: unknown, row: DateTableProps) =>
-        row.status === "Active" ? (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
-            <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-            <span>Active</span>
-          </span>
-        ) : (
         <Tooltip title={`Expires on ${row.endDate}`}>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
-            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-            <span>Inactive</span>
-          </span>
+          <StatusText id={Number(row.status)} />
         </Tooltip>
-        ),
     },
     {
       key: "id",
@@ -359,6 +350,7 @@ export default function DateManagerClient() {
       size: "w-[130px]",
     },
   ];
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <ToastContainer />

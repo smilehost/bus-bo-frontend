@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 // import MemberTable from "@/app/components/Table/MemberTable";
 import MemberModal from "@/app/components/Model/MemberModal";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
@@ -13,7 +12,7 @@ import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { useMemberStore } from "@/stores/memberStore";
 import { useCompanyStore } from "@/stores/companyStore";
-import { STATUS_LABELS, FILTER, USER_TIER } from "@/constants/enum";
+import { FILTER, USER_TIER } from "@/constants/enum";
 import { MemberItem } from "@/types/member";
 import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
@@ -56,9 +55,6 @@ export default function MemberPageComponent({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  const [searchCompany, setSearchCompany] = useState<FILTER>(
-    FILTER.ALL_COMPANIES
-  );
   const [filteredMembers, setFilteredMembers] = useState<MemberItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
 
@@ -110,20 +106,20 @@ export default function MemberPageComponent({
           m.username.toLowerCase().includes(q)
       );
     }
-    if (searchStatus !== FILTER.ALL_STATUS) {
+    if (searchStatus !== FILTER.ALL_STATUS && searchStatus !== '') {
       temp = temp.filter(
-        (m) => STATUS_LABELS[m.status] === searchStatus.toString()
+        (m) => m.status === Number(searchStatus)
       );
     }
-    if (searchCompany !== FILTER.ALL_COMPANIES) {
-      temp = temp.filter(
-        (m) => m.companyId?.toString() === searchCompany.toString()
-      );
-    }
+    // if (searchCompany !== FILTER.ALL_COMPANIES) {
+    //   temp = temp.filter(
+    //     (m) => m.companyId?.toString() === searchCompany.toString()
+    //   );
+    // }
     setFilteredMembers(temp);
     setTotalResults(temp.length);
     setCurrentPage(1);
-  }, [debouncedSearch, searchStatus, searchCompany, members, companies]);
+  }, [debouncedSearch, searchStatus, members, companies]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
