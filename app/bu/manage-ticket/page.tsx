@@ -33,6 +33,8 @@ import TitlePage from '@/app/components/Title/TitlePage';
 import { Ticket, Trash2 } from "lucide-react";
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 import {getTextTicketPage, useLanguageContext} from '@/app/i18n/translations'
+import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput';
+import { Alert } from '@/app/components/Dialog/Alert';
 
 
 export interface TicketTableData {
@@ -137,21 +139,48 @@ function Page() {
   }, [tickets]);
 
   // Handle delete route
+  // const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
+  //   const isConfirmed = await Confirm({
+  //     title: `Delete "${ticketName}"?`,
+  //     text: `Are you sure you want to delete it.`,
+  //     confirmText: "Delete",
+  //     cancelText: "Cancel",
+  //   });
+  //   if (isConfirmed) {
+  //     const result = await deleteTicket(id);
+  //     if (result.success) {
+  //       fetchTicketData();
+  //       toast.success("delete ticket successfully!");
+  //     } else {
+  //       toast.error(`Error: ${result.message}`);
+  //     }
+  //   }
+  // };
+
   const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
-    const isConfirmed = await Confirm({
+    const inputName = await ConfirmWithInput({
       title: `Delete "${ticketName}"?`,
       text: `Are you sure you want to delete it.`,
       confirmText: "Delete",
       cancelText: "Cancel",
+      placeholder: "Type route name here"
     });
-    if (isConfirmed) {
+
+    if (inputName === ticketName) {
       const result = await deleteTicket(id);
+
       if (result.success) {
         fetchTicketData();
         toast.success("delete ticket successfully!");
       } else {
         toast.error(`Error: ${result.message}`);
       }
+    } else if (inputName !== null) {
+      await Alert({
+        title: "Name mismatch!",
+        text: "The typed name does not match the ticket name.",
+        type: "error"
+      });
     }
   };
 
@@ -238,10 +267,10 @@ function Page() {
       render: (_, row) => {
         const isActive = row.route_status === 1 ? true : false
         return (
-          <Tooltip title={isActive ? row.routeNameTH: "This route status is inactive"} arrow>
+          <Tooltip title={isActive ? row.routeNameTH : "This route status is inactive"} arrow>
             <div className={`${!isActive && "text-red-500"} flex flex-col gap-1 cursor-default custom-ellipsis-style w-fit`}>
               <p className='whitespace-nowrap custom-ellipsis-style'>{row.routeNameTH}</p>
-              <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500": "text-gray-500"}`}>{row.routeNameEN}</p>
+              <p className={`whitespace-nowrap custom-ellipsis-style ${!isActive ? "text-red-500" : "text-gray-500"}`}>{row.routeNameEN}</p>
             </div>
           </Tooltip>
         )

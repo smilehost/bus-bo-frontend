@@ -13,7 +13,9 @@ import { useCompanyStore } from "@/stores/companyStore";
 import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import StatusText from "@/app/components/StatusText";
-import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
+import TableTemplate, {
+  ColumnConfig,
+} from "@/app/components/Table/TableTemplate";
 import { usePathname } from "next/navigation";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import CompanyTable from "@/app/components/Table/CompanyTable";
@@ -58,7 +60,9 @@ export default function ManageCompaniesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCompany, setEditingCompany] = useState<CompanyItem | null>(null);
+  const [editingCompany, setEditingCompany] = useState<CompanyItem | null>(
+    null
+  );
   const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
 
   const fetchCompanies = async () => {
@@ -257,7 +261,6 @@ export default function ManageCompaniesPage() {
         store.account_role.set(decoded.account_role);
         window.open("/bu/dashboard", "_blank");
         // shell.openExternal('localhost:3000/bu/dashboard');
-
       } else {
         setError("Login failed: No token received");
       }
@@ -267,116 +270,124 @@ export default function ManageCompaniesPage() {
     }
   };
 
-
   //table columns
   const columns: ColumnConfig<CompanyTableData>[] = [
     {
-      key: 'no',
-      label: 'No.',
-      width: '5%',
+      key: "no",
+      label: "No.",
+      width: "5%",
     },
     {
-      key: 'name', label: 'Company Name', width: '20%',
+      key: "name",
+      label: "Company Name",
+      width: "20%",
     },
     {
-      key: 'prefix', label: 'Prefix', width: '20%',
+      key: "prefix",
+      label: "Prefix",
+      width: "20%",
     },
 
     {
-      key: 'status',
-      label: 'Status',
-      width: '15%',
-      render: (_, row) => (
-        <StatusText id={Number(row.status)} />
-      ),
+      key: "status",
+      label: "Status",
+      width: "15%",
+      render: (_, row) => <StatusText id={Number(row.status)} />,
     },
     {
-      key: 'id',
-      label: 'Action',
-      width: '25%',
-      align: 'right',
+      key: "id",
+      label: "Action",
+      width: "25%",
+      align: "right",
       render: (_, row) => (
-        <div className='flex gap-2 min-w-max justify-end'>
+        <div className="flex gap-2 min-w-max justify-end">
           <TableActionButton
             onClick={() => handleEditCompany(row.id)}
-            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
+            icon={
+              <SquarePen
+                className={`custom-size-tableAction-btn text-blue-500`}
+              />
+            }
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
             title="Edit"
           />
           <TableActionButton
             href={`${pathName}/manage-device?comId=${row.id}`}
-            icon={<Smartphone className={`custom-size-tableAction-btn text-orange-400`} />}
+            icon={
+              <Smartphone
+                className={`custom-size-tableAction-btn text-orange-400`}
+              />
+            }
             bgColor="bg-orange-100 text-orange-400"
             hoverColor="hover:bg-orange-100"
             title="Device"
           />
           <TableActionButton
             href={`${pathName}/manage-admin?comId=${row.id}`}
-            icon={<Users className={`custom-size-tableAction-btn text-blue-600`} />}
+            icon={
+              <Users className={`custom-size-tableAction-btn text-blue-600`} />
+            }
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
             title="Add User"
           />
-         
+
           <TableActionButton
-          onClick={() => {
-            setSelectedCompanyId(Number(row.id));
-            setShowPassModal(true);
-          }}
-            icon={<KeyRound className={`custom-size-tableAction-btn text-gray-700`} />}
+            onClick={() => {
+              setSelectedCompanyId(Number(row.id));
+              setShowPassModal(true);
+            }}
+            icon={
+              <KeyRound
+                className={`custom-size-tableAction-btn text-gray-700`}
+              />
+            }
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
             title="Login as Company"
-
           />
         </div>
       ),
     },
   ];
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
-        <TitlePage title="Manage Companies" description="View and manage bus companies" btnText='Add New Company' handleOpenModel={handleAddCompany} />
-        <div className="bg-white rounded-md shadow p-5 mt-5">
+        <TitlePage
+          title="Manage Companies"
+          description="View and manage bus companies"
+          btnText="Add New Company"
+          handleOpenModel={handleAddCompany}
+        />
+        <div className="custom-frame-content p-5 mt-5">
           <FormFilter
             setSearch={(value: string) =>
               handleSearchChange({
                 target: { value },
               } as React.ChangeEvent<HTMLInputElement>)
             }
-            placeholderSearch='Search by company.'
+            placeholderSearch="Search by company."
             search={searchTerm}
           />
           {isLoadingSkeleton ? (
             <SkeletonCompanyTable rows={5} />
           ) : (
-            // <CompanyTable
-            //   companies={paginatedCompanies}
-            //   onEdit={handleEditCompany}
-            //   onDelete={handleDeleteCompany}
-            //   currentPage={currentPage}
-            //   onPageChange={setCurrentPage}
-            //   rowsPerPage={rowsPerPage}
-            //   onRowsPerPageChange={handleRowsPerPageChange}
-            //   totalResults={filtered.length}
-            //   isLoading={isLoading}
-            // />
-            <TableTemplate
-              columns={columns}
-              data={paginatedCompaniesWithNo}
-              currentPage={currentPage}
-              rowsPerPage={rowsPerPage}
-              totalPages={Math.ceil(filtered.length / rowsPerPage)}
-              totalResults={filtered.length}
-              onPageChange={setCurrentPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              rowKey={(row) => row.id}
-            />
-            
+            <div className="w-full overflow-x-auto">
+              <TableTemplate
+                columns={columns}
+                data={paginatedCompaniesWithNo}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                totalPages={Math.ceil(filtered.length / rowsPerPage)}
+                totalResults={filtered.length}
+                onPageChange={setCurrentPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowKey={(row) => row.id}
+              />
+            </div>
           )}
         </div>
-
       </div>
 
       {isModalOpen && (
@@ -386,24 +397,25 @@ export default function ManageCompaniesPage() {
           editingCompany={
             editingCompany
               ? {
-                name: editingCompany.name,
-                prefix: editingCompany.prefix,
-                status: editingCompany.status,
-              }
+                  name: editingCompany.name,
+                  prefix: editingCompany.prefix,
+                  status: editingCompany.status,
+                }
               : undefined
           }
         />
       )}
+
       <EnterPassModal
-              isOpen={showPassModal}
-              onClose={() => setShowPassModal(false)}
-              onSubmit={(password) => {
-                if (selectedCompanyId !== null) {
-                  onLoginAsCompany(selectedCompanyId, password);
-                  setShowPassModal(false);
-                }
-              }}
-            />
+        isOpen={showPassModal}
+        onClose={() => setShowPassModal(false)}
+        onSubmit={(password) => {
+          if (selectedCompanyId !== null) {
+            onLoginAsCompany(selectedCompanyId, password);
+            setShowPassModal(false);
+          }
+        }}
+      />
     </div>
   );
 }

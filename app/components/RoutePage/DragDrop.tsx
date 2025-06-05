@@ -6,22 +6,24 @@ import { LocationItem } from '@/types/location';
 type DragDropProps = {
   listA: LocationItem[],
   listB: LocationItem[],
-  setListA: Dispatch<SetStateAction<LocationItem[]>>,
+  setListA?: Dispatch<SetStateAction<LocationItem[]>>,
   setListB: Dispatch<SetStateAction<LocationItem[]>>,
   disable: boolean
 }
 
-function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDropProps) {
+function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
 
   const [search, setSearch] = useState<string>("");
 
-  // ใช้ useMemo เพื่อ filter listA ตามคำ search
+  // Filtered display only (ไม่ใช้กับ setList)
   const filteredListA = useMemo(() => {
     if (!search) return listA;
     return listA.filter((item) =>
       item.name.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search, listA]);
+  }, [search, listA]).filter(
+    (itemA) => !listB.some((itemB) => itemB.id === itemA.id)
+  );;
 
   return (
     <div className={`flex gap-10 gap-y-20 justify-between flex-wrap`}>
@@ -39,8 +41,8 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
           </div>
           <div className=' mt-4 overflow-y-scroll h-full'>
             <ReactSortable
-              list={listA}
-              setList={setListA}
+              list={filteredListA}
+              setList={() => {}} 
               group={{ name: 'shared', pull: true, put: true }} // 👈 ใส่แบบนี้เหมือนกัน
               animation={200}
               className="min-h-36"
@@ -60,7 +62,7 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
       )}
 
       {/* List B */}
-      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg" : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
+      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg overflow-y-scroll" : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
         <p className="text-center text-[12px] font-medium">Stations this Route</p>
         <div className={`mt-5 h-[350px]`}>
           <ReactSortable
@@ -73,12 +75,12 @@ function DragDrop({ listA, listB, setListA, setListB, disable = false }: DragDro
           >
             {listB.length > 0 ? (
               listB.map((item, index) => (
-                <div key={index} className='flex gap-2'>
-                  <div className={`${listB.length - 1 === index && "rounded-b-md"} ${0 === index && "rounded-t-md border-t"} w-[30px] h-[30px] flex justify-center items-center border-b border-r border-l ${disable ? "" : "bg-white"} border-[#D1D5DB] text-[12px] cursor-pointer`}>
+                <div key={index} className='flex h-8'>
+                  <div className={`${listB.length - 1 === index && "rounded-bl-md"} ${0 === index && "rounded-tl-md border-t"} px-4 w-[30px] h-full flex justify-center items-center border-b  border-l ${disable ? "" : "bg-white"} border-[#D1D5DB] text-[12px] cursor-pointer`}>
                     {index + 1}
                   </div>
                   <div
-                    className={`${listB.length - 1 === index && "rounded-b-md "} ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "" : "bg-white"} text-[12px] cursor-pointer`}
+                    className={`${listB.length - 1 === index && "rounded-br-md "} ${0 === index && "rounded-tr-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "" : "bg-white"} text-[12px] cursor-pointer flex items-center`}
                   >
                     {item.name}
                   </div>

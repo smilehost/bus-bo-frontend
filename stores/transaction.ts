@@ -45,7 +45,7 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
           transaction_date_time: first.transaction_date_time,
         });
       }
-      console.log("res.result", res.result);
+
       return res.result;
     } catch (error) {
       console.error("getTransactionMap error:", error);
