@@ -5,7 +5,6 @@ import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { usePathname } from "next/navigation";
 
 //icon
 import {
@@ -26,12 +25,11 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb";
 import { Confirm } from "../components/Dialog/Confirm";
 
 //store
-import { store } from "@/stores/store";
-
-//hooks
-import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useUserStore } from "@/stores/userStore";
 
 //enum
+import { USER_TIER } from "@/constants/enum";
+import { store } from "@/stores/store";
 import { getTextMenu, useLanguageContext } from "../i18n/translations";
 
 export default function RootLayout({
@@ -39,11 +37,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
   const [hasMounted, setHasMounted] = useState(false);
-  const [roleMenu, setRoleMenu] = useState<number[]>([]);
-  const account_name = store.account_name.get();
-  const account_username = store.account_username.get();
+  const { userData } = useUserStore();
   const lang = store.Translation.use(); // ✅ re-render เมื่อเปลี่ยนภาษา
 
   const setLang = (value: 'TH' | 'EN') => {
@@ -56,7 +51,7 @@ export default function RootLayout({
     setHasMounted(true);
   }, []);
 
-  const account_role = Number(store.account_role.get());
+  const account_role = userData.account_role;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const toggleGroup = (groupName: string) => {
@@ -105,21 +100,21 @@ export default function RootLayout({
   ];
 
 
+
+  const [roleMenu, setRoleMenu] = useState<number[]>();
   const logOut = () => {
     localStorage.clear();
     window.location.href = "/";
   };
 
-  useEffect(() => {
-    if (account_role === 2) {
-      setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
-    } else if (account_role === 1) {
-      setRoleMenu([1, 10, 8]);
-    }
-  }, [account_role]);
-
-  //auth redirect
-  useAuthGuard({ account_role, roleMenu, pathname, allMenu });
+    useEffect(() => {
+        if (account_role === 2) {
+            setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+        } else if (account_role === 1) {
+            setRoleMenu([1, 10, 8]);
+        }
+        // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
+    }, [account_role]);
 
   const filteredMenu = allMenu
     .map((group) => ({
@@ -128,6 +123,7 @@ export default function RootLayout({
     }))
     .filter((group) => group.items.length > 0);
 
+  // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
 
   if (!hasMounted) return null;
   return (
@@ -171,8 +167,9 @@ export default function RootLayout({
                       {group.group}
                     </span>
                     <svg
-                      className={`w-4 h-4 transform transition-transform duration-200 ${isOpen ? "rotate-90" : "rotate-0"
-                        }`}
+                      className={`w-4 h-4 transform transition-transform duration-200 ${
+                        isOpen ? "rotate-90" : "rotate-0"
+                      }`}
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -237,22 +234,20 @@ export default function RootLayout({
             >
               <MenuIcon size={24} className="text-gray-500 " />
             </button>
-            <div className="flex items-center">
-              <div className="relative">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full custom-bg-main flex items-center justify-center text-white font-medium">
-                    {account_username.substring(0, 1).toUpperCase()}
-                  </div>
+            <div className="flex items-center space-x-4 w-full">
+              <div className="relative flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full custom-bg-main flex items-center justify-center text-white font-medium">
+                  {userData?.name.substring(0, 1).toUpperCase()}
+                </div>
+                <div className="hidden md:block">
                   <div className="hidden md:block">
                     <div className="text-sm font-medium text-black ">
-                      {/* {userData?.name} */}
-                      {account_username}
+                      {userData?.name}
                     </div>
                     <div className="text-xs text-gray-500  capitalize">
-                      {/* {userData.account_role === 1
+                      {userData.account_role === 1
                         ? USER_TIER.SUPER_ADMIN
-                        : USER_TIER.ADMIN} */}
-                      {account_name}
+                        : USER_TIER.ADMIN}
                     </div>
                   </div>
                 </div>
