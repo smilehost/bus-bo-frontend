@@ -23,7 +23,7 @@ interface TimeModalProps {
   editingTime?: Partial<NewTime>;
 }
 
-// Custom TimePicker (เหมือนเดิม)
+// Custom TimePicker
 interface CustomTimePickerProps {
   value: string;
   onChange: (value: string) => void;
@@ -126,6 +126,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
       : [],
   });
 
+  const [showHint, setShowHint] = useState(false);
   const isEditing = !!editingTime;
 
   useEffect(() => {
@@ -153,10 +154,6 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
       setTimeout(() => toast.error("Please enter a time name"), 100);
       return;
     }
-    if (!newTime.startTime.trim()) {
-      setTimeout(() => toast.error("Please select a start time"), 100);
-      return;
-    }
     if (newTime.times.length === 0) {
       setTimeout(() => toast.error("Please add at least one time slot"), 100);
       return;
@@ -166,17 +163,34 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
 
   const isValidTimeFormat = (time: string) => /^\d{2}:\d{2}$/.test(time);
 
+  const handleTimeChange = (val: string) => {
+    setNewTime({ ...newTime, startTime: val || "" });
+    // แสดง hint เมื่อเลือกเวลาแล้ว
+    if (val && isValidTimeFormat(val)) {
+      setShowHint(true);
+      setTimeout(() => setShowHint(false), 3000);
+    }
+  };
+
   const addTimeSlot = () => {
     const trimmedTime = newTime.startTime.trim();
     if (!trimmedTime || !isValidTimeFormat(trimmedTime)) {
-      alert("Invalid time format. Please use HH:mm.");
+      toast.error("Invalid time format. Please use HH:mm.");
       return;
     }
-    if (newTime.times.includes(trimmedTime)) return;
+    if (newTime.times.includes(trimmedTime)) {
+      toast.warning("This time slot already exists.");
+      return;
+    }
+
     setNewTime({
       ...newTime,
       times: [...newTime.times, trimmedTime].sort(),
+      startTime: "", // Clear เวลาหลังจาก add เพื่อให้เพิ่มเวลาใหม่ได้
     });
+
+    setShowHint(false);
+    toast.success("Time slot added successfully!");
   };
 
   const formatTimeDisplay = (time: string) => {
@@ -196,7 +210,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                 : "Fill in the time details below"
             }
           />
-          <div className="mt-7 flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             {/* Time Name */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
@@ -205,39 +219,70 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
               <input
                 type="text"
                 placeholder="Enter time name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500 ${
+                  newTime.name
+                    ? ""
+                    : "border-gray-300"
+                }`}
                 value={newTime.name}
                 onChange={(e) =>
                   setNewTime({ ...newTime, name: e.target.value })
                 }
               />
             </div>
+
             {/* Start Time */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Start Time
+                Select Time to Add
               </label>
-              <CustomTimePicker
-                onChange={(val) =>
-                  setNewTime({ ...newTime, startTime: val || "" })
-                }
-                value={newTime.startTime}
-                format="HH:mm"
-                disableClock
-                clearIcon={null}
-                clockIcon={null}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
-              />
+              <div className="relative">
+                <CustomTimePicker
+                  onChange={handleTimeChange}
+                  value={newTime.startTime}
+                  format="HH:mm"
+                  disableClock
+                  clearIcon={null}
+                  clockIcon={null}
+                  className={`w-full border rounded-md px-3 py-2 text-gray-700 focus:ring-2 focus:ring-orange-300 focus:border-orange-500 ${
+                    newTime.startTime
+                      ? "border-orange-300 bg-orange-50"
+                      : "border-gray-300"
+                  }`}
+                />
+                {newTime.startTime && showHint && (
+                  <div className="absolute -bottom-6 left-0 text-xs text-orange-600 animate-pulse flex items-center">
+                    <svg
+                      className="w-3 h-3 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Click "Add This Time" to add this slot
+                  </div>
+                )}
+              </div>
             </div>
+
             {/* Time Slots */}
             <div>
               <div className="flex justify-between items-center mb-3">
                 <label className="font-medium text-gray-700 text-sm">
-                  Time Slots
+                  Time Slots ({newTime.times.length})
                 </label>
                 <button
                   onClick={addTimeSlot}
-                  className="flex items-center text-sm px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors font-medium shadow-sm"
+                  disabled={!newTime.startTime.trim()}
+                  className={`flex items-center text-sm px-4 py-1.5 rounded-full font-medium shadow-sm transition-all ${
+                    !newTime.startTime.trim()
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-orange-100 text-orange-700 hover:bg-orange-200 cursor-pointer hover:shadow-md"
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -253,16 +298,16 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add Current Time
+                  Add This Time
                 </button>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-16 shadow-inner">
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-20 shadow-inner">
                 {Array.isArray(newTime.times) && newTime.times.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {newTime.times.map((time, index) => (
                       <div
                         key={index}
-                        className="px-3 py-1.5 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg flex items-center shadow-sm transition-all hover:shadow"
+                        className="px-3 py-1.5 bg-orange-50 border border-orange-200 text-orange-800 rounded-lg flex items-center shadow-sm transition-all hover:shadow animate-fadeIn"
                       >
                         <span className="font-medium">
                           {formatTimeDisplay(time)}
@@ -272,8 +317,9 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                             const newTimes = [...newTime.times];
                             newTimes.splice(index, 1);
                             setNewTime({ ...newTime, times: newTimes });
+                            toast.info("Time slot removed");
                           }}
-                          className="ml-2 text-orange-400 hover:text-orange-700 transition-colors"
+                          className="ml-2 text-orange-400 hover:text-red-600 transition-colors cursor-pointer"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -294,27 +340,42 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-6 text-gray-500 flex flex-col items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-10 w-10 text-gray-300 mb-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    No time slots added yet.
+                  <div className="text-center py-8 text-gray-500 flex flex-col items-center">
+                    <div className="relative">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-12 w-12 text-gray-300 mb-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      {newTime.startTime && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full animate-pulse"></div>
+                      )}
+                    </div>
+                    <span className="text-sm">
+                      {newTime.startTime
+                        ? "Ready to add your selected time!"
+                        : "No time slots added yet."}
+                    </span>
+                    {newTime.startTime && (
+                      <span className="text-xs text-orange-600 mt-1">
+                        Selected: {formatTimeDisplay(newTime.startTime)}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
             </div>
           </div>
+
           {/* Footer Buttons */}
           <div className="flex gap-3 justify-end mt-7">
             <ButtonDefault size="" text="Cancel" onClick={onClose} />
@@ -324,6 +385,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
               onClick={handleSaveTime}
             />
           </div>
+
           {/* Close Button */}
           <div
             className="absolute top-0 right-0 cursor-pointer"
