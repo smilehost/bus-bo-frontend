@@ -7,9 +7,15 @@ function useLanguageContext() {
   return { role, isTH, isSuperAdmin };
 }
 
-export function getTextMenu({ isTH, isSuperAdmin }: { isTH: boolean; isSuperAdmin: boolean }) {
+export function getTextMenu({
+  isTH,
+  isSuperAdmin,
+}: {
+  isTH: boolean;
+  isSuperAdmin: boolean;
+}) {
   return {
-    overview: isTH ? "ภาพรวม" : "OVER VIEW",
+    overview: isTH ? "ภาพรวม" : "OVERVIEW",
     setup: isTH ? "ตั้งค่าเส้นทาง & ตั๋ว" : "SETUP ROUTE & TICKET",
     template: isTH ? "แม่แบบข้อมูล" : "TEMPLATE",
     users: isTH ? "ผู้ใช้งาน" : "USERS",
@@ -27,8 +33,12 @@ export function getTextMenu({ isTH, isSuperAdmin }: { isTH: boolean; isSuperAdmi
     manageTime: isTH ? "จัดการเวลา" : "Manage Times",
 
     manageUser: isSuperAdmin
-      ? isTH ? "จัดการแอดมิน" : "Manage Admin"
-      : isTH ? "จัดการพนักงาน" : "Manage Employee",
+      ? isTH
+        ? "จัดการแอดมิน"
+        : "Manage Admin"
+      : isTH
+      ? "จัดการพนักงาน"
+      : "Manage Employee",
     manageCompany: isTH ? "จัดการบริษัท" : "Manage Company",
   };
 }
@@ -42,14 +52,20 @@ export function getTextFormRoute({ isTH }: { isTH: boolean }) {
     timeLabel: isTH ? "เวลาเดินรถ" : "Times",
     scheduleLabel: isTH ? "ตารางเดินรถ" : "Schedule",
     routeColor: isTH ? "สีของเส้นทาง" : "Route Color",
-    headerUrl: isTH ? "URL รายละเอียดสลิปส่วนหัว" : "URL for slip details at the header",
-    footerUrl: isTH ? "URL รายละเอียดสลิปส่วนท้าย" : "URL for slip details at the footer",
+    headerUrl: isTH
+      ? "URL รายละเอียดสลิปส่วนหัว"
+      : "URL for slip details at the header",
+    footerUrl: isTH
+      ? "URL รายละเอียดสลิปส่วนท้าย"
+      : "URL for slip details at the footer",
     placeholderUrl: isTH ? "กรอก URL..." : "Enter URL...",
     cancel: isTH ? "ยกเลิก" : "Cancel",
     addRoute: isTH ? "เพิ่มเส้นทาง" : "Add Route",
     editRoute: isTH ? "แก้ไขเส้นทาง" : "Edit Route",
     title: isTH ? "สถานี" : "Stations",
-    subtitle: isTH ? "เพิ่มสถานีตามลำดับจากต้นทางไปปลายทาง" : "Add stations in order from start to end",
+    subtitle: isTH
+      ? "เพิ่มสถานีตามลำดับจากต้นทางไปปลายทาง"
+      : "Add stations in order from start to end",
   };
 }
 
@@ -95,13 +111,35 @@ export function getTextRouteTicketBystep({ isTH }: { isTH: boolean }) {
   };
 }
 
-export function getTextManageUserPage({ isTH, isSuperAdmin }: { isTH: boolean; isSuperAdmin: boolean }) {
+export function getTextManageUserPage({
+  isTH,
+  isSuperAdmin,
+}: {
+  isTH: boolean;
+  isSuperAdmin: boolean;
+}) {
   return {
-    title: isSuperAdmin ? (isTH ? "จัดการแอดมิน" : "Manage Admins") : isTH ? "จัดการพนักงาน" : "Manage Employees ",
+    title: isSuperAdmin
+      ? isTH
+        ? "จัดการแอดมิน"
+        : "Manage Admins"
+      : isTH
+      ? "จัดการพนักงาน"
+      : "Manage Employees ",
     description: isSuperAdmin
-      ? isTH ? "ดูและจัดการผู้ใช้งานระดับแอดมิน" : "View and manage admin-level users"
-      : isTH ? "ดูและจัดการข้อมูลลูกค้า" : "View and manage customer information",
-    btnText: isSuperAdmin ? (isTH ? "เพิ่มแอดมิน" : "Add New Admin") : isTH ? "เพิ่มสมาชิก" : "Add New Member",
+      ? isTH
+        ? "ดูและจัดการผู้ใช้งานระดับแอดมิน"
+        : "View and manage admin-level users"
+      : isTH
+      ? "ดูและจัดการข้อมูลลูกค้า"
+      : "View and manage customer information",
+    btnText: isSuperAdmin
+      ? isTH
+        ? "เพิ่มแอดมิน"
+        : "Add New Admin"
+      : isTH
+      ? "เพิ่มสมาชิก"
+      : "Add New Member",
     number: isTH ? "ลำดับ" : "No.",
     name: isTH ? "ชื่อ" : "Name",
     userName: isTH ? "ชื่อผู้ใช้" : "Username",
@@ -150,6 +188,51 @@ export function getTextLocation({ isTH }: { isTH: boolean }) {
     action: isTH ? "การดําเนินการ" : "Action",
     search: isTH ? "ค้นหาสถานที่" : "Search Location",
     number: isTH ? "ลำดับ" : "No.",
+  };
+}
+
+export function getTextDate({ isTH }: { isTH: boolean }) {
+  return {
+    title: isTH ? "จัดการวันที่" : "Manage Date",
+    description: isTH
+      ? "ดูและจัดการวันที่"
+      : "View and manage date information",
+    btnText: isTH ? "เพิ่มวันที่" : "Add New Date",
+    name: isTH ? "ชื่อวันที่" : "Date Name",
+    date: isTH ? "วันที่" : "Date",
+    action: isTH ? "การดําเนินการ" : "Action",
+    search: isTH ? "ค้นหาด้วยชื่อ..." : "Search by name...",
+    number: isTH ? "ลำดับ" : "No.",
+    status: isTH ? "สถานะ" : "Status",
+    monday: isTH ? "จันทร์" : "Monday",
+    tuesday: isTH ? "อังคาร" : "Tuesday",
+    wednesday: isTH ? "พุธ" : "Wednesday",
+    thursday: isTH ? "พฤหัส" : "Thursday",
+    friday: isTH ? "ศุกร์" : "Friday",
+    saturday: isTH ? "เสาร์" : "Saturday",
+    sunday: isTH ? "อาทิตย์" : "Sunday",
+    active: isTH ? "ใช้งาน" : "Active",
+    inactive: isTH ? "ไม่ใช้งาน" : "Inactive",
+    expiresOn: isTH ? "หมดอายุ" : "Expires on",
+    filters: isTH ? "ตัวกรอง" : "Filters",
+    allStatus: isTH ? "ทุกสถานะ" : "All Status",
+  };
+}
+
+export function getTextTime({ isTH }: { isTH: boolean }) {
+  return {
+    title: isTH ? "จัดการเวลา" : "Manage Time",
+    description: isTH ? "ดูและจัดการเวลา" : "View and manage time information",
+    btnText: isTH ? "เพิ่มเวลา" : "Add New Time",
+    name: isTH ? "ชื่อเวลา" : "Name",
+    schedule: isTH ? "ตารางเวลา" : "Schedule",
+    time: isTH ? "เวลา" : "Time",
+    action: isTH ? "การดําเนินการ" : "Actions",
+    search: isTH ? "ค้นหาด้วยเวลา..." : "Search by time...",
+    number: isTH ? "ลำดับ" : "No.",
+    status: isTH ? "สถานะ" : "Status",
+    active: isTH ? "ใช้งาน" : "Active",
+    inactive: isTH ? "ไม่ใช้งาน" : "Inactive",
   };
 }
 

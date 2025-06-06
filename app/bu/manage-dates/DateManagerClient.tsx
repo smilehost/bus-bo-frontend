@@ -21,6 +21,7 @@ import { FILTER } from "@/constants/enum";
 import { statusOptions } from "@/constants/options";
 import { Tooltip } from "@mui/material";
 import StatusText from "@/app/components/StatusText";
+import { getTextDate, useLanguageContext } from "@/app/i18n/translations";
 
 type DateTableProps = {
   no: number;
@@ -56,6 +57,8 @@ export default function DateManagerClient() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+  const { isTH } = useLanguageContext();
+  const text = getTextDate({ isTH });
 
   const fetchDates = async () => {
     setIsLoading(true);
@@ -279,24 +282,28 @@ export default function DateManagerClient() {
     "Sunday",
   ];
 
+  const dayLabels = isTH
+    ? ["จันทร์", "อังคาร", "พุธ", "พฤหัส", "ศุกร์", "เสาร์", "อาทิตย์"]
+    : englishDays;
+
   const columns: ColumnConfig<DateTableProps>[] = [
     {
       key: "no",
-      label: "No.",
+      label: text.number,
       width: "6%",
       align: "center",
       render: (_: unknown, row: DateTableProps) => <span>{row.no}</span>,
     },
     {
       key: "name",
-      label: "Name",
+      label: text.name,
       width: "16%",
       align: "left",
       render: (_: unknown, row: DateTableProps) => <span>{row.name}</span>,
     },
     ...englishDays.map((day, idx) => ({
       key: `days.${day.toLowerCase()}` as keyof DateTableProps,
-      label: day,
+      label: dayLabels[idx],
       width: "8%",
       align: "center" as const,
       render: (_: unknown, row: DateTableProps) => {
@@ -314,27 +321,27 @@ export default function DateManagerClient() {
     })),
     {
       key: "status",
-      label: "Status",
+      label: text.status ?? "Status",
       width: "10%",
       align: "center",
       render: (_: unknown, row: DateTableProps) =>
         row.status === "Active" ? (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
             <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-            <span>Active</span>
+            <span>{isTH ? "ใช้งาน" : "Active"}</span>
           </span>
         ) : (
-          <Tooltip title={`Expires on ${row.endDate}`}>
+          <Tooltip title={`${isTH ? "หมดอายุ" : "Expires on"} ${row.endDate}`}>
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-              <span>Inactive</span>
+              <span>{isTH ? "ไม่ใช้งาน" : "Inactive"}</span>
             </span>
           </Tooltip>
         ),
     },
     {
       key: "id",
-      label: "Actions",
+      label: text.action,
       width: "12%",
       align: "center",
       render: (_: unknown, row: DateTableProps) => (
@@ -389,9 +396,9 @@ export default function DateManagerClient() {
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage
-          title="Manage Date"
-          description="View and manage date information"
-          btnText="Add New Date"
+          title={text.title}
+          description={text.description}
+          btnText={text.btnText}
           handleOpenModel={handleAddDate}
         />
         <div className="custom-frame-content p-5 mt-5">
@@ -407,7 +414,7 @@ export default function DateManagerClient() {
                 target: { value },
               } as React.ChangeEvent<HTMLInputElement>)
             }
-            placeholderSearch={"Search by name..."}
+            placeholderSearch={text.search}
             filter={filterSearch}
             search={searchTerm}
           />
