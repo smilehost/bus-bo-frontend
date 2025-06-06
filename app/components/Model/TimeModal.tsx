@@ -263,7 +263,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                         clipRule="evenodd"
                       />
                     </svg>
-                    Click "Add This Time" to add this slot
+                    Click "Add In slot" to add this slot
                   </div>
                 )}
               </div>
