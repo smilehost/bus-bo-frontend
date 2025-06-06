@@ -6,6 +6,7 @@ import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getTextLocation, useLanguageContext } from "@/app/i18n/translations";
 import InputLabel from "../Form/InputLabel";
 
 interface LocationModalProps {
@@ -32,6 +33,8 @@ function LocationModal({
     latitude: "",
     longitude: "",
   });
+  const { isTH } = useLanguageContext();
+  const text = getTextLocation({ isTH });
 
   useEffect(() => {
     if (editingLocation) {
@@ -73,24 +76,27 @@ function LocationModal({
       <DialogContent>
         <div className="w-[448px] py-2 relative">
           <TitleModel
-            title={isEditing ? "Edit Location" : "Add New Location"}
-            description={
-              isEditing
-                ? "Update the location details below"
-                : "Fill in the location details below"
-            }
+            title={isEditing ? text.editLoc : text.addLoc}
+            description={isEditing ? text.upDate : text.fillIn}
           />
           <div className="mt-7 flex flex-col gap-4">
             <InputLabel
-              label={"Location Name"}
-              placeholder="Enter location name"
+              label={text.name}
+              placeholder={text.placeholderNameLoc}
               type="text"
               value={location.name}
-              setValue={(val: string) => setLocation({ ...location, name: val })}
+              setValue={(val: string) =>
+                setLocation({ ...location, name: val })
+              }
             />
             <InputLabel
-              label={"Location (Latitude, Longitude)"}
+              label={text.latLong}
               placeholder="16.40110363857608, 102.85026064787496"
+              value={
+                location.latitude && location.longitude
+                  ? `${location.latitude}, ${location.longitude}`
+                  : ""
+              }
               type="text"
               setValue={(val: string) => {
                 const [lat, lng] = val.split(",").map((s) => s.trim());
@@ -101,13 +107,14 @@ function LocationModal({
                 }));
               }}
             />
+
             {/* <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Location Name
+                {text.name}
               </label>
               <input
                 type="text"
-                placeholder="Enter location name"
+                placeholder={text.placeholderNameLoc}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
                 value={location.name}
                 onChange={(e) =>
@@ -117,7 +124,7 @@ function LocationModal({
             </div> */}
             {/* <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Location (Latitude, Longitude)
+                {text.latLong}
               </label>
               <input
                 type="text"

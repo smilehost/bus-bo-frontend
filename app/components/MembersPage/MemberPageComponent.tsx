@@ -148,12 +148,12 @@ export default function MemberPageComponent({
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const isConfirmed = await Confirm({
-        title: data.id ? "Confirm Update" : "Confirm Create",
+        title: data.id ? text.confirmUpdateTitle : text.confirmCreateTitle,
         text: data.id
-          ? "Do you want to update this member?"
-          : "Do you want to create this member?",
-        confirmText: data.id ? "Update" : "Create",
-        cancelText: "Cancel",
+          ? text.confirmUpdateText
+          : text.confirmCreateText,
+        confirmText: data.id ? text.updateBtn : text.createBtn,
+        cancelText: text.cancelText,
         type: "question",
       });
 
@@ -165,8 +165,8 @@ export default function MemberPageComponent({
           companyId: Number(data.companyId),
         } as MemberItem);
         await Alert({
-          title: "Updated!",
-          text: "Member updated.",
+          title: text.alertUpdatedTitle,
+          text: text.alertUpdatedText,
           type: "success",
         });
       } else {
@@ -177,8 +177,8 @@ export default function MemberPageComponent({
           role: data.role,
         });
         await Alert({
-          title: "Created!",
-          text: "Member created.",
+          title: text.alertCreatedTitle,
+          text: text.alertCreatedText,
           type: "success",
         });
       }
@@ -187,8 +187,8 @@ export default function MemberPageComponent({
     } catch (err) {
       console.error(err);
       await Alert({
-        title: "Error!",
-        text: "Failed to save member.",
+        title: text.alertErrorTitle,
+        text: text.alertFailedSave,
         type: "error",
       });
     }
@@ -198,10 +198,10 @@ export default function MemberPageComponent({
     if (!selectedMember) return;
 
     const isConfirmed = await Confirm({
-      title: "Confirm Status Change",
-      text: "Do you want to update the status?",
-      confirmText: "Update",
-      cancelText: "Cancel",
+      title: text.confirmStatusTitle,
+      text: text.confirmStatusText,
+      confirmText: text.updateBtn,
+      cancelText: text.cancelText,
       type: "question",
     });
 
@@ -212,16 +212,16 @@ export default function MemberPageComponent({
         .getState()
         .changeStatus(selectedMember.id, newStatus);
       await Alert({
-        title: "Updated!",
-        text: "Status changed.",
+        title: text.alertUpdatedTitle,
+        text: text.alertStatusText,
         type: "success",
       });
       fetchMembers();
     } catch (error) {
       console.error("Status update error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to change status.",
+        title: text.alertErrorTitle,
+        text: text.alertFailedStatus,
         type: "error",
       });
     }
@@ -231,10 +231,10 @@ export default function MemberPageComponent({
 
   const handleEditPassword = async (userId: string, newPassword: string) => {
     const isConfirmed = await Confirm({
-      title: "Confirm Password Change",
-      text: "Do you want to change the password?",
-      confirmText: "Update",
-      cancelText: "Cancel",
+      title: text.confirmPasswordTitle,
+      text: text.confirmPasswordText,
+      confirmText: text.updateBtn,
+      cancelText: text.cancelText,
       type: "question",
     });
 
@@ -243,15 +243,15 @@ export default function MemberPageComponent({
     try {
       await useMemberStore.getState().changePassword(userId, newPassword);
       await Alert({
-        title: "Updated!",
-        text: "Password changed.",
+        title: text.alertUpdatedTitle,
+        text: text.alertPasswordText,
         type: "success",
       });
     } catch (error) {
       console.error("Password update error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to change password.",
+        title: text.alertErrorTitle,
+        text: text.alertFailedPassword,
         type: "error",
       });
     }

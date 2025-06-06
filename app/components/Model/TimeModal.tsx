@@ -9,6 +9,7 @@ import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getTextTimes, useLanguageContext } from "@/app/i18n/translations";
 
 interface NewTime {
   name: string;
@@ -52,6 +53,7 @@ const CustomTimePicker = ({
     i.toString().padStart(2, "0")
   );
   const [currentHour, currentMinute] = value ? value.split(":") : ["00", "00"];
+  
 
   const handleSelectTime = (hour: string, minute: string) => {
     onChange(`${hour}:${minute}`);
@@ -197,33 +199,31 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
     const parts = time.split(":");
     return parts.length === 2 ? `${parts[0]}:${parts[1]}` : time;
   };
+  const isTH = useLanguageContext();
+  const text = getTextTimes(isTH);
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <div className="w-[448px] py-2 relative">
           <TitleModel
-            title={isEditing ? "Edit Time" : "Add New Time"}
+            title={isEditing ? text.editTime : text.add}
             description={
               isEditing
-                ? "Update the time details below"
-                : "Fill in the time details below"
+                ? text.upIn
+                : text.fillIn
             }
           />
           <div className="flex flex-col gap-4">
             {/* Time Name */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Time Name
+                {text.name}
               </label>
               <input
                 type="text"
-                placeholder="Enter time name"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500 ${
-                  newTime.name
-                    ? ""
-                    : "border-gray-300"
-                }`}
+                placeholder={text.enterName}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
                 value={newTime.name}
                 onChange={(e) =>
                   setNewTime({ ...newTime, name: e.target.value })
@@ -234,7 +234,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
             {/* Start Time */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Select Time to Add
+                {text.selectTime}
               </label>
               <div className="relative">
                 <CustomTimePicker
@@ -273,7 +273,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
             <div>
               <div className="flex justify-between items-center mb-3">
                 <label className="font-medium text-gray-700 text-sm">
-                  Time Slots ({newTime.times.length})
+                  {text.timeSlot}
                 </label>
                 <button
                   onClick={addTimeSlot}
@@ -298,7 +298,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add This Time
+                  {text.btnAddSlot}
                 </button>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-20 shadow-inner">
@@ -340,36 +340,22 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500 flex flex-col items-center">
-                    <div className="relative">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-12 w-12 text-gray-300 mb-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      {newTime.startTime && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full animate-pulse"></div>
-                      )}
-                    </div>
-                    <span className="text-sm">
-                      {newTime.startTime
-                        ? "Ready to add your selected time!"
-                        : "No time slots added yet."}
-                    </span>
-                    {newTime.startTime && (
-                      <span className="text-xs text-orange-600 mt-1">
-                        Selected: {formatTimeDisplay(newTime.startTime)}
-                      </span>
-                    )}
+                  <div className="text-center py-6 text-gray-500 flex flex-col items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-10 w-10 text-gray-300 mb-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {text.noSlot}
                   </div>
                 )}
               </div>
@@ -378,10 +364,10 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
 
           {/* Footer Buttons */}
           <div className="flex gap-3 justify-end mt-7">
-            <ButtonDefault size="" text="Cancel" onClick={onClose} />
+            <ButtonDefault size="" text={text.btnCancle} onClick={onClose} />
             <ButtonBG
               size=""
-              text={isEditing ? "Update Time" : "Add Time"}
+              text={isEditing ? text.btnUp : text.btnAdd}
               onClick={handleSaveTime}
             />
           </div>
