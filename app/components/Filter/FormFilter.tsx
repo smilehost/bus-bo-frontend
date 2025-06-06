@@ -60,7 +60,7 @@ function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilter
                 )}
             </div>
             {filter && (
-                <>
+                <div className='flex items-center gap-2 flex-wrap'>
                     <div className='flex items-center mx-4 gap-2'>
                         <Funnel size={18}
                             style={{ color: "#6B7280" }}
@@ -78,7 +78,7 @@ function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilter
                             />
                         ))}
                     </div>
-                </>
+                </div>
             )}
         </div>
     )

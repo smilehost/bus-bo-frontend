@@ -271,7 +271,7 @@ export default function DateManagerClient() {
       align: "left",
       render: (_: unknown, row: DateTableProps) => <span>{row.name}</span>,
     },
-    ...englishDays.map((day, idx) => ({
+    ...englishDays.map((day) => ({
       key: `days.${day.toLowerCase()}` as keyof DateTableProps,
       label: day,
       width: "8%",
