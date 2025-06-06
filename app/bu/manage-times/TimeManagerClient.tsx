@@ -18,7 +18,9 @@ import TableTemplate, {
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { Clock, SquarePen, Trash2 } from "lucide-react";
 import { Tooltip } from "@mui/material";
+import { getTextTimes, useLanguageContext } from "@/app/i18n/translations";
 import FormFilter from "@/app/components/Filter/FormFilter";
+
 
 function Page() {
   const { times, getTimes, createTime, updateTime, deleteTime } =
@@ -31,6 +33,7 @@ function Page() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
+
 
   // Define the interface for the time item
   interface TimeItem {
@@ -53,6 +56,8 @@ function Page() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+  const { isTH } = useLanguageContext();
+  const text = getTextTimes({isTH});
 
   const fetchTimes = async () => {
     setIsLoading(true);
@@ -120,12 +125,12 @@ function Page() {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
-      title: editingTime ? "Confirm Update" : "Confirm Create",
+      title: editingTime ? text.confirmUpdateTitle : text.confirmCreateTitle,
       text: editingTime
-        ? "Do you want to update this time?"
-        : "Do you want to create this time?",
-      confirmText: editingTime ? "Update" : "Create",
-      cancelText: "Cancel",
+        ? text.confirmUpdateText
+        : text.confirmCreateText,
+      confirmText: editingTime ? text.confirmTextUpdate : text.confirmTextCreate,
+      cancelText: text.btnCancle,
       type: "question",
     });
 
@@ -135,15 +140,15 @@ function Page() {
       if (editingTime) {
         await updateTime(editingTime.id, data.name, schedule);
         await Alert({
-          title: "Updated!",
-          text: "Time updated successfully",
+          title: text.updatedTitle,
+          text: text.updatedText,
           type: "success",
         });
       } else {
         await createTime(data.name, schedule);
         await Alert({
-          title: "Created!",
-          text: "Time created successfully",
+          title: text.createdTitle,
+          text: text.createdText,
           type: "success",
         });
       }
@@ -152,8 +157,8 @@ function Page() {
     } catch (error) {
       console.error("Save Time error:", error);
       await Alert({
-        title: "Error!",
-        text: "Something went wrong.",
+        title: text.errorTitle,
+        text: text.errorText,
         type: "error",
       });
     }
@@ -161,10 +166,10 @@ function Page() {
 
   const handleDeleteTime = async (id: number) => {
     const isConfirmed = await Confirm({
-      title: "Confirm Delete",
-      text: "Are you sure you want to delete this time?",
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: text.confirmDeleteTitle,
+      text: text.confirmDeleteText,
+      confirmText: text.deleteConfirmText,
+      cancelText: text.btnCancle,
       type: "warning",
     });
 
@@ -173,16 +178,16 @@ function Page() {
     try {
       await deleteTime(id);
       await Alert({
-        title: "Deleted!",
-        text: "Time deleted successfully",
+        title: text.deletedTitle,
+        text: text.deletedText,
         type: "success",
       });
       fetchTimes();
     } catch (error) {
       console.error("Delete Time error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to delete.",
+        title: text.errorTitle,
+        text: text.deleteFailText,
         type: "error",
       });
     }
@@ -213,31 +218,34 @@ function Page() {
   const columns: ColumnConfig<TimeTableProps>[] = [
     {
       key: "no",
-      label: "No.",
+      label: text.no,
       width: "20%",
       align: "left",
     },
     {
       key: "name",
-      label: "Name",
+      label: text.name,
       width: "20%",
       align: "left",
     },
     {
-      key: 'schedule', label: 'Schedule', width: '20%', align: 'left', render: (_, row) => (
+      key: 'schedule', label: text.schedule, width: '20%', align: 'left', render: (_, row) => (
         <Tooltip title={row.schedule.join(", ")}>
           <div className="flex items-center gap-2 custom-ellipsis-style">
             <div className="shrink-0">
               <Clock className={`custom-size-tableAction-btn text-blue-500 `} />
             </div>
-            <p className="whitespace-nowrap custom-ellipsis-style"> {row.schedule.join(", ")}</p>
+            <p className="whitespace-nowrap custom-ellipsis-style">
+              {" "}
+              {row.schedule.join(", ")}
+            </p>
           </div>
         </Tooltip>
-      )
+      ),
     },
     {
       key: "id",
-      label: "Actions",
+      label: text.action,
       width: "25%",
       align: "right",
       render: (_, row) => (
@@ -251,7 +259,7 @@ function Page() {
             }
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
-            title="Edit"
+            title={text.editTime}
           />
           <TableActionButton
             onClick={() => handleDeleteTime(row.id)}
@@ -260,7 +268,7 @@ function Page() {
             }
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
-            title="Delete"
+            title={text.delete}
           />
         </div>
       ),
@@ -272,9 +280,9 @@ function Page() {
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage
-          title="Manage Time"
-          description="View and manage time information"
-          btnText="Add New Time"
+          title={text.title}
+          description={text.Subtitle}
+          btnText={text.btnAdd}
           handleOpenModel={handleAddTime}
         />
         <div className="custom-frame-content p-5 mt-5">
@@ -284,7 +292,7 @@ function Page() {
                 target: { value },
               } as React.ChangeEvent<HTMLInputElement>)
             }
-            placeholderSearch="Search by time..."
+            placeholderSearch={text.search}
             search={searchTerm}
           />
           {/* <SearchFilter
@@ -323,10 +331,10 @@ function Page() {
           editingTime={
             editingTime
               ? {
-                ...editingTime,
-                startTime: editingTime.startTime || "",
-                times: editingTime.times || [],
-              }
+                  ...editingTime,
+                  startTime: editingTime.startTime || "",
+                  times: editingTime.times || [],
+                }
               : undefined
           }
         />

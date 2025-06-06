@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { Dispatch, SetStateAction } from 'react';
 import { LocationItem } from '@/types/location';
+import { getTextFormRoute, useLanguageContext } from '@/app/i18n/translations';
 
 type DragDropProps = {
   listA: LocationItem[],
@@ -14,6 +15,8 @@ type DragDropProps = {
 function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
 
   const [search, setSearch] = useState<string>("");
+  const { isTH } = useLanguageContext();
+  const text = getTextFormRoute({isTH});
 
   // Filtered display only (ไม่ใช้กับ setList)
   const filteredListA = useMemo(() => {
@@ -30,11 +33,11 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
       {/* List A */}
       {!disable && (
         <div className=" py-4 h-[350px] rounded-md w-[250px] lg:w-[350px] xl:w-[400px]">
-          <p className="text-center text-[12px] font-medium">Station List</p>
+          <p className="text-center text-[12px] font-medium">{text.stList}</p>
           <div className='mt-3'>
             <input
               type={"text"}
-              placeholder={"Search Station..."}
+              placeholder={text.search}
               className={` px-5 py-1 rounded-md custom-border-gray text-[14px] w-full`}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -63,7 +66,7 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
 
       {/* List B */}
       <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg overflow-y-scroll" : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
-        <p className="text-center text-[12px] font-medium">Stations this Route</p>
+        <p className="text-center text-[12px] font-medium">{text.stThis}</p>
         <div className={`mt-5 h-[350px]`}>
           <ReactSortable
             list={listB}
@@ -89,7 +92,7 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
 
             ) : (
               <div className='flex justify-center items-center h-full text-gray-400 text-sm italic'>
-                Drag items here to add
+                {text.Drag}
               </div>
             )}
           </ReactSortable>

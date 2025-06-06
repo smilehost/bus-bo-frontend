@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
+import { useLanguageContext } from "@/app/i18n/translations";
 
 interface SearchFilterProps {
   searchTerm: string;
@@ -18,6 +19,7 @@ function DateSearchFilter({
 }: SearchFilterProps) {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const statusRef = useRef<HTMLDivElement>(null);
+  const { isTH } = useLanguageContext();
 
   const clearSearch = () => {
     setSearchTerm({
@@ -52,7 +54,7 @@ function DateSearchFilter({
           </div>
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder={isTH ? "ค้นหาชื่อ..." : "Search by name..."}
             className="pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             value={searchTerm}
             onChange={setSearchTerm}

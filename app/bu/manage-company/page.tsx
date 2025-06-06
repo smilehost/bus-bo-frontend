@@ -240,9 +240,7 @@ export default function ManageCompaniesPage() {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
         {
-          username: "admin57",
-          // password : 'G1@ugO37ir',
-          // username,
+          username: "admin",
           password,
         },
         {

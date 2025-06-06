@@ -22,6 +22,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { CopyIcon } from "../Icons/CopyIcon";
 import { CompanyItem } from "@/types/company";
+import { getTextDateManagement, getTextManageUserPage, useLanguageContext } from "@/app/i18n/translations";
 
 type CompanyOption = {
   value: string;
@@ -68,6 +69,8 @@ function MemberModal({
   //store
   const { userData } = useUserStore();
   const { getCompanyById } = useCompanyStore();
+  const { isTH, isSuperAdmin } = useLanguageContext();
+    const text = getTextManageUserPage({ isTH, isSuperAdmin });
 
   //get company by id
   useEffect(() => {
@@ -97,7 +100,7 @@ function MemberModal({
           label: com.com_name,
         }));
         setCompanyOptions([
-          { value: "", label: "Select a company" },
+          { value: "", label: text.seCom },
           ...mapped,
         ]);
       } catch (error) {
@@ -205,23 +208,23 @@ function MemberModal({
       <DialogContent>
         <div className="w-[448px] py-2 relative">
           <TitleModel
-            title={isEditing ? "Edit Member" : "Add New Member"}
+            title={isEditing ? text.editMem : text.btnText}
             description={
               isEditing
                 ? "Update the member details below"
-                : "Fill in the member details below"
+                : text.fillIn
             }
           />
           <div className="mt-7 flex flex-col gap-4">
             <InputLabel
-              label="Member Name"
-              placeholder="Enter member name"
+              label={text.name}
+              placeholder={text.enterMem}
               type="text"
               value={name}
               setValue={setName}
             />
             <div className="flex flex-col gap-2">
-              <LabelText text={"Username"} />
+              <LabelText text={text.userName} />
               <div className="flex gap-2">
                 <div
                   className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] flex justify-center items-center`}
@@ -231,7 +234,7 @@ function MemberModal({
                 <input
                   value={username}
                   type={"text"}
-                  placeholder={"Enter username"}
+                  placeholder={text.enterUser}
                   className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] w-full`}
                   onChange={(e) => {
                     const input = e.target.value;
@@ -247,7 +250,7 @@ function MemberModal({
                 <InputLabel
                   label={
                     <div className="flex justify-between">
-                      <p>Password</p>
+                      <p>{text.passWord}</p>
                       <div
                         className=""
                         onClick={() => {
@@ -255,12 +258,12 @@ function MemberModal({
                         }}
                       >
                         <p className="" style={{ fontSize: "14px" }}>
-                          auto
+                          {text.genPassword}
                         </p>
                       </div>
                     </div>
                   }
-                  placeholder="Enter password"
+                  placeholder={text.enterPass}
                   type={typePassword ? "password" : "text"}
                   value={password}
                   setValue={setPassword}
@@ -288,7 +291,7 @@ function MemberModal({
             )}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Company
+                {text.com}
               </label>
               <select
                 disabled={isEditing}
@@ -309,7 +312,7 @@ function MemberModal({
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">Role</label>
+              <label className="text-sm font-medium text-gray-700">{text.role}</label>
               <select
                 disabled={isEditing}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
@@ -326,10 +329,10 @@ function MemberModal({
           </div>
 
           <div className="flex gap-3 justify-end mt-7">
-            <ButtonDefault size="" text="Cancel" onClick={onClose} />
+            <ButtonDefault size="" text={text.cancelText} onClick={onClose} />
             <ButtonBG
               size=""
-              text={isEditing ? "Update Member" : "Add Member"}
+              text={isEditing ? text.editMem : text.addMem}
               onClick={handleSubmit}
             />
           </div>

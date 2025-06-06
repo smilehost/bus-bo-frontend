@@ -20,6 +20,7 @@ import { useLocationStore } from '@/stores/locationStore';
 //toast
 import { toast } from 'react-toastify';
 import { getComId } from '@/utils/getComId';
+import { getTextRoute, useLanguageContext } from '@/app/i18n/translations';
 
 function Page() {
 
@@ -55,6 +56,8 @@ function Page() {
     const [listStations, setListStations] = useState<number[]>([]);
     const [headerUrl, setHeaderUrl] = useState<string>('')
     const [footerUrl, setFooterUrl] = useState<string>('')
+    const { isTH } = useLanguageContext();
+    const text = getTextRoute({isTH});
 
     //select time
     const [selectedTime, setSelectedTime] = useState<number>(); // ค่าที่จะเก็บเวลา
@@ -92,16 +95,16 @@ function Page() {
         const result = await addRoute(payload);
 
         if (result.success) {
-            toast.success("Create route successfully!");
+            toast.success(text.successCreate);
             router.back();
         } else {
-            toast.error(`Error: ${result.message}`);
+            toast.error(`${text.errorCreate}: ${result.message}`);
         }
     };
 
     return (
         <div>
-            <TitlePage title={"Create Route"} />
+            <TitlePage title={text.titleAddRoute} />
             <FormRoute
                 routeNameTH={routeNameTH}
                 setRouteNameTH={setRouteNameTH}
