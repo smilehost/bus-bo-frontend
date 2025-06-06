@@ -93,7 +93,7 @@ export default function DateManagerClient() {
 
       return {
         ...date,
-        status: isExpired ? "Inactive" : date.status,
+        status: isExpired ? 0 : date.status, // Map "Inactive" to 0
       };
     });
 
@@ -325,7 +325,7 @@ export default function DateManagerClient() {
       width: "10%",
       align: "center",
       render: (_: unknown, row: DateTableProps) =>
-        row.status === "Active" ? (
+        row.status === 1 ? (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
             <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
             <span>{isTH ? "ใช้งาน" : "Active"}</span>
