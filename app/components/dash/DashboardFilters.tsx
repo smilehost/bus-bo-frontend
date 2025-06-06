@@ -41,7 +41,7 @@ export default function DashboardFilters({
               setDate(val);
               setCustomDate(""); // reset custom date
             }}
-            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-full md:w-fit"
           >
             <option value="all">{text.all}</option>
             <option value="day">{text.today}</option>
@@ -59,7 +59,7 @@ export default function DashboardFilters({
               setCustomDate(val);
               setDate(val); // ใช้เป็น selectDate เช่นกัน
             }}
-            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm"
+            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm w-full md:w-fit"
           />
         </div>
       </div>

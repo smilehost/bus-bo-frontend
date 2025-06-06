@@ -29,7 +29,7 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
   );;
 
   return (
-    <div className={`flex gap-10 gap-y-20 justify-between flex-wrap`}>
+    <div className={`flex gap-10 gap-y-20 justify-center lg:justify-between flex-wrap`}>
       {/* List A */}
       {!disable && (
         <div className=" py-4 h-[350px] rounded-md w-[250px] lg:w-[350px] xl:w-[400px]">

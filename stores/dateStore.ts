@@ -35,7 +35,7 @@ export const useDateStore = create<DateState>((set) => ({
         size,
         search,
         status,
-      })) as { result: any[] };
+      })) as { result: UpdateDatePayload[] };
       const rawData = res.result || [];
       const today = new Date();
       const todayStart = new Date(
