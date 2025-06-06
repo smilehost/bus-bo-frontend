@@ -337,8 +337,8 @@ export function getTextPriceType({ isTH }: { isTH: boolean }) {
     btnEdit: isTH ? "แก้ไข" : "Edit",
     btnDelete: isTH ? "ลบ" : "Delete",
 
-    addOrEditTitle: (isEdit: boolean) =>
-      isEdit ? (isTH ? "แก้ไขประเภทราคา" : "Edit Price Type") : (isTH ? "เพิ่มประเภทราคา" : "Add New Price Type"),
+    isEdit: isTH ? "แก้ไขประเภทราคา" : "Edit Price Type",
+    isAdd: isTH ? "เพิ่มประเภทราคา" : "Add Price Type",
     inputText: isTH ? "กรอกรายละเอียดประเภทตั๋วด้านล่าง" : "Fill in the price type details below.",
     inputPlaceholder: isTH ? "พิมพ์ชื่อประเภทตั๋วที่นี่" : "Type route name here",
     inputEmptyError: isTH ? "ห้ามเว้นชื่อว่าง" : "Name cannot be empty",
@@ -346,6 +346,8 @@ export function getTextPriceType({ isTH }: { isTH: boolean }) {
     createdError: isTH ? "สร้างไม่สำเร็จ" : "Creation failed",
     updatedSuccess: isTH ? "อัปเดตเรียบร้อย!" : "Updated successfully!",
     updatedError: isTH ? "อัปเดตไม่สำเร็จ" : "Update failed",
+    label: isTH ? "ชื่อเส้นทาง" : "Route Name",
+    
 
     // ✨ Discount Dialog
     confirmCreateTitle: isTH ? "ยืนยันการสร้าง" : "Confirm Create",
