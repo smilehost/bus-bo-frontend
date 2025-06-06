@@ -23,6 +23,7 @@ import { statusOptions } from "@/constants/options";
 import { Tooltip } from "@mui/material";
 import StatusText from "@/app/components/StatusText";
 
+
 type DateTableProps = {
   no: number;
   id: number;
@@ -279,7 +280,6 @@ export default function DateManagerClient() {
     { key: "saturday", label: isTH ? "วันเสาร์" : "Saturday" },
     { key: "sunday", label: isTH ? "วันอาทิตย์" : "Sunday" },
   ];
-
 
   const columns: ColumnConfig<DateTableProps>[] = [
     {

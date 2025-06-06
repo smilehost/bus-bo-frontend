@@ -69,7 +69,6 @@ export function getTextFormRoute({ isTH }: { isTH: boolean }) {
     stThis: isTH ? "สถานีในเส้นทาง" : "Stations this Route",
     Drag: isTH ? "ลากสถานี" : "Drag items here to add",
     search: isTH ? "ค้นหาสถานี" : "Search Station",
-    
   };
 }
 
