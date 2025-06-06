@@ -2,6 +2,8 @@
 export enum USER_TIER {
     ADMIN = "Admin",
     SUPER_ADMIN = "Super Admin",
+    SALESMAN = "Salesman",
+    GUEST = "ใครอะ",
 }
 
 export enum STATUS {

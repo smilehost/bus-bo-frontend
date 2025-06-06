@@ -11,6 +11,7 @@ export interface CreateMemberPayload {
   password: string;
   name: string;
   role: string;
+  com_id: number;
 }
 
 export interface UpdateMemberPayload {

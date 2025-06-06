@@ -4,7 +4,7 @@ export type MemberItem = {
   name: string;            // account_name
   role: string;            // account_role
   status: number;          // account_status
-  companyId: number;       // account_com_id
+  com_id: number;       // account_com_id
 };
 
 export interface FetchMembersResult {

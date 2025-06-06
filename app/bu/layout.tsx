@@ -28,15 +28,12 @@ import { Confirm } from "../components/Dialog/Confirm";
 import { useUserStore } from "@/stores/userStore";
 
 //enum
-import { USER_TIER } from "@/constants/enum";
 import { store } from "@/stores/store";
 import { getTextMenu, useLanguageContext } from "../i18n/translations";
 
 //hooks
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { usePathname } from "next/navigation";
-
-
 
 export default function RootLayout({
   children,
@@ -47,6 +44,8 @@ export default function RootLayout({
   const [hasMounted, setHasMounted] = useState(false);
   const { userData } = useUserStore();
   const lang = store.Translation.use(); // ✅ re-render เมื่อเปลี่ยนภาษา
+  const account_name = store.account_name.use();
+  const account_username = store.account_username.use();
 
   const setLang = (value: 'TH' | 'EN') => {
     if (value !== lang) {
@@ -100,13 +99,11 @@ export default function RootLayout({
     {
       group: menuText.users,
       items: [
-        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee",  link: isSuperAdmin ? "manage-admin" : "manage-employee" },
+        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", link: isSuperAdmin ? "manage-admin" : "manage-employee" },
         { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
   ];
-
-
 
   const [roleMenu, setRoleMenu] = useState<number[]>([]);
   const logOut = () => {
@@ -251,12 +248,14 @@ export default function RootLayout({
                 <div className="hidden md:block">
                   <div className="hidden md:block">
                     <div className="text-sm font-medium text-black ">
-                      {userData?.name}
+                      {/* {userData?.name} */}
+                      {account_name}
                     </div>
                     <div className="text-xs text-gray-500  capitalize">
-                      {userData.account_role === 1
+                      {/* {userData.account_role === 1
                         ? USER_TIER.SUPER_ADMIN
-                        : USER_TIER.ADMIN}
+                        : USER_TIER.ADMIN} */}
+                      {account_username}
                     </div>
                   </div>
                 </div>

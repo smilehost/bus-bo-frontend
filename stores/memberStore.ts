@@ -57,7 +57,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
         name: item.account_name,
         role: item.account_role,
         status: item.account_status,
-        companyId: item.account_com_id,
+        com_id: item.account_com_id,
       }));
 
       set({ members: mapped, total: totalCount });
@@ -84,7 +84,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
         name: item.account_name,
         role: item.account_role,
         status: item.account_status,
-        companyId: item.account_com_id,
+        com_id: item.account_com_id,
       }));
 
       set({ members: mapped, total: totalCount });
@@ -121,7 +121,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
         name: item.account_name,
         role: item.account_role,
         status: item.account_status,
-        companyId: item.account_com_id,
+        com_id: item.account_com_id,
       };
     } catch (error) {
       console.error("getMemberById error:", error);
