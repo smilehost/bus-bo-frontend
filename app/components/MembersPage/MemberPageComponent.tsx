@@ -451,7 +451,7 @@ export default function MemberPageComponent({
         <EditStatusModel
           open={isEditStatusOpen}
           onClose={() => setEditStatusOpen(false)}
-          currentStatus={selectedMember?.status || 1}
+          currentStatus={selectedMember?.status || 0}
           onSave={handleEditStatus}
         />
         <EditPasswordModel

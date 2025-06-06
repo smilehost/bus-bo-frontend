@@ -38,7 +38,7 @@ export const useDateStore = create<DateState>((set) => ({
       })) as { result: any[] };
       const rawData = res.result || [];
 
-      const mapped: DateItem[] = rawData.map((item: any) => ({
+      const mapped: DateItem[] = rawData.map((item: UpdateDatePayload) => ({
         id: item.route_date_id,
         name: item.route_date_name,
         startDate: item.route_date_start,

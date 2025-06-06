@@ -36,7 +36,7 @@ type DateTableProps = {
     sunday: boolean;
   };
   endDate: string;
-  status: string;
+  status: number;
 };
 
 export default function DateManagerClient() {
@@ -79,7 +79,7 @@ export default function DateManagerClient() {
     }
 
     if (statusFilter !== "" && statusFilter !== FILTER.ALL_STATUS) {
-      tempDates = tempDates.filter((date) => date.status === statusFilter);
+      tempDates = tempDates.filter((date) => date.status === Number(statusFilter));
     }
     setFilteredDates(tempDates);
     setTotalResults(tempDates.length);

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
+import { STATUS } from "@/constants/enum";
 
 type EditStatusModelProps = {
   open: boolean;
@@ -20,9 +21,9 @@ function EditStatusModel({
   const [status, setStatus] = useState<number>(currentStatus);
 
   const statusOptions = [
-    { label: "Active", value: 1 },
-    { label: "Inactive", value: 0 },
-    { label: "Cancelled", value: 2 },
+    { label: STATUS.ACTIVE, value: 1 },
+    { label: STATUS.INACTIVE, value: 0 },
+    { label: STATUS.CANCELLED, value: 2 },
   ];
 
   const handleSave = () => {
