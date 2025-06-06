@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, X } from "lucide-react";
+import { useLanguageContext } from "@/app/i18n/translations";
 
 interface SearchFilterProps {
   searchTerm: string;
@@ -10,6 +11,7 @@ function SearchFilter({ searchTerm, setSearchTerm }: SearchFilterProps) {
   const clearSearch = () => {
     setSearchTerm("");
   };
+  const isTH = useLanguageContext();
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">
@@ -21,7 +23,7 @@ function SearchFilter({ searchTerm, setSearchTerm }: SearchFilterProps) {
           </div>
           <input
             type="text"
-            placeholder="Search by time..."
+            placeholder={isTH ? "ค้นหาโดยเวลาที่..." : "Search by time..."}
             className="pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

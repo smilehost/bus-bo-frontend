@@ -12,15 +12,36 @@ type InputLabelProps = {
     disabled?: boolean;
 }
 function InputLabel({ label, placeholder, setValue, type, size, value, disabled }: InputLabelProps) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+
+        if (type === "amount") {
+            // ✅ ถ้าเป็นค่าว่างให้ยอมให้ลบ
+            if (val === "") {
+                setValue("0");
+                return;
+            }
+
+            const num = parseInt(val, 10);
+
+            if (isNaN(num) || num < 0) return;
+
+            setValue(num.toString());
+        } else {
+            setValue(val);
+        }
+    };
     return (
         <div className='flex flex-col gap-2'>
             <LabelText text={label} />
             <input
                 value={value}
-                type={type}
+                type={type === "amount" ? "number" : type}
+                min={type === "amount" ? 0 : undefined}
+
                 placeholder={placeholder}
                 className={` h-[38px] px-5 rounded-md custom-border-gray text-[14px] ${size} custom-focus-input`}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={handleChange}
                 disabled={disabled}
             />
         </div>

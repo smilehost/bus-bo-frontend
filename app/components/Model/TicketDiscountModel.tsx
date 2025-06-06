@@ -10,6 +10,7 @@ import SelectInputUnified from "../Form/SelectInputUnified";
 import { DISCOUNT_TYPE } from "@/constants/enum";
 import TextError from "../TextError";
 import { toast } from "react-toastify";
+import { getTextPriceType, useLanguageContext } from "@/app/i18n/translations";
 
 interface TicketDiscountProps {
     open: boolean;
@@ -32,6 +33,8 @@ function TicketDiscountModel({
     editingDiscount,
 }: TicketDiscountProps) {
     const isEditing = !!editingDiscount;
+    const { isTH } = useLanguageContext();
+    const text = getTextPriceType({ isTH });
 
     const [valueData, setValueData] = useState({
         name: "",
@@ -75,17 +78,17 @@ function TicketDiscountModel({
             <DialogContent>
                 <div className="w-[448px] py-2 relative">
                     <TitleModel
-                        title={isEditing ? "Edit Discount" : "Add New Discount"}
+                        title={isEditing ? text.editDiscount : text.addDiscount}
                         description={
                             isEditing
-                                ? "Update the Discount details below"
-                                : "Fill in the Discount details below"
+                                ? text.discountUpdateFill
+                                : text.discountFillInfo
                         }
                     />
                     <div className="mt-7 flex flex-col gap-4">
                         <InputLabel
-                            label="Discount Name"
-                            placeholder="Enter ticket amount"
+                            label= {text.name}
+                            placeholder= {text.enterTicket}
                             type="text"
                             value={valueData.name}
                             setValue={(e) =>
@@ -93,7 +96,7 @@ function TicketDiscountModel({
                             }
                         />
                         <SelectInputUnified
-                            label="Types"
+                            label= {text.DiscountType}
                             value={valueData.type.toString()}
                             tailwind="w-full"
                             onChange={(e) => {
@@ -111,7 +114,7 @@ function TicketDiscountModel({
                             ]}
                         />
                         <InputLabel
-                            label="Value"
+                            label= {text.value}
                             placeholder="Enter ticket amount"
                             type="number"
                             value={valueData.value.toString()}

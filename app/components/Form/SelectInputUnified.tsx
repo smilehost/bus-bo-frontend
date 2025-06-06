@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, MenuItem, InputAdornment, SelectChangeEvent } from '@mui/material';
+import { Select, MenuItem, InputAdornment, SelectChangeEvent, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import LabelText from '@/app/components/Form/LabelText';
 
@@ -31,7 +31,7 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
   withRenderValue = false,
   withStartAdornment = false,
   onAddClick,
-  tailwind="min-w-[300px] xl:w-[400px] max-w-[400px]"
+  tailwind = "min-w-[300px] xl:w-[400px] max-w-[400px]"
 }) => {
   return (
     <div className={`${tailwind}`}>
@@ -39,29 +39,29 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
         <LabelText text={label} />
         <div className="relative flex w-full">
           <Select
-            value={value}
+            value={value ?? ""}
             onChange={onChange}
             className="w-full h-[38px] custom-border-gray"
             renderValue={
               withRenderValue
                 ? () => {
-                    if (!value) return;
-                    const selectedItem = data.find((item) => item.id === parseInt(value));
-                    const timeString = selectedItem?.schedule?.join(', ') || '';
-                    return (
-                      <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64"
-            
-                      >
-                        {selectedItem?.name} {timeString}
-                      </p>
-                    );
-                  }
+                  if (!value) return;
+                  const selectedItem = data.find((item) => item.id === parseInt(value));
+                  const timeString = selectedItem?.schedule?.join(', ') || '';
+                  return (
+                    <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64"
+
+                    >
+                      {selectedItem?.name} {timeString}
+                    </p>
+                  );
+                }
                 : undefined
             }
             startAdornment={
               withStartAdornment && (
                 <InputAdornment position="start">
-                  <Clock size={22}/>
+                  <Clock size={22} />
                 </InputAdornment>
               )
             }
@@ -75,7 +75,7 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
           >
             {data.map((item) => (
               <MenuItem value={item.id} key={item.id}>
-                <div className="flex justify-between custom-ellipsis-style">
+                <div className="flex justify-between custom-ellipsis-style  w-64 lg:w-72">
                   <p className="text-[13px] custom-ellipsis-style">
                     {item.name} {item.schedule?.join(', ')}
                   </p>

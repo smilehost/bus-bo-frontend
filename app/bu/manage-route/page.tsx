@@ -183,7 +183,7 @@ function Page() {
         fetchRouteData();
         toast.success("Delete route successfully!");
       } else {
-        toast.error(`Error: ${result.message}`);
+        toast.error(`${text.errorDelete}${result.message}`);
       }
     } else {
       toast.error("The typed name does not match the route name.");
@@ -201,19 +201,19 @@ function Page() {
     const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
 
     const isStatusConfirmed = await Confirm({
-      title: "Change Status?",
-      text: `Do you want to change the status to "${statusText}"`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
+      title: text.changeStatusTitle,
+      text: text.changeStatusText(statusText),
+      confirmText: text.confirmText,
+      cancelText: text.cancelText,
     });
 
     if (isStatusConfirmed) {
       const result = await updateRouteStatus(idRoute, nextStatus);
       if (result.success) {
-        toast.success("Change status sucessfuly!")
+        toast.success(text.successChangeStatus);
         fetchRouteData();
       } else {
-        toast.error(`Change status error: ${result.message}`)
+        toast.error(`${text.errorChangeStatus}: ${result.message}`)
       }
     }
   };
