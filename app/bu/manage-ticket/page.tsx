@@ -191,7 +191,7 @@ function Page() {
     const isStatusConfirmed = await Confirm({
       title: text.changeStatusTitle,
       text: text.changeStatusText(statusText),
-      confirmText: text.confirmText,
+      confirmText: text.confirm,
       cancelText: text.cancelText,
     });
 
@@ -294,14 +294,14 @@ function Page() {
             href={`${pathname}/edit?id=${row?.id}&name=${row?.ticketNameTH}`}
             bgColor="text-green-600 bg-green-100"
             hoverColor="hover:bg-green-200"
-            title='Edit'
+            title={text.holdEdit}
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteTicket({ ticket: row?.ticketNameEN, id: Number(row?.id) })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
-            title='Delete'
+            title={text.confirmText}
           />
         </div>
       ),

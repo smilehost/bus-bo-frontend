@@ -66,7 +66,7 @@ export function getTextFormRoute({ isTH }: { isTH: boolean }) {
     title: isTH ? "สถานี" : "Stations",
     subtitle: isTH ? "เพิ่มสถานีตามลำดับจากต้นทางไปปลายทาง" : "Add stations in order from start to end",
     stList: isTH ? "รายการสถานี" : "Station List",
-    stThis: isTH ? "สถานีในเส้นทาง" : "Stations this Route",
+    stThis: isTH ? "สถานีในเส้นทาง" : "Stations along the route",
     Drag: isTH ? "ลากสถานี" : "Drag items here to add",
     search: isTH ? "ค้นหาสถานี" : "Search Station",
   };
@@ -256,6 +256,7 @@ export function getTextTicketPage({ isTH }: { isTH: boolean }) {
       : "Type ticket name here",
     confirmText: isTH ? "ลบ" : "Delete",
     cancelText: isTH ? "ยกเลิก" : "Cancel",
+    confirm: isTH ? "ยืนยัน" : "Confirm",
     successDelete: isTH ? "ลบตั๋วเรียบร้อยแล้ว!" : "Delete ticket successfully!",
     errorDelete: isTH ? "เกิดข้อผิดพลาด: " : "Error: ",
     mismatchTitle: isTH ? "ชื่อไม่ตรงกัน!" : "Name mismatch!",
