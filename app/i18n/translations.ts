@@ -395,10 +395,10 @@ export function getTextPriceType({ isTH }: { isTH: boolean }) {
 
 export function getTextDateManagement({ isTH }: { isTH: boolean }) {
   return {
-    dateTitle: isTH ? "จัดการช่วงเวลา" : "Manage Date",
-    dateSubTitle: isTH ? "ดูแลและจัดการช่วงเวลา" : "View and manage date information",
-    addDate: isTH ? "เพิ่มช่วงเวลา" : "Add Date",
-    upDate: isTH ? "อัปเดตช่วงเวลา" : "Update Date",
+    dateTitle: isTH ? "จัดการช่วงวันที่" : "Manage Date",
+    dateSubTitle: isTH ? "ดูแลและจัดการช่วงวันที่" : "View and manage date information",
+    addDate: isTH ? "เพิ่มช่วงวันที่" : "Add Date",
+    upDate: isTH ? "อัปเดตช่วงวันที่" : "Update Date",
 
     // Confirm Modal
     confirmTitleCreate: isTH ? "ยืนยันการสร้าง" : "Confirm Create",
@@ -455,8 +455,8 @@ export function getTextDateManagement({ isTH }: { isTH: boolean }) {
 
 export function getTextTimes({ isTH }: { isTH: boolean }) {
   return {
-    title: isTH ? "ช่วงเวลา" : "Times",
-    Subtitle: isTH ? "เพิ่มช่วงเวลาใหม่" : "View and manage time information",
+    title: isTH ? "จัดการช่วงเวลา" : "Times",
+    Subtitle: isTH ? "ดูแลและจัดการช่วงเวลา" : "View and manage time information",
     add: isTH ? "เพิ่มช่วงเวลาใหม่" : "Add New Time",
     editTime: isTH ? "แก้ไขช่วงเวลา" : "Edit Time",
     delete: isTH ? "ลบช่วงเวลา" : "Delete Time",
