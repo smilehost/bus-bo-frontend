@@ -35,7 +35,7 @@ export const useDateStore = create<DateState>((set) => ({
         size,
         search,
         status,
-      })) as { result: any[] };
+      })) as { result: UpdateDatePayload[] };
       const rawData = res.result || [];
       const today = new Date();
       const todayStart = new Date(
@@ -66,7 +66,7 @@ export const useDateStore = create<DateState>((set) => ({
             sat: item.route_date_sat === 1,
             sun: item.route_date_sun === 1,
           },
-          status: endDateStart < todayStart ? "Inactive" : "Active",
+          status: endDateStart < todayStart ? 0 : 1, // Assuming 0 for "Inactive" and 1 for "Active"
         };
       });
       set({ dates: mapped, total: mapped.length });

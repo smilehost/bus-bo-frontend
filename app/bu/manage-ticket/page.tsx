@@ -172,7 +172,7 @@ function Page() {
         fetchTicketData();
         toast.success("Delete ticket successfully!");
       } else {
-        toast.error(`Error: ${result.message}`);
+        toast.error(`${text.errorDelete}${result.message}`);
       }
     } else {
       toast.error("The typed name does not match the ticket name.");
@@ -189,10 +189,10 @@ function Page() {
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
 
     const isStatusConfirmed = await Confirm({
-      title: "Change Status?",
-      text: `Do you want to change the status to "${statusText}"`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
+      title: text.changeStatusTitle,
+      text: text.changeStatusText(statusText),
+      confirmText: text.confirmText,
+      cancelText: text.cancelText,
     });
 
 
@@ -201,10 +201,10 @@ function Page() {
       const result = await updateTicketStatus(idTicket, nextStatus);
 
       if (result.success) {
-        toast.success("Status changed successfully!");
+        toast.success(text.successChangeStatus);
         fetchTicketData?.();
       } else {
-        toast.error(`Failed to change status: ${result.message}`);
+        toast.error(`${text.errorChangeStatus}: ${result.message}`);
       }
     }
   };

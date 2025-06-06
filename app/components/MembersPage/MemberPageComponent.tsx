@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 // import MemberTable from "@/app/components/Table/MemberTable";
 import MemberModal from "@/app/components/Model/MemberModal";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
@@ -13,7 +12,7 @@ import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { useMemberStore } from "@/stores/memberStore";
 import { useCompanyStore } from "@/stores/companyStore";
-import { STATUS_LABELS, FILTER, USER_TIER } from "@/constants/enum";
+import { FILTER, USER_TIER } from "@/constants/enum";
 import { MemberItem } from "@/types/member";
 import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
@@ -56,9 +55,6 @@ export default function MemberPageComponent({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
-  const [searchCompany, setSearchCompany] = useState<FILTER>(
-    FILTER.ALL_COMPANIES
-  );
   const [filteredMembers, setFilteredMembers] = useState<MemberItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
 
@@ -110,20 +106,20 @@ export default function MemberPageComponent({
           m.username.toLowerCase().includes(q)
       );
     }
-    if (searchStatus !== FILTER.ALL_STATUS) {
+    if (searchStatus !== FILTER.ALL_STATUS && searchStatus !== '') {
       temp = temp.filter(
-        (m) => STATUS_LABELS[m.status] === searchStatus.toString()
+        (m) => m.status === Number(searchStatus)
       );
     }
-    if (searchCompany !== FILTER.ALL_COMPANIES) {
-      temp = temp.filter(
-        (m) => m.companyId?.toString() === searchCompany.toString()
-      );
-    }
+    // if (searchCompany !== FILTER.ALL_COMPANIES) {
+    //   temp = temp.filter(
+    //     (m) => m.companyId?.toString() === searchCompany.toString()
+    //   );
+    // }
     setFilteredMembers(temp);
     setTotalResults(temp.length);
     setCurrentPage(1);
-  }, [debouncedSearch, searchStatus, searchCompany, members, companies]);
+  }, [debouncedSearch, searchStatus, members, companies]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -152,12 +148,12 @@ export default function MemberPageComponent({
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const isConfirmed = await Confirm({
-        title: data.id ? "Confirm Update" : "Confirm Create",
+        title: data.id ? text.confirmUpdateTitle : text.confirmCreateTitle,
         text: data.id
-          ? "Do you want to update this member?"
-          : "Do you want to create this member?",
-        confirmText: data.id ? "Update" : "Create",
-        cancelText: "Cancel",
+          ? text.confirmUpdateText
+          : text.confirmCreateText,
+        confirmText: data.id ? text.updateBtn : text.createBtn,
+        cancelText: text.cancelText,
         type: "question",
       });
 
@@ -169,8 +165,8 @@ export default function MemberPageComponent({
           companyId: Number(data.companyId),
         } as MemberItem);
         await Alert({
-          title: "Updated!",
-          text: "Member updated.",
+          title: text.alertUpdatedTitle,
+          text: text.alertUpdatedText,
           type: "success",
         });
       } else {
@@ -181,8 +177,8 @@ export default function MemberPageComponent({
           role: data.role,
         });
         await Alert({
-          title: "Created!",
-          text: "Member created.",
+          title: text.alertCreatedTitle,
+          text: text.alertCreatedText,
           type: "success",
         });
       }
@@ -191,8 +187,8 @@ export default function MemberPageComponent({
     } catch (err) {
       console.error(err);
       await Alert({
-        title: "Error!",
-        text: "Failed to save member.",
+        title: text.alertErrorTitle,
+        text: text.alertFailedSave,
         type: "error",
       });
     }
@@ -202,10 +198,10 @@ export default function MemberPageComponent({
     if (!selectedMember) return;
 
     const isConfirmed = await Confirm({
-      title: "Confirm Status Change",
-      text: "Do you want to update the status?",
-      confirmText: "Update",
-      cancelText: "Cancel",
+      title: text.confirmStatusTitle,
+      text: text.confirmStatusText,
+      confirmText: text.updateBtn,
+      cancelText: text.cancelText,
       type: "question",
     });
 
@@ -216,16 +212,16 @@ export default function MemberPageComponent({
         .getState()
         .changeStatus(selectedMember.id, newStatus);
       await Alert({
-        title: "Updated!",
-        text: "Status changed.",
+        title: text.alertUpdatedTitle,
+        text: text.alertStatusText,
         type: "success",
       });
       fetchMembers();
     } catch (error) {
       console.error("Status update error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to change status.",
+        title: text.alertErrorTitle,
+        text: text.alertFailedStatus,
         type: "error",
       });
     }
@@ -235,10 +231,10 @@ export default function MemberPageComponent({
 
   const handleEditPassword = async (userId: string, newPassword: string) => {
     const isConfirmed = await Confirm({
-      title: "Confirm Password Change",
-      text: "Do you want to change the password?",
-      confirmText: "Update",
-      cancelText: "Cancel",
+      title: text.confirmPasswordTitle,
+      text: text.confirmPasswordText,
+      confirmText: text.updateBtn,
+      cancelText: text.cancelText,
       type: "question",
     });
 
@@ -247,15 +243,15 @@ export default function MemberPageComponent({
     try {
       await useMemberStore.getState().changePassword(userId, newPassword);
       await Alert({
-        title: "Updated!",
-        text: "Password changed.",
+        title: text.alertUpdatedTitle,
+        text: text.alertPasswordText,
         type: "success",
       });
     } catch (error) {
       console.error("Password update error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to change password.",
+        title: text.alertErrorTitle,
+        text: text.alertFailedPassword,
         type: "error",
       });
     }
@@ -455,7 +451,7 @@ export default function MemberPageComponent({
         <EditStatusModel
           open={isEditStatusOpen}
           onClose={() => setEditStatusOpen(false)}
-          currentStatus={selectedMember?.status || 1}
+          currentStatus={selectedMember?.status || 0}
           onSave={handleEditStatus}
         />
         <EditPasswordModel

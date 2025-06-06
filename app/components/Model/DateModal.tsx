@@ -8,6 +8,7 @@ import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getTextDateManagement, useLanguageContext } from "@/app/i18n/translations";
 
 interface DateModalProps {
   open: boolean;
@@ -60,6 +61,8 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
   });
   const [selectedOption, setSelectedOption] = useState("Select");
   const isEditing = !!editingDate;
+  const { isTH } = useLanguageContext();
+  const text = getTextDateManagement({isTH});
 
   // โหลดข้อมูลถ้ามีการแก้ไข
   useEffect(() => {
@@ -116,10 +119,10 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
       const start = new Date(newDate.startDate);
       const end = new Date(newDate.endDate);
       if (start > end) {
-        return "Start date cannot be after end date";
+        return isTH ? "วันเริ่มต้นต้องไม่เกินวันสิ้นสุด" : "Start date cannot be after end date";
       }
       if (end < start) {
-        return "End date cannot be before start date";
+        return isTH ? "วันสิ้นสุดต้องไม่เกินวันเริ่มต้น" : "End date cannot be before start date";
       }
     }
 
@@ -156,7 +159,9 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
     endDate.setHours(0, 0, 0, 0); // เคลียร์เวลา
 
     const status = endDate < today ? "Inactive" : "Active";
-
+    
+    
+    // ส่งข้อมูลและปิด Modal
     onSave({
       name: newDate.name,
       startDate: newDate.startDate,
@@ -209,17 +214,26 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
       });
     }
   };
+  const weekDays = [
+    { key: "monday", label: isTH ? "จันทร์" : "Mon" },
+    { key: "tuesday", label: isTH ? "อังคาร" : "Tue" },
+    { key: "wednesday", label: isTH ? "พุธ" : "Wed" },
+    { key: "thursday", label: isTH ? "พฤหัส" : "Thu" },
+    { key: "friday", label: isTH ? "ศุกร์" : "Fri" },
+    { key: "saturday", label: isTH ? "เสาร์" : "Sat" },
+    { key: "sunday", label: isTH ? "อาทิตย์" : "Sun" },
+  ];
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <div className="w-[448px] py-2 relative">
           <TitleModel
-            title={isEditing ? "Edit Date" : "Add New Date"}
+            title={isEditing ? text.editDate : text.addDate}
             description={
               isEditing
-                ? "Update the date details below"
-                : "Fill in the date details below"
+                ? text.upIn
+                : text.fillIn
             }
           />
 
@@ -233,7 +247,7 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
                 }`}
                 onClick={() => handleSelectOption("Select")}
               >
-                Select
+                {text.selectDays}
               </button>
               <button
                 className={`flex-1 py-2 text-center font-medium ${
@@ -243,17 +257,17 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
                 }`}
                 onClick={() => handleSelectOption("All Days")}
               >
-                All Days
+                {text.allDay}
               </button>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Date Name
+                {text.dateName}
               </label>
               <input
                 type="text"
-                placeholder="Enter date name"
+                placeholder={text.enterDate}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
                 value={newDate.name}
                 onChange={(e) =>
@@ -265,7 +279,7 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-700">
-                  Start date
+                  {text.startDate}
                 </label>
                 <div className="relative">
                   <input
@@ -280,7 +294,7 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-700">
-                  End date
+                  {text.endDate}
                 </label>
                 <div className="relative">
                   <input
@@ -297,50 +311,41 @@ function DateModal({ open, onClose, onSave, editingDate }: DateModalProps) {
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Select Days
+                {text.selectDays}
               </label>
               <div className="grid grid-cols-7 gap-2">
-                {[
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday",
-                ].map((day) => (
-                  <button
-                    key={day}
-                    onClick={() => handleDaySelect(day)}
-                    disabled={selectedOption === "All Days"}
-                    className={`
-                      py-2 px-1 rounded-md text-center text-xs font-medium transition-all duration-200
-                      ${
-                        newDate.days[
-                          day.toLowerCase() as keyof typeof newDate.days
-                        ]
-                          ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
-                          : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
-                      }
-                      ${
-                        selectedOption === "All Days"
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }
-                    `}
-                  >
-                    {day.slice(0, 3)}
-                  </button>
-                ))}
-              </div>
+  {weekDays.map(({ key, label }) => (
+    <button
+      key={key}
+      onClick={() => handleDaySelect(key)}
+      disabled={selectedOption === "All Days"}
+      className={`
+        py-2 px-1 rounded-md text-center text-xs font-medium transition-all duration-200
+        ${
+          newDate.days[key as keyof typeof newDate.days]
+            ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md"
+            : "bg-white border hover:border-yellow-400 hover:bg-yellow-50"
+        }
+        ${
+          selectedOption === "All Days"
+            ? "opacity-50 cursor-not-allowed"
+            : ""
+        }
+      `}
+    >
+      {label}
+    </button>
+  ))}
+</div>
+
             </div>
           </div>
 
           <div className="flex gap-3 justify-end mt-7">
-            <ButtonDefault size="" text="Cancel" onClick={onClose} />
+            <ButtonDefault size="" text={text.confirmTextCancel} onClick={onClose} />
             <ButtonBG
               size=""
-              text={isEditing ? "Update Date" : "Add Date"}
+              text={isEditing ? text.upDate : text.addDate}
               onClick={handleSaveDate}
             />
           </div>

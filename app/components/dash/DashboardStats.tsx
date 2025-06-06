@@ -1,3 +1,4 @@
+import { getTextDashboard, useLanguageContext } from "@/app/i18n/translations";
 import { JSX } from "@emotion/react/jsx-runtime";
 import { UsersIcon, CreditCardIcon, TruckIcon } from "lucide-react";
 
@@ -10,24 +11,26 @@ export default function DashboardStats({
   totalAmount: number;
   totalRoutes: number;
 }) {
+  const isTH = useLanguageContext();
+  const text = getTextDashboard(isTH);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
       <StatsCard
-        title="Total Passengers"
+        title={text.totalPassenger}
         value={totalPassengers }
         icon={<UsersIcon size={24} className="text-green-600" />}
         // change="+8.1% from yesterday"
         iconBg="bg-green-100"
       />
       <StatsCard
-        title="Total Revenue"
+        title={text.totalRevenue}
         value={`${totalAmount.toLocaleString()} THB`}
         icon={<CreditCardIcon size={24} className="text-blue-600" />}
         // change="+12.3% from yesterday"
         iconBg="bg-blue-100"
       />
       <StatsCard
-        title="Active Routes"
+        title={text.activeRoute}
         value={totalRoutes}
         icon={<TruckIcon size={24} className="text-purple-600" />}
         // change="Today"

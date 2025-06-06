@@ -13,6 +13,7 @@ import {
   } from "recharts";
   import { useEffect, useState } from "react";
   import { useRouteStore } from "@/stores/routeStore";
+import { getTextDashboard, useLanguageContext } from "@/app/i18n/translations";
   
   interface RouteData {
     lat: number;
@@ -25,6 +26,8 @@ import {
   export default function DashboardCharts({ routeData }: { routeData: RouteData[] }) {
     const getRouteById = useRouteStore((state) => state.getRouteById);
     const [routeNameMap, setRouteNameMap] = useState<Record<number, string>>({});
+    const isTH = useLanguageContext();
+    const text = getTextDashboard(isTH);
   
     // ✅ ดึงชื่อสายจาก API โดยใช้ route_id
     useEffect(() => {
@@ -57,8 +60,8 @@ import {
     );
   
     const transactionData = [
-      { name: "Cash", value: paymentSummary.cash, color: "#10B981" },
-      { name: "QR Code", value: paymentSummary.qr, color: "#6366F1" },
+      { name: text.cash, value: paymentSummary.cash, color: "#10B981" },
+      { name: text.qr, value: paymentSummary.qr, color: "#6366F1" },
     ];
   
     // ✅ รวมข้อมูลโดยแสดงชื่อสายแทน id
@@ -84,7 +87,7 @@ import {
         {/* Pie Chart */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Transactions by Payment Method
+            {text.trans}
           </h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -114,7 +117,7 @@ import {
         {/* Bar Chart */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Revenue by Route
+            {text.revenueByRoute}
           </h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -127,8 +130,8 @@ import {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="amount" name="Amount (฿)" fill="#F59E0B" />
-                <Bar dataKey="passengers" name="passengers" fill="#3B82F6" />
+                <Bar dataKey="amount" name={text.amount} fill="#F59E0B" />
+                <Bar dataKey="passengers" name={text.passenger} fill="#3B82F6" />
               </BarChart>
             </ResponsiveContainer>
           </div>
