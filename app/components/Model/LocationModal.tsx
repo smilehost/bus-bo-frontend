@@ -34,7 +34,7 @@ function LocationModal({
     longitude: "",
   });
   const { isTH } = useLanguageContext();
-  const text = getTextLocation({isTH});
+  const text = getTextLocation({ isTH });
 
   useEffect(() => {
     if (editingLocation) {
@@ -77,23 +77,26 @@ function LocationModal({
         <div className="w-[448px] py-2 relative">
           <TitleModel
             title={isEditing ? text.editLoc : text.addLoc}
-            description={
-              isEditing
-                ? text.upDate
-                : text.fillIn
-            }
+            description={isEditing ? text.upDate : text.fillIn}
           />
           <div className="mt-7 flex flex-col gap-4">
             <InputLabel
-              label={"Location Name"}
-              placeholder="Enter location name"
+              label={text.name}
+              placeholder={text.placeholderNameLoc}
               type="text"
               value={location.name}
-              setValue={(val: string) => setLocation({ ...location, name: val })}
+              setValue={(val: string) =>
+                setLocation({ ...location, name: val })
+              }
             />
             <InputLabel
-              label={"Location (Latitude, Longitude)"}
+              label={text.latLong}
               placeholder="16.40110363857608, 102.85026064787496"
+              value={
+                location.latitude && location.longitude
+                  ? `${location.latitude}, ${location.longitude}`
+                  : ""
+              }
               type="text"
               setValue={(val: string) => {
                 const [lat, lng] = val.split(",").map((s) => s.trim());
@@ -104,6 +107,7 @@ function LocationModal({
                 }));
               }}
             />
+
             {/* <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
                 {text.name}

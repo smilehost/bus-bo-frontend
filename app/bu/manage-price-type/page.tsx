@@ -464,26 +464,26 @@ function Page() {
         <ConfirmWithInput
           open={confirmDialogOpen}
           onClose={() => setConfirmDialogOpen(false)}
-          title={confirmDialogData?.mode === 'edit' ? 'Edit Price Type' : 'Add New Price Type'}
-          text="Fill in the price type details below."
-          confirmText="Confirm"
-          cancelText="Cancel"
-          placeholder="Type route name here"
+          title={confirmDialogData?.mode === 'edit' ? text.isEdit : text.isAdd}
+          text={text.inputText}
+          confirmText={text.confirmText}
+          cancelText={text.cancelBtn}
+          placeholder={text.inputPlaceholder}
           defaultValue={confirmDialogData?.name || ''}
-          label="Route Name"
+          label={text.label}
           onConfirm={handleTicketTypeConfirm}
         />
 
         <ConfirmWithInput
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
-          title={`Delete "${deleteDialogData?.name}"?`}
-          text="Please type the route name below to confirm deletion."
-          confirmText="Delete"
-          cancelText="Cancel"
-          placeholder="Type route name here"
+          title={isTH ? `ลบ "${deleteDialogData?.name}"?` : `Delete "${deleteDialogData?.name}"?`}
+          text={text.deleteConfirmText}
+          confirmText={text.deleteBtn}
+          cancelText={text.cancelBtn}
+          placeholder={text.inputPlaceholder}
           defaultValue=""
-          label="Route Name"
+          label={text.label}
           onConfirm={handleDeleteConfirm}
         />
       </div>
