@@ -3,6 +3,7 @@ export type CompanyItem = {
   name: string;        // com_name
   prefix: string;      // com_prefix
   status: number;      // com_status (1 = Active, 0 = Inactive)
+  companyId?: number; // com_id (optional, ใช้สำหรับการสร้าง/อัพเดต)
 };
 
 export interface FetchCompaniesResult {

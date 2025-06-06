@@ -70,16 +70,16 @@ export default function ManageCompaniesPage() {
     cancelSkeleton();
   };
 
+  useEffect(() => {
+    fetchCompanies();
+  }, [currentPage, rowsPerPage, debouncedSearch]);
+
   const debouncedFetch = useCallback(
     debounce((value: string) => {
       setDebouncedSearch(value);
     }, 350),
     []
   );
-
-  useEffect(() => {
-    fetchCompanies();
-  }, [currentPage, rowsPerPage, debouncedSearch]);
 
   const handleAddCompany = () => {
     setEditingCompany(null);
@@ -395,10 +395,10 @@ export default function ManageCompaniesPage() {
           editingCompany={
             editingCompany
               ? {
-                  name: editingCompany.name,
-                  prefix: editingCompany.prefix,
-                  status: editingCompany.status,
-                }
+                name: editingCompany.name,
+                prefix: editingCompany.prefix,
+                status: editingCompany.status,
+              }
               : undefined
           }
         />

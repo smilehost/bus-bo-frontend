@@ -22,7 +22,9 @@ import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
 import { CopyIcon } from "../Icons/CopyIcon";
 import { CompanyItem } from "@/types/company";
-import { getTextDateManagement, getTextManageUserPage, useLanguageContext } from "@/app/i18n/translations";
+import { getTextManageUserPage, useLanguageContext } from "@/app/i18n/translations";
+import { store } from "@/stores/store";
+import { USER_TIER } from "@/constants/enum";
 
 type CompanyOption = {
   value: string;
@@ -47,6 +49,7 @@ type MemberModalProps = {
     username: string;
     role: string;
     companyId: string;
+    status: number
   };
 };
 
@@ -68,9 +71,11 @@ function MemberModal({
 
   //store
   const { userData } = useUserStore();
-  const { getCompanyById } = useCompanyStore();
+  const { getCompanyById, getCompanies, companies } = useCompanyStore();
   const { isTH, isSuperAdmin } = useLanguageContext();
-    const text = getTextManageUserPage({ isTH, isSuperAdmin });
+  const text = getTextManageUserPage({ isTH, isSuperAdmin });
+  const account_role = store.account_role.use();
+  const com_id = store.com_id.use();
 
   //get company by id
   useEffect(() => {
@@ -86,30 +91,30 @@ function MemberModal({
 
   const isEditing = !!editingMember;
 
-  const roleOptions = [{ value: "2", label: "Salesman" }];
+  const roleOptions = account_role === "1" ? [{ value: "2", label: USER_TIER.ADMIN }] : [{ value: "3", label: USER_TIER.SALESMAN }];
+
+  const fetchCompanies = async () => {
+    await getCompanies(1, 999, "");
+  };
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/company/all`
-        );
-        const raw = res.data.result || [];
-        const mapped = raw.map((com: any) => ({
-          value: com.com_id.toString(),
-          label: com.com_name,
-        }));
-        setCompanyOptions([
-          { value: "", label: text.seCom },
-          ...mapped,
-        ]);
-      } catch (error) {
-        console.error("Failed to load companies:", error);
-      }
+      const mapped = companies.map((com: any) => ({
+        value: com.id.toString(),
+        label: com.name,
+      }));
+      setCompanyOptions([
+        { value: "", label: text.seCom },
+        ...mapped,
+      ]);
     };
 
     if (open) fetchCompanies();
-  }, [open]);
+  }, [open, companies]);
 
   useEffect(() => {
     if (open && !isEditing) {
@@ -132,42 +137,50 @@ function MemberModal({
       setName("");
       setUsername("");
       setPassword("");
-      setRole("2");
+      setRole("");
       setCompanyId("");
     }
   }, [editingMember, isEditing, open]);
 
   const handleSubmit = () => {
-    if (!name || (!isEditing && (!username || !password || !companyId))) {
+    if (!name || (!isEditing && (!username || !password) || !role)) {
+      if (account_role === "1" && !companyId) {
+        toast.error("Please select a company.");
+        return
+      }
       toast.error("Please fill in all required fields.");
       return;
     }
 
+    if (password.length < 8 && !isEditing) {
+      toast.error("Password must be at least 8 characters long.");
+      return;
+    }
     const payload = isEditing
       ? {
-          id: editingMember?.id,
-          name,
-          username: editingMember?.username || "",
-          role: editingMember?.role || "2",
-          companyId: editingMember?.companyId || "",
-          status: 0,
-        }
+        id: editingMember?.id,
+        name,
+        username: `${company?.prefix}-${editingMember?.username}` || "",
+        role: editingMember?.role || "3",
+        companyId: Number(account_role) === 1 ? editingMember?.companyId : com_id.toString(),
+        status: editingMember?.status,
+      }
       : {
-          name,
-          username,
-          password,
-          companyId,
-          role,
-          status: 1,
-        };
+        name,
+        username: `${company?.prefix}-${username}` || "",
+        password,
+        companyId: Number(account_role) === 2 && com_id.toString() || companyId,
+        role: role,
+        status: 1,
+      };
 
     onHandle(payload);
 
-    setName("");
-    setUsername("");
-    setPassword("");
-    setRole("2");
-    setCompanyId("");
+    // setName("");
+    // setUsername("");
+    // setPassword("");
+    // setRole("");
+    // setCompanyId("");
   };
 
   const genPassword = (length: number) => {
@@ -280,45 +293,49 @@ function MemberModal({
                   <button
                     type="button"
                     onClick={copyPassword}
-                    className={`${
-                      isCopy ? "text-green-600" : "text-gray-500"
-                    } hover:text-green-700 transition-colors`}
+                    className={`${isCopy ? "text-green-600" : "text-gray-500"
+                      } hover:text-green-700 transition-colors`}
                   >
                     <CopyIcon copied={isCopy} />
                   </button>
                 </div>
               </div>
             )}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                {text.com}
-              </label>
-              <select
-                disabled={isEditing}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
-                value={companyId}
-                onChange={(e) => setCompanyId(e.target.value)}
-              >
-                {companyOptions.map((option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                    disabled={option.value === ""}
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {account_role === "1" && (
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  {text.com}
+                </label>
+                <select
+                  disabled={isEditing}
+                  className={`${isEditing && "bg-gray-200"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                  value={companyId}
+                  onChange={(e) => setCompanyId(e.target.value)}
+                >
+                  {companyOptions.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      disabled={option.value === ""}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">{text.role}</label>
               <select
                 disabled={isEditing}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
+                className={`${isEditing && "bg-gray-200"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
+                <option value={""}>
+                  Select Role
+                </option>
                 {roleOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}

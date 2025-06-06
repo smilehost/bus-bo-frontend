@@ -162,7 +162,7 @@ export default function MemberPageComponent({
       if (data.id) {
         await updateMember(data.id, {
           ...data,
-          companyId: Number(data.companyId),
+          com_id: Number(data.companyId),
         } as MemberItem);
         await Alert({
           title: text.alertUpdatedTitle,
@@ -175,6 +175,7 @@ export default function MemberPageComponent({
           password: data.password || "",
           name: data.name,
           role: data.role,
+          com_id: Number(data.companyId)
         });
         await Alert({
           title: text.alertCreatedTitle,
@@ -268,8 +269,8 @@ export default function MemberPageComponent({
       username: m.username,
       role: m.role,
       status: m.status,
-      company: getCompanyName(m.companyId.toString()),
-      com_id: m.companyId,
+      company: "",
+      com_id: m.com_id,
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);
 
@@ -330,7 +331,7 @@ export default function MemberPageComponent({
       key: 'role', label: text.role, width: '20%',
       render: (_, row) => (
         <p>
-          {Number(row.role) === 1 ? USER_TIER.ADMIN : USER_TIER.SUPER_ADMIN}
+          {Number(row.role) === 1 ? USER_TIER.SUPER_ADMIN : Number(row.role) === 2 ? USER_TIER.ADMIN : Number(row.role) === 3 ? USER_TIER.SALESMAN : USER_TIER.GUEST}
         </p>
       ),
     },
@@ -443,7 +444,7 @@ export default function MemberPageComponent({
               ? {
                 ...editingMember,
                 id: editingMember.id.toString(),
-                companyId: editingMember.companyId.toString(),
+                companyId: editingMember.com_id.toString(),
               }
               : undefined
           }
