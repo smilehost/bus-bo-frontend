@@ -100,7 +100,14 @@ export default function RootLayout({
     {
       group: menuText.users,
       items: [
-        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee",  link: isSuperAdmin ? "manage-admin" : "manage-employee" },
+        {
+          id: 8,
+          icon: Users,
+          text: menuText.manageUser,
+          href: "manage-members", // path จริง
+          as: isSuperAdmin ? "manage-admin" : "manage-employee" // path ที่โชว์ใน URL
+        }
+        ,
         { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
