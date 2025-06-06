@@ -17,6 +17,7 @@ import TableTemplate, {
 } from "@/app/components/Table/TableTemplate";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { SquarePen, Trash2 } from "lucide-react";
+import { getTextDateManagement, useLanguageContext } from "@/app/i18n/translations";
 
 type DateTableProps = {
   no: number;
@@ -51,6 +52,8 @@ export default function DateManagerClient() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
+  const { isTH } = useLanguageContext();
+  const text = getTextDateManagement({isTH});
 
   const fetchDates = async () => {
     setIsLoading(true);
@@ -134,12 +137,12 @@ export default function DateManagerClient() {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
-      title: editingDate ? "Confirm Update" : "Confirm Create",
+      title: editingDate ? text.confirmTitleUpdate : text.confirmTitleCreate,
       text: editingDate
-        ? "Do you want to update this date?"
-        : "Do you want to create this date?",
-      confirmText: editingDate ? "Update" : "Create",
-      cancelText: "Cancel",
+        ? text.confirmTextUpdate
+        : text.confirmTextCreate,
+      confirmText: editingDate ? text.updateTitle : text.createTitle,
+      cancelText: text.confirmTextCancel,
       type: "question",
     });
 
@@ -160,8 +163,8 @@ export default function DateManagerClient() {
           days: schedule,
         });
         await Alert({
-          title: "Updated!",
-          text: "Date updated successfully",
+          title: text.updatedTitle,
+          text: text.updatedText,
           type: "success",
         });
       } else {
@@ -175,18 +178,17 @@ export default function DateManagerClient() {
           days: schedule,
         });
         await Alert({
-          title: "Created!",
-          text: "Date created successfully",
+          title: text.createdTitle,
+          text: text.createdText,
           type: "success",
         });
       }
       setShowModal(false);
       fetchDates();
     } catch (error) {
-      console.error("Save Date error:", error);
       await Alert({
-        title: "Error!",
-        text: "Something went wrong.",
+        title: text.errorTitle,
+        text: text.errorTextSave,
         type: "error",
       });
     }
@@ -194,10 +196,10 @@ export default function DateManagerClient() {
 
   const handleDeleteDate = async (id: number) => {
     const isConfirmed = await Confirm({
-      title: "Confirm Delete",
-      text: "Are you sure you want to delete this date?",
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: text.deleteConfirmTitle,
+      text: text.deleteConfirmText,
+      confirmText: text.deleteConfirmButton,
+      cancelText: text.confirmTextCancel,
       type: "warning",
     });
     if (!isConfirmed) return;
@@ -205,16 +207,15 @@ export default function DateManagerClient() {
     try {
       await deleteDate(id);
       await Alert({
-        title: "Deleted!",
-        text: "Date deleted successfully",
+        title: text.deletedTitle,
+        text: text.deletedText,
         type: "success",
       });
       fetchDates();
     } catch (error) {
-      console.error("Delete Date error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to delete.",
+        title: text.errorTitle,
+        text: text.errorTextDelete,
         type: "error",
       });
     }
@@ -240,38 +241,38 @@ export default function DateManagerClient() {
     currentPage * rowsPerPage
   );
 
-  const englishDays = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
+  const dayKeys = [
+    { key: "monday", label: isTH ? "วันจันทร์" : "Monday" },
+    { key: "tuesday", label: isTH ? "วันอังคาร" : "Tuesday" },
+    { key: "wednesday", label: isTH ? "วันพุธ" : "Wednesday" },
+    { key: "thursday", label: isTH ? "วันพฤหัสบดี" : "Thursday" },
+    { key: "friday", label: isTH ? "วันศุกร์" : "Friday" },
+    { key: "saturday", label: isTH ? "วันเสาร์" : "Saturday" },
+    { key: "sunday", label: isTH ? "วันอาทิตย์" : "Sunday" },
   ];
 
   const columns: ColumnConfig<DateTableProps>[] = [
     {
       key: "no",
-      label: "No.",
+      label: text.no,
       width: "6%",
       align: "center",
       render: (_: unknown, row: DateTableProps) => <span>{row.no}</span>,
     },
     {
       key: "name",
-      label: "Name",
+      label: text.name,
       width: "16%",
       align: "left",
       render: (_: unknown, row: DateTableProps) => <span>{row.name}</span>,
     },
-    ...englishDays.map((day, idx) => ({
-      key: `days.${day.toLowerCase()}` as keyof DateTableProps,
-      label: day,
+    ...dayKeys.map(({ key, label }) => ({
+      key: `days.${key}` as keyof DateTableProps,
+      label,
       width: "8%",
       align: "center" as const,
       render: (_: unknown, row: DateTableProps) => {
-        const value = row.days[day.toLowerCase() as keyof typeof row.days];
+        const value = row.days[key as keyof typeof row.days];
         return value ? (
           <span className="inline-flex items-center justify-center w-7 h-7 bg-green-100 text-green-600 rounded-full shadow-sm transition-transform hover:scale-110">
             ✓
@@ -285,7 +286,7 @@ export default function DateManagerClient() {
     })),
     {
       key: "status",
-      label: "Status",
+      label: text.status,
       width: "10%",
       align: "center",
       render: (_: unknown, row: DateTableProps) =>
@@ -303,7 +304,7 @@ export default function DateManagerClient() {
     },
     {
       key: "id",
-      label: "Actions",
+      label: text.action,
       width: "12%",
       align: "center",
       render: (_: unknown, row: DateTableProps) => (
@@ -315,6 +316,7 @@ export default function DateManagerClient() {
             }
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
+            title={text.edit}
           />
           <TableActionButton
             onClick={() => handleDeleteDate(row.id)}
@@ -323,6 +325,7 @@ export default function DateManagerClient() {
             }
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
+            title={text.deleteConfirmButton}
           />
         </div>
       ),
@@ -348,9 +351,9 @@ export default function DateManagerClient() {
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage
-          title="Manage Date"
-          description="View and manage date information"
-          btnText="Add New Date"
+          title={text.dateTitle}
+          description={text.dateSubTitle}
+          btnText={text.addDate}
           handleOpenModel={handleAddDate}
         />
         <div className="custom-frame-content p-5 mt-5">

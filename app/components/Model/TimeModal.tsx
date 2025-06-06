@@ -9,6 +9,7 @@ import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getTextTimes, useLanguageContext } from "@/app/i18n/translations";
 
 interface NewTime {
   name: string;
@@ -52,6 +53,7 @@ const CustomTimePicker = ({
     i.toString().padStart(2, "0")
   );
   const [currentHour, currentMinute] = value ? value.split(":") : ["00", "00"];
+  
 
   const handleSelectTime = (hour: string, minute: string) => {
     onChange(`${hour}:${minute}`);
@@ -183,28 +185,30 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
     const parts = time.split(":");
     return parts.length === 2 ? `${parts[0]}:${parts[1]}` : time;
   };
+  const isTH = useLanguageContext();
+  const text = getTextTimes(isTH);
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <div className="w-[448px] py-2 relative">
           <TitleModel
-            title={isEditing ? "Edit Time" : "Add New Time"}
+            title={isEditing ? text.editTime : text.add}
             description={
               isEditing
-                ? "Update the time details below"
-                : "Fill in the time details below"
+                ? text.upIn
+                : text.fillIn
             }
           />
           <div className="mt-7 flex flex-col gap-4">
             {/* Time Name */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Time Name
+                {text.name}
               </label>
               <input
                 type="text"
-                placeholder="Enter time name"
+                placeholder={text.enterName}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
                 value={newTime.name}
                 onChange={(e) =>
@@ -215,7 +219,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
             {/* Start Time */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                Start Time
+                {text.selectTime}
               </label>
               <CustomTimePicker
                 onChange={(val) =>
@@ -233,7 +237,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
             <div>
               <div className="flex justify-between items-center mb-3">
                 <label className="font-medium text-gray-700 text-sm">
-                  Time Slots
+                  {text.timeSlot}
                 </label>
                 <button
                   onClick={addTimeSlot}
@@ -253,7 +257,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add Current Time
+                  {text.btnAddSlot}
                 </button>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-16 shadow-inner">
@@ -309,7 +313,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    No time slots added yet.
+                    {text.noSlot}
                   </div>
                 )}
               </div>
@@ -317,10 +321,10 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
           </div>
           {/* Footer Buttons */}
           <div className="flex gap-3 justify-end mt-7">
-            <ButtonDefault size="" text="Cancel" onClick={onClose} />
+            <ButtonDefault size="" text={text.btnCancle} onClick={onClose} />
             <ButtonBG
               size=""
-              text={isEditing ? "Update Time" : "Add Time"}
+              text={isEditing ? text.btnUp : text.btnAdd}
               onClick={handleSaveTime}
             />
           </div>

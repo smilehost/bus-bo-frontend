@@ -65,24 +65,24 @@ function Login() {
         store.account_role.set(decoded.account_role);
         store.account_name.set(response.data.result.account_name);
         store.account_username.set(response.data.result.account_username);
-        store.Translation.set("TH");
+        store.Translation.set("EN");
   
         // ✅ ถ้าเป็น SuperAdmin → ดึง com_id ทั้งหมด
-        if (decoded.account_role === "2") {
-          try {
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/company/all`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true,
-            });
+        // if (decoded.account_role === "2") {
+        //   try {
+        //     const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/company/all`, {
+        //       headers: {
+        //         Authorization: `Bearer ${token}`,
+        //       },
+        //       withCredentials: true,
+        //     });
   
-            const comIds = res.data.result.map((company: any) => company.com_id);
-            localStorage.setItem("comidSuper", JSON.stringify(comIds));
-          } catch (err) {
-            console.error("Failed to fetch companies for SuperAdmin:", err);
-          }
-        }
+        //     const comIds = res.data.result.map((company: any) => company.com_id);
+        //     localStorage.setItem("comidSuper", JSON.stringify(comIds));
+        //   } catch (err) {
+        //     console.error("Failed to fetch companies for SuperAdmin:", err);
+        //   }
+        // }
   
         await Alert({
           title: "Login Success!",

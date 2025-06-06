@@ -169,11 +169,11 @@ function Page() {
   // Handle delete route
   const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
     const inputName = await ConfirmWithInput({
-      title: `Delete "${route}"?`,
-      text: `Please type the route name below to confirm deletion.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      placeholder: "Type route name here"
+      title: text.confirmDeleteTitle.replace('${route}', route),
+      text: text.confirmDeleteText,
+      confirmText: text.confirmDeleteConfirm,
+      cancelText: text.confirmDeleteCancel,
+      placeholder: text.confirmDeletePlaceholder,
     });
 
     if (inputName === route) {
@@ -181,15 +181,15 @@ function Page() {
 
       if (result.success) {
         fetchRouteData();
-        toast.success("delete route successfully!");
+        toast.success(text.successDelete);
       } else {
-        toast.error(`Error: ${result.message}`);
+        toast.error(`${text.errorDelete}${result.message}`);
       }
     } else if (inputName !== null) {
       await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the route name.",
-        type: "error"
+        title: text.mismatchTitle,
+        text: text.mismatchText,
+        type: "error",
       });
     }
   };
@@ -201,19 +201,19 @@ function Page() {
     const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
 
     const isStatusConfirmed = await Confirm({
-      title: "Change Status?",
-      text: `Do you want to change the status to "${statusText}"`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
+      title: text.changeStatusTitle,
+      text: text.changeStatusText(statusText),
+      confirmText: text.confirmText,
+      cancelText: text.cancelText,
     });
 
     if (isStatusConfirmed) {
       const result = await updateRouteStatus(idRoute, nextStatus);
       if (result.success) {
-        toast.success("Change status sucessfuly!")
+        toast.success(text.successChangeStatus);
         fetchRouteData();
       } else {
-        toast.error(`Change status error: ${result.message}`)
+        toast.error(`${text.errorChangeStatus}: ${result.message}`)
       }
     }
   };

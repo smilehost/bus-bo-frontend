@@ -29,6 +29,7 @@ import { Confirm } from '@/app/components/Dialog/Confirm'
 import TicketDiscountModel from '@/app/components/Model/TicketDiscountModel'
 import { RouteTicketDiscount } from '@/payloads/route.ticket.discount.payload'
 import { SquarePen, Trash2 } from 'lucide-react'
+import { getTextPriceType, useLanguageContext } from '@/app/i18n/translations'
 
 
 
@@ -72,6 +73,8 @@ function Page() {
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   const [showModel, setShowModel] = useState(false)
   const [editingDiscount, setEditingDiscount] = useState<RouteTicketDiscount>()
+  const { isTH } = useLanguageContext();
+  const text = getTextPriceType({ isTH })
 
   //fetch tickets and discount
   const fetchTicketTypeData = async () => {
@@ -155,11 +158,11 @@ function Page() {
   //ticket type models
   const handleTicketTypeModel = async ({ id, name }: { id?: number, name?: string }) => {
     const isConfirmed = await ConfirmWithInput({
-      title: `${id ? "Edit Price Type" : "Add New Price Type"}`,
-      text: `Fill in the price type details below.`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
-      placeholder: "Type route name here",
+      title: text.addOrEditTitle(Boolean(id)),
+      text: text.inputText,
+      placeholder: text.inputPlaceholder,
+      confirmText: text.confirmText,
+      cancelText: text.cancelBtn,
       defaultValue: name || ""  // ใส่ค่า name ถ้ามี, ไม่งั้นเป็น empty string
     });
 
@@ -167,7 +170,7 @@ function Page() {
       const inputName = isConfirmed.trim();
 
       if (!inputName) {
-        toast.error("Name cannot be empty");
+        toast.error(text.inputEmptyError);
         return;
       }
 
@@ -182,17 +185,17 @@ function Page() {
           route_ticket_price_type_id: id,
         });
         if (result.success) {
-          toast.success("Updated successfully!");
+          toast.success(text.updatedSuccess);
         } else {
-          toast.error(`Update failed: ${result.message}`);
+          toast.error(`${text.updatedError}: ${result.message}`);
         }
       } else {
         // เพิ่มใหม่ (ไม่ส่ง id)
         const result = await addTicketType(formatPayload);
         if (result.success) {
-          toast.success("Created successfully!");
+          toast.success(text.createdSuccess);
         } else {
-          toast.error(`Creation failed: ${result.message}`);
+          toast.error(`${text.createdError}: ${result.message}`);
         }
       }
       fetchTicketTypeData(); // รีเฟรชข้อมูล
@@ -223,12 +226,12 @@ function Page() {
     setShowModel(false);
 
     const isConfirmed = await Confirm({
-      title: editingDiscount ? "Confirm Update" : "Confirm Create",
+      title: editingDiscount ? text.confirmUpdateTitle : text.confirmCreateTitle,
       text: editingDiscount
-        ? "Do you want to update this discount?"
-        : "Do you want to create this discount?",
-      confirmText: editingDiscount ? "Update" : "Create",
-      cancelText: "Cancel",
+        ? text.confirmUpdateText
+        : text.confirmCreateText,
+      confirmText: editingDiscount ? text.updateBtn : text.createBtn,
+      cancelText: text.cancelBtn,
       type: "question",
     });
 
@@ -236,15 +239,15 @@ function Page() {
     try {
       if (editingDiscount) {
         await updateTicketDiscount(editingDiscount.ticket_discount_id, tempData);
-        toast.success("Updated!")
+        toast.success(text.updateBtn)
       } else {
         await addTicketDiscount(tempData);
-        toast.success("Created!")
+        toast.success(text.createBtn)
       }
       fetchTicketDiscount();
     } catch (error) {
-      toast.error("Save Discount error:");
-      console.error("Save Discount error:", error);
+      toast.error(text.saveError);
+      console.error(text.saveError, error);
     }
   }
 
@@ -255,18 +258,18 @@ function Page() {
     const statusText = nextStatus === 1 ? STATUS.ACTIVE : STATUS.INACTIVE;
 
     const isStatusConfirmed = await Confirm({
-      title: "Change Status?",
-      text: `Do you want to change the status to "${statusText}"`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
+      title: text.changeStatusTitle,
+      text: text.changeStatusText(statusText),
+      confirmText: text.confirmText,
+      cancelText: text.cancelBtn,
     });
     if (isStatusConfirmed) {
       const result = await updateTicketDiscountStatus(idDiscount, nextStatus);
       if (result.success) {
-        toast.success("Change status sucessfuly!")
+        toast.success(text.statusChangedSuccess)
         fetchTicketDiscount();
       } else {
-        toast.error(`Change status error: ${result.message}`)
+        toast.error(`${text.statusChangedError}: ${result.message}`)
       }
     }
   };
@@ -274,25 +277,25 @@ function Page() {
   //delete
   const handleDeleteTicketType = async ({ name, id }: { name: string, id: number }) => {
     const inputName = await ConfirmWithInput({
-      title: `Delete "${name}"?`,
-      text: `Please type the route name below to confirm deletion.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      placeholder: "Type route name here"
+      title: text.deleteTitle(name),
+      text: text.deleteConfirmText,
+      confirmText: text.deleteBtn,
+      cancelText: text.cancelBtn,
+      placeholder: text.inputPlaceholder
     });
 
     if (inputName === name) {
       const result = await deleteTicketType(id);
       if (result.success) {
         fetchTicketTypeData();
-        toast.success("delete price type successfully!");
+        toast.success(text.deleteSuccess);
       } else {
         toast.error(`Error: ${result.message}`);
       }
     } else if (inputName !== null) {
       await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the route name.",
+        title: text.nameMismatchTitle,
+        text: text.nameMismatchText,
         type: "error"
       });
     }
@@ -301,24 +304,24 @@ function Page() {
   const handleDeleteTicketDiscount = async ({ name, id }: { name: string, id: number }) => {
 
     const isConfirmed = await Confirm({
-     title: `Delete "${name}"?`,
-     text: `Please type the route name below to confirm deletion.`,
-       confirmText: "Delete",
-      cancelText: "Cancel",
+     title: text.deleteTitle(name),
+     text: text.deleteConfirmText,
+       confirmText: text.deleteBtn,
+      cancelText: text.cancelBtn,
     });
 
     if (isConfirmed) {
       const result = await deleteTicketDiscount(id);
       if (result.success) {
         fetchTicketDiscount();
-        toast.success("delete discount price successfully!");
+        toast.success(text.deleteSuccess);
       } else {
         toast.error(`Error: ${result.message}`);
       }
     } else if (isConfirmed) {
       await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the route name.",
+        title: text.nameMismatchTitle,
+        text: text.nameMismatchText,
         type: "error"
       });
     }
@@ -330,10 +333,10 @@ function Page() {
 
   //table columns
   const columnTicketType: ColumnConfig<TicketTypeTableData>[] = [
-    { key: 'no', label: 'No.', width: '5%', align: 'left' },
-    { key: 'name', label: 'Price Type', width: '20%', align: 'left' },
+    { key: 'no', label: text.no, width: '5%', align: 'left' },
+    { key: 'name', label: text.priceTypeTable, width: '20%', align: 'left' },
     {
-      key: 'company_id', label: 'Actions', width: '20%', align: 'right',
+      key: 'company_id', label: text.action, width: '20%', align: 'right',
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
           {/* <TableActionButton
@@ -353,14 +356,14 @@ function Page() {
             onClick={() => handleTicketTypeModel({ id: row.id, name: row.name })}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
-            title='Edit'
+            title={text.btnEdit}
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             onClick={() => handleDeleteTicketType({ name: row.name, id: row.id })}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
-            title='Delete'
+            title={text.btnDelete}
           />
         </div>
       ),
@@ -368,20 +371,20 @@ function Page() {
   ];
 
   const columnTicketDiscount: ColumnConfig<DiscountPriceTableData>[] = [
-    { key: 'no', label: 'No.', width: '5%', align: 'left' },
-    { key: 'ticket_discount_name', label: 'Name', width: '20%', align: 'left' },
+    { key: 'no', label: text.no, width: '5%', align: 'left' },
+    { key: 'ticket_discount_name', label: text.name, width: '20%', align: 'left' },
     {
-      key: 'ticket_discount_value', label: 'Value', width: '20%', align: 'left',
+      key: 'ticket_discount_value', label: text.value, width: '20%', align: 'left',
     },
     {
-      key: 'ticket_discount_type', label: 'Discount Type', width: '20%', align: 'center',
+      key: 'ticket_discount_type', label: text.DiscountType, width: '20%', align: 'center',
       render: (_, row) => (
         <p>{`${row.ticket_discount_type === 0 ? DISCOUNT_TYPE.BAHT : DISCOUNT_TYPE.PERCENT}`}</p>
       )
     },
     {
       key: 'ticket_discount_status',
-      label: 'Status',
+      label: text.status,
       width: '15%',
       align: 'center',
       render: (_, row) => (
@@ -391,21 +394,21 @@ function Page() {
       ),
     },
     {
-      key: 'ticket_discount_comId', label: 'Action', width: '20%', align: 'right', render: (_, row) => (
+      key: 'ticket_discount_comId', label: text.action, width: '20%', align: 'right', render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
           <TableActionButton
             onClick={() => handleEditDiscount(row.ticket_discount_id)}
             icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
-            title='Edit'
+            title={text.btnEdit}
           />
           <TableActionButton
             onClick={() => handleDeleteTicketDiscount({ name: row.ticket_discount_name, id: row.ticket_discount_id })}
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}
             bgColor="bg-red-50 text-red-600"
             hoverColor="hover:bg-red-100"
-            title='Delete'
+            title={text.btnDelete}
           />
         </div>
       ),
@@ -415,7 +418,7 @@ function Page() {
   return (
     <>
       <div>
-        <TitlePage title='Manage Ticket Types' description='View and manage ticket type information' btnText='Add New Type' handleOpenModel={handleOpenTicketTypeModal} />
+        <TitlePage title={text.typeTitle} description={text.typeSubtitle} btnText={text.addType} handleOpenModel={handleOpenTicketTypeModal} />
         {isLoadingskeleton ? <SkeletonRoute /> :
           <TableTemplate
             columns={columnTicketType}
@@ -426,7 +429,7 @@ function Page() {
         }
       </div>
       <div className='mt-5'>
-        <TitlePage title='Manage Ticket Discount Price' description='View and manage discount price information' btnText='Add a Discount' handleOpenModel={handleAddDiscount} />
+        <TitlePage title={text.disCountTitle} description={text.disCountSubtitle} btnText={text.addDisCount} handleOpenModel={handleAddDiscount} />
         {isLoadingskeleton ? <SkeletonRoute /> :
           <TableTemplate
             columns={columnTicketDiscount}

@@ -1,5 +1,6 @@
 "use client";
 
+import { getTextDashboard, useLanguageContext } from "@/app/i18n/translations";
 import { FilterIcon } from "lucide-react";
 
 export default function DashboardFilters({
@@ -13,12 +14,14 @@ export default function DashboardFilters({
   customDate: string;
   setCustomDate: (date: string) => void;
 }) {
+  const isTH = useLanguageContext();
+  const text = getTextDashboard(isTH);
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
         <div className="flex items-center text-gray-500">
           <FilterIcon size={18} className="mr-2" />
-          <span className="text-sm font-medium">Filters:</span>
+          <span className="text-sm font-medium">{text.filters}</span>
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
@@ -40,11 +43,11 @@ export default function DashboardFilters({
             }}
             className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
-            <option value="all">All</option>
-            <option value="day">Today</option>
-            <option value="month">This Month</option>
-            <option value="year">This Year</option>
-            <option value="custom">Custom Date</option>
+            <option value="all">{text.all}</option>
+            <option value="day">{text.today}</option>
+            <option value="month">{text.thisMonth}</option>
+            <option value="year">{text.thisYear}</option>
+            <option value="custom">{text.custom}</option>
           </select>
 
           {/* Custom Date Picker */}

@@ -123,12 +123,10 @@ function Page() {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const isConfirmed = await Confirm({
-      title: editingLocation ? "Confirm Update" : "Confirm Create",
-      text: editingLocation
-        ? "Do you want to update this location?"
-        : "Do you want to create this location?",
-      confirmText: editingLocation ? "Update" : "Create",
-      cancelText: "Cancel",
+      title: editingLocation ? text.confirmUpdateTitle : text.confirmCreateTitle,
+      text: editingLocation ? text.confirmUpdateText : text.confirmCreateText,
+      confirmText: editingLocation ? text.updateBtn : text.createBtn,
+      cancelText: text.cancelBtn,
       type: "question",
     });
 
@@ -138,25 +136,24 @@ function Page() {
       if (editingLocation) {
         await updateLocation(editingLocation.id, location);
         await Alert({
-          title: "Updated!",
-          text: "Location updated.",
+          title: text.alertUpdatedTitle,
+          text: text.alertUpdatedText,
           type: "success",
         });
       } else {
         await createLocation(location);
         await Alert({
-          title: "Created!",
-          text: "Location created.",
+          title: text.alertCreatedTitle,
+          text: text.alertCreatedText,
           type: "success",
         });
       }
       setShowModal(false);
       fetchLocations();
     } catch (error) {
-      console.error("Save Location error:", error);
       await Alert({
-        title: "Error!",
-        text: "Something went wrong.",
+        title: text.errorTitle,
+        text: text.errorText,
         type: "error",
       });
     }
@@ -164,10 +161,10 @@ function Page() {
 
   const handleDeleteLocation = async (id: number) => {
     const isConfirmed = await Confirm({
-      title: "Confirm Delete",
-      text: "Are you sure you want to delete this location?",
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: text.confirmDeleteTitle,
+      text: text.confirmDeleteText,
+      confirmText: text.deleteBtn,
+      cancelText: text.cancelBtn,
       type: "warning",
     });
 
@@ -176,16 +173,15 @@ function Page() {
     try {
       await deleteLocation(id);
       await Alert({
-        title: "Deleted!",
-        text: "Location deleted.",
+        title: text.alertDeletedTitle,
+        text: text.alertDeletedText,
         type: "success",
       });
       fetchLocations();
     } catch (error) {
-      console.error("Delete Location error:", error);
       await Alert({
-        title: "Error!",
-        text: "Failed to delete.",
+        title: text.alertDeletedText,
+        text: text.deleteErrorText,
         type: "error",
       });
     }

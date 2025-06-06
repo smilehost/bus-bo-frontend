@@ -159,11 +159,11 @@ function Page() {
 
   const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
     const inputName = await ConfirmWithInput({
-      title: `Delete "${ticketName}"?`,
-      text: `Are you sure you want to delete it.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      placeholder: "Type route name here"
+      title: text.confirmDeleteTitle(ticketName),
+      text: text.confirmDeleteText,
+      confirmText: text.confirmText,
+      cancelText: text.cancelText,
+      placeholder: text.confirmDeletePlaceholder,
     });
 
     if (inputName === ticketName) {
@@ -171,14 +171,14 @@ function Page() {
 
       if (result.success) {
         fetchTicketData();
-        toast.success("delete ticket successfully!");
+        toast.success(text.successDelete);
       } else {
-        toast.error(`Error: ${result.message}`);
+        toast.error(`${text.errorDelete}${result.message}`);
       }
     } else if (inputName !== null) {
       await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the ticket name.",
+        title: text.mismatchTitle,
+        text: text.mismatchText,
         type: "error"
       });
     }
@@ -191,10 +191,10 @@ function Page() {
     const statusText = nextStatus === 1 ? "Active" : "Inactive";
 
     const isStatusConfirmed = await Confirm({
-      title: "Change Status?",
-      text: `Do you want to change the status to "${statusText}"`,
-      confirmText: "Confirm",
-      cancelText: "Cancel",
+      title: text.changeStatusTitle,
+      text: text.changeStatusText(statusText),
+      confirmText: text.confirmText,
+      cancelText: text.cancelText,
     });
 
 
@@ -203,10 +203,10 @@ function Page() {
       const result = await updateTicketStatus(idTicket, nextStatus);
 
       if (result.success) {
-        toast.success("Status changed successfully!");
+        toast.success(text.successChangeStatus);
         fetchTicketData?.();
       } else {
-        toast.error(`Failed to change status: ${result.message}`);
+        toast.error(`${text.errorChangeStatus}: ${result.message}`);
       }
     }
   };

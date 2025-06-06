@@ -1,9 +1,13 @@
+import { getTextDashboard, useLanguageContext } from "@/app/i18n/translations";
+
 export default function DashboardHeader() {
+  const isTH = useLanguageContext();
+  const text = getTextDashboard(isTH);
     return (
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{text.title}</h1>
         <p className="text-gray-600">
-          Today&apos;s overview of transactions and statistics
+          {text.subtitle}
         </p>
       </div>
     );
