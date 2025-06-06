@@ -200,7 +200,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
 
   //Next Form
   const handleValidateNext = () => {
-    if (!ticketNameTH || !ticketNameEN || !ticketAmount || !ticketColor || !ticketType || ticketChecked.length <= 0) {
+    if (!ticketNameTH || !ticketNameEN || !ticketAmount || ticketAmount === "0" || !ticketColor || !ticketType || ticketChecked.length <= 0) {
       setError("Please fill in completely.");
       return;
     }

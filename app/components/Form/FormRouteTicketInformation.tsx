@@ -13,7 +13,6 @@ import { TICKET_TYPE } from '@/constants/enum'
 
 //type
 import { TicketPriceType } from '@/types/types'
-import { store } from '@/stores/store'
 import { getTextFormTicket, useLanguageContext } from '@/app/i18n/translations'
 
 type FormRouteTicketProps = {
@@ -73,109 +72,109 @@ function FormRouteTicketInformation({
     setTicketChecked(newChecked); // ✅ ไม่ error แล้ว
   };
   const { isTH } = useLanguageContext();
-  const text = getTextFormTicket({isTH});
+  const text = getTextFormTicket({ isTH });
 
   return (
     <>
       <form className="flex flex-wrap gap-4 w-full">
-    {/* Ticket Name (Thai) */}
-    <div className="w-full sm:w-[calc(50%-8px)]">
-      <InputLabel
-        label={text.nameTH}
-        placeholder='เช่น ขอนแก่น - โคราช'
-        type="text"
-        value={ticketNameTH}
-        setValue={setTicketNameTH}
-      />
-    </div>
-
-    {/* Ticket Name (English) */}
-    <div className="w-full sm:w-[calc(50%-8px)]">
-      <InputLabel
-        label={text.nameEN}
-        placeholder='e.g. Khon Kaen - Korat'
-        type="text"
-        value={ticketNameEN}
-        setValue={setTicketNameEN}
-      />
-    </div>
-
-    {/* Ticket Type */}
-    <div className="w-full sm:w-[calc(50%-8px)] flex flex-col justify-end">
-      <LabelText text={text.ticketTypeLabel} />
-      <div className="flex gap-2 mt-2 flex-wrap">
-        <ButtonDefault
-          text={text.fixedText}
-          size={`flex-1 min-w-[140px] max-w-[244px] h-[38px] ${isEditMode ? 'bg-gray-200' : ''
-            } ${ticketType === TICKET_TYPE.FIXED ? 'custom-bg-main' : ''}`}
-          onClick={() => !isEditMode && setTicketType(TICKET_TYPE.FIXED)}
-        />
-        <ButtonDefault
-          text={text.tieredText}
-          size={`flex-1 min-w-[140px] max-w-[244px] h-[38px] ${isEditMode ? 'bg-gray-200' : ''
-            } ${ticketType === TICKET_TYPE.TIERED ? 'custom-bg-main' : ''}`}
-          onClick={() => !isEditMode && setTicketType(TICKET_TYPE.TIERED)}
-        />
-      </div>
-    </div>
-
-    {/* Ticket Amount & Color */}
-    <div className="w-full md:w-[calc(50%-8px)]">
-      <div className="flex flex-col sm:flex-row gap-2 mt-2">
-        <div className="w-full sm:w-2/3">
+        {/* Ticket Name (Thai) */}
+        <div className="w-full sm:w-[calc(50%-8px)]">
           <InputLabel
-            label={text.amountLabel}
-            placeholder={text.amountPlaceholder}
-            type="number"
-            value={ticketAmount}
-            setValue={setTicketAmount}
+            label={text.nameTH}
+            placeholder='เช่น ขอนแก่น - โคราช'
+            type="text"
+            value={ticketNameTH}
+            setValue={setTicketNameTH}
           />
         </div>
-        <div className="w-full sm:w-1/3">
-          <ColorRoute
-            color={ticketColor}
-            setRouteColor={setTicketColor}
-            label={text.colorLabel}
-            size_circle="w-[38px] h-[38px]"
-            size_input="w-full"
-          />
-        </div>
-      </div>
-    </div>
 
-    {/* Ticket Price Type */}
-    <div className="w-full md:w-[calc(50%-8px)] mt-3">
-      {ticketType && (
-        <div className={`flex flex-col  w-full max-w-96`}>
-          <LabelText text={text.priceTypeLabel} />
-          <div
-            className="mt-2 h-23 overflow-y-auto custom-border-gray rounded-md p-3 flex flex-col gap-1"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}
-          >
-            {ticketTypeList?.map((item, index) => {
-              const isMatch = ticketChecked?.some((c) => item.id === c);
-              const isLocked = initialTicketChecked?.includes(item.id);
-              return (
-                <div key={index} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="cursor-pointer"
-                    checked={isMatch}
-                    disabled={isLocked}
-                    onChange={() => handleChecked(item.id)}
-                  />
-                  <p className="text-[14px]">{item.name}</p>
-                </div>
-              );
-            })}
+        {/* Ticket Name (English) */}
+        <div className="w-full sm:w-[calc(50%-8px)]">
+          <InputLabel
+            label={text.nameEN}
+            placeholder='e.g. Khon Kaen - Korat'
+            type="text"
+            value={ticketNameEN}
+            setValue={setTicketNameEN}
+          />
+        </div>
+
+        {/* Ticket Type */}
+        <div className="w-full sm:w-[calc(50%-8px)] flex flex-col justify-end">
+          <LabelText text={text.ticketTypeLabel} />
+          <div className="flex gap-2 mt-2 flex-wrap">
+            <ButtonDefault
+              text={text.fixedText}
+              size={`flex-1 min-w-[140px] max-w-[244px] h-[38px] ${isEditMode ? 'bg-gray-200' : ''
+                } ${ticketType === TICKET_TYPE.FIXED ? 'custom-bg-main' : ''}`}
+              onClick={() => !isEditMode && setTicketType(TICKET_TYPE.FIXED)}
+            />
+            <ButtonDefault
+              text={text.tieredText}
+              size={`flex-1 min-w-[140px] max-w-[244px] h-[38px] ${isEditMode ? 'bg-gray-200' : ''
+                } ${ticketType === TICKET_TYPE.TIERED ? 'custom-bg-main' : ''}`}
+              onClick={() => !isEditMode && setTicketType(TICKET_TYPE.TIERED)}
+            />
           </div>
         </div>
-      )}
-    </div>
-  </form>
+
+        {/* Ticket Amount & Color */}
+        <div className="w-full md:w-[calc(50%-8px)]">
+          <div className="flex flex-col sm:flex-row gap-2 mt-2">
+            <div className="w-full sm:w-2/3">
+              <InputLabel
+                label={text.amountLabel}
+                placeholder={text.amountPlaceholder}
+                type="amount"
+                value={ticketAmount}
+                setValue={setTicketAmount}
+              />
+            </div>
+            <div className="w-full sm:w-1/3">
+              <ColorRoute
+                color={ticketColor}
+                setRouteColor={setTicketColor}
+                label={text.colorLabel}
+                size_circle="w-[38px] h-[38px]"
+                size_input="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Ticket Price Type */}
+        <div className="w-full md:w-[calc(50%-8px)] mt-3">
+          {ticketType && (
+            <div className={`flex flex-col  w-full max-w-96`}>
+              <LabelText text={text.priceTypeLabel} />
+              <div
+                className="mt-2 h-23 overflow-y-auto custom-border-gray rounded-md p-3 flex flex-col gap-1"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                {ticketTypeList?.map((item, index) => {
+                  const isMatch = ticketChecked?.some((c) => item.id === c);
+                  const isLocked = initialTicketChecked?.includes(item.id);
+                  return (
+                    <div key={index} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="cursor-pointer"
+                        checked={isMatch}
+                        disabled={isLocked}
+                        onChange={() => handleChecked(item.id)}
+                      />
+                      <p className="text-[14px]">{item.name}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </form>
 
       {/* old version don't responsive design */}
 
