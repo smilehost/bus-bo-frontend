@@ -7,6 +7,7 @@ import ButtonDefault from "../Form/ButtonDefault";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getTextLocation, useLanguageContext } from "@/app/i18n/translations";
+import InputLabel from "../Form/InputLabel";
 
 interface LocationModalProps {
   open: boolean;
@@ -83,7 +84,27 @@ function LocationModal({
             }
           />
           <div className="mt-7 flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+            <InputLabel
+              label={"Location Name"}
+              placeholder="Enter location name"
+              type="text"
+              value={location.name}
+              setValue={(val: string) => setLocation({ ...location, name: val })}
+            />
+            <InputLabel
+              label={"Location (Latitude, Longitude)"}
+              placeholder="16.40110363857608, 102.85026064787496"
+              type="text"
+              setValue={(val: string) => {
+                const [lat, lng] = val.split(",").map((s) => s.trim());
+                setLocation((prev) => ({
+                  ...prev,
+                  latitude: lat || "",
+                  longitude: lng || "",
+                }));
+              }}
+            />
+            {/* <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
                 {text.name}
               </label>
@@ -96,8 +117,8 @@ function LocationModal({
                   setLocation({ ...location, name: e.target.value })
                 }
               />
-            </div>
-            <div className="flex flex-col gap-2">
+            </div> */}
+            {/* <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
                 {text.latLong}
               </label>
@@ -116,7 +137,7 @@ function LocationModal({
                   }));
                 }}
               />
-            </div>
+            </div> */}
           </div>
           <div className="flex gap-3 justify-end mt-7">
             <ButtonDefault size="" text="Cancel" onClick={onClose} />

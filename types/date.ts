@@ -14,7 +14,7 @@ export interface DateItem {
       sat: boolean;
       sun: boolean;
     };
-    status: string;
+    status: number;
   }
 
 export interface FetchDatesResult {

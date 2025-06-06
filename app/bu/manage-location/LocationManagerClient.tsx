@@ -14,7 +14,8 @@ import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { MapPin, SquarePen, Trash2 } from "lucide-react";
 import TableTemplate, { ColumnConfig } from "@/app/components/Table/TableTemplate";
-import {getTextLocation, useLanguageContext} from "@/app/i18n/translations";
+import { getTextLocation, useLanguageContext } from "@/app/i18n/translations";
+import FormFilter from "@/app/components/Filter/FormFilter";
 
 // Define interfaces for location data
 interface Location {
@@ -59,7 +60,7 @@ function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   const { isTH } = useLanguageContext();
-  const text = getTextLocation({isTH});
+  const text = getTextLocation({ isTH });
 
   const fetchLocations = async () => {
     setIsLoading(true);
@@ -217,7 +218,7 @@ function Page() {
       key: 'name', label: text.name, width: '20%', align: 'left'
     },
     { key: 'lat', label: text.lat, width: '20%', align: 'center' },
-    { key: 'long', label: text.long , width: '20%', align: 'center' },
+    { key: 'long', label: text.long, width: '20%', align: 'center' },
     {
       key: 'id', label: text.action, width: '25%', align: 'right',
       render: (_, row) => (
@@ -264,13 +265,22 @@ function Page() {
       <div className="flex-1 flex flex-col p-0">
         <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddLocation} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
-          <SearchFilter
+          {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={(value: string) =>
               handleSearchChange({
                 target: { value },
               } as React.ChangeEvent<HTMLInputElement>)
             }
+          /> */}
+          <FormFilter
+            setSearch={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+            placeholderSearch={text.search}
+            search={searchTerm}
           />
           {isLoadingskeleton ? (
             <SkeletonLocationTable rows={5} />
@@ -300,10 +310,10 @@ function Page() {
           editingLocation={
             editingLocation
               ? {
-                  name: editingLocation.name,
-                  latitude: parseFloat(editingLocation.lat),
-                  longitude: parseFloat(editingLocation.long),
-                }
+                name: editingLocation.name,
+                latitude: parseFloat(editingLocation.lat),
+                longitude: parseFloat(editingLocation.long),
+              }
               : null
           }
         />

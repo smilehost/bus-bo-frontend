@@ -19,6 +19,7 @@ import TableActionButton from "@/app/components/Table/TableActionButton/TableAct
 import { Clock, SquarePen, Trash2 } from "lucide-react";
 import { Tooltip } from "@mui/material";
 import { getTextTimes, useLanguageContext } from "@/app/i18n/translations";
+import FormFilter from "@/app/components/Filter/FormFilter";
 
 function Page() {
   const { times, getTimes, createTime, updateTime, deleteTime } =
@@ -230,12 +231,15 @@ function Page() {
         <Tooltip title={row.schedule.join(", ")}>
           <div className="flex items-center gap-2 custom-ellipsis-style">
             <div className="shrink-0">
-              <Clock className={`custom-size-tableAction-btn text-blue-500 `}/>
+              <Clock className={`custom-size-tableAction-btn text-blue-500 `} />
             </div>
-            <p className="whitespace-nowrap custom-ellipsis-style"> {row.schedule.join(", ")}</p>
+            <p className="whitespace-nowrap custom-ellipsis-style">
+              {" "}
+              {row.schedule.join(", ")}
+            </p>
           </div>
         </Tooltip>
-      )
+      ),
     },
     {
       key: "id",
@@ -280,14 +284,23 @@ function Page() {
           handleOpenModel={handleAddTime}
         />
         <div className="custom-frame-content p-5 mt-5">
-          <SearchFilter
+          <FormFilter
+            setSearch={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+            placeholderSearch={text.search}
+            search={searchTerm}
+          />
+          {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={(value: string) =>
               handleSearchChange({
                 target: { value },
               } as React.ChangeEvent<HTMLInputElement>)
             }
-          />
+          /> */}
           {isLoadingskeleton ? (
             <SkeletonManageTime rows={5} />
           ) : (

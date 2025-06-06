@@ -19,7 +19,6 @@ export type SelectFilterProps = {
 
 function SelectFilter({ width, defaultValue, listValue, onChange }: SelectFilterProps) {
     return (
-
         <Select
             displayEmpty
             className={`${width}`}

@@ -10,7 +10,6 @@ import Tooltip from '@mui/material/Tooltip';
 
 //companent 
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput'
-import { Alert } from '@/app/components/Dialog/Alert'
 import FormFilter from '@/app/components/Filter/FormFilter'
 import TableTemplate, { ColumnConfig } from '@/app/components/Table/TableTemplate'
 import StatusText from '@/app/components/StatusText'
@@ -89,7 +88,7 @@ function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { isTH } = useLanguageContext();
-  const text = getTextRoute({isTH});
+  const text = getTextRoute({ isTH });
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSize = Number(e.target.value);
@@ -167,32 +166,33 @@ function Page() {
 
 
   // Handle delete route
-  const handleDeleteRoute = async ({ route, id }: { route: string, id: number }) => {
-    const inputName = await ConfirmWithInput({
-      title: text.confirmDeleteTitle.replace('${route}', route),
-      text: text.confirmDeleteText,
-      confirmText: text.confirmDeleteConfirm,
-      cancelText: text.confirmDeleteCancel,
-      placeholder: text.confirmDeletePlaceholder,
-    });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [routeToDelete, setRouteToDelete] = useState<{ route: string, id: number } | null>(null);
+  const handleDeleteRoute = ({ route, id }: { route: string; id: number }) => {
+    setRouteToDelete({ route, id });
+    setConfirmOpen(true);
+  };
+  
+  const onConfirmDelete = async (inputName: string) => {
+    if (!routeToDelete) return;
 
-    if (inputName === route) {
-      const result = await deleteRoute(id);
+    if (inputName === routeToDelete.route) {
+      const result = await deleteRoute(routeToDelete.id);
 
       if (result.success) {
         fetchRouteData();
-        toast.success(text.successDelete);
+        toast.success("Delete route successfully!");
       } else {
         toast.error(`${text.errorDelete}${result.message}`);
       }
-    } else if (inputName !== null) {
-      await Alert({
-        title: text.mismatchTitle,
-        text: text.mismatchText,
-        type: "error",
-      });
+    } else {
+      toast.error("The typed name does not match the route name.");
     }
+
+    setConfirmOpen(false);
+    setRouteToDelete(null);
   };
+
 
   // Handle Change Status
   const handleChangeStatus = async ({ idStatus, idRoute }: { idStatus: string, idRoute: number }) => {
@@ -253,7 +253,7 @@ function Page() {
   const columns: ColumnConfig<RouteTableData>[] = [
     {
       key: 'route',
-      label:text.tableTitle,
+      label: text.tableTitle,
       width: '20%',
       render: (_, row) => (
         <div className='flex gap-3'>
@@ -411,7 +411,22 @@ function Page() {
           />
         }
       </div>
-
+      {routeToDelete && (
+        <ConfirmWithInput
+          open={confirmOpen}
+          onClose={() => {
+            setConfirmOpen(false);
+            setRouteToDelete(null);
+          }}
+          title={`Delete "${routeToDelete.route}"?`}
+          text={`Please type the route name below to confirm deletion.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          placeholder="Type route name here"
+          onConfirm={onConfirmDelete}
+          label='Route Name'
+        />
+      )}
     </>
   )
 }

@@ -1,7 +1,4 @@
 import { store } from "@/stores/store";
-import { Subtitles } from "lucide-react";
-import { title } from "process";
-import { scheduler } from "timers/promises";
 
 function useLanguageContext() {
   const lang = store.Translation.use();
@@ -11,7 +8,13 @@ function useLanguageContext() {
   return { role, isTH, isSuperAdmin };
 }
 
-export function getTextMenu({ isTH, isSuperAdmin }: { isTH: boolean; isSuperAdmin: boolean }) {
+export function getTextMenu({
+  isTH,
+  isSuperAdmin,
+}: {
+  isTH: boolean;
+  isSuperAdmin: boolean;
+}) {
   return {
     overview: isTH ? "ภาพรวม" : "OVERVIEW",
     setup: isTH ? "ตั้งค่าเส้นทาง & ตั๋ว" : "SETUP ROUTE & TICKET",
@@ -31,8 +34,12 @@ export function getTextMenu({ isTH, isSuperAdmin }: { isTH: boolean; isSuperAdmi
     manageTime: isTH ? "จัดการเวลา" : "Manage Times",
 
     manageUser: isSuperAdmin
-      ? isTH ? "จัดการแอดมิน" : "Manage Admin"
-      : isTH ? "จัดการพนักงาน" : "Manage Employee",
+      ? isTH
+        ? "จัดการแอดมิน"
+        : "Manage Admin"
+      : isTH
+      ? "จัดการพนักงาน"
+      : "Manage Employee",
     manageCompany: isTH ? "จัดการบริษัท" : "Manage Company",
   };
 }
@@ -46,8 +53,12 @@ export function getTextFormRoute({ isTH }: { isTH: boolean }) {
     timeLabel: isTH ? "เวลาเดินรถ" : "Times",
     scheduleLabel: isTH ? "ตารางเดินรถ" : "Schedule",
     routeColor: isTH ? "สีของเส้นทาง" : "Route Color",
-    headerUrl: isTH ? "URL รายละเอียดสลิปส่วนหัว" : "URL for slip details at the header",
-    footerUrl: isTH ? "URL รายละเอียดสลิปส่วนท้าย" : "URL for slip details at the footer",
+    headerUrl: isTH
+      ? "URL รายละเอียดสลิปส่วนหัว"
+      : "URL for slip details at the header",
+    footerUrl: isTH
+      ? "URL รายละเอียดสลิปส่วนท้าย"
+      : "URL for slip details at the footer",
     placeholderUrl: isTH ? "กรอก URL..." : "Enter URL...",
     cancel: isTH ? "ยกเลิก" : "Cancel",
     addRoute: isTH ? "เพิ่มเส้นทาง" : "Add Route",
@@ -132,13 +143,35 @@ export function getTextRouteTicketBystep({ isTH }: { isTH: boolean }) {
   };
 }
 
-export function getTextManageUserPage({ isTH, isSuperAdmin }: { isTH: boolean; isSuperAdmin: boolean }) {
+export function getTextManageUserPage({
+  isTH,
+  isSuperAdmin,
+}: {
+  isTH: boolean;
+  isSuperAdmin: boolean;
+}) {
   return {
-    title: isSuperAdmin ? (isTH ? "จัดการแอดมิน" : "Manage Admins") : isTH ? "จัดการพนักงาน" : "Manage Employees ",
+    title: isSuperAdmin
+      ? isTH
+        ? "จัดการแอดมิน"
+        : "Manage Admins"
+      : isTH
+      ? "จัดการพนักงาน"
+      : "Manage Employees ",
     description: isSuperAdmin
-      ? isTH ? "ดูและจัดการผู้ใช้งานระดับแอดมิน" : "View and manage admin-level users"
-      : isTH ? "ดูและจัดการข้อมูลลูกค้า" : "View and manage customer information",
-    btnText: isSuperAdmin ? (isTH ? "เพิ่มแอดมิน" : "Add New Admin") : isTH ? "เพิ่มสมาชิก" : "Add New Member",
+      ? isTH
+        ? "ดูและจัดการผู้ใช้งานระดับแอดมิน"
+        : "View and manage admin-level users"
+      : isTH
+      ? "ดูและจัดการข้อมูลลูกค้า"
+      : "View and manage customer information",
+    btnText: isSuperAdmin
+      ? isTH
+        ? "เพิ่มแอดมิน"
+        : "Add New Admin"
+      : isTH
+      ? "เพิ่มสมาชิก"
+      : "Add New Member",
     number: isTH ? "ลำดับ" : "No.",
     name: isTH ? "ชื่อจริง" : "Name",
     userName: isTH ? "ชื่อผู้ใช้" : "Username",
@@ -417,6 +450,7 @@ export function getTextDateManagement({ isTH }: { isTH: boolean }) {
     selectDays: isTH ? "เลือกวัน" : "Select Days",
     allDay: isTH ? "ทุกวัน" : "All Day",
     enterDate: isTH ? "กรอกชื่อช่วงเวลา" : "Enter Date Name",
+    search: isTH ? "ค้นหาช่วงเวลา" : "Search Date",
   };
 }
 

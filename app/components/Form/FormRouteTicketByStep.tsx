@@ -33,7 +33,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import Typography from '@mui/material/Typography';
-import {getTextRouteTicketBystep, useLanguageContext} from '@/app/i18n/translations'
+import { getTextRouteTicketBystep, useLanguageContext } from '@/app/i18n/translations'
 
 export type TicketPriceTypeFixed = {
   id_type: string,
@@ -75,7 +75,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
   const [checkConfirm, setCheckConfirm] = useState(true);
   const [initialTicketChecked, setInitialTicketChecked] = useState<string[]>([]);
   const [isSaveTable, setSaveTable] = useState<number>(0)
-  const { isTH  } = useLanguageContext();
+  const { isTH } = useLanguageContext();
   const text = getTextRouteTicketBystep({ isTH });
 
   // ------------------- UTIL ----------------------
@@ -273,7 +273,7 @@ function FromRouteTicketByStep({ ticketData, routeId, ticketActiveConfig }: Rout
         price: item.price.toString(),
         route_ticket_price_route_id: Number(routeId)
       }))
-      
+
     };
 
     //fetch create, update to api

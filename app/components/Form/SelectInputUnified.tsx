@@ -75,8 +75,8 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
           >
             {data.map((item) => (
               <MenuItem value={item.id} key={item.id}>
-                <div className="flex justify-between w-full">
-                  <p className="text-[13px]">
+                <div className="flex justify-between custom-ellipsis-style">
+                  <p className="text-[13px] custom-ellipsis-style">
                     {item.name} {item.schedule?.join(', ')}
                   </p>
                 </div>

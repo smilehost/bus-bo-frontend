@@ -36,6 +36,10 @@ body {
   @apply whitespace-nowrap text-ellipsis overflow-hidden;
 }
 
+.custom-focus-input {
+  @apply focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500;
+}
+
 .custom-size-tableAction-btn {
   @apply w-4 h-4;
 }

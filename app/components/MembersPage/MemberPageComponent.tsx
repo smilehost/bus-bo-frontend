@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import SearchFilter from "@/app/components/SearchFilter/MemberSearchFilter";
 // import MemberTable from "@/app/components/Table/MemberTable";
 import MemberModal from "@/app/components/Model/MemberModal";
 import EditPasswordModel from "@/app/components/Model/EditMemberPassModal";
@@ -13,7 +12,7 @@ import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { useMemberStore } from "@/stores/memberStore";
 import { useCompanyStore } from "@/stores/companyStore";
-import { STATUS_LABELS, FILTER, USER_TIER } from "@/constants/enum";
+import { FILTER, USER_TIER } from "@/constants/enum";
 import { MemberItem } from "@/types/member";
 import TitlePage from "@/app/components/Title/TitlePage";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
@@ -24,6 +23,8 @@ import TableTemplate, {
 import { ToastContainer } from "react-toastify";
 import { Eye, Lock } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
+import FormFilter from "../Filter/FormFilter";
+import { statusOptions } from "@/constants/options";
 
 export interface MemberTableData {
   no: number;
@@ -53,10 +54,7 @@ export default function MemberPageComponent({
   const { companies, getCompanies } = useCompanyStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [searchStatus, setSearchStatus] = useState<FILTER>(FILTER.ALL_STATUS);
-  const [searchCompany, setSearchCompany] = useState<FILTER>(
-    FILTER.ALL_COMPANIES
-  );
+  const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
   const [filteredMembers, setFilteredMembers] = useState<MemberItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
 
@@ -84,7 +82,7 @@ export default function MemberPageComponent({
     if (comId) {
       await getMemberByComId(comId);
     } else {
-      await getMembers(1, 50, "", ""); 
+      await getMembers(1, 50, "", "");
     }
     cancelSkeleton();
   };
@@ -108,20 +106,20 @@ export default function MemberPageComponent({
           m.username.toLowerCase().includes(q)
       );
     }
-    if (searchStatus !== FILTER.ALL_STATUS) {
+    if (searchStatus !== FILTER.ALL_STATUS && searchStatus !== '') {
       temp = temp.filter(
-        (m) => STATUS_LABELS[m.status] === searchStatus.toString()
+        (m) => m.status === Number(searchStatus)
       );
     }
-    if (searchCompany !== FILTER.ALL_COMPANIES) {
-      temp = temp.filter(
-        (m) => m.companyId?.toString() === searchCompany.toString()
-      );
-    }
+    // if (searchCompany !== FILTER.ALL_COMPANIES) {
+    //   temp = temp.filter(
+    //     (m) => m.companyId?.toString() === searchCompany.toString()
+    //   );
+    // }
     setFilteredMembers(temp);
     setTotalResults(temp.length);
     setCurrentPage(1);
-  }, [debouncedSearch, searchStatus, searchCompany, members, companies]);
+  }, [debouncedSearch, searchStatus, members, companies]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -376,6 +374,16 @@ export default function MemberPageComponent({
     },
   ];
 
+  //filter
+  const filterSearch = [
+    {
+      defaulteValue: FILTER.ALL_STATUS,
+      listValue: statusOptions,
+      setSearchValue: setSearchStatus,
+      size: "w-[130px]",
+    },
+  ];
+
   // console.log("paginatedCompaniesWithNo: ", paginatedCompaniesWithNo)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -383,7 +391,17 @@ export default function MemberPageComponent({
       <div className="flex-1 flex flex-col p-0">
         <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddMember} />
         <div className="bg-white rounded-md shadow p-5 mt-5">
-          <SearchFilter
+          <FormFilter
+            setSearch={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+            placeholderSearch={"Search by name or phone..."}
+            filter={filterSearch}
+            search={searchTerm}
+          />
+          {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
             statusFilter={searchStatus}
@@ -395,7 +413,7 @@ export default function MemberPageComponent({
               setSearchCompany(value as FILTER)
             }
             companies={companies}
-          />
+          /> */}
 
           {isLoadingSkeleton ? (
             <SkeletonMemberPage rows={5} />
@@ -423,17 +441,17 @@ export default function MemberPageComponent({
           editingMember={
             editingMember
               ? {
-                  ...editingMember,
-                  id: editingMember.id.toString(),
-                  companyId: editingMember.companyId.toString(),
-                }
+                ...editingMember,
+                id: editingMember.id.toString(),
+                companyId: editingMember.companyId.toString(),
+              }
               : undefined
           }
         />
         <EditStatusModel
           open={isEditStatusOpen}
           onClose={() => setEditStatusOpen(false)}
-          currentStatus={selectedMember?.status || 1}
+          currentStatus={selectedMember?.status || 0}
           onSave={handleEditStatus}
         />
         <EditPasswordModel

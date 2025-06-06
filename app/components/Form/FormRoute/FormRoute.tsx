@@ -23,8 +23,7 @@ import { LocationItem } from "@/types/location";
 import styles from "./FormRoute.module.scss";
 import SelectInputUnified from "../SelectInputUnified";
 import { Confirm } from "../../Dialog/Confirm";
-import { store } from "@/stores/store";
-import { getTextFormRoute, useLanguageContext  } from '../../../i18n/translations';
+import { getTextFormRoute, useLanguageContext } from '../../../i18n/translations';
 
 type FormRouteProps = {
   routeNameTH?: string | undefined;
@@ -81,7 +80,7 @@ function FormRoute({
   useEffect(() => {
     getTimes(1, 5, "");
     getDates(1, 5, "");
-  }, []);
+  }, [getTimes, getDates]);
 
   const handleValidateSubmit = () => {
     const payload = {
@@ -119,8 +118,8 @@ function FormRoute({
       router.push(`/bu/${path}`);
     }
   };
-  const { isTH} = useLanguageContext();
-  const textFormRoute = getTextFormRoute({isTH});
+  const { isTH } = useLanguageContext();
+  const textFormRoute = getTextFormRoute({ isTH });
 
   // console.log(listA, listB)
   return (
@@ -206,9 +205,8 @@ function FormRoute({
       </div>
 
       <div
-        className={`${
-          disable ? "custom-disable-bg" : "bg-white"
-        } border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-lg`}
+        className={`${disable ? "custom-disable-bg" : "bg-white"
+          } border-[#D1D5DB] border-1 mt-3 py-8 px-8 rounded-lg`}
       >
         <div className={` ${styles.customSizeContainer} mx-auto`}>
           <DragDrop

@@ -43,7 +43,7 @@ function FormFilter({ setSearch, placeholderSearch, filter, search }: FormFilter
                         <input
                             type="text"
                             placeholder={placeholderSearch}
-                            className="pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="pl-10 pr-10 py-2.5 custom-border-gray rounded-lg w-full custom-focus-input transition-all"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />

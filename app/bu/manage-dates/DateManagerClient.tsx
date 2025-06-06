@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDateStore } from "@/stores/dateStore";
 import DateModal from "@/app/components/Model/DateModal";
-import SearchFilter from "@/app/components/SearchFilter/DateSearchFilter";
 import { debounce } from "@/utils/debounce";
 import SkeletonDateTable from "@/app/components/Skeleton/SkeletonDateTable";
 import { Alert } from "@/app/components/Dialog/Alert";
@@ -18,6 +17,11 @@ import TableTemplate, {
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { SquarePen, Trash2 } from "lucide-react";
 import { getTextDateManagement, useLanguageContext } from "@/app/i18n/translations";
+import FormFilter from "@/app/components/Filter/FormFilter";
+import { FILTER } from "@/constants/enum";
+import { statusOptions } from "@/constants/options";
+import { Tooltip } from "@mui/material";
+import StatusText from "@/app/components/StatusText";
 
 type DateTableProps = {
   no: number;
@@ -32,7 +36,8 @@ type DateTableProps = {
     saturday: boolean;
     sunday: boolean;
   };
-  status: string;
+  endDate: string;
+  status: number;
 };
 
 export default function DateManagerClient() {
@@ -45,7 +50,7 @@ export default function DateManagerClient() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [statusFilter, setStatusFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingDate, setEditingDate] = useState<DateItem | undefined>(
     undefined
@@ -69,15 +74,39 @@ export default function DateManagerClient() {
   };
 
   const filterDates = useCallback(() => {
-    let tempDates = [...dates];
+    const today = new Date();
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ); // ตัดเวลาออก
+
+    let tempDates = [...dates].map((date) => {
+      const endDate = new Date(date.endDate);
+      const endDateStart = new Date(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate()
+      );
+
+      const isExpired = endDateStart < todayStart;
+
+      return {
+        ...date,
+        status: isExpired ? 0 : date.status, // Map "Inactive" to 0
+      };
+    });
+
     if (debouncedSearch) {
       tempDates = tempDates.filter((date) =>
         date.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
-    if (statusFilter !== "All Status") {
-      tempDates = tempDates.filter((date) => date.status === statusFilter);
+
+    if (statusFilter !== "" && statusFilter !== FILTER.ALL_STATUS) {
+      tempDates = tempDates.filter((date) => date.status === Number(statusFilter));
     }
+
     setFilteredDates(tempDates);
     setTotalResults(tempDates.length);
     setCurrentPage(1);
@@ -232,9 +261,9 @@ export default function DateManagerClient() {
     debouncedFetch(e.target.value);
   };
 
-  const handleStatusFilterChange = (value: string) => {
-    setStatusFilter(value);
-  };
+  // const handleStatusFilterChange = (value: string) => {
+  //   setStatusFilter(value);
+  // };
 
   const paginatedDates = filteredDates.slice(
     (currentPage - 1) * rowsPerPage,
@@ -250,6 +279,7 @@ export default function DateManagerClient() {
     { key: "saturday", label: isTH ? "วันเสาร์" : "Saturday" },
     { key: "sunday", label: isTH ? "วันอาทิตย์" : "Sunday" },
   ];
+
 
   const columns: ColumnConfig<DateTableProps>[] = [
     {
@@ -290,16 +320,18 @@ export default function DateManagerClient() {
       width: "10%",
       align: "center",
       render: (_: unknown, row: DateTableProps) =>
-        row.status === "Active" ? (
+        row.status === 1 ? (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
             <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-            <span>Active</span>
+            <span>{isTH ? "ใช้งาน" : "Active"}</span>
           </span>
         ) : (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
-            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-            <span>Inactive</span>
-          </span>
+          <Tooltip title={`${isTH ? "หมดอายุ" : "Expires on"} ${row.endDate}`}>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
+              <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+              <span>{isTH ? "ไม่ใช้งาน" : "Inactive"}</span>
+            </span>
+          </Tooltip>
         ),
     },
     {
@@ -346,6 +378,16 @@ export default function DateManagerClient() {
     },
   }));
 
+  //filter
+  const filterSearch = [
+    {
+      defaulteValue: FILTER.ALL_STATUS,
+      listValue: statusOptions,
+      setSearchValue: setStatusFilter,
+      size: "w-[130px]",
+    },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <ToastContainer />
@@ -357,11 +399,21 @@ export default function DateManagerClient() {
           handleOpenModel={handleAddDate}
         />
         <div className="custom-frame-content p-5 mt-5">
-          <SearchFilter
+          {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
             statusFilter={statusFilter}
             setStatusFilter={handleStatusFilterChange}
+          /> */}
+          <FormFilter
+            setSearch={(value: string) =>
+              handleSearchChange({
+                target: { value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
+            placeholderSearch={text.search}
+            filter={filterSearch}
+            search={searchTerm}
           />
           {isLoadingskeleton ? (
             <SkeletonDateTable count={5} />
