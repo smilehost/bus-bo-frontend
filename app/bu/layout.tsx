@@ -99,7 +99,8 @@ export default function RootLayout({
     {
       group: menuText.users,
       items: [
-        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", link: isSuperAdmin ? "manage-admin" : "manage-employee" },
+        // { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", link: "manage-members" },
+        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee",  link: isSuperAdmin ? "manage-admin" : "manage-employee" },
         { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
@@ -190,12 +191,12 @@ export default function RootLayout({
                     <div className="space-y-1 mt-1">
                       {group.items.map((item) => (
                         <MenuItemLink
-                          key={item.id}
-                          text={item.text}
-                          icon={item.icon}
-                          href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
-                          as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
-                        />
+                        key={item.id}
+                        text={item.text}
+                        icon={item.icon}
+                        href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
+                        as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
+                      />
                       ))}
                     </div>
 
