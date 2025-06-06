@@ -13,9 +13,15 @@ type MenuItemProps = {
 
 function MenuItemLink({ text, icon: Icon, href, as }: MenuItemProps) {
   const pathname = usePathname();
-
+  console.log("---------");
+  
+  console.log('pathname', pathname);
+  
   const current = pathname.replace('/bu/', '').split('/')[0];
+  console.log('current', current);
+  
   const expected = (as ?? href).replace('/bu/', '').split('/')[0];
+  console.log('expected', expected);
 
   const isActive = current === expected;
 

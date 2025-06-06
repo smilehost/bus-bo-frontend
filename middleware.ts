@@ -15,6 +15,8 @@ export function middleware(request: NextRequest) {
   if (url.pathname === '/bu/manage-employee') {
     url.pathname = '/bu/manage-members'; // ใช้หน้าเดียวกัน
     console.log("===========================================3",url.pathname);
+    console.log("===========================================4",url);
+    
     return NextResponse.rewrite(url);
   }
 
