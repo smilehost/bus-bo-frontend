@@ -183,7 +183,7 @@ function Page() {
   const handleTicketTypeConfirm = async (input: string) => {
     const name = input.trim();
     if (!name) {
-      toast.error("Name cannot be empty");
+      toast.error(text.inputEmptyError);
       return;
     }
 
@@ -198,16 +198,16 @@ function Page() {
         route_ticket_price_type_id: confirmDialogData.id,
       });
       if (result.success) {
-        toast.success("Updated successfully!");
+        toast.success(text.updatedSuccess);
       } else {
-        toast.error(`Update failed: ${result.message}`);
+        toast.error(`${text.updatedError}: ${result.message}`);
       }
     } else {
       const result = await addTicketType(formatPayload);
       if (result.success) {
-        toast.success("Created successfully!");
+        toast.success(text.createdSuccess);
       } else {
-        toast.error(`Creation failed: ${result.message}`);
+        toast.error(`${text.createdError}: ${result.message}`);
       }
     }
 
@@ -217,8 +217,8 @@ function Page() {
   const handleDeleteConfirm = async (input: string) => {
     if (input !== deleteDialogData?.name) {
       await Alert({
-        title: "Name mismatch!",
-        text: "The typed name does not match the route name.",
+        title: text.nameMismatchTitle,
+        text: text.nameMismatchText,
         type: "error"
       });
       return;
@@ -227,7 +227,7 @@ function Page() {
     const result = await deleteTicketType(deleteDialogData.id);
     if (result.success) {
       fetchTicketTypeData();
-      toast.success("Deleted successfully!");
+      toast.success(text.deleteSuccess);
     } else {
       toast.error(`Error: ${result.message}`);
     }
@@ -310,10 +310,10 @@ function Page() {
   const handleDeleteTicketDiscount = async ({ name, id }: { name: string, id: number }) => {
 
     const isConfirmed = await Confirm({
-      title: `Delete "${name}"?`,
-      text: `Please type the route name below to confirm deletion.`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: text.deleteTitle(name),
+      text: text.deleteConfirmText,
+      confirmText: text.deleteBtn,
+      cancelText: text.cancelBtn,
     });
 
     if (isConfirmed) {
@@ -464,26 +464,26 @@ function Page() {
         <ConfirmWithInput
           open={confirmDialogOpen}
           onClose={() => setConfirmDialogOpen(false)}
-          title={confirmDialogData?.mode === 'edit' ? 'Edit Price Type' : 'Add New Price Type'}
-          text="Fill in the price type details below."
-          confirmText="Confirm"
-          cancelText="Cancel"
-          placeholder="Type route name here"
+          title={confirmDialogData?.mode === 'edit' ? text.isEdit : text.isAdd}
+          text={text.inputText}
+          confirmText={text.confirmText}
+          cancelText={text.cancelBtn}
+          placeholder={text.inputPlaceholder}
           defaultValue={confirmDialogData?.name || ''}
-          label="Route Name"
+          label={text.label}
           onConfirm={handleTicketTypeConfirm}
         />
 
         <ConfirmWithInput
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
-          title={`Delete "${deleteDialogData?.name}"?`}
-          text="Please type the route name below to confirm deletion."
-          confirmText="Delete"
-          cancelText="Cancel"
-          placeholder="Type route name here"
+          title={isTH ? `ลบ "${deleteDialogData?.name}"?` : `Delete "${deleteDialogData?.name}"?`}
+          text={text.deleteConfirmText}
+          confirmText={text.deleteBtn}
+          cancelText={text.cancelBtn}
+          placeholder={text.inputPlaceholder}
           defaultValue=""
-          label="Route Name"
+          label={text.label}
           onConfirm={handleDeleteConfirm}
         />
       </div>

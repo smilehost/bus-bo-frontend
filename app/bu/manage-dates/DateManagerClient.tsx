@@ -16,13 +16,15 @@ import TableTemplate, {
 } from "@/app/components/Table/TableTemplate";
 import TableActionButton from "@/app/components/Table/TableActionButton/TableActionButton";
 import { SquarePen, Trash2 } from "lucide-react";
-import { getTextDateManagement, useLanguageContext } from "@/app/i18n/translations";
+import {
+  getTextDateManagement,
+  useLanguageContext,
+} from "@/app/i18n/translations";
 import FormFilter from "@/app/components/Filter/FormFilter";
 import { FILTER } from "@/constants/enum";
 import { statusOptions } from "@/constants/options";
 import { Tooltip } from "@mui/material";
 import StatusText from "@/app/components/StatusText";
-
 
 type DateTableProps = {
   no: number;
@@ -59,7 +61,7 @@ export default function DateManagerClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   const { isTH } = useLanguageContext();
-  const text = getTextDateManagement({isTH});
+  const text = getTextDateManagement({ isTH });
 
   const fetchDates = async () => {
     setIsLoading(true);
@@ -105,7 +107,9 @@ export default function DateManagerClient() {
     }
 
     if (statusFilter !== "" && statusFilter !== FILTER.ALL_STATUS) {
-      tempDates = tempDates.filter((date) => date.status === Number(statusFilter));
+      tempDates = tempDates.filter(
+        (date) => date.status === Number(statusFilter)
+      );
     }
 
     setFilteredDates(tempDates);
@@ -168,9 +172,7 @@ export default function DateManagerClient() {
 
     const isConfirmed = await Confirm({
       title: editingDate ? text.confirmTitleUpdate : text.confirmTitleCreate,
-      text: editingDate
-        ? text.confirmTextUpdate
-        : text.confirmTextCreate,
+      text: editingDate ? text.confirmTextUpdate : text.confirmTextCreate,
       confirmText: editingDate ? text.updateTitle : text.createTitle,
       cancelText: text.confirmTextCancel,
       type: "question",
@@ -323,13 +325,13 @@ export default function DateManagerClient() {
         row.status === 1 ? (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
             <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-            <span>{isTH ? "ใช้งาน" : "Active"}</span>
+            <span>Active</span>
           </span>
         ) : (
-          <Tooltip title={`${isTH ? "หมดอายุ" : "Expires on"} ${row.endDate}`}>
+          <Tooltip title={`Expires on ${row.endDate}`}>
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow-sm">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-              <span>{isTH ? "ไม่ใช้งาน" : "Inactive"}</span>
+              <span>Inactive</span>
             </span>
           </Tooltip>
         ),
