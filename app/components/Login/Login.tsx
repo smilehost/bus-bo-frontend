@@ -102,15 +102,15 @@ function Login() {
   
 
   return (
-    <div className="shadow-xl rounded-lg overflow-hidden">
-      <div className="flex flex-col justify-center items-center gap-4 custom-bg-main py-8 w-[448px] text-white">
+    <div className="shadow-xl rounded-lg overflow-hidden ">
+      <div className="flex flex-col justify-center items-center gap-4 custom-bg-main py-8 w-[330px] md:w-[448px] text-white">
         <div className="border-6 border-white rounded-full w-[64px] h-[64px] shadow-xl" />
         <div className="flex flex-col gap-2 items-center">
           <p className="font-bold text-xl">Bus Ticketing System</p>
           <p className="text-xs">Log in to access your account</p>
         </div>
       </div>
-      <form onSubmit={handleLogin} className="p-6 flex flex-col gap-8">
+      <form onSubmit={handleLogin} className="p-6 flex flex-col gap-5">
         <InputLabel
           label="Username"
           placeholder="Enter your username"
@@ -124,7 +124,7 @@ function Login() {
           type="password"
         />
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-        <div className="mt-2">
+        <div className="mt-5">
           <ButtonBG size={`w-[100%]`} text="Sign In" />
         </div>
       </form>

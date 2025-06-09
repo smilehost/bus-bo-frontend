@@ -98,7 +98,9 @@ function MemberModal({
   };
 
   useEffect(() => {
-    fetchCompanies();
+    if (isSuperAdmin) {
+      fetchCompanies();
+    }
   }, []);
 
   useEffect(() => {

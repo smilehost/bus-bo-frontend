@@ -16,7 +16,7 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
 
   const [search, setSearch] = useState<string>("");
   const { isTH } = useLanguageContext();
-  const text = getTextFormRoute({isTH});
+  const text = getTextFormRoute({ isTH });
 
   // Filtered display only (ไม่ใช้กับ setList)
   const filteredListA = useMemo(() => {
@@ -32,7 +32,7 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
     <div className={`flex gap-10 gap-y-20 justify-center lg:justify-between flex-wrap`}>
       {/* List A */}
       {!disable && (
-        <div className=" py-4 h-[350px] rounded-md w-[250px] lg:w-[350px] xl:w-[400px]">
+        <div className=" py-4 h-[350px] rounded-md w-[250px] lg:w-[350px] xl:w-[400px] ">
           <p className="text-center text-[12px] font-medium">{text.stList}</p>
           <div className='mt-3'>
             <input
@@ -42,10 +42,11 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className=' mt-4 overflow-y-scroll h-full'>
+          <div className=' mt-4 overflow-y-scroll h-full scrollbar'
+          >
             <ReactSortable
               list={filteredListA}
-              setList={() => {}} 
+              setList={() => { }}
               group={{ name: 'shared', pull: true, put: true }} // 👈 ใส่แบบนี้เหมือนกัน
               animation={200}
               className="min-h-36"
@@ -65,34 +66,35 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
       )}
 
       {/* List B */}
-      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg overflow-y-scroll" : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
+      <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg overflow-y-scroll " : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
         <p className="text-center text-[12px] font-medium">{text.stThis}</p>
-        <div className={`mt-5 h-[350px]`}>
+        <div className={`mt-5 h-[350px]`}
+        >
           <ReactSortable
             list={listB}
             setList={setListB}
             group={{ name: 'shared', pull: true, put: true }} // 👈 ใส่แบบนี้เหมือนกัน
             animation={200}
-            className={`${!disable && "h-full border rounded-lg border-gray-300 shadow p-3 overflow-y-scroll"} border"`}
+            className={`${!disable && "h-full border rounded-lg border-gray-300 shadow p-3 overflow-y-scroll scrollbar"} border"`}
             disabled={disable}
           >
             {listB.length > 0 ? (
               listB.map((item, index) => (
-                <div key={index} className='flex h-8'>
+                <div key={index} className='flex h-8 '>
                   <div className={`${listB.length - 1 === index && "rounded-bl-md"} ${0 === index && "rounded-tl-md border-t"} px-4 w-[30px] h-full flex justify-center items-center border-b  border-l ${disable ? "" : "bg-white"} border-[#D1D5DB] text-[12px] cursor-pointer`}>
                     {index + 1}
                   </div>
                   <div
                     className={`${listB.length - 1 === index && "rounded-br-md "} ${0 === index && "rounded-tr-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "" : "bg-white"} text-[12px] cursor-pointer flex items-center`}
                   >
-                    {item.name}
+                    <p className=' custom-ellipsis-style'> {item.name}</p>
                   </div>
                 </div>
               ))
 
             ) : (
-              <div className='flex justify-center items-center h-full text-gray-400 text-sm italic'>
-                {text.Drag}
+              <div className='flex justify-center items-center h-full text-gray-400 text-sm italic custom-ellipsis-style'>
+                <p className='custom-ellipsis-style'>{text.Drag}</p>
               </div>
             )}
           </ReactSortable>

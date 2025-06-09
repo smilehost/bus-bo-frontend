@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { XIcon, MenuIcon, LogOutIcon } from "lucide-react";
+import { XIcon, MenuIcon, LogOutIcon, Users } from "lucide-react";
 import MenuItemLink from "../components/Menu/MenuItem";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,7 +14,7 @@ import {
   Route,
   Clock,
   Calendar,
-  Users,
+  // Users,
   DollarSign,
   FileBarChart,
   Building,
@@ -99,7 +99,9 @@ export default function RootLayout({
     {
       group: menuText.users,
       items: [
-        { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", link: isSuperAdmin ? "manage-admin" : "manage-employee" },
+        // { id: 8, icon: Users, text: menuText.manageUser, href: "manage-members", as: isSuperAdmin ? "manage-admin" : "manage-employee", link: isSuperAdmin ? "manage-admin" : "manage-employee" },
+        { id: 8, icon: Users, text: menuText.manageUser, link: "manage-employee", },
+        { id: 12, icon: Users, text: menuText.manageUser, link: "manage-admin", },
         { id: 10, icon: Building, text: menuText.manageCompany, link: "manage-company", },
       ],
     },
@@ -115,7 +117,7 @@ export default function RootLayout({
     if (account_role === 2) {
       setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
     } else if (account_role === 1) {
-      setRoleMenu([1, 10, 8]);
+      setRoleMenu([1, 10, 12]);
     }
     // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
   }, [account_role]);
@@ -193,8 +195,8 @@ export default function RootLayout({
                           key={item.id}
                           text={item.text}
                           icon={item.icon}
-                          href={item.href ?? `/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
-                          as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
+                          href={`/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
+                          // as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
                         />
                       ))}
                     </div>

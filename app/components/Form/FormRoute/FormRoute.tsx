@@ -159,6 +159,7 @@ function FormRoute({
           <SelectInputUnified
             label={textFormRoute.scheduleLabel}
             value={schedule}
+
             onChange={handleChangeSchedule}
             data={dates}
             onAddClick={() => RedirecTo({ path: "manage-dates" })}

@@ -11,7 +11,6 @@ import { Alert } from "@/app/components/Dialog/Alert";
 import { debounce } from "@/utils/debounce";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import { useMemberStore } from "@/stores/memberStore";
-import { useCompanyStore } from "@/stores/companyStore";
 import { FILTER, USER_TIER } from "@/constants/enum";
 import { MemberItem } from "@/types/member";
 import TitlePage from "@/app/components/Title/TitlePage";
@@ -51,7 +50,6 @@ export default function MemberPageComponent({
     getMemberByComId,
     clearMember,
   } = useMemberStore();
-  const { companies, getCompanies } = useCompanyStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [searchStatus, setSearchStatus] = useState<string>(''); // Filter by status
@@ -89,7 +87,6 @@ export default function MemberPageComponent({
 
   useEffect(() => {
     fetchMembers();
-    getCompanies(1, 10);
 
     return () => {
       clearMember();
@@ -111,15 +108,11 @@ export default function MemberPageComponent({
         (m) => m.status === Number(searchStatus)
       );
     }
-    // if (searchCompany !== FILTER.ALL_COMPANIES) {
-    //   temp = temp.filter(
-    //     (m) => m.companyId?.toString() === searchCompany.toString()
-    //   );
-    // }
+  
     setFilteredMembers(temp);
     setTotalResults(temp.length);
     setCurrentPage(1);
-  }, [debouncedSearch, searchStatus, members, companies]);
+  }, [debouncedSearch, searchStatus, members]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -131,8 +124,8 @@ export default function MemberPageComponent({
     setCurrentPage(1);
   };
 
-  const getCompanyName = (id: string) =>
-    companies.find((c) => c.id.toString() === id)?.name || "-";
+  // const getCompanyName = (id: string) =>
+  //   companies.find((c) => c.id.toString() === id)?.name || "-";
 
   const handleCreateOrUpdate = async (data: {
     id?: string;
@@ -385,7 +378,6 @@ export default function MemberPageComponent({
     },
   ];
 
-  // console.log("paginatedCompaniesWithNo: ", paginatedCompaniesWithNo)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <ToastContainer />
@@ -426,6 +418,7 @@ export default function MemberPageComponent({
                 currentPage={currentPage}
                 rowsPerPage={rowsPerPage}
                 totalResults={totalResults}
+                totalPages={Math.ceil(totalResults / rowsPerPage)}
                 onPageChange={setCurrentPage}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 rowKey={(row) => row.id}

@@ -44,7 +44,7 @@ type DecodedToken = {
 export default function ManageCompaniesPage() {
   const {
     companies,
-    isLoading,
+    // isLoading,
     getCompanies,
     createCompany,
     updateCompany,
@@ -339,6 +339,7 @@ export default function ManageCompaniesPage() {
       ),
     },
   ];
+  // console.log(rowsPerPage)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">

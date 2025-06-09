@@ -4,7 +4,7 @@ import Image from 'next/image';
 import LabelText from '@/app/components/Form/LabelText';
 
 //icon
-import { Clock } from 'lucide-react';
+import { Clock, Clover } from 'lucide-react';
 
 interface UnifiedSelectItem {
   id: number;
@@ -45,18 +45,23 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
             renderValue={
               withRenderValue
                 ? () => {
-                  if (!value) return;
-                  const selectedItem = data.find((item) => item.id === parseInt(value));
-                  const timeString = selectedItem?.schedule?.join(', ') || '';
+                  const selectedItem = data.find((item) => item.id === parseInt(value || ""));
+                  if (!selectedItem) return <p className="text-[13px] text-gray-400">No selection</p>;
+                  const timeString = selectedItem.schedule?.join(", ") || "";
                   return (
-                    <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64"
-
-                    >
-                      {selectedItem?.name} {timeString}
+                    <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64">
+                      {selectedItem.name} {timeString}
                     </p>
                   );
                 }
-                : undefined
+                : () => {
+                  const selectedItem = data.find((item) => item.id === parseInt(value || ""));
+                  return selectedItem ? (
+                    <p className="text-[13px]">{selectedItem.name}</p>
+                  ) : (
+                    <p className="text-[13px] text-gray-400">No selection</p>
+                  );
+                }
             }
             startAdornment={
               withStartAdornment && (
