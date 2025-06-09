@@ -44,6 +44,11 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
             />
           </div>
           <div className=' mt-4 overflow-y-scroll h-full scrollbar'
+            style={{
+              overflowY: 'scroll',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'auto',
+            }}
           >
             <ReactSortable
               list={filteredListA}
@@ -71,6 +76,7 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
       <div className={` py-4 rounded-md ${disable ? "w-full custom-disable-bg overflow-y-scroll " : "w-[250px] lg:w-[350px] xl:w-[400px]"}`}>
         <p className="text-center text-[12px] font-medium">{text.stThis}</p>
         <div className={`mt-5 h-[350px]`}
+
         >
           <ReactSortable
             list={listB}
@@ -79,6 +85,11 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
             animation={200}
             className={`${!disable && "h-full border rounded-lg border-gray-300 shadow p-3 overflow-y-scroll scrollbar"} border"`}
             disabled={disable}
+            style={{
+              overflowY: 'scroll',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'auto',
+            }}
           >
             {listB.length > 0 ? (
               listB.map((item, index) => (
