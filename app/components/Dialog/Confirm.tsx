@@ -24,7 +24,7 @@ export async function Confirm({
     showCancelButton: true,
     confirmButtonText: confirmText,
     cancelButtonText: cancelText,
-    reverseButtons: false,
+    reverseButtons: true,
     customClass: {
       confirmButton: "swal2-confirm-btn mx-2 cursor-pointer",
       cancelButton: "swal2-cancel-btn mx-2 cursor-pointer",

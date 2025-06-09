@@ -3,6 +3,7 @@ import { ReactSortable } from 'react-sortablejs';
 import { Dispatch, SetStateAction } from 'react';
 import { LocationItem } from '@/types/location';
 import { getTextFormRoute, useLanguageContext } from '@/app/i18n/translations';
+import { Tooltip } from '@mui/material';
 
 type DragDropProps = {
   listA: LocationItem[],
@@ -52,13 +53,14 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
               className="min-h-36"
             >
               {filteredListA.map((item, index) => (
-                <div
-                  key={item.id || index}
-                  className={`${filteredListA.length - 1 === index && "rounded-b-md"
-                    } ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style border-b border-r border-l w-full px-4 py-1 border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
-                >
-                  {item.name}
-                </div>
+                <Tooltip title={item.name} key={item.id || index}>
+                  <div
+                    className={`${filteredListA.length - 1 === index && "rounded-b-md"
+                      } ${0 === index && "rounded-t-md border-t"} custom-ellipsis-style border-b border-r border-l w-full px-4 py-1 border-[#D1D5DB] bg-white text-[12px] cursor-pointer`}
+                  >
+                    {item.name}
+                  </div>
+                </Tooltip>
               ))}
             </ReactSortable>
           </div>
@@ -84,11 +86,13 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
                   <div className={`${listB.length - 1 === index && "rounded-bl-md"} ${0 === index && "rounded-tl-md border-t"} px-4 w-[30px] h-full flex justify-center items-center border-b  border-l ${disable ? "" : "bg-white"} border-[#D1D5DB] text-[12px] cursor-pointer`}>
                     {index + 1}
                   </div>
-                  <div
-                    className={`${listB.length - 1 === index && "rounded-br-md "} ${0 === index && "rounded-tr-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "" : "bg-white"} text-[12px] cursor-pointer flex items-center`}
-                  >
-                    <p className=' custom-ellipsis-style'> {item.name}</p>
-                  </div>
+                  <Tooltip title={item.name}>
+                    <div
+                      className={`${listB.length - 1 === index && "rounded-br-md "} ${0 === index && "rounded-tr-md border-t"} custom-ellipsis-style  border-b border-r border-l w-full px-4 py-1  border-[#D1D5DB] ${disable ? "" : "bg-white"} text-[12px] cursor-pointer flex items-center`}
+                    >
+                      <p className=' custom-ellipsis-style'> {item.name}</p>
+                    </div>
+                  </Tooltip>
                 </div>
               ))
 

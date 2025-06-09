@@ -4,7 +4,7 @@ import Image from 'next/image';
 import LabelText from '@/app/components/Form/LabelText';
 
 //icon
-import { Clock, Clover } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 interface UnifiedSelectItem {
   id: number;
@@ -49,15 +49,20 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
                   if (!selectedItem) return <p className="text-[13px] text-gray-400">No selection</p>;
                   const timeString = selectedItem.schedule?.join(", ") || "";
                   return (
-                    <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64">
-                      {selectedItem.name} {timeString}
-                    </p>
+                    <Tooltip title={`${selectedItem.name} ${timeString}`}>
+                      <p className="text-[13px] custom-ellipsis-style w-40 lg:w-64">
+                        {selectedItem.name} {timeString}
+                      </p>
+                    </Tooltip>
                   );
                 }
                 : () => {
                   const selectedItem = data.find((item) => item.id === parseInt(value || ""));
                   return selectedItem ? (
-                    <p className="text-[13px]">{selectedItem.name}</p>
+                    <Tooltip title={`${selectedItem.name}`}>
+                      <p className="text-[13px]">{selectedItem.name}</p>
+                    </Tooltip>
+
                   ) : (
                     <p className="text-[13px] text-gray-400">No selection</p>
                   );
@@ -80,11 +85,13 @@ const SelectInputUnified: React.FC<UnifiedSelectProps> = ({
           >
             {data.map((item) => (
               <MenuItem value={item.id} key={item.id}>
-                <div className="flex justify-between custom-ellipsis-style  w-64 lg:w-72">
-                  <p className="text-[13px] custom-ellipsis-style">
-                    {item.name} {item.schedule?.join(', ')}
-                  </p>
-                </div>
+                <Tooltip title={`${item.name} ${item.schedule ? item.schedule?.join(', ') : ""}`}>
+                  <div className="flex justify-between custom-ellipsis-style  w-64 lg:w-72">
+                    <p className="text-[13px] custom-ellipsis-style">
+                      {item.name} {item.schedule?.join(', ')}
+                    </p>
+                  </div>
+                </Tooltip>
               </MenuItem>
             ))}
           </Select>
