@@ -77,18 +77,28 @@ export default function CompanyModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Prefix
             </label>
-            <input
-              type="text"
-              disabled={editingCompany ? true : false}
-              value={prefix}
-              onChange={(e) => {
-                const onlyEnglishLetters = e.target.value.replace(/[^a-zA-Z]/g, '').slice(0, 5);;
-                setPrefix(onlyEnglishLetters);
-              }}
-              placeholder="Enter Company prefix (e.g. BST)"
-              className={`${editingCompany && "bg-gray-200"
-                } w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400`}
-            />
+            {editingCompany ? (
+              <div
+                className={`${editingCompany && "bg-gray-200"
+                  } w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400`}
+              >
+                {prefix}
+              </div>
+            ) : (
+              <input
+                type="text"
+                disabled={editingCompany ? true : false}
+                value={prefix}
+                onChange={(e) => {
+                  const onlyEnglishLetters = e.target.value.replace(/[^a-zA-Z]/g, '').slice(0, 5);;
+                  setPrefix(onlyEnglishLetters);
+                }}
+                placeholder="Enter Company prefix (e.g. BST)"
+                className={`${editingCompany && "bg-gray-200"
+                  } w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400`}
+              />
+            )}
+
           </div>
 
           <div>

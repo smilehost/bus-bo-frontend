@@ -49,12 +49,12 @@ export const MemberService = {
     });
   },
 
-  async changePassword(userId: string, newPassword: string) {
+  async changePassword(userId: number, newPassword: string) {
     return await api.post({
-      path: "api/auth/changepassword",
+      path: "/auth/changepassword",
       body: {
-        userId: parseInt(userId),
-        newPassword,
+        userId: Number(userId),
+        newPassword: newPassword,
       },
     });
   },

@@ -45,7 +45,7 @@ body {
 }
 
 .custom-disable-bg {
-  @apply bg-gray-100
+  @apply bg-gray-200
 }
 /* 🎯 เพิ่ม Animation Fade-In-Up (แบบเดียวกับที่ทำให้ Table Animate) */
 @keyframes fadeInUp {

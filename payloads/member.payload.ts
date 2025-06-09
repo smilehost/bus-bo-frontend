@@ -17,6 +17,7 @@ export interface CreateMemberPayload {
 export interface UpdateMemberPayload {
   account_id: number;
   account_name: string;
+  account_username?: string;
 }
 
 export interface UpdateMemberStatusPayload {

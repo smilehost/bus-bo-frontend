@@ -28,7 +28,7 @@ interface MemberStore {
   updateMember: (id: string, member: Partial<MemberItem>) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
   getMemberById: (id: string) => Promise<MemberItem | undefined>;
-  changePassword: (userId: string, newPassword: string) => Promise<void>;
+  changePassword: (userId: number, newPassword: string) => Promise<void>;
   changeStatus: (userId: string, newStatus: number) => Promise<void>; // ✅ เพิ่มเมธอด
   clearMember: () => void;
 }
@@ -103,6 +103,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
     const payload: UpdateMemberPayload = {
       account_id: parseInt(id, 10),
       account_name: member.name!,
+      // account_username: member.username,
     };
     await MemberService.updateMember(id, payload);
   },
@@ -129,7 +130,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
     }
   },
 
-  changePassword: async (userId: string, newPassword: string) => {
+  changePassword: async (userId: number, newPassword: string) => {
     try {
       await MemberService.changePassword(userId, newPassword);
     } catch (error) {

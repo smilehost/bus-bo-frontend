@@ -55,18 +55,18 @@ instance.interceptors.response.use(
     if (code === 20000 || code === 10011 || code === 22006) {
       console.warn("Token expired or unauthorized!", response.data);
       // localStorage.clear();
-      if (process.env.NODE_ENV !== "development") {
-        window.location.href = CONTEXT_PATH;
-      }
+      // if (process.env.NODE_ENV !== "development") {
+      //   window.location.href = CONTEXT_PATH;
+      // }
     }
     return response;
   },
   (error) => {
     console.error("API Error:", error);
     // localStorage.clear();
-    if (process.env.NODE_ENV !== "development") {
-      window.location.href = CONTEXT_PATH;
-    }
+    // if (process.env.NODE_ENV !== "development") {
+    //   window.location.href = CONTEXT_PATH;
+    // }
     return Promise.reject(error);
   }
 );

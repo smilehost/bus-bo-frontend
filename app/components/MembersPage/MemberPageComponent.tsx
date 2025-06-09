@@ -19,8 +19,8 @@ import StatusText from "@/app/components/StatusText";
 import TableTemplate, {
   ColumnConfig,
 } from "@/app/components/Table/TableTemplate";
-import { ToastContainer } from "react-toastify";
-import { Eye, Lock } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import { Eye, Lock, RotateCcwKey } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
 import FormFilter from "../Filter/FormFilter";
 import { statusOptions } from "@/constants/options";
@@ -234,8 +234,14 @@ export default function MemberPageComponent({
 
     if (!isConfirmed) return;
 
+    // console.log("userId: ", userId)
+    // console.log("newPassword: ", newPassword)
+    if(newPassword.length < 8){
+      toast.error("invalid password, must be at least 8 characters");
+      return;
+    }
     try {
-      await useMemberStore.getState().changePassword(userId, newPassword);
+      await useMemberStore.getState().changePassword(Number(userId), newPassword);
       await Alert({
         title: text.alertUpdatedTitle,
         text: text.alertPasswordText,
@@ -348,7 +354,7 @@ export default function MemberPageComponent({
           <TableActionButton
             onClick={() => onEditPassword(row.id)}
             icon={
-              <Lock className={`custom-size-tableAction-btn text-yellow-700`} />
+              <RotateCcwKey className={`custom-size-tableAction-btn text-yellow-700`} />
             }
             bgColor="bg-yellow-100 text-yellow-400"
             hoverColor="hover:bg-yellow-100"

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import Image from "next/image";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,7 +10,6 @@ import InputLabel from "../Form/InputLabel";
 import TitleModel from "../Title/TitleModel";
 import ButtonBG from "../Form/ButtonBG";
 import ButtonDefault from "../Form/ButtonDefault";
-import { EyeIcon } from "../Icons/EyeIcon";
 
 //utils
 import { createSecurePassword } from "@/utils/generatePassword";
@@ -20,11 +18,11 @@ import LabelText from "../Form/LabelText";
 //store
 import { useUserStore } from "@/stores/userStore";
 import { useCompanyStore } from "@/stores/companyStore";
-import { CopyIcon } from "../Icons/CopyIcon";
 import { CompanyItem } from "@/types/company";
 import { getTextManageUserPage, useLanguageContext } from "@/app/i18n/translations";
 import { store } from "@/stores/store";
 import { USER_TIER } from "@/constants/enum";
+import InputPassword from "../Form/InputPassword";
 
 type CompanyOption = {
   value: string;
@@ -91,7 +89,7 @@ function MemberModal({
 
   const isEditing = !!editingMember;
 
-  const roleOptions = account_role === "1" ? [{ value: "2", label: USER_TIER.ADMIN }] : [{ value: "3", label: USER_TIER.SALESMAN }];
+  const roleOptions = account_role === "1" ? [{ value: "2", label: USER_TIER.ADMIN }, { value: "3", label: USER_TIER.SALESMAN }] : [{ value: "3", label: USER_TIER.SALESMAN }];
 
   const fetchCompanies = async () => {
     await getCompanies(1, 999, "");
@@ -131,7 +129,7 @@ function MemberModal({
   useEffect(() => {
     if (isEditing && editingMember) {
       setName(editingMember.name);
-      setUsername(editingMember.username);
+      setUsername(editingMember?.username);
       setRole(editingMember.role);
       setCompanyId(editingMember.companyId);
       setPassword("");
@@ -162,14 +160,14 @@ function MemberModal({
       ? {
         id: editingMember?.id,
         name,
-        username: `${company?.prefix}-${editingMember?.username}` || "",
+        username: `${username}` || "",
         role: editingMember?.role || "3",
         companyId: Number(account_role) === 1 ? editingMember?.companyId : com_id.toString(),
         status: editingMember?.status,
       }
       : {
         name,
-        username: `${company?.prefix}-${username}` || "",
+        username: `${username}` || "",
         password,
         companyId: Number(account_role) === 2 && com_id.toString() || companyId,
         role: role,
@@ -242,108 +240,103 @@ function MemberModal({
               <LabelText text={text.userName} />
               <div className="flex gap-2">
                 <div
-                  className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] flex justify-center items-center`}
+                  className={`custom-disable-bg h-[38px] px-5 rounded-md custom-border-gray text-[14px] flex justify-center items-center`}
                 >
                   {company?.prefix}
                 </div>
-                <input
-                  value={username}
-                  type={"text"}
-                  placeholder={text.enterUser}
-                  className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] w-full`}
-                  onChange={(e) => {
-                    const input = e.target.value;
-                    const englishOnly = input.replace(/[^a-zA-Z0-9]/g, ''); // กรองให้เหลือแค่ a-z, A-Z, 0-9
-                    setUsername(englishOnly);
-                  }}
-                />
+                <div
+                  className={` flex justify-center items-center`}
+                >
+                  <p className="">-</p>
+                </div>
+                {isEditing ? (
+                  <div
+                    className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] w-full flex items-center custom-disable-bg`}
+                  >{username.split("-")[1] || ""}
+                  </div>
+                ) : (
+                  <input
+                    value={username.split("-")[1] || ""}
+                    type={"text"}
+                    placeholder={text.enterUser}
+                    className={`h-[38px] px-5 rounded-md custom-border-gray text-[14px] w-full`}
+                    onChange={(e) => {
+                      const input = e.target.value;
+                      const englishOnly = input.replace(/[^a-zA-Z0-9]/g, '');
+                      const prefix = username.split("-")[0] || company?.prefix; // ดึง prefix เดิม หรือ fallback เป็น 'prefix'
+                      setUsername(`${prefix}-${englishOnly}`);
+                    }}
+                  />
+                )}
               </div>
             </div>
 
             {!isEditing && (
-              <div className="relative">
-                <InputLabel
-                  label={
-                    <div className="flex justify-between">
-                      <p>{text.passWord}</p>
-                      <div
-                        className=""
-                        onClick={() => {
-                          genPassword(8);
-                        }}
-                      >
-                        <p className="" style={{ fontSize: "14px" }}>
-                          {text.genPassword}
-                        </p>
-                      </div>
-                    </div>
-                  }
-                  placeholder={text.enterPass}
-                  type={typePassword ? "password" : "text"}
-                  value={password}
-                  setValue={setPassword}
-                  autoComplete="new-password"
-                />
-                <div className="absolute bottom-2 right-4 flex gap-2 items-center">
-                  <button
-                    type="button"
-                    onClick={handleOpenPassword}
-                    className="text-gray-500 hover:text-blue-500 transition-colors"
-                  >
-                    <EyeIcon visible={typePassword} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={copyPassword}
-                    className={`${isCopy ? "text-green-600" : "text-gray-500"
-                      } hover:text-green-700 transition-colors`}
-                  >
-                    <CopyIcon copied={isCopy} />
-                  </button>
-                </div>
-              </div>
+              <InputPassword
+                label={text.passWord}
+                placeholder={text.enterPass}
+                value={password}
+                setValue={setPassword}
+                onGenerate={() => genPassword(8)}
+                generateLabel={text.genPassword}
+              />
             )}
             {account_role === "1" && (
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-700">
                   {text.com}
                 </label>
-                <select
-                  disabled={isEditing}
-                  className={`${isEditing && "bg-gray-200"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
-                  value={companyId}
-                  onChange={(e) => setCompanyId(e.target.value)}
-                >
-                  {companyOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      disabled={option.value === ""}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                {isEditing ? (
+                  <div
+                    className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                  >
+                    {companyOptions.find((item) => item.value === companyId)?.label || text.seCom}
+                  </div>
+                ) : (
+                  <select
+                    disabled={isEditing}
+                    className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                    value={companyId}
+                    onChange={(e) => setCompanyId(e.target.value)}
+                  >
+                    {companyOptions.map((option) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        disabled={option.value === ""}
+                      >
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             )}
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">{text.role}</label>
-              <select
-                disabled={isEditing}
-                className={`${isEditing && "bg-gray-200"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value={""}>
-                  Select Role
-                </option>
-                {roleOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+              {isEditing ? (
+                <div className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}>
+                  {roleOptions.find((item) => item.value === role)?.label}
+                </div>
+              ) : (
+                <select
+                  disabled={isEditing}
+                  className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  <option value={""}>
+                    Select Role
                   </option>
-                ))}
-              </select>
+                  {roleOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+
             </div>
           </div>
 
