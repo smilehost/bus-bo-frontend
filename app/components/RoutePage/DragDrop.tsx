@@ -75,7 +75,8 @@ function DragDrop({ listA, listB, setListB, disable = false }: DragDropProps) {
                   </Tooltip>
                 ))
               ) : (
-                <p className="italic text-center text-gray-400 py-4">{"No Data"}</p>
+                // <p className="italic text-center text-gray-400 py-4">{"No Data"}</p>
+                <></>
               )}
             </ReactSortable>
           </div>

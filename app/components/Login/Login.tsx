@@ -7,6 +7,7 @@ import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { Alert } from "@/app/components/Dialog/Alert";
+import Image from "next/image";
 
 type DecodedToken = {
   account_id: number;
@@ -53,12 +54,12 @@ function Login() {
           withCredentials: true,
         }
       );
-  
+
       const authHeader = response.headers["authorization"];
       if (authHeader?.startsWith("Bearer ")) {
         const token = authHeader.split(" ")[1].trim();
         store.token.set(token);
-  
+
         const decoded = jwtDecode<DecodedToken>(token);
         store.com_id.set(decoded.com_id);
         store.account_id.set(decoded.account_id);
@@ -66,7 +67,7 @@ function Login() {
         store.account_name.set(response.data.result.account_name);
         store.account_username.set(response.data.result.account_username);
         store.Translation.set("EN");
-  
+
         // ✅ ถ้าเป็น SuperAdmin → ดึง com_id ทั้งหมด
         // if (decoded.account_role === "2") {
         //   try {
@@ -76,20 +77,20 @@ function Login() {
         //       },
         //       withCredentials: true,
         //     });
-  
+
         //     const comIds = res.data.result.map((company: any) => company.com_id);
         //     localStorage.setItem("comidSuper", JSON.stringify(comIds));
         //   } catch (err) {
         //     console.error("Failed to fetch companies for SuperAdmin:", err);
         //   }
         // }
-  
+
         await Alert({
           title: "Login Success!",
           text: "The system will take you to the website.",
           type: "success",
         });
-  
+
         router.replace("/bu/dashboard");
       } else {
         setError("Login failed: No token received");
@@ -99,12 +100,21 @@ function Login() {
       console.error("Login error:", err);
     }
   };
-  
+
 
   return (
     <div className="shadow-xl rounded-lg overflow-hidden ">
       <div className="flex flex-col justify-center items-center gap-4 custom-bg-main py-8 w-[330px] md:w-[448px] text-white">
-        <div className="border-6 border-white rounded-full w-[64px] h-[64px] shadow-xl" />
+        <div className=" rounded-full w-[64px] h-[64px] shadow-lg flex justify-center items-center bg-[#eab308] p-10" >
+          <Image
+            width={1000}
+            height={1000}
+            priority
+            alt="logo"
+            src={"/bus.png"}
+            className="h-12 min-w-12 border "
+          />
+        </div>
         <div className="flex flex-col gap-2 items-center">
           <p className="font-bold text-xl">Bus Ticketing System</p>
           <p className="text-xs">Log in to access your account</p>
