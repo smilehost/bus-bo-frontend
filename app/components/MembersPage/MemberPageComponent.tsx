@@ -20,7 +20,7 @@ import TableTemplate, {
   ColumnConfig,
 } from "@/app/components/Table/TableTemplate";
 import { toast, ToastContainer } from "react-toastify";
-import { Eye, Lock, RotateCcwKey } from "lucide-react";
+import { Eye, RotateCcwKey } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
 import FormFilter from "../Filter/FormFilter";
 import { statusOptions } from "@/constants/options";
@@ -268,7 +268,7 @@ export default function MemberPageComponent({
       username: m.username,
       role: m.role,
       status: m.status,
-      company: "",
+      // company: "",
       com_id: m.com_id,
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);
@@ -323,9 +323,9 @@ export default function MemberPageComponent({
     {
       key: 'username', label: text.userName, width: '20%',
     },
-    {
-      key: 'company', label: text.com, width: '20%',
-    },
+    // {
+    //   key: 'company', label: text.com, width: '20%',
+    // },
     {
       key: 'role', label: text.role, width: '20%',
       render: (_, row) => (
