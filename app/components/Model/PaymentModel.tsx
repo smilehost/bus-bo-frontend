@@ -32,7 +32,7 @@ export default function PaymentModel({
   }, [editing]);
 
   const handleSave = () => {
-    if (!name.trim() || !url) {
+    if (!name.trim()) {
       toast.error("Please enter all input.");
       return;
     }
@@ -62,7 +62,7 @@ export default function PaymentModel({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter Company name"
+              placeholder="Enter Payment Name"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
@@ -74,7 +74,7 @@ export default function PaymentModel({
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter Company name"
+              placeholder="Enter Payment Url"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
