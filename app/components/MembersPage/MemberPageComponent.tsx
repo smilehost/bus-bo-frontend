@@ -154,7 +154,7 @@ export default function MemberPageComponent({
 
       if (data.id) {
         await updateMember(data.id, {
-          ...data,
+          name: data.name,
           com_id: Number(data.companyId),
         } as MemberItem);
         await Alert({

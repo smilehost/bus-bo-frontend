@@ -1,5 +1,5 @@
 
-import ManagePaymentMethodPage from "@/app/bu/manage-company/manage-payment-method/ManagePaymentMethodPage";
+import ManagePaymentMethodPage from "@/app/components/ManagePaymentMethodPage/ManagePaymentMethodPage";
 import React from "react";
 
 function Page() {

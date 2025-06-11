@@ -76,7 +76,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
         com_id
       };
       const res = await MemberService.fetchMemberByComId(query);
-      const rawData = (res as { result: any[] })?.newResult || [];
+      const rawData = (res as { newResult: any[] })?.newResult || [];
       const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData?.length;
 
       const mapped: MemberItem[] = rawData.map((item: any) => ({
@@ -125,6 +125,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
         role: item.account_role,
         status: item.account_status,
         com_id: item.account_com_id,
+        company: item.company
       };
     } catch (error) {
       console.error("getMemberById error:", error);
