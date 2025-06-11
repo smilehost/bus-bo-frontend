@@ -243,7 +243,7 @@ function ManagePaymentMethodPage() {
   const handleDelete = async (id: number) => {
     const isConfirmed = await Confirm({
       title: "Confirm Delete",
-      text: "Are you sure you want to delete this company?",
+      text: "Are you sure you want to delete this payment?",
       confirmText: "Delete",
       cancelText: "Cancel",
       type: "warning",
