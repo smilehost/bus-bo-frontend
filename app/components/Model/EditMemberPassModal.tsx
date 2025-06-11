@@ -56,7 +56,7 @@ function EditPasswordModel({
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
 
-        <div className="w-[400px] py-4">
+        <div className="w-[400px] ">
           <h3 className="text-lg font-medium text-gray-800">Edit Password</h3>
           <div className="mt-4">
             <InputPassword
@@ -66,6 +66,7 @@ function EditPasswordModel({
               setValue={setPassword}
               onGenerate={() => genPassword(8)}
               generateLabel={text.genPassword}
+              warring="Please specify length greater than 8."
             />
           </div>
           {/* <div className="mt-4">

@@ -154,7 +154,7 @@ export default function MemberPageComponent({
 
       if (data.id) {
         await updateMember(data.id, {
-          ...data,
+          name: data.name,
           com_id: Number(data.companyId),
         } as MemberItem);
         await Alert({
@@ -268,7 +268,7 @@ export default function MemberPageComponent({
       username: m.username,
       role: m.role,
       status: m.status,
-      // company: "",
+      company: m?.company?.com_name,
       com_id: m.com_id,
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);
@@ -323,9 +323,9 @@ export default function MemberPageComponent({
     {
       key: 'username', label: text.userName, width: '20%',
     },
-    // {
-    //   key: 'company', label: text.com, width: '20%',
-    // },
+    {
+      key: 'company', label: text.com, width: '20%',
+    },
     {
       key: 'role', label: text.role, width: '20%',
       render: (_, row) => (

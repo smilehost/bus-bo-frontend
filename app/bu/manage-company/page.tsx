@@ -326,7 +326,7 @@ export default function ManageCompaniesPage() {
           />
           <TableActionButton
             // href={`${pathName}/manage-payment-method?comId=${row.id}&name=${row.name}`}
-            href={`${pathName}/manage-payment-method`}
+            href={`${pathName}/manage-payment-method?comId=${row.id}&name=${row.name}`}
             icon={<HandCoins  className={`custom-size-tableAction-btn text-green-600`} />}
             bgColor="bg-green-50 text-green-600"
             hoverColor="hover:bg-green-100"

@@ -2,6 +2,7 @@ import { useState } from "react";
 import InputLabel from "./InputLabel"; // ปรับ path ให้ตรงกับโปรเจกต์คุณ
 import { EyeIcon } from "../Icons/EyeIcon";
 import { CopyIcon } from "../Icons/CopyIcon";
+import TextError from "../TextError";
 
 
 type PasswordInputProps = {
@@ -12,6 +13,7 @@ type PasswordInputProps = {
   onGenerate?: () => void;
   autoComplete?: string;
   generateLabel?: string;
+  warring?: string;
 };
 
 export default function PasswordInput({
@@ -22,6 +24,8 @@ export default function PasswordInput({
   onGenerate,
   autoComplete = "new-password",
   generateLabel = "Generate",
+  warring
+
 }: PasswordInputProps) {
   const [typePassword, setTypePassword] = useState(true);
   const [isCopy, setIsCopy] = useState(false);
@@ -57,6 +61,11 @@ export default function PasswordInput({
         setValue={setValue}
         autoComplete={autoComplete}
       />
+      {warring && (
+        <div className=" float-start mt-1">
+          <TextError text={warring} />
+        </div>
+      )}
 
       <div className="absolute bottom-2 right-4 flex gap-2 items-center">
         <button

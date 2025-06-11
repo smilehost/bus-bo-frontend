@@ -12,10 +12,12 @@ interface TimeState {
     getTimes: (page: number, size: number, search?: string) => Promise<void>;
     createTime: (name: string, schedule: string[]) => Promise<void>;
     updateTime: (id: number, name: string, schedule: string[]) => Promise<void>;
-    deleteTime: (id: number) => Promise<void>;
+    deleteTime: (
+        id: number,
+    ) => Promise<{ success: boolean; message?: string }>;
     getTimeById: (id: number) => Promise<TimeItem | undefined>;
 }
-const  com_id  = getComId();
+const com_id = getComId();
 
 export const useTimeStore = create<TimeState>((set) => ({
     times: [],
@@ -76,11 +78,14 @@ export const useTimeStore = create<TimeState>((set) => ({
         }
     },
 
-    deleteTime: async (id) => {
+    deleteTime: async (id): Promise<{ success: boolean; message?: string }> => {
         try {
             await TimeService.deleteTime(id);
+            return { success: true };
+
         } catch (error) {
             console.error("deleteTime error:", error);
+            return { success: false };
         }
     },
 
