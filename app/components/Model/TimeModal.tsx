@@ -192,7 +192,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
     });
 
     setShowHint(false);
-    toast.success("Time slot added successfully!");
+    // toast.success("Time slot added successfully!");
   };
 
   const formatTimeDisplay = (time: string) => {
@@ -317,7 +317,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                             const newTimes = [...newTime.times];
                             newTimes.splice(index, 1);
                             setNewTime({ ...newTime, times: newTimes });
-                            toast.info("Time slot removed");
+                            // toast.info("Time slot removed");
                           }}
                           className="ml-2 text-orange-400 hover:text-red-600 transition-colors cursor-pointer"
                         >
