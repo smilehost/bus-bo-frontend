@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 // import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Model/TimeModal";
-import SearchFilter from "@/app/components/SearchFilter/TimeSearchFilter";
 import { useTimeStore } from "@/stores/timeStore";
 import { debounce } from "@/utils/debounce";
 import SkeletonManageTime from "@/app/components/Skeleton/SkeletonManageTime";
@@ -11,7 +10,7 @@ import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
 import { withSkeletonDelay } from "@/app/components/Skeleton/withSkeletonDelay";
 import TitlePage from "@/app/components/Title/TitlePage";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import TableTemplate, {
   ColumnConfig,
 } from "@/app/components/Table/TableTemplate";
@@ -57,7 +56,7 @@ function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   const { isTH } = useLanguageContext();
-  const text = getTextTimes({isTH});
+  const text = getTextTimes({ isTH });
 
   const fetchTimes = async () => {
     setIsLoading(true);
@@ -175,22 +174,13 @@ function Page() {
 
     if (!isConfirmed) return;
 
-    try {
-      await deleteTime(id);
-      await Alert({
-        title: text.deletedTitle,
-        text: text.deletedText,
-        type: "success",
-      });
-      fetchTimes();
-    } catch (error) {
-      console.error("Delete Time error:", error);
-      await Alert({
-        title: text.errorTitle,
-        text: text.deleteFailText,
-        type: "error",
-      });
-    }
+    const result = await deleteTime(id);
+      if (result.success) {
+        fetchTimes();
+        toast.success(`${text.deletedText}`);
+      } else {
+        toast.error(`${text.errorText}`);
+      }
   };
 
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -331,10 +321,10 @@ function Page() {
           editingTime={
             editingTime
               ? {
-                  ...editingTime,
-                  startTime: editingTime.startTime || "",
-                  times: editingTime.times || [],
-                }
+                ...editingTime,
+                startTime: editingTime.startTime || "",
+                times: editingTime.times || [],
+              }
               : undefined
           }
         />

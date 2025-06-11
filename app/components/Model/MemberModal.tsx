@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "@mui/material";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams } from "next/navigation";
 
 //component
 import InputLabel from "../Form/InputLabel";
@@ -66,6 +67,8 @@ function MemberModal({
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([
     { value: "", label: "Select a company" },
   ]);
+  const searchParams = useSearchParams()
+  const comId = searchParams.get("comId")
 
   //store
   const { userData } = useUserStore();
@@ -282,35 +285,48 @@ function MemberModal({
               />
             )}
             {account_role === "1" && (
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">
-                  {text.com}
-                </label>
-                {isEditing ? (
+              comId ? (
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    {text.com}
+                  </label>
                   <div
-                    className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                    className={`custom-disable-bg  w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
                   >
-                    {companyOptions.find((item) => item.value === companyId)?.label || text.seCom}
+                    {companyOptions.find((item) => item.value === comId)?.label}
                   </div>
-                ) : (
-                  <select
-                    disabled={isEditing}
-                    className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
-                    value={companyId}
-                    onChange={(e) => setCompanyId(e.target.value)}
-                  >
-                    {companyOptions.map((option) => (
-                      <option
-                        key={option.value}
-                        value={option.value}
-                        disabled={option.value === ""}
-                      >
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    {text.com}
+                  </label>
+                  {isEditing ? (
+                    <div
+                      className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                    >
+                      {companyOptions.find((item) => item.value === companyId)?.label || text.seCom}
+                    </div>
+                  ) : (
+                    <select
+                      disabled={isEditing}
+                      className={`${isEditing && "custom-disable-bg"} w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500`}
+                      value={companyId}
+                      onChange={(e) => setCompanyId(e.target.value)}
+                    >
+                      {companyOptions.map((option) => (
+                        <option
+                          key={option.value}
+                          value={option.value}
+                          disabled={option.value === ""}
+                        >
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )
             )}
 
             <div className="flex flex-col gap-2">
@@ -362,8 +378,8 @@ function MemberModal({
             />
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DialogContent >
+    </Dialog >
   );
 }
 

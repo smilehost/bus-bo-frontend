@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import InputPassword from "../Form/InputPassword";
+import { createSecurePassword } from "@/utils/generatePassword";
+import ButtonDefault from "../Form/ButtonDefault";
+import ButtonBG from "../Form/ButtonBG";
 
 type Props = {
   isOpen: boolean;
@@ -9,13 +13,35 @@ type Props = {
 export default function EnterPassModal({ isOpen, onClose, onSubmit }: Props) {
   const [password, setPassword] = useState("");
 
+
+  const genPassword = (length: number) => {
+    const newPassword = createSecurePassword(length);
+    setPassword(newPassword);
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center">
       <div className="bg-white p-5 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-lg font-semibold mb-3">กรอกรหัสผ่าน</h2>
-        <input
+        <h3 className="text-lg font-medium text-gray-800">Edit Password</h3>
+        <div className="mt-4">
+          <InputPassword
+            label={"กรอกรหัสผ่าน"}
+            placeholder={"Password"}
+            value={password}
+            setValue={setPassword}
+            onGenerate={() => genPassword(8)}
+            generateLabel={"Genarage Password"}
+            warring="Please specify length greater than 8."
+          />
+        </div>
+
+        <div className="flex gap-3 justify-end mt-10">
+          <ButtonDefault size="" text="Cancel" onClick={onClose} />
+          <ButtonBG size="" text="Save" onClick={() => onSubmit(password)} />
+        </div>
+        {/* <input
           type="password"
           placeholder="Password"
           className="w-full p-2 border rounded mb-4"
@@ -33,7 +59,7 @@ export default function EnterPassModal({ isOpen, onClose, onSubmit }: Props) {
           >
             ยืนยัน
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

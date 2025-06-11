@@ -169,8 +169,8 @@ export function getTextManageUserPage({
         ? "เพิ่มแอดมิน"
         : "Add New Admin"
       : isTH
-      ? "เพิ่มสมาชิก"
-      : "Add New Member",
+      ? "เพิ่มสมาชิกพนักงาน"
+      : "Add New Employee",
     number: isTH ? "ลำดับ" : "No.",
     name: isTH ? "ชื่อจริง" : "Name",
     userName: isTH ? "ชื่อผู้ใช้" : "Username",
