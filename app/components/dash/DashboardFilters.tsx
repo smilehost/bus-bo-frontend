@@ -1,21 +1,39 @@
-"use client";
-
 import { getTextDashboard, useLanguageContext } from "@/app/i18n/translations";
 import { FilterIcon } from "lucide-react";
 
 export default function DashboardFilters({
   selectDate,
-  setDate,
+  setSelectDate,
   customDate,
   setCustomDate,
+  rangeFrom,
+  setRangeFrom,
+  rangeTo,
+  setRangeTo,
 }: {
   selectDate: string;
-  setDate: (date: string) => void;
+  setSelectDate: (val: string) => void;
   customDate: string;
-  setCustomDate: (date: string) => void;
+  setCustomDate: (val: string) => void;
+  rangeFrom: string;
+  setRangeFrom: (val: string) => void;
+  rangeTo: string;
+  setRangeTo: (val: string) => void;
 }) {
   const isTH = useLanguageContext();
   const text = getTextDashboard(isTH);
+
+  const presetOptions = [
+    { value: "day", label: text.today },
+    { value: "month", label: text.thisMonth },
+    { value: "2m", label: isTH ? "2 เดือน" : "2 months" },
+    { value: "3m", label: isTH ? "3 เดือน" : "3 months" },
+    { value: "6m", label: isTH ? "6 เดือน" : "6 months" },
+    { value: "year", label: text.thisYear },
+    { value: "custom", label: isTH ? "เลือกวันเดียว" : "Custom Day" },
+    { value: "range", label: isTH ? "ช่วงวันที่" : "Date Range" },
+  ];
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
@@ -25,42 +43,52 @@ export default function DashboardFilters({
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
-          {/* Select Date Type */}
           <select
-            value={
-              ["all", "day", "month", "year"].includes(selectDate)
-                ? selectDate
-                : "custom"
-            }
+            value={selectDate}
             onChange={(e) => {
               const val = e.target.value;
-              if (val === "custom") {
-                // กด custom จาก select => ไม่เปลี่ยนค่าทันที
-                return;
-              }
-              setDate(val);
-              setCustomDate(""); // reset custom date
+              setSelectDate(val);
+              setCustomDate("");
+              setRangeFrom("");
+              setRangeTo("");
             }}
-            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 w-full md:w-fit"
+            className="px-3 py-2 border rounded-md text-sm"
           >
-            <option value="all">{text.all}</option>
-            <option value="day">{text.today}</option>
-            <option value="month">{text.thisMonth}</option>
-            <option value="year">{text.thisYear}</option>
-            <option value="custom">{text.custom}</option>
+            {presetOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
 
-          {/* Custom Date Picker */}
-          <input
-            type="date"
-            value={customDate}
-            onChange={(e) => {
-              const val = e.target.value;
-              setCustomDate(val);
-              setDate(val); // ใช้เป็น selectDate เช่นกัน
-            }}
-            className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm w-full md:w-fit"
-          />
+          {selectDate === "custom" && (
+            <input
+              type="date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              className="px-3 py-2 border rounded-md text-sm"
+            />
+          )}
+
+          {selectDate === "range" && (
+            <>
+              <input
+                type="date"
+                value={rangeFrom}
+                max={rangeTo || undefined}
+                onChange={(e) => setRangeFrom(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm"
+              />
+              <span className="text-sm">-</span>
+              <input
+                type="date"
+                value={rangeTo}
+                min={rangeFrom || undefined}
+                onChange={(e) => setRangeTo(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm"
+              />
+            </>
+          )}
         </div>
       </div>
     </div>

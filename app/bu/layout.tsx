@@ -69,7 +69,13 @@ export default function RootLayout({
   };
 
   const { isTH, isSuperAdmin } = useLanguageContext();
-  const menuText = getTextMenu({ isTH, isSuperAdmin });
+  const menuText = getTextMenu({ isTH, isSuperAdmin, });
+  useEffect(() => {
+    const newOpenGroups = Object.fromEntries(
+      filteredMenu.map(group => [group.group, true])
+    );
+    setOpenGroups(newOpenGroups);
+  }, [isTH]);
 
 
   const allMenu = [
@@ -129,10 +135,6 @@ export default function RootLayout({
       items: group.items.filter((item) => roleMenu?.includes(item.id)),
     }))
     .filter((group) => group.items.length > 0);
-
-  // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
-
-  //auth redirectAdd commentMore actions
   useAuthGuard({ account_role, roleMenu, pathname, allMenu });
 
   if (!hasMounted) return null;
