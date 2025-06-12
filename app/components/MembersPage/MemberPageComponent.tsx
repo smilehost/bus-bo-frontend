@@ -390,9 +390,9 @@ export default function MemberPageComponent({
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddMember} />
-        <button onClick={() => exportCSV(paginatedCompaniesWithNo, columns, 'members.csv')}>
+        {/* <button onClick={() => exportCSV(paginatedCompaniesWithNo, columns, 'members.csv')}>
           Export CSV
-        </button>
+        </button> */}
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <FormFilter
             setSearch={(value: string) =>

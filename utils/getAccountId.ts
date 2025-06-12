@@ -1,4 +1,6 @@
 export const getAccountRoleId = (): number | null => {
+    if (typeof window === 'undefined') return null; // 👈 ป้องกัน SSR
+
     try {
         const raw = localStorage.getItem("token_bo"); // เปลี่ยนชื่อ key ตามจริง
         if (!raw) return null;
