@@ -49,7 +49,7 @@ import { getTextDashboard, useLanguageContext } from "@/app/i18n/translations";
     // ✅ รวมยอดเงินตามประเภทการจ่ายเงิน
     const paymentSummary = routeData.reduce(
       (acc, curr) => {
-        if (curr.payment === 1) {
+        if (curr.payment === 1|| curr.payment === 4) {
           acc.cash += curr.amount;
         } else if ([2, 3].includes(curr.payment)) {
           acc.qr += curr.amount;

@@ -28,7 +28,7 @@ export default function DashboardPage() {
 
   const getTransactionMap = useTransactionStore((state) => state.getTransactionMap);
   const [routeData, setRouteData] = useState<RouteData[]>([]);
-  const [selectDate, setSelectDate] = useState("all");
+  const [selectDate, setSelectDate] = useState("day");
   const [customDate, setCustomDate] = useState(""); // <-- เพิ่มแยก
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
 

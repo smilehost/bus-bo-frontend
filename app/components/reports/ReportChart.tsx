@@ -16,55 +16,88 @@ import {
 
 export const dailyData = [
   {
-    date: '2023-05-10',
-    passengers: 320,
-    revenue: 9600,
-    routes: 4,
-    tickets: 400,
+    date: '2023-05-10 16:00',
+    routes: 'Northern Express',
+    ticketNumber: 1,
+    price: 24.00,
+    discount: 4,
+    total: 20.00,
+    status: 'success'
   },
   {
-    date: '2023-05-11',
-    passengers: 350,
-    revenue: 10500,
-    routes: 4,
-    tickets: 450,
+    date: '2023-05-10 16:15',
+    routes: 'Eastern Line',
+    ticketNumber: 2,
+    price: 30.00,
+    discount: 5,
+    total: 25.00,
+    status: 'success'
   },
   {
-    date: '2023-05-12',
-    passengers: 380,
-    revenue: 11400,
-    routes: 4,
-    tickets: 480,
+    date: '2023-05-10 16:30',
+    routes: 'Southern Express',
+    ticketNumber: 3,
+    price: 20.00,
+    discount: 0,
+    total: 20.00,
+    status: 'cancelled'
   },
   {
-    date: '2023-05-13',
-    passengers: 450,
-    revenue: 13500,
-    routes: 5,
-    tickets: 560,
+    date: '2023-05-10 17:00',
+    routes: 'Central Shuttle',
+    ticketNumber: 4,
+    price: 15.00,
+    discount: 3,
+    total: 12.00,
+    status: 'success'
   },
   {
-    date: '2023-05-14',
-    passengers: 480,
-    revenue: 14400,
-    routes: 5,
-    tickets: 600,
+    date: '2023-05-10 17:30',
+    routes: 'Northern Express',
+    ticketNumber: 5,
+    price: 24.00,
+    discount: 4,
+    total: 20.00,
+    status: 'success'
   },
   {
-    date: '2023-05-15',
-    passengers: 410,
-    revenue: 12300,
-    routes: 4,
-    tickets: 510,
+    date: '2023-05-10 18:00',
+    routes: 'Eastern Line',
+    ticketNumber: 6,
+    price: 30.00,
+    discount: 10,
+    total: 20.00,
+    status: 'success'
   },
   {
-    date: '2023-05-16',
-    passengers: 390,
-    revenue: 11700,
-    routes: 4,
-    tickets: 490,
+    date: '2023-05-10 18:15',
+    routes: 'Southern Express',
+    ticketNumber: 7,
+    price: 25.00,
+    discount: 5,
+    total: 20.00,
+    status: 'refunded'
   },
-]
+  {
+    date: '2023-05-10 18:30',
+    routes: 'Central Shuttle',
+    ticketNumber: 8,
+    price: 18.00,
+    discount: 2,
+    total: 16.00,
+    status: 'success'
+  },
+  {
+    date: '2023-05-10 19:00',
+    routes: 'Northern Express',
+    ticketNumber: 9,
+    price: 24.00,
+    discount: 4,
+    total: 20.00,
+    status: 'success'
+  }
+];
+
   const companyData = [
     {
       name: 'Northern Bus Co.',

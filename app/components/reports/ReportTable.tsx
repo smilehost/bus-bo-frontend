@@ -9,7 +9,7 @@ const ReportTable = () => {
       <div className="px-6 py-4 border-b border-gray-200 ">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium text-gray-900 ">
-            Detailed Data
+            Sales Volume
           </h3>
         </div>
       </div>
@@ -17,7 +17,7 @@ const ReportTable = () => {
         <table className="min-w-full divide-y divide-gray-200 ">
           <thead className="bg-gray-50 ">
             <tr>
-              {['ticket Number', 'Passengers', 'Ticket Price', 'Routes'].map((header) => (
+              {['ticket Number','Date', 'Routes', 'Ticket Price', 'Discount', 'Total', 'Status'].map((header) => (
                 <th
                   key={header}
                   scope="col"
@@ -32,16 +32,34 @@ const ReportTable = () => {
             {dailyData.map((day, index) => (
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 ">
-                  {day.tickets}
+                  {day.ticketNumber}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
-                  {day.passengers}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
-                  ${(day.revenue / day.passengers).toFixed(2)}
+                  {day.date}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                   {day.routes}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
+                  {day.price}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
+                  {day.discount}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
+                  {day.total}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <span
+                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                      ${day.status === 'success' ? 'bg-green-100 text-green-800' : ''}
+                      ${day.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
+                      ${day.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
+                      ${day.status === 'refunded' ? 'bg-blue-100 text-blue-800' : ''}
+                    `}
+                  >
+                    {day.status}
+                  </span>
                 </td>
               </tr>
             ))}
