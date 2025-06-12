@@ -34,6 +34,7 @@ import { getTextMenu, useLanguageContext } from "../i18n/translations";
 //hooks
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function RootLayout({
   children,
@@ -114,12 +115,12 @@ export default function RootLayout({
   };
 
   useEffect(() => {
+    //เอา id page จะ validate redirect จาก id เหล่านี้ 
     if (account_role === 2) {
-      setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]);
+      setRoleMenu([1, 3, 4, 5, 6, 7, 8, 9, 11]);
     } else if (account_role === 1) {
       setRoleMenu([1, 10, 12]);
     }
-    // setRoleMenu([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 8]);
   }, [account_role]);
 
   const filteredMenu = allMenu
@@ -147,7 +148,15 @@ export default function RootLayout({
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-white shrink-0">
           <div className="flex items-center">
-            <div className="h-8 w-8 rounded-md custom-bg-main"></div>
+            {/* <div className="h-8 w-8 rounded-md custom-bg-main" /> */}
+            <Image
+              width={1000}
+              height={1000}
+              priority
+              alt="logo"
+              src={"/bus.png"}
+              className="h-8 w-8 border"
+            />
             <span className="ml-2 text-lg font-semibold text-gray-800">
               BusTicket
             </span>
@@ -196,7 +205,7 @@ export default function RootLayout({
                           text={item.text}
                           icon={item.icon}
                           href={`/bu/${item.link}`} // ✅ ใช้ href ถ้ามี, ไม่งั้นใช้ link
-                          // as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
+                        // as={item.as ? `/bu/${item.as}` : undefined} // ✅ สร้าง as path ถ้ามี
                         />
                       ))}
                     </div>
@@ -245,7 +254,7 @@ export default function RootLayout({
             <div className="flex items-center space-x-4 w-full">
               <div className="relative flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full custom-bg-main flex items-center justify-center text-white font-medium">
-                  {userData?.name.substring(0, 1).toUpperCase()}
+                  {account_name.substring(0, 1).toUpperCase()}
                 </div>
                 <div className="hidden md:block">
                   <div className="hidden md:block">

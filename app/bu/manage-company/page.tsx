@@ -23,7 +23,7 @@ import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
 import EnterPassModal from "@/app/components/Model/EnterPassModal";
 import { CompanyItem } from "@/types/company";
-import { KeyRound, Smartphone, SquarePen, Users } from "lucide-react";
+import { KeyRound, Smartphone, SquarePen, Users, HandCoins  } from "lucide-react";
 
 export interface CompanyTableData {
   no: number;
@@ -322,19 +322,27 @@ export default function ManageCompaniesPage() {
             icon={<Users className={`custom-size-tableAction-btn text-blue-600`} />}
             bgColor="bg-blue-50 text-blue-600"
             hoverColor="hover:bg-blue-100"
-            title="Add User"
+            title="Admin"
           />
-
+          <TableActionButton
+            // href={`${pathName}/manage-payment-method?comId=${row.id}&name=${row.name}`}
+            href={`${pathName}/manage-payment-method?comId=${row.id}&name=${row.name}`}
+            icon={<HandCoins  className={`custom-size-tableAction-btn text-green-600`} />}
+            bgColor="bg-green-50 text-green-600"
+            hoverColor="hover:bg-green-100"
+            title="Payment method"
+          />
           <TableActionButton
             onClick={() => {
               setSelectedCompanyId(Number(row.id));
               setShowPassModal(true);
             }}
             icon={<KeyRound className={`custom-size-tableAction-btn text-gray-700`} />}
-            bgColor="bg-red-50 text-red-600"
+            bgColor="bg-red-50 text-gray-100"
             hoverColor="hover:bg-red-100"
             title="Login as Company"
           />
+
         </div>
       ),
     },

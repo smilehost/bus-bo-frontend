@@ -148,11 +148,7 @@ function FormRouteTicketInformation({
             <div className={`flex flex-col  w-full max-w-96`}>
               <LabelText text={text.priceTypeLabel} />
               <div
-                className="mt-2 h-23 overflow-y-auto custom-border-gray rounded-md p-3 flex flex-col gap-1"
-                style={{
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                }}
+                className="mt-2 h-23 overflow-y-auto custom-border-gray rounded-md p-3 flex flex-col gap-1 scrollbar"
               >
                 {ticketTypeList?.map((item, index) => {
                   const isMatch = ticketChecked?.some((c) => item.id === c);

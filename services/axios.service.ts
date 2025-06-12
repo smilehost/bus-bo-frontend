@@ -32,7 +32,8 @@ instance.interceptors.request.use((config) => {
       if (raw) {
         const parsed = JSON.parse(raw);
         const token = parsed?.state?.token;
-        const com_id = parsed?.state?.com_id?.toString();
+        // const com_id = parsed?.state?.com_id?.toString();
+        const com_id = 1;
 
         if (config.headers) {
           config.headers.set("Authorization", token ? `Bearer ${token}` : "");

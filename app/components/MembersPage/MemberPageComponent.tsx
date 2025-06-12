@@ -20,7 +20,7 @@ import TableTemplate, {
   ColumnConfig,
 } from "@/app/components/Table/TableTemplate";
 import { toast, ToastContainer } from "react-toastify";
-import { Eye, Lock, RotateCcwKey } from "lucide-react";
+import { Eye, RotateCcwKey } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
 import FormFilter from "../Filter/FormFilter";
 import { statusOptions } from "@/constants/options";
@@ -154,7 +154,7 @@ export default function MemberPageComponent({
 
       if (data.id) {
         await updateMember(data.id, {
-          ...data,
+          name: data.name,
           com_id: Number(data.companyId),
         } as MemberItem);
         await Alert({
@@ -268,7 +268,7 @@ export default function MemberPageComponent({
       username: m.username,
       role: m.role,
       status: m.status,
-      company: "",
+      company: m?.company?.com_name,
       com_id: m.com_id,
     }));
   }, [filteredMembers, currentPage, rowsPerPage]);

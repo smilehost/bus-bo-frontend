@@ -127,7 +127,7 @@ function FormRoute({
       <div
         className={` mx-auto flex flex-col gap-3 ${styles.customSizeContainer}`}
       >
-        <div className="flex justify-between flex-wrap gap-3">
+        <div className="flex justify-center lg:justify-between flex-wrap gap-3">
           <InputLabel
             label={textFormRoute.routeNameTH}
             placeholder={textFormRoute.placeholderTH}
@@ -146,7 +146,7 @@ function FormRoute({
           />
         </div>
 
-        <div className="flex justify-between flex-wrap gap-3">
+        <div className="flex justify-center lg:justify-between flex-wrap gap-3">
           <SelectInputUnified
             label={textFormRoute.timeLabel}
             value={selectedTime}
@@ -166,7 +166,7 @@ function FormRoute({
           />
         </div>
 
-        <div className="flex justify-between flex-wrap gap-3">
+        <div className="flex justify-center lg:justify-between flex-wrap gap-3">
           <ColorRoute
             color={routeColor}
             setRouteColor={setRouteColor}
@@ -179,7 +179,7 @@ function FormRoute({
 
         <hr className="custom-border-gray my-5" />
 
-        <div className="flex justify-between flex-wrap gap-3">
+        <div className="flex justify-center lg:justify-between flex-wrap gap-3">
           <InputLabel
             label={textFormRoute.headerUrl}
             placeholder={textFormRoute.placeholderUrl}

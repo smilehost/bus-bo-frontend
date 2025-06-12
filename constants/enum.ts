@@ -29,6 +29,11 @@ export enum TICKET_TYPE {
     TIERED = "tier",
 }
 
+export enum PAYMENT_TYPE {
+    STATIC = "STATIC",
+    GATE_WAY = "GATE_WAY",
+}
+
 export const STATUS_LABELS: Record<number, STATUS> = {
   1: STATUS.ACTIVE,
   0: STATUS.INACTIVE,
