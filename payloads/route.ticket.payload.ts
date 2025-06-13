@@ -26,7 +26,7 @@ export interface CreateRouteTicketPayload {
 }
 
 export interface UpdateRouteTicketPayload extends CreateRouteTicketPayload {
-    route_ticket_id: number;
+    route_ticket_id?: number;
 }
 
 export interface FetchTicketQuery {

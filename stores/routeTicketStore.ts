@@ -172,7 +172,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
             const price = res.route_ticket_price;
 
             const merged: TicketProps = {
-                id: ticket.route_ticket_id.toString(),
+                id: ticket.route_ticket_id?.toString(),
                 ticketName_th: ticket.route_ticket_name_th,
                 ticketName_en: ticket.route_ticket_name_en,
                 ticket_type: ticket.route_ticket_type,
