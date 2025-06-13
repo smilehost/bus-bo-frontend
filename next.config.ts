@@ -1,12 +1,3 @@
-// import type { NextConfig } from "next";
-
-// const nextConfig: NextConfig = {
-//   /* config options here */
-//   eslint: {ignoreDuringBuilds: true}, // Ignore ESLint errors during build
-// };
-
-// export default nextConfig;
-
 import type { NextConfig } from "next";
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
@@ -19,8 +10,12 @@ const withAnalyzer = withBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  output: "export", // ✅ สำคัญ! เพิ่มบรรทัดนี้
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  images: {
+    unoptimized: true, // ✅ ถ้าใช้ <Image /> ต้องมีบรรทัดนี้ด้วย
   },
   webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
     if (process.env.ANALYZE === "true") {
@@ -39,8 +34,3 @@ const nextConfig: NextConfig = {
 };
 
 export default withAnalyzer(nextConfig);
-
-
-
-
-
