@@ -18,7 +18,8 @@ RUN npm install
 COPY . .
 
 COPY entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh && \
+    dos2unix /usr/bin/entrypoint.sh  #make docker can build on windows
 ENTRYPOINT ["entrypoint.sh"]
 
 # build Next.js
