@@ -24,7 +24,6 @@ function EditStatusModel({
   const statusOptions = [
     { label: STATUS.ACTIVE, value: 1 },
     { label: STATUS.INACTIVE, value: 0 },
-    { label: STATUS.CANCELLED, value: 2 },
   ];
   const { isTH, isSuperAdmin } = useLanguageContext();
   const text = getTextManageUserPage({ isTH, isSuperAdmin });

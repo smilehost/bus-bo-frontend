@@ -24,6 +24,7 @@ import { Eye, RotateCcwKey } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
 import FormFilter from "../Filter/FormFilter";
 import { statusOptions } from "@/constants/options";
+import { exportCSV } from "@/utils/exportCSV";
 
 export interface MemberTableData {
   no: number;
@@ -108,7 +109,7 @@ export default function MemberPageComponent({
         (m) => m.status === Number(searchStatus)
       );
     }
-  
+
     setFilteredMembers(temp);
     setTotalResults(temp.length);
     setCurrentPage(1);
@@ -236,7 +237,7 @@ export default function MemberPageComponent({
 
     // console.log("userId: ", userId)
     // console.log("newPassword: ", newPassword)
-    if(newPassword.length < 8){
+    if (newPassword.length < 8) {
       toast.error("invalid password, must be at least 8 characters");
       return;
     }
@@ -389,6 +390,9 @@ export default function MemberPageComponent({
       <ToastContainer />
       <div className="flex-1 flex flex-col p-0">
         <TitlePage title={text.title} description={text.description} btnText={text.btnText} handleOpenModel={handleAddMember} />
+        {/* <button onClick={() => exportCSV(paginatedCompaniesWithNo, columns, 'members.csv')}>
+          Export CSV
+        </button> */}
         <div className="bg-white rounded-md shadow p-5 mt-5">
           <FormFilter
             setSearch={(value: string) =>
@@ -400,6 +404,7 @@ export default function MemberPageComponent({
             filter={filterSearch}
             search={searchTerm}
           />
+
           {/* <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={handleSearchChange}
@@ -431,6 +436,7 @@ export default function MemberPageComponent({
               />
             </div>
           )}
+
         </div>
 
         {/* ✅ Responsive modal ส่วนล่างยังคงใช้ได้ */}

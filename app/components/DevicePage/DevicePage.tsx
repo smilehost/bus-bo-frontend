@@ -166,7 +166,7 @@ function DevicePage({ comId }: DevicePageProps) {
         if (isStatusConfirmed) {
             const result = await updateDeviceStatus(id, nextStatus);
             if (result.success) {
-                toast.success("Change status sucessfuly!")
+                toast.success("Change status successfully!")
                 fetchDeviceData();
             } else {
                 toast.error(`Change status error: ${result.message}`)
