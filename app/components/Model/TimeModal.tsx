@@ -38,10 +38,10 @@ interface CustomTimePickerProps {
 const CustomTimePicker = ({
   value,
   onChange,
-  format,
-  disableClock,
-  clearIcon,
-  clockIcon,
+  // format,
+  // disableClock,
+  // clearIcon,
+  // clockIcon,
   className,
 }: CustomTimePickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -263,7 +263,7 @@ function TimeModal({ open, onClose, onSave, editingTime }: TimeModalProps) {
                         clipRule="evenodd"
                       />
                     </svg>
-                    Click "Add In slot" to add this slot
+                    {/* Click "Add In slot" to add this slot */}
                   </div>
                 )}
               </div>

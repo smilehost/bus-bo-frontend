@@ -34,7 +34,7 @@ function Login() {
         if (decoded.exp > now) {
           router.replace("/bu/dashboard");
         }
-      } catch (e) {
+      } catch {
         console.warn("Invalid token found, ignoring.");
       }
     }

@@ -19,6 +19,12 @@ interface TimeState {
 }
 const com_id = getComId();
 
+interface RawTimeData {
+    route_time_id: number;
+    route_time_name: string;
+    route_time_array: string | string[];
+}
+
 export const useTimeStore = create<TimeState>((set) => ({
     times: [],
     total: 0,
@@ -28,19 +34,19 @@ export const useTimeStore = create<TimeState>((set) => ({
         set({ isLoading: true });
         try {
             const res = (await TimeService.fetchTimes({ page, size, search })) as {
-                result: any[];
+                result: Time[];
             };
             const rawData = res.result || [];
 
-            const mapped: TimeItem[] = rawData.map((item: any) => ({
+            const mapped: TimeItem[] = (rawData as unknown as RawTimeData[]).map((item) => ({
                 id: item.route_time_id,
                 name: item.route_time_name,
                 schedule: Array.isArray(item.route_time_array)
                     ? item.route_time_array
                     : item.route_time_array
                         .split(",")
-                        .map((t: string) => t.trim())
-                        .filter((t: string) => t),
+                        .map((t) => t.trim())
+                        .filter((t) => t),
             }));
 
             set({ times: mapped, total: mapped.length });

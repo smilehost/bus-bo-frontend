@@ -72,7 +72,6 @@ export const usePaymentStore = create<PaymentStoreProps>((set) => ({
             console.error("updateTicketStatus error:", error);
             return {
                 success: false,
-                message: (error as any)?.message || "Unknown error during update",
             };
         }
     },

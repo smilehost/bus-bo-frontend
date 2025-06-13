@@ -44,7 +44,7 @@ export const useDateStore = create<DateState>((set) => ({
         today.getDate()
       );
 
-      const mapped: DateItem[] = rawData.map((item: any) => {
+      const mapped: DateItem[] = rawData.map((item: UpdateDatePayload) => {
         const endDate = new Date(item.route_date_end);
         const endDateStart = new Date(
           endDate.getFullYear(),

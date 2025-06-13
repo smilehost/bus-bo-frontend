@@ -2,7 +2,6 @@ import { api } from "@/services/axios.service";
 import {
   FetchMemberQuery,
   CreateMemberPayload,
-  UpdateMemberPayload,
 } from "@/payloads/member.payload";
 
 export const MemberService = {
@@ -34,7 +33,10 @@ export const MemberService = {
     });
   },
 
-  async updateMember(id: string, payload: UpdateMemberPayload) {
+  async updateMember(id: string, payload: {
+    account_id: number;
+    account_name: string;
+  }) {
     return await api.put({
       path: `/accounts`,
       params: id,

@@ -1,13 +1,14 @@
+import React, { isValidElement } from 'react';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 
 type ColumnConfig<T> = {
   key: keyof T | string;
   label: string;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
 };
 
-export function exportCSV<T extends Record<string, any>>(
+export function exportCSV<T extends Record<string, unknown>>(
   data: T[],
   columns: ColumnConfig<T>[],
   fileName = 'export.csv'
@@ -25,7 +26,13 @@ export function exportCSV<T extends Record<string, any>>(
         if (typeof rendered === 'string') return rendered;
         if (typeof rendered === 'number') return rendered.toString();
         if (typeof rendered === 'boolean') return rendered ? 'true' : 'false';
-        return (rendered as any)?.props?.children ?? '';
+
+        if (isValidElement(rendered)) {
+          const props = rendered.props as { children?: React.ReactNode };
+          const children = props.children;
+          if (typeof children === 'string') return children;
+          if (typeof children === 'number') return children.toString();
+        }
       }
 
       return rawValue ?? '';

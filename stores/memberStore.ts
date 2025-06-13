@@ -48,10 +48,10 @@ export const useMemberStore = create<MemberStore>((set) => ({
         status: status,
       };
       const res = await MemberService.fetchMembers(query);
-      const rawData = (res as { result: { data: any[] } })?.result?.data || [];
+      const rawData = (res as { result: { data: UpdateMemberPayload[] } })?.result?.data || [];
       const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData?.length;
 
-      const mapped: MemberItem[] = rawData.map((item: any) => ({
+      const mapped: MemberItem[] = rawData.map((item: UpdateMemberPayload) => ({
         id: item.account_id.toString(),
         username: item.account_username,
         name: item.account_name,
@@ -76,10 +76,10 @@ export const useMemberStore = create<MemberStore>((set) => ({
         com_id
       };
       const res = await MemberService.fetchMemberByComId(query);
-      const rawData = (res as { newResult: any[] })?.newResult || [];
+      const rawData = (res as { newResult: UpdateMemberPayload[] })?.newResult || [];
       const totalCount = (res as { total?: number }).total !== undefined ? (res as { total?: number }).total : rawData?.length;
 
-      const mapped: MemberItem[] = rawData.map((item: any) => ({
+      const mapped: MemberItem[] = rawData.map((item: UpdateMemberPayload) => ({
         id: item.account_id.toString(),
         username: item.account_username,
         name: item.account_name,
@@ -102,7 +102,10 @@ export const useMemberStore = create<MemberStore>((set) => ({
   },
 
   updateMember: async (id, member) => {
-    const payload: UpdateMemberPayload = {
+    const payload: {
+      account_id: number;
+      account_name: string;
+    } = {
       account_id: parseInt(id, 10),
       account_name: member.name!,
       // account_username: member.username,
@@ -117,7 +120,7 @@ export const useMemberStore = create<MemberStore>((set) => ({
   getMemberById: async (id) => {
     try {
       const res = await MemberService.fetchMemberById(id);
-      const item = (res as { result: any }).result;
+      const item = (res as { result: UpdateMemberPayload }).result;
       return {
         id: item.account_id.toString(),
         username: item.account_username,

@@ -48,7 +48,7 @@ export default function ManageCompaniesPage() {
     getCompanies,
     createCompany,
     updateCompany,
-    deleteCompany,
+    // deleteCompany,
   } = useCompanyStore();
 
   //pathName
@@ -86,34 +86,34 @@ export default function ManageCompaniesPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteCompany = async (id: string) => {
-    const isConfirmed = await Confirm({
-      title: "Confirm Delete",
-      text: "Are you sure you want to delete this company?",
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      type: "warning",
-    });
+  // const handleDeleteCompany = async (id: string) => {
+  //   const isConfirmed = await Confirm({
+  //     title: "Confirm Delete",
+  //     text: "Are you sure you want to delete this company?",
+  //     confirmText: "Delete",
+  //     cancelText: "Cancel",
+  //     type: "warning",
+  //   });
 
-    if (!isConfirmed) return;
+  //   if (!isConfirmed) return;
 
-    try {
-      await deleteCompany(id);
-      await Alert({
-        title: "Deleted!",
-        text: "Company deleted.",
-        type: "success",
-      });
-      fetchCompanies();
-    } catch (error) {
-      console.error("Delete error:", error);
-      await Alert({
-        title: "Error!",
-        text: "Failed to delete.",
-        type: "error",
-      });
-    }
-  };
+  //   try {
+  //     await deleteCompany(id);
+  //     await Alert({
+  //       title: "Deleted!",
+  //       text: "Company deleted.",
+  //       type: "success",
+  //     });
+  //     fetchCompanies();
+  //   } catch (error) {
+  //     console.error("Delete error:", error);
+  //     await Alert({
+  //       title: "Error!",
+  //       text: "Failed to delete.",
+  //       type: "error",
+  //     });
+  //   }
+  // };
 
   const handleEditCompany = (id: string) => {
     const found = companies.find((c) => c.id === id);
@@ -348,6 +348,7 @@ export default function ManageCompaniesPage() {
     },
   ];
   // console.log(rowsPerPage)
+  console.log(error)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">

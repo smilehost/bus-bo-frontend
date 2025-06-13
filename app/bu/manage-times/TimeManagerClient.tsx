@@ -53,13 +53,13 @@ function Page() {
   const [editingTime, setEditingTime] = useState<TimeItem | undefined>(
     undefined
   );
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   const { isTH } = useLanguageContext();
   const text = getTextTimes({ isTH });
 
   const fetchTimes = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
     try {
       await getTimes(currentPage, rowsPerPage);
@@ -67,7 +67,7 @@ function Page() {
       console.error("Failed to load data", error);
     }
     cancelSkeleton();
-    setIsLoading(false);
+    // setIsLoading(false);
     setIsLoadingskeleton(false);
   };
 

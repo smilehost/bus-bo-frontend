@@ -6,11 +6,30 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
+type ModalProps = {
+  open: boolean;
+  onClose: () => void;
+  onSave: (member: {
+    id?: string;
+    name: string;
+    url: string;
+    type: string;
+    slip: number;
+  }) => void;
+  editing?: {
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+    slip: number;
+  };
+};
+
 export default function PaymentModel({
   onClose,
   onSave,
   editing,
-}: any) {
+}: ModalProps) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [type, setType] = useState("");

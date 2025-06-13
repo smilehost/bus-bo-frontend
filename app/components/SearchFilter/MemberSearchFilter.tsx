@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useCompanyStore } from "@/stores/companyStore";
 import { STATUS, FILTER } from "@/constants/enum";
 import { Search, Filter, ChevronDown, X } from "lucide-react";
 
-//store
-import { useUserStore } from "@/stores/userStore";
 
 interface Company {
   id: string;
@@ -31,11 +28,9 @@ export default function SearchFilter({
   companyFilter,
   setCompanyFilter,
 }: SearchFilterProps) {
-  const { companies } = useCompanyStore();
-  const { userData } = useUserStore();
 
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-  const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+  // const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
 
   const statusRef = useRef<HTMLDivElement>(null);
   const companyRef = useRef<HTMLDivElement>(null);
@@ -67,7 +62,7 @@ export default function SearchFilter({
         companyRef.current &&
         !companyRef.current.contains(event.target as Node)
       ) {
-        setCompanyDropdownOpen(false);
+        // setCompanyDropdownOpen(false);
       }
     }
 

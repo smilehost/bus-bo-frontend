@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Pagination from "../Pagination/Pagination";
-import { Alert } from "../Dialog/Alert";
 import axios from "axios";
 import { store } from "@/stores/store";
 import { jwtDecode } from "jwt-decode";
-import { Router } from "lucide-react";
-import { useRouter } from "next/navigation"; // ✅ สำหรับ Next.js App Router
 import EnterPassModal from "../Model/EnterPassModal";
 // import { shell } from 'electron';
 
@@ -46,19 +43,18 @@ export default function CompanyTable({
   onPageChange,
   rowsPerPage,
   totalResults,
-  isLoading,
   onRowsPerPageChange,
 }: CompanyTableProps) {
   const totalPages = Math.ceil(totalResults / rowsPerPage);
-  const [error, setError] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
+  // const [modalOpen, setModalOpen] = useState(false);
   const [showPassModal, setShowPassModal] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
     null
   );
 
   const onLoginAsCompany = async (com_id: number, password: string) => {
-    setError(null);
+    // setError(null);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
@@ -86,10 +82,10 @@ export default function CompanyTable({
         // shell.openExternal('localhost:3000/bu/dashboard');
 
       } else {
-        setError("Login failed: No token received");
+        // setError("Login failed: No token received");
       }
     } catch (err) {
-      setError("Login failed: Invalid credentials");
+      // setError("Login failed: Invalid credentials");
       console.error("Login error:", err);
     }
   };
