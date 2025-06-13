@@ -228,14 +228,14 @@ export default function ManageCompaniesPage() {
     ...company,
     no: (currentPage - 1) * rowsPerPage + index + 1,
   }));
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [showPassModal, setShowPassModal] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
     null
   );
 
   const onLoginAsCompany = async (com_id: number, password: string) => {
-    setError(null);
+    // setError(null);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
@@ -260,10 +260,10 @@ export default function ManageCompaniesPage() {
         window.open("/bu/dashboard", "_blank");
         // shell.openExternal('localhost:3000/bu/dashboard');
       } else {
-        setError("Login failed: No token received");
+        // setError("Login failed: No token received");
       }
     } catch (err) {
-      setError("Login failed: Invalid credentials");
+      // setError("Login failed: Invalid credentials");
       console.error("Login error:", err);
     }
   };
@@ -348,7 +348,6 @@ export default function ManageCompaniesPage() {
     },
   ];
   // console.log(rowsPerPage)
-  console.log(error)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col p-0">
