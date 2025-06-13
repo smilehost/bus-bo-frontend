@@ -201,7 +201,7 @@ function FormRoute({
       <div className="flex flex-col justify-center items-center mt-10">
         <p className="text-[16px] font-bold">{textFormRoute.title}</p>
         <p className="textFormRoute-[12px] text-[#6B7280]">
-         {disable ? "test":textFormRoute.subtitle}
+          {disable ? "Unable to change station order, may affect price" : textFormRoute.subtitle}
         </p>
       </div>
 
