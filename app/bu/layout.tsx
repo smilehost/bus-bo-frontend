@@ -69,7 +69,13 @@ export default function RootLayout({
   };
 
   const { isTH, isSuperAdmin } = useLanguageContext();
-  const menuText = getTextMenu({ isTH, isSuperAdmin });
+  const menuText = getTextMenu({ isTH, isSuperAdmin, });
+  useEffect(() => {
+    const newOpenGroups = Object.fromEntries(
+      filteredMenu.map(group => [group.group, true])
+    );
+    setOpenGroups(newOpenGroups);
+  }, [isTH]);
 
 
   const allMenu = [

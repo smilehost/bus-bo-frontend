@@ -38,6 +38,10 @@ export default function DashboardPage() {
   const totalAmount = routeData.reduce((sum, route) => sum + route.amount, 0);
   const totalPassengers = routeData.length;
 
+  const [rangeFrom, setRangeFrom] = useState("");
+  const [rangeTo, setRangeTo] = useState("");
+
+
   const center = routeData.length
     ? {
         lat: routeData.reduce((sum, { lat }) => sum + lat, 0) / routeData.length,
@@ -87,37 +91,36 @@ export default function DashboardPage() {
       const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
       const data = await getTransactionMap();
       if (!data) return;
-
+  
       const now = new Date();
-
       const filtered = data.filter((tx) => {
         const txDate = new Date(tx.transaction_date_time);
-
-        if (selectDate === "day") {
-          return (
-            txDate.getFullYear() === now.getFullYear() &&
-            txDate.getMonth() === now.getMonth() &&
-            txDate.getDate() === now.getDate()
-          );
-        } else if (selectDate === "month") {
-          return (
-            txDate.getFullYear() === now.getFullYear() &&
-            txDate.getMonth() === now.getMonth()
-          );
-        } else if (selectDate === "year") {
-          return txDate.getFullYear() === now.getFullYear();
-        } else if (/\d{4}-\d{2}-\d{2}/.test(selectDate)) {
-          const customDate = new Date(selectDate);
-          return (
-            txDate.getFullYear() === customDate.getFullYear() &&
-            txDate.getMonth() === customDate.getMonth() &&
-            txDate.getDate() === customDate.getDate()
-          );
+  
+        if (selectDate === "day") return sameDate(txDate, now);
+        if (selectDate === "month") return sameMonth(txDate, now);
+        if (selectDate === "year") return txDate.getFullYear() === now.getFullYear();
+        if (["2m", "3m", "6m"].includes(selectDate)) {
+          const m = parseInt(selectDate); const compare = new Date(now);
+          compare.setMonth(now.getMonth() - m);
+          return txDate >= compare && txDate <= now;
         }
+  
+        if (selectDate === "custom" && customDate) {
+          const d = new Date(customDate);
+          return sameDate(txDate, d);
+        }
+  
+        if (selectDate === "range" && rangeFrom && rangeTo) {
+          const from = new Date(rangeFrom);
+          const to = new Date(rangeTo);
+          to.setHours(23, 59, 59, 999); // ✅ เพิ่มให้ครอบคลุมตลอดทั้งวัน
 
+          return txDate >= from && txDate <= to;
+        }
+  
         return true;
       });
-
+  
       const mapped = filtered.map((tx) => ({
         lat: parseFloat(tx.transaction_lat),
         lng: parseFloat(tx.transaction_long),
@@ -126,13 +129,24 @@ export default function DashboardPage() {
         payment: tx.transaction_payment_method_id,
         Date: tx.transaction_date_time,
       }));
-
+  
       setRouteData(mapped);
       cancelSkeleton();
     };
-
+  
     fetchData();
-  }, [selectDate, getTransactionMap]);
+  }, [selectDate, customDate, rangeFrom, rangeTo, getTransactionMap]);
+  
+  function sameDate(a: Date, b: Date) {
+    return a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
+  }
+  
+  function sameMonth(a: Date, b: Date) {
+    return a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth();
+  }
 
   return (
     <>
@@ -142,11 +156,17 @@ export default function DashboardPage() {
         <div>
           <DashboardHeader />
           <DashboardFilters
-            selectDate={selectDate}
-            setDate={setSelectDate}
-            customDate={customDate}
-            setCustomDate={setCustomDate}
-          />
+          selectDate={selectDate}
+          setSelectDate={setSelectDate}
+          customDate={customDate}
+          setCustomDate={setCustomDate}
+          rangeFrom={rangeFrom}
+          setRangeFrom={setRangeFrom}
+          rangeTo={rangeTo}
+          setRangeTo={setRangeTo}
+        />
+
+
           <DashboardStats
             totalPassengers={totalPassengers}
             totalAmount={totalAmount}
