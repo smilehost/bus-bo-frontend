@@ -17,7 +17,13 @@ export interface CreateMemberPayload {
 export interface UpdateMemberPayload {
   account_id: number;
   account_name: string;
-  account_username?: string;
+  account_username: string;
+  account_role: string;
+  account_status: number;
+  account_com_id: number;
+  company: {
+    com_name: string
+  }
 }
 
 export interface UpdateMemberStatusPayload {

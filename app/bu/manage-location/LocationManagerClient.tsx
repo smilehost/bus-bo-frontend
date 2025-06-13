@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import LocationTable from "@/app/components/Table/LocationTable";
+// import LocationTable from "@/app/components/Table/LocationTable";
 import LocationModal from "@/app/components/Model/LocationModal";
-import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
+// import SearchFilter from "@/app/components/SearchFilter/LocationSearchFilter";
 import SkeletonLocationTable from "@/app/components/Skeleton/SkeletonLocationTable";
 import { Confirm } from "@/app/components/Dialog/Confirm";
 import { Alert } from "@/app/components/Dialog/Alert";
@@ -57,13 +57,13 @@ function Page() {
   const [editingLocation, setEditingLocation] = useState<Location | undefined>(
     undefined
   );
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [isLoadingskeleton, setIsLoadingskeleton] = useState(false);
   const { isTH } = useLanguageContext();
   const text = getTextLocation({ isTH });
 
   const fetchLocations = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
     const cancelSkeleton = withSkeletonDelay(setIsLoadingskeleton);
     try {
       await getLocations(currentPage, rowsPerPage);
@@ -71,7 +71,7 @@ function Page() {
       console.error("Failed to load data", error);
     }
     cancelSkeleton();
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   const filterLocations = useCallback(() => {
@@ -151,7 +151,7 @@ function Page() {
       }
       setShowModal(false);
       fetchLocations();
-    } catch (error) {
+    } catch {
       await Alert({
         title: text.errorTitle,
         text: text.errorText,
@@ -179,7 +179,7 @@ function Page() {
         type: "success",
       });
       fetchLocations();
-    } catch (error) {
+    } catch  {
       await Alert({
         title: text.alertDeletedText,
         text: text.deleteErrorText,

@@ -30,7 +30,7 @@ import { statusOptions } from '@/constants/options';
 import TitlePage from '@/app/components/Title/TitlePage';
 
 ////icons
-import { Ticket, Trash2 } from "lucide-react";
+import { SquarePen, Ticket, Trash2 } from "lucide-react";
 import TableActionButton from '@/app/components/Table/TableActionButton/TableActionButton';
 import { getTextTicketPage, useLanguageContext } from '@/app/i18n/translations'
 import { ConfirmWithInput } from '@/app/components/Dialog/ConfirmWithInput';
@@ -85,10 +85,6 @@ function Page() {
     setCurrentPage(1);
   };
 
-  // useEffect(() => {
-  //   fetchTicketData();
-  // }, [currentPage, rowsPerPage]);
-
   // Function to create data for table
   const createData = (
     id: number,
@@ -135,25 +131,6 @@ function Page() {
     };
     fetchWithTicketCounts();
   }, [tickets]);
-
-  // Handle delete route
-  // const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
-  //   const isConfirmed = await Confirm({
-  //     title: `Delete "${ticketName}"?`,
-  //     text: `Are you sure you want to delete it.`,
-  //     confirmText: "Delete",
-  //     cancelText: "Cancel",
-  //   });
-  //   if (isConfirmed) {
-  //     const result = await deleteTicket(id);
-  //     if (result.success) {
-  //       fetchTicketData();
-  //       toast.success("delete ticket successfully!");
-  //     } else {
-  //       toast.error(`Error: ${result.message}`);
-  //     }
-  //   }
-  // };
 
   // Handle delete route ticket
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -290,11 +267,11 @@ function Page() {
       render: (_, row) => (
         <div className='flex justify-end gap-2 min-w-max'>
           <TableActionButton
-            icon={<Ticket className={`custom-size-tableAction-btn text-green-500`} />}
+            icon={<SquarePen className={`custom-size-tableAction-btn text-blue-500`} />}
             href={`${pathname}/edit?id=${row?.id}&name=${row?.ticketNameTH}`}
-            bgColor="text-green-600 bg-green-100"
-            hoverColor="hover:bg-green-200"
-            title={text.holdEdit}
+            bgColor="bg-blue-50 text-blue-600"
+            hoverColor="hover:bg-blue-100"
+             title={text.holdEdit}
           />
           <TableActionButton
             icon={<Trash2 className={`custom-size-tableAction-btn text-red-600`} />}

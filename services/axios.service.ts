@@ -1,7 +1,7 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
-const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
+// const CONTEXT_PATH = process.env.NEXT_PUBLIC_CONTEXT_PATH || "/bu";
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -10,18 +10,18 @@ const instance = axios.create({
   },
 });
 
-// ดึง com_id จาก localStorage
-function getComId(): string | null {
-  try {
-    const store = localStorage.getItem("token_bo");
-    if (!store) return null;
-    const parsed = JSON.parse(store);
-    return parsed?.state?.com_id?.toString() || null;
-  } catch (error) {
-    console.error("Failed to parse com_id from token_bo:", error);
-    return null;
-  }
-}
+// // ดึง com_id จาก localStorage
+// function getComId(): string | null {
+//   try {
+//     const store = localStorage.getItem("token_bo");
+//     if (!store) return null;
+//     const parsed = JSON.parse(store);
+//     return parsed?.state?.com_id?.toString() || null;
+//   } catch (error) {
+//     console.error("Failed to parse com_id from token_bo:", error);
+//     return null;
+//   }
+// }
 
 // Interceptor ก่อนส่ง request
 instance.interceptors.request.use((config) => {

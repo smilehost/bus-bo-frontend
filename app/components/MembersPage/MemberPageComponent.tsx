@@ -24,7 +24,7 @@ import { Eye, RotateCcwKey } from "lucide-react";
 import { getTextManageUserPage, useLanguageContext } from '@/app/i18n/translations';
 import FormFilter from "../Filter/FormFilter";
 import { statusOptions } from "@/constants/options";
-import { exportCSV } from "@/utils/exportCSV";
+// import { exportCSV } from "@/utils/exportCSV";
 
 export interface MemberTableData {
   no: number;

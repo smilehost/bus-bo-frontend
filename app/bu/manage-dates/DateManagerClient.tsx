@@ -24,7 +24,6 @@ import FormFilter from "@/app/components/Filter/FormFilter";
 import { FILTER } from "@/constants/enum";
 import { statusOptions } from "@/constants/options";
 import { Tooltip } from "@mui/material";
-import StatusText from "@/app/components/StatusText";
 
 type DateTableProps = {
   no: number;
@@ -217,7 +216,7 @@ export default function DateManagerClient() {
       }
       setShowModal(false);
       fetchDates();
-    } catch (error) {
+    } catch  {
       await Alert({
         title: text.errorTitle,
         text: text.errorTextSave,
@@ -244,7 +243,7 @@ export default function DateManagerClient() {
         type: "success",
       });
       fetchDates();
-    } catch (error) {
+    } catch  {
       await Alert({
         title: text.errorTitle,
         text: text.errorTextDelete,

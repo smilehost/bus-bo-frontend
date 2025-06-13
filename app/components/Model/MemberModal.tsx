@@ -106,7 +106,7 @@ function MemberModal({
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      const mapped = companies.map((com: any) => ({
+      const mapped = companies.map((com: CompanyItem) => ({
         value: com.id.toString(),
         label: com.name,
       }));
@@ -192,32 +192,32 @@ function MemberModal({
   };
 
   //handle  password
-  const [typePassword, setTypePassword] = useState<boolean>(true);
-  const [isCopy, setIsCopy] = useState<boolean>(false);
+  // const [typePassword, setTypePassword] = useState<boolean>(true);
+  // // const [isCopy, setIsCopy] = useState<boolean>(false);
 
-  //change type input in password
-  const handleOpenPassword = () => {
-    setTypePassword(!typePassword);
-    setIsCopy(false);
-  };
+  // // //change type input in password
+  // // const handleOpenPassword = () => {
+  // //   setTypePassword(!typePassword);
+  // //   setIsCopy(false);
+  // // };
 
-  //copy
-  const copyPassword = () => {
-    if (!password) return;
-    navigator.clipboard
-      .writeText(password)
-      .then(() => {
-        setIsCopy(true);
-      })
-      .catch((err) => {
-        console.error("Failed to copy password: ", err);
-      });
-  };
+  // // //copy
+  // // const copyPassword = () => {
+  // //   if (!password) return;
+  // //   navigator.clipboard
+  // //     .writeText(password)
+  // //     .then(() => {
+  // //       setIsCopy(true);
+  // //     })
+  // //     .catch((err) => {
+  // //       console.error("Failed to copy password: ", err);
+  // //     });
+  // // };
 
-  //check isCopy
-  useEffect(() => {
-    setIsCopy(false);
-  }, [password]);
+  // // //check isCopy
+  // // useEffect(() => {
+  // //   setIsCopy(false);
+  // // }, [password]);
 
   return (
     <Dialog open={open} onClose={onClose}>

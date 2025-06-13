@@ -39,9 +39,9 @@ export const useCompanyStore = create<CompanyStore>((set) => ({
         status: status || "",
       };
       const res = await CompanyService.fetchCompanies(query);
-      const rawData = (res as { result: any[] }).result || [];
+      const rawData = (res as { result: UpdateCompanyPayload[] }).result || [];
 
-      const mapped: CompanyItem[] = rawData.map((item: any) => ({
+      const mapped: CompanyItem[] = rawData.map((item: UpdateCompanyPayload) => ({
         id: item.com_id.toString(),
         name: item.com_name,
         prefix: item.com_prefix,
@@ -82,7 +82,7 @@ export const useCompanyStore = create<CompanyStore>((set) => ({
   getCompanyById: async (id) => {
     try {
       const res = await CompanyService.fetchCompanyById(id);
-      const item = (res as { result: any }).result;
+      const item = (res as { result: UpdateCompanyPayload }).result;
       return {
         id: item.com_id.toString(),
         name: item.com_name,

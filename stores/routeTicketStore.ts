@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { Ticket, TicketProps } from '@/types/types';
 
 import { RouteTicketService } from '@/services/route.ticket.service';
-import { CreateRouteTicketPayload, UpdateRouteTicketPayload } from '@/payloads/route.ticket.payload';
+import { CreateRouteTicketPayload, RoutePriceTicket, UpdateRouteTicketPayload } from '@/payloads/route.ticket.payload';
 
 
 type TicketStore = {
@@ -41,7 +41,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
                 size,
                 search,
                 status
-            }) as { result: any };
+            }) as { result: { data: UpdateRouteTicketPayload[]; page: number; size: number; total: number; totalPages: number } };
 
             const rawData = res.result.data as UpdateRouteTicketPayload[];
 
@@ -83,13 +83,16 @@ export const useTicketStore = create<TicketStore>((set) => ({
     ): Promise<{ success: boolean; message?: string }> => {
         try {
             const payload: CreateRouteTicketPayload = newTicket;
-
-            // console.log("From API: ",payload)
             await RouteTicketService.createTicket(payload);
             return { success: true };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("create route error:", error);
-            return { success: false, message: (error as any)?.message || "Unknown error" };
+
+            let errorMessage = "Unknown error";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            return { success: false, message: errorMessage };
         }
     },
 
@@ -109,11 +112,17 @@ export const useTicketStore = create<TicketStore>((set) => ({
             }));
 
             return { success: true };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("update route error:", error);
+
+            let errorMessage = "Unknown error during update";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+
             return {
                 success: false,
-                message: (error as any)?.message || "Unknown error during update",
+                message: errorMessage,
             };
         }
     },
@@ -131,34 +140,39 @@ export const useTicketStore = create<TicketStore>((set) => ({
                 ),
             }));
             return { success: true };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("updateTicketStatus error:", error);
             return {
                 success: false,
-                message: (error as any)?.message || "Unknown error during update",
+                message: error instanceof Error ? error.message : "Unknown error during update",
             };
         }
     },
 
     // ฟังก์ชันการลบข้อมูล
-    deleteTicket: async (id): Promise<{ success: boolean; message?: string }> => {
+    deleteTicket: async (id: number): Promise<{ success: boolean; message?: string }> => {
         try {
             await RouteTicketService.deleteTicket(id);
             return { success: true };
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("delete ticket error:", error);
-            return { success: false, message: (error as any)?.message || "Unknown error" };
+
+            let errorMessage = "Unknown error";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            return { success: false, message: errorMessage };
         }
     },
 
     getTicketById: async (id: number): Promise<TicketProps | undefined> => {
         try {
-            const res = await RouteTicketService.getTicketById(id) as { route_ticket: any; route_ticket_price: any };
+            const res = await RouteTicketService.getTicketById(id) as { route_ticket: UpdateRouteTicketPayload; route_ticket_price: RoutePriceTicket[] };
             const ticket = res.route_ticket;
             const price = res.route_ticket_price;
 
             const merged: TicketProps = {
-                id: ticket.route_ticket_id.toString(),
+                id: ticket.route_ticket_id?.toString(),
                 ticketName_th: ticket.route_ticket_name_th,
                 ticketName_en: ticket.route_ticket_name_en,
                 ticket_type: ticket.route_ticket_type,
@@ -166,7 +180,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
                 ticket_color: ticket.route_ticket_color,
                 ticket_status: ticket.route_ticket_status,
                 route_id: ticket.route_ticket_route_id.toString(),
-                ticket_price: price?.map((priceItem: any) => ({
+                ticket_price: price?.map((priceItem: RoutePriceTicket) => ({
                     id: priceItem.route_ticket_price_id,
                     from: priceItem.route_ticket_location_start?.toString(),
                     to: priceItem.route_ticket_location_stop?.toString(),
@@ -185,7 +199,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
 
     getTicketByRouteId: async (id: number): Promise<TicketProps[] | undefined> => {
         try {
-            const res = await RouteTicketService.getTicketByRoute(id) as { result: any[] };
+            const res = await RouteTicketService.getTicketByRoute(id) as { result: UpdateRouteTicketPayload[] };
 
             const mappedTickets: TicketProps[] = res.result.map((ticket) => ({
                 id: ticket.route_ticket_id?.toString(),
@@ -198,7 +212,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
                 route_id: ticket.route_ticket_route_id?.toString(),
 
                 // ✅ map ticket_price ให้มีโครงสร้างที่ต้องการ
-                ticket_price: ticket.route_ticket_price?.map((priceItem: any) => ({
+                ticket_price: ticket.route_ticket_price?.map((priceItem: RoutePriceTicket) => ({
                     id: priceItem.route_ticket_price_id,
                     from: priceItem.route_ticket_location_start?.toString(),
                     to: priceItem.route_ticket_location_stop?.toString(),
