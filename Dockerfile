@@ -1,32 +1,54 @@
-# base image
-FROM node:20-alpine
+# =============================
+# 🔨 BUILD STAGE (เร็ว + แยก dev dep)
+# =============================
+FROM node:20-alpine AS builder
 
-# set working directory
 WORKDIR /app
 
-# set environment variables
+# set environment variables (placeholder ตามที่ขอ)
 ENV NODE_ENV=NODE_ENV
 ENV NEXT_PUBLIC_API_URL=NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_CONTEXT_PATH=NEXT_PUBLIC_CONTEXT_PATH
 ENV NEXT_PUBLIC_JWT_SECRET=NEXT_PUBLIC_JWT_SECRET
 
-# copy dependencies
+# copy only package files first (ใช้ layer cache ได้)
 COPY package*.json ./
 RUN npm install
 
 # copy source code
 COPY . .
 
+# build Next.js project
+RUN npm run build
+
+# =============================
+# 🚀 PRODUCTION STAGE (เล็ก เร็ว)
+# =============================
+FROM node:20-alpine
+
+WORKDIR /app
+
+# copy env placeholders (ตามเงื่อนไข)
+ENV NODE_ENV=NODE_ENV
+ENV NEXT_PUBLIC_API_URL=NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_CONTEXT_PATH=NEXT_PUBLIC_CONTEXT_PATH
+ENV NEXT_PUBLIC_JWT_SECRET=NEXT_PUBLIC_JWT_SECRET
+
+# copy built app only
+COPY --from=builder /app/.next .next
+COPY --from=builder /app/public public
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
+
+# install only production deps
+RUN npm install --omit=dev
+
+# copy entrypoint
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh && \
     dos2unix /usr/bin/entrypoint.sh  #make docker can build on windows
 ENTRYPOINT ["entrypoint.sh"]
 
-# build Next.js
-RUN npm run build
-
 EXPOSE 3000
 
-
-# run in production
 CMD ["npm", "run", "start"]
