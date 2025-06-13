@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-// import TimeTable from "@/app/components/Table/TimeTable";
 import TimeModal from "@/app/components/Model/TimeModal";
 import { useTimeStore } from "@/stores/timeStore";
 import { debounce } from "@/utils/debounce";
@@ -285,14 +284,6 @@ function Page() {
             placeholderSearch={text.search}
             search={searchTerm}
           />
-          {/* <SearchFilter
-            searchTerm={searchTerm}
-            setSearchTerm={(value: string) =>
-              handleSearchChange({
-                target: { value },
-              } as React.ChangeEvent<HTMLInputElement>)
-            }
-          /> */}
           {isLoadingskeleton ? (
             <SkeletonManageTime rows={5} />
           ) : (

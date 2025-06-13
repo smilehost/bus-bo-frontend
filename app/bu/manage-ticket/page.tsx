@@ -85,10 +85,6 @@ function Page() {
     setCurrentPage(1);
   };
 
-  // useEffect(() => {
-  //   fetchTicketData();
-  // }, [currentPage, rowsPerPage]);
-
   // Function to create data for table
   const createData = (
     id: number,
@@ -135,25 +131,6 @@ function Page() {
     };
     fetchWithTicketCounts();
   }, [tickets]);
-
-  // Handle delete route
-  // const handleDeleteRoute = async ({ ticketName, id }: { ticketName: string, id: number }) => {
-  //   const isConfirmed = await Confirm({
-  //     title: `Delete "${ticketName}"?`,
-  //     text: `Are you sure you want to delete it.`,
-  //     confirmText: "Delete",
-  //     cancelText: "Cancel",
-  //   });
-  //   if (isConfirmed) {
-  //     const result = await deleteTicket(id);
-  //     if (result.success) {
-  //       fetchTicketData();
-  //       toast.success("delete ticket successfully!");
-  //     } else {
-  //       toast.error(`Error: ${result.message}`);
-  //     }
-  //   }
-  // };
 
   // Handle delete route ticket
   const [confirmOpen, setConfirmOpen] = useState(false);

@@ -130,8 +130,6 @@ export default function RootLayout({
     }))
     .filter((group) => group.items.length > 0);
 
-  // const MenuList = React.memo(function MenuList({ menu }: { menu: MenuItem[] })
-
   //auth redirectAdd commentMore actions
   useAuthGuard({ account_role, roleMenu, pathname, allMenu });
 
